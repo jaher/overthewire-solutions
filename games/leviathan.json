@@ -1,0 +1,24 @@
+{
+ "title": "Leviathan",
+ "host": "leviathan.labs.overthewire.org:2223",
+ "levels": [
+  {
+   "lvl": 0,
+   "user": "leviathan0",
+   "cmds": [
+    [
+     "ssh -p 2223 leviathan0@leviathan.labs.overthewire.org",
+     "ls -la ~/.backup",
+     "grep -i password ~/.backup/bookmarks.html"
+    ]
+   ],
+   "out": [
+    "\u2026the password for leviathan1 is PiXaSWQqHq\u2026"
+   ],
+   "pw": "PiXaSWQqHq"
+  }
+ ],
+ "goals": {
+  "0": "Your home directory holds a hidden backup of an old bookmarks file \u2014 read it closely."
+ }
+}
