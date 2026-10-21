@@ -40,6 +40,7 @@
   <h1>OverTheWire: Bandit — the full run</h1>
   <div class="sub">Every level (0–33) solved from a DGX Spark (“DGX 5”), replayed in a shell — watch it type, or jump to a level. Passwords are the game's own level passwords. Full writeup in the <a href="https://github.com/jaher/overthewire-solutions">repo</a>.</div>
 
+  <div id="nowPlaying" style="font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--green);font-size:20px;font-weight:700;letter-spacing:1px;margin:14px 0 6px;">—</div>
   <div class="term" id="term" aria-label="terminal replay"></div>
 
   <div class="bar">
@@ -169,19 +170,20 @@ async function loadManifest(){
 }
 loadManifest();
 
-let playing = true, timer = null, cur = 0;
+let playing = true, timer = null, cur = 0, runId = 0;
 const speed = () => parseFloat(speedSel.value);
 function sleep(ms){ return new Promise(r => { const iv = setInterval(() => { if (playing) { clearInterval(iv); r(); } }, 60); setTimeout(() => {}, 0); }); }
 function delay(ms){ return new Promise(r => { let t = 0; const iv = setInterval(() => { if (playing) { t += 50; if (t >= ms) { clearInterval(iv); r(); } } }, 50); }); }
 function line(html, cls){ const d = document.createElement('div'); if (cls) d.className = cls; d.innerHTML = html; term.appendChild(d); term.scrollTop = term.scrollHeight; return d; }
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
-async function typeCmd(user, cmd){
+async function typeCmd(user, cmd, my){
   const d = line('<span class="prompt"></span><span class="cmd"></span><span class="cursor"></span>');
-  d.querySelector('.prompt').textContent = user + '@bandit:~$ ';
+  d.querySelector('.prompt').textContent = user + '@' + (gameKey === 'bandit' ? 'bandit' : 'dgx5') + ':~$ ';
   const span = d.querySelector('.cmd');
   for (let i = 0; i < cmd.length; i++){
-    while (!playing) await sleep(80);
+    if (my !== runId) return;
+    while (!playing) { await sleep(80); if (my !== runId) return; }
     span.textContent += cmd[i];
     term.scrollTop = term.scrollHeight;
     await delay((28 + Math.random() * 85) * speed());
@@ -194,7 +196,10 @@ async function typeCmd(user, cmd){
 async function playLevel(idx){
   const G = curGame();
   const L = G.levels[idx]; if (!L) return;
+  const my = ++runId;
   cur = idx;
+  document.getElementById('nowPlaying').textContent = G.title.toUpperCase() + ' — LEVEL ' + L.lvl;
+  document.title = G.title + ' Level ' + L.lvl + ' — OverTheWire solutions';
   term.innerHTML = '';
   jump.value = L.lvl;
   fill.style.width = (idx / (G.levels.length - 1) * 100) + '%';
@@ -205,21 +210,23 @@ async function playLevel(idx){
   await delay(500 * speed());
   for (const group of L.cmds){
     for (const c of group){
+      if (my !== runId) return;
       if (c.startsWith('#')) { line('<span class="note">' + esc(c) + '</span>', 'note'); await delay(420 * speed()); }
-      else await typeCmd(L.user, c);
+      else await typeCmd(L.user, c, my);
     }
   }
-  for (const o of (L.out || [])) { line(esc(o), 'out'); await delay(160 * speed()); }
+  for (const o of (L.out || [])) { if (my !== runId) return; line(esc(o), 'out'); await delay(160 * speed()); }
   if (L.pw) { line('The password is <span class="pw">' + L.pw + '</span>', 'out'); }
   if (L.note) { line('<span class="note">' + esc(L.note) + '</span>', 'note'); }
   line('');
   await delay(1400 * speed());
+  if (my !== runId) return;
   if (idx + 1 < curGame().levels.length && playing) playLevel(idx + 1);
   else if (idx + 1 >= curGame().levels.length) { statusEl.textContent = curGame().title + ' complete — all levels'; }
 }
 playBtn.onclick = () => { playing = !playing; playBtn.textContent = playing ? '⏸ Pause' : '▶ Play'; };
 document.getElementById('restartBtn').onclick = () => { playing = true; playBtn.textContent = '⏸ Pause'; playLevel(cur); };
-jump.onchange = () => { playing = true; playBtn.textContent = '⏸ Pause'; playLevel(parseInt(jump.value, 10)); };
+jump.onchange = () => { playing = true; playBtn.textContent = '⏸ Pause'; const ix = curGame().levels.findIndex(x => x.lvl === parseInt(jump.value, 10)); playLevel(ix < 0 ? 0 : ix); };
 playLevel(0);
 </script>
 </body>
