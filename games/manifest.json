@@ -4,6 +4,21 @@
    "key": "natas",
    "title": "Natas",
    "host": "natas.labs.overthewire.org"
+  },
+  {
+   "key": "manpage",
+   "title": "Manpage",
+   "host": "manpage.labs.overthewire.org"
+  },
+  {
+   "key": "maze",
+   "title": "Maze",
+   "host": "maze.labs.overthewire.org"
+  },
+  {
+   "key": "narnia",
+   "title": "Narnia",
+   "host": "narnia.labs.overthewire.org"
   }
  ]
 }
