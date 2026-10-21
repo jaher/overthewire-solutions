@@ -1,3 +1,9 @@
 {
-  "games": []
+ "games": [
+  {
+   "key": "natas",
+   "title": "Natas",
+   "host": "natas.labs.overthewire.org"
+  }
+ ]
 }
