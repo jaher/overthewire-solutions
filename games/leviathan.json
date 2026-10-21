@@ -16,9 +16,27 @@
     "\u2026the password for leviathan1 is PiXaSWQqHq\u2026"
    ],
    "pw": "PiXaSWQqHq"
+  },
+  {
+   "lvl": 1,
+   "user": "leviathan1",
+   "cmds": [
+    [
+     "ssh -p 2223 leviathan1@leviathan.labs.overthewire.org",
+     "ltrace ./check",
+     "# strcmp(\"tes\", \"sex\") \u2014 the binary compares against a hardcoded string",
+     "echo sex | ./check   # drops into a leviathan2 shell",
+     "cat /etc/leviathan_pass/leviathan2"
+    ]
+   ],
+   "out": [
+    "strcmp(\"tes\", \"sex\")"
+   ],
+   "pw": "ERJ9jTYWXE"
   }
  ],
  "goals": {
-  "0": "Your home directory holds a hidden backup of an old bookmarks file \u2014 read it closely."
+  "0": "Your home directory holds a hidden backup of an old bookmarks file \u2014 read it closely.",
+  "1": "A setuid 'check' program gates the next shell behind a password \u2014 watch its library calls and it will tell you the password itself."
  }
 }

