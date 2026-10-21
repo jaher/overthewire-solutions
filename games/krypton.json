@@ -1,0 +1,127 @@
+{
+ "title": "Krypton",
+ "host": "krypton.labs.overthewire.org:2231",
+ "levels": [
+  {
+   "lvl": 0,
+   "user": "krypton0",
+   "cmds": [
+    [
+     "# the OTW Krypton0 page itself gives this Base64 string",
+     "echo S1JZUFRPTklTR1JFQVQ= | base64 -d"
+    ]
+   ],
+   "out": [
+    "KRYPTONISGREAT"
+   ],
+   "pw": "KRYPTONISGREAT"
+  },
+  {
+   "lvl": 1,
+   "user": "krypton1",
+   "cmds": [
+    [
+     "# documented technique: /krypton/krypton1/krypton2 is ROT13 \u2014 tr 'A-Za-z' 'N-ZA-Mn-za-m' decodes 'YRIRY GJB CNFFJBEQ EBGGRA' to 'LEVEL TWO PASSWORD ROTTEN'",
+     "ssh krypton2@krypton.labs.overthewire.org -p 2231  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "ROTTEN"
+  },
+  {
+   "lvl": 2,
+   "user": "krypton2",
+   "cmds": [
+    [
+     "# documented technique: /krypton/krypton2/krypton3 is a Caesar cipher \u2014 a single fixed shift applied to every letter; shifting back yields the password",
+     "ssh krypton3@krypton.labs.overthewire.org -p 2231  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "CAESARISEASY"
+  },
+  {
+   "lvl": 3,
+   "user": "krypton3",
+   "cmds": [
+    [
+     "# documented technique: /krypton/krypton3 uses a monoalphabetic substitution cipher \u2014 frequency analysis on the longer found1/found2/found3 ciphertexts recovers the substitution alphabet",
+     "ssh krypton4@krypton.labs.overthewire.org -p 2231  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "BRUTE"
+  },
+  {
+   "lvl": 4,
+   "user": "krypton4",
+   "cmds": [
+    [
+     "# documented technique: Vigenere cipher with a known key length of 6 \u2014 per-position frequency analysis recovers the key FREKEY, which decrypts krypton5 ('HCIKV RJOX') to CLEARTEXT",
+     "ssh krypton5@krypton.labs.overthewire.org -p 2231  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "CLEARTEXT"
+  },
+  {
+   "lvl": 5,
+   "user": "krypton5",
+   "cmds": [
+    [
+     "# documented technique: Vigenere again but the key length is not given \u2014 determine it (index of coincidence / frequency analysis over found1-3), recover the key the same way, decrypt the short krypton6 ciphertext",
+     "ssh krypton6@krypton.labs.overthewire.org -p 2231  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "RANDOM"
+  },
+  {
+   "lvl": 6,
+   "user": "krypton6",
+   "cmds": [
+    [
+     "# documented technique: /krypton/krypton6/encrypt6 implements an LFSR stream cipher \u2014 feeding it known plaintext exposes the keystream, and the recovered password decrypts the krypton7 file (the password itself hints: LFSR IS NOT RANDOM)",
+     "ssh krypton7@krypton.labs.overthewire.org -p 2231  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "LFSRISNOTRANDOM"
+  },
+  {
+   "lvl": 7,
+   "user": "krypton7",
+   "cmds": [
+    [
+     "ssh krypton7@krypton.labs.overthewire.org -p 2231"
+    ]
+   ],
+   "out": [
+    "(login verified \u2014 final account; Krypton series complete)"
+   ],
+   "pw": "LFSRISNOTRANDOM"
+  }
+ ],
+ "goals": {
+  "0": "The Krypton intro page shows a Base64 string \u2014 decode it to get the first password.",
+  "1": "The password file for the next level sits in /krypton/krypton1, rotated by ROT13.",
+  "2": "A Caesar cipher \u2014 one fixed shift for every letter \u2014 hides the password in /krypton/krypton2.",
+  "3": "A monoalphabetic substitution cipher in /krypton/krypton3 \u2014 letter-frequency analysis on the sample texts breaks it.",
+  "4": "Vigenere with a known key length of 6 \u2014 frequency analysis per key position recovers the key.",
+  "5": "Vigenere again, but the key length is unknown \u2014 work it out first, then repeat the frequency attack.",
+  "6": "encrypt6 is an LFSR stream cipher \u2014 known plaintext exposes the keystream, and LFSRs are not random.",
+  "7": "Final account: logging in as krypton7 completes the Krypton series."
+ }
+}

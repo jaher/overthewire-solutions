@@ -39,6 +39,11 @@
    "key": "leviathan",
    "title": "Leviathan",
    "host": "leviathan.labs.overthewire.org"
+  },
+  {
+   "key": "krypton",
+   "title": "Krypton",
+   "host": "krypton.labs.overthewire.org"
   }
  ]
 }
