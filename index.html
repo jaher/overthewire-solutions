@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OverTheWire: Bandit — solved live from DGX 5</title>
+<style>
+  :root { --green:#33ff66; --dim:#1fae4a; --bg:#050805; --panel:#0a0f0a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--green);
+         font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; }
+  .sub { color: var(--dim); font-size: 13px; margin-bottom: 16px; }
+  .term { background:#000; border:1px solid #14532d; border-radius:8px;
+          box-shadow: 0 0 24px rgba(51,255,102,.12), inset 0 0 60px rgba(51,255,102,.04);
+          padding: 14px 16px; height: 62vh; min-height: 380px; overflow-y: auto;
+          font-size: 14px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
+  .term .prompt { color:#7dff9e; }
+  .term .out { color:#b6ffc7; }
+  .term .pw { color:#eaffea; background:rgba(51,255,102,.14); padding:0 3px; border-radius:3px; }
+  .term .note { color:var(--dim); font-style: italic; }
+  .cursor { display:inline-block; width:9px; height:1.05em; background:var(--green);
+            vertical-align:text-bottom; animation: blink 0.9s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:14px 0 8px; }
+  button, select { background:var(--panel); color:var(--green); border:1px solid var(--dim);
+                   border-radius:6px; padding:6px 12px; font:inherit; font-size:13px; cursor:pointer; }
+  button:hover, select:hover { background:#0f1f0f; }
+  .lvl { color:var(--dim); font-size:13px; }
+  .progress { height:6px; background:#0f1f0f; border-radius:3px; overflow:hidden; margin-top:6px; }
+  .progress > div { height:100%; background:var(--green); width:0%; transition: width .3s; }
+  a { color:#7dff9e; }
+  footer { color:var(--dim); font-size:12px; margin-top:18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>OverTheWire: Bandit — the full run</h1>
+  <div class="sub">Every level (0–33) solved from a DGX Spark (“DGX 5”), replayed in a shell — watch it type, or jump to a level. Passwords are the game's own level passwords. Full writeup in the <a href="https://github.com/jaher/overthewire-solutions">repo</a>.</div>
+
+  <div class="term" id="term" aria-label="terminal replay"></div>
+
+  <div class="bar">
+    <button id="playBtn">⏸ Pause</button>
+    <button id="restartBtn">⟲ Restart level</button>
+    <label class="lvl">Speed
+      <select id="speed">
+        <option value="2">0.5×</option>
+        <option value="1" selected>1×</option>
+        <option value="0.45">2×</option>
+        <option value="0.15">4×</option>
+      </select>
+    </label>
+    <label class="lvl">Level
+      <select id="jump"></select>
+    </label>
+    <span class="lvl" id="status"></span>
+  </div>
+  <div class="progress"><div id="fill"></div></div>
+
+  <footer>Reconstructed from the actual solving session on DGX 5 (2026-10-20). Commands are the real ones used; long outputs are trimmed for the replay.</footer>
+</div>
+<script>
+const LEVELS = [
+{lvl:0, user:"bandit0", cmds:[["cat readme"]], out:["The password you are looking for is:"], pw:"6y2kwnwK6grgvwvpvLaa2T1cpFEKOhNR"},
+{lvl:1, user:"bandit1", cmds:[["ls"],["cat ./-"]], out:["-  spaces in this filename  readme"], pw:"PK8fYLZg2hnHSz83plBL1iEPKdD3QToB"},
+{lvl:2, user:"bandit2", cmds:[["cat \"./--spaces in this filename--\""]], out:[], pw:"7ZZ2LFrykP2zEyvBl4m3clcL7tGYJPME"},
+{lvl:3, user:"bandit3", cmds:[["ls -la inhere/"],["cat inhere/...Hiding-From-You"]], out:["...Hiding-From-You"], pw:"xzTXq1rDJQVVAzdv5cHq1TQytTWufAMq"},
+{lvl:4, user:"bandit4", cmds:[["file inhere/*"],["cat inhere/-file07"]], out:["inhere/-file07: ASCII text  (the only human-readable one)"], pw:"6C7h9GD8M6ai5nr7wo1RonrzFjj9yIrG"},
+{lvl:5, user:"bandit5", cmds:[["find inhere -type f -size 1033c ! -executable"],["cat inhere/maybehere07/.file2"]], out:["inhere/maybehere07/.file2"], pw:"pXa26xhMWaC2SvDotA4r9EgZkulOeSBW"},
+{lvl:6, user:"bandit6", cmds:[["find / -user bandit7 -group bandit6 -size 33c 2>/dev/null"],["cat /var/lib/dpkg/info/bandit7.password"]], out:["/var/lib/dpkg/info/bandit7.password"], pw:"Bmnnvf82KzQlfxgAI2d1zYbr1u9pr3E3"},
+{lvl:7, user:"bandit7", cmds:[["grep millionth data.txt"]], out:["millionth"], pw:"VR1ljMayciFxbnUokuQmJFw6QC9VKtub"},
+{lvl:8, user:"bandit8", cmds:[["sort data.txt | uniq -u"]], out:["(the only line that occurs once)"], pw:"EjmOSvuAu7sGAHqHVcBDPirRe9T03kxl"},
+{lvl:9, user:"bandit9", cmds:[["strings data.txt | grep \"===\""]], out:["========== the password is"], pw:"B0s2khmbT9u0geKuOoVGW3JZKhndE3BG"},
+{lvl:10, user:"bandit10", cmds:[["base64 -d data.txt"]], out:["The password is"], pw:"pYfOY6HwUsDj5rL9UvyhU7MCmv8vN5Ro"},
+{lvl:11, user:"bandit11", cmds:[["cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'"]], out:["The password is (ROT13)"], pw:"GROozWPO8QyN0mGrjUkID0WCYkZiQxrN"},
+{lvl:12, user:"bandit12", cmds:[["xxd -r data.txt > data.bin"],["# data.bin is gzip… then bzip2… then tar… peel each layer by `file`","for i in $(seq 1 8); do f=$(ls data.*); case $(file -b $f) in *gzip*) gzip -dc $f > next;; *bzip2*) bzip2 -dc $f > next;; *tar*) tar -xOf $f > next;; *) break;; esac; mv next data.bin; done","cat data.bin"]], out:["The password is"], pw:"qQYQiHOBPR8zR61qxYqX45quvihF2uzk"},
+{lvl:13, user:"bandit13", cmds:[["ls"],["# sshkey.private — log in as bandit14 with the key","ssh -i sshkey.private bandit14@localhost -p 2220"],["cat /etc/bandit_pass/bandit14"]], out:["sshkey.private"], pw:"aaWecNkG4FhxJQxz07uiwzVP6bJiYS65"},
+{lvl:14, user:"bandit14", cmds:[["echo pYfOY6HwUsDj5rL9UvyhU7MCmv8vN5Ro | nc -q 2 localhost 30000"]], out:["Correct!"], pw:"pbLYuZtTg4MgaqfJx8jbA9gKKGqM68A7", note:"(the daemon checks the current level's password and hands back the next)"},
+{lvl:15, user:"bandit15", cmds:[["echo pbLYuZtTg4MgaqfJx8jbA9gKKGqM68A7 | openssl s_client -connect localhost:30001 -quiet"]], out:["Correct!"], pw:"kS0Hf0u5HiXFwKMKFqXvPdOTNGGa0X8V", note:"(same idea, over SSL)"},
+{lvl:16, user:"bandit16", cmds:[["nmap -p 31000-32000 localhost"],["# decoy echo ports everywhere — the real one speaks SSL on 31790","echo kS0Hf0u5HiXFwKMKFqXvPdOTNGGa0X8V | openssl s_client -connect localhost:31790 -quiet"],["# it returns an SSH private key for bandit17 — save it, chmod 600","ssh -i bandit17.key bandit17@localhost -p 2220"],["cat /etc/bandit_pass/bandit17"]], out:["31790/tcp open  ssl/unknown"], pw:"pWXMAZoxGC8JmDMfmT5MGEsobMM3vnj2"},
+{lvl:17, user:"bandit17", cmds:[["diff passwords.old passwords.new"]], out:["(one line changed — the new value is the password)"], pw:"OQxXZjELndr90zuhOTDYBEomI0SZITXI"},
+{lvl:18, user:"bandit18", cmds:[["# interactive login logs straight out — .bashrc does it","ssh bandit18@bandit.labs.overthewire.org -p 2220 'cat ~/readme'"]], out:[], pw:"KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI", note:"(run the command over ssh instead of opening a shell)"},
+{lvl:19, user:"bandit19", cmds:[["./bandit20-do cat /etc/bandit_pass/bandit20"]], out:[], pw:"4pIjcunZ0fK2vmp3IwfG8Vf7VhxD6pOA", note:"(setuid binary runs the command as bandit20)"},
+{lvl:20, user:"bandit20", cmds:[["{ echo 4pIjcunZ0fK2vmp3IwfG8Vf7VhxD6pOA; sleep 3; } | nc -l -p 4000 &"],["./suconnect 4000"]], out:["Password matches, sending next password"], pw:"bW9kBv5WC3P4yoDyf12LSdGuNz5ka6hY"},
+{lvl:21, user:"bandit21", cmds:[["cat /etc/cron.d/cronjob_bandit22"],["cat /usr/bin/cronjob_bandit22.sh"],["# it copies the password to /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv every minute","cat /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv"]], out:["* * * * * bandit22 /usr/bin/cronjob_bandit22.sh"], pw:"RYVux2rHEm9tiXHmLFzuR7Vhx6AZQMEz"},
+{lvl:22, user:"bandit22", cmds:[["cat /usr/bin/cronjob_bandit23.sh"],["# target file is /tmp/$(echo I am user bandit23 | md5sum | cut -d' ' -f1)","echo I am user bandit23 | md5sum"],["cat /tmp/8ca319486bfbbc3663ea0fbe81326349"]], out:["8ca319486bfbbc3663ea0fbe81326349"], pw:"gKXDTAXnIz3OBxiPjRZ2uqutUlPZrBsw"},
+{lvl:23, user:"bandit23", cmds:[["cat /etc/cron.d/cronjob_bandit24"],["# cronjob_bandit24.sh runs every script dropped in /var/spool/bandit24/foo as bandit24","echo 'cat /etc/bandit_pass/bandit24 > /tmp/b23out' > /var/spool/bandit24/foo/grab.sh"],["chmod +x /var/spool/bandit24/foo/grab.sh"],["sleep 60; cat /tmp/b23out"]], out:[], pw:"hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv"},
+{lvl:24, user:"bandit24", cmds:[["# a daemon on localhost:30002 wants the password + a 4-digit PIN","for i in $(seq -w 0 9999); do echo \"hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv $i\"; done | nc localhost 30002 | grep -v Wrong"]], out:["Correct! The password for bandit25 is"], pw:"SoHfqMOEqIX2IYKVciZxvgpR9a2Djx4P", note:"(all 10,000 PINs, filtered)"},
+{lvl:25, user:"bandit25", cmds:[["ls"],["# bandit26.sshkey — but bandit26's shell is /usr/bin/showtext: `more ~/text.txt`, then logout","# shrink the terminal to 3 rows so `more` still paginates on the short text…","# inside more press:  v        (opens vi)","# in vi:            :set shell=/bin/bash","# then:             :shell","cat /etc/bandit_pass/bandit26"]], out:["bandit26.sshkey"], pw:"jHdv2ELQhT22BkprMNDjybZDAkw1zeBJ"},
+{lvl:26, user:"bandit26", cmds:[["# same showtext → more → v → vi → :shell break-out to get a real shell","./bandit27-do cat /etc/bandit_pass/bandit27"]], out:[], pw:"STJLJBRRphMxKB392CT4iOr5CbzPU9ER"},
+{lvl:27, user:"bandit27", cmds:[["git clone ssh://bandit27-git@bandit.labs.overthewire.org:2220/home/bandit27-git/repo"],["cat repo/README.md"]], out:["The password for bandit28 is"], pw:"y8Yd2ssKcpHpud7UvOSOxwamRMzIGIeQ"},
+{lvl:28, user:"bandit28", cmds:[["git clone ssh://bandit28-git@bandit.labs.overthewire.org:2220/home/bandit28-git/repo"],["cd repo && git log --oneline"],["# HEAD's README is redacted ('fix info leak') — look at its parent","git show HEAD~1:README.md"]], out:["password for bandit29"], pw:"Em7eGtqaMySwNFjCpwzzHhLhospOcdt0"},
+{lvl:29, user:"bandit29", cmds:[["git clone ssh://bandit29-git@bandit.labs.overthewire.org:2220/home/bandit29-git/repo"],["cd repo && git branch -a"],["# 'no passwords in production' on master — check the dev branch","git show origin/dev:README.md"]], out:["password for bandit30"], pw:"jq9Dfg2rXsfYsWMgFuKlXhphjdH7USgX"},
+{lvl:30, user:"bandit30", cmds:[["git clone ssh://bandit30-git@bandit.labs.overthewire.org:2220/home/bandit30-git/repo"],["cd repo && git tag"],["git show secret"]], out:["password for bandit31"], pw:"82NkymblpGBYmIXG6ZQ8YldBYstHpfUf"},
+{lvl:31, user:"bandit31", cmds:[["git clone ssh://bandit31-git@bandit.labs.overthewire.org:2220/home/bandit31-git/repo"],["cd repo"],["# README: push a file key.txt containing 'May I come in?' to master","echo 'May I come in?' > key.txt"],["git add -f key.txt   # .gitignore blocks *.txt, force it"],["git commit -m 'key' && git push origin master"]], out:["The password for bandit32 is"], pw:"pWuj5jBQ6IgV0NXwiH6g1pXRF8S1YvbT", note:"(the remote hook prints it while declining the push — exactly as designed)"},
+{lvl:32, user:"bandit32", cmds:[["# the login shell UPPERCASES every command before running it","$0"]], out:["(a fresh shell — $ and 0 have no case; it inherits euid bandit33)"], pw:"u4P2CyPOwPGLe94RdD9Uo2FxFwvnFswM", note:"then: cat /etc/bandit_pass/bandit33"},
+{lvl:33, user:"bandit33", cmds:[["cat ~/README.txt"]], out:["Congratulations on solving the last level of this game!"], pw:null, note:"bandit33 is the final level — there is no bandit34 account. Game complete."},
+];
+
+const term = document.getElementById('term');
+const playBtn = document.getElementById('playBtn');
+const statusEl = document.getElementById('status');
+const fill = document.getElementById('fill');
+const jump = document.getElementById('jump');
+const speedSel = document.getElementById('speed');
+LEVELS.forEach(L => { const o = document.createElement('option'); o.value = L.lvl; o.textContent = 'Level ' + L.lvl; jump.appendChild(o); });
+
+let playing = true, timer = null, cur = 0;
+const speed = () => parseFloat(speedSel.value);
+function sleep(ms){ return new Promise(r => { const iv = setInterval(() => { if (playing) { clearInterval(iv); r(); } }, 60); setTimeout(() => {}, 0); }); }
+function delay(ms){ return new Promise(r => { let t = 0; const iv = setInterval(() => { if (playing) { t += 50; if (t >= ms) { clearInterval(iv); r(); } } }, 50); }); }
+function line(html, cls){ const d = document.createElement('div'); if (cls) d.className = cls; d.innerHTML = html; term.appendChild(d); term.scrollTop = term.scrollHeight; return d; }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+async function typeCmd(user, cmd){
+  const d = line('<span class="prompt"></span><span class="cmd"></span><span class="cursor"></span>');
+  d.querySelector('.prompt').textContent = user + '@bandit:~$ ';
+  const span = d.querySelector('.cmd');
+  for (let i = 0; i < cmd.length; i++){
+    while (!playing) await sleep(80);
+    span.textContent += cmd[i];
+    term.scrollTop = term.scrollHeight;
+    await delay((28 + Math.random() * 85) * speed());
+    if (Math.random() < 0.06) await delay(260 * speed());
+  }
+  d.querySelector('.cursor').remove();
+  await delay(280 * speed());
+}
+
+async function playLevel(idx){
+  const L = LEVELS[idx]; if (!L) return;
+  cur = idx;
+  term.innerHTML = '';
+  jump.value = L.lvl;
+  fill.style.width = (idx / (LEVELS.length - 1) * 100) + '%';
+  statusEl.textContent = 'Level ' + L.lvl + ' / 33';
+  line('<span class="note">── ssh ' + L.user + '@bandit.labs.overthewire.org -p 2220 ──</span>', 'note');
+  await delay(500 * speed());
+  for (const group of L.cmds){
+    for (const c of group){
+      if (c.startsWith('#')) { line('<span class="note">' + esc(c) + '</span>', 'note'); await delay(420 * speed()); }
+      else await typeCmd(L.user, c);
+    }
+  }
+  for (const o of (L.out || [])) { line(esc(o), 'out'); await delay(160 * speed()); }
+  if (L.pw) { line('The password is <span class="pw">' + L.pw + '</span>', 'out'); }
+  if (L.note) { line('<span class="note">' + esc(L.note) + '</span>', 'note'); }
+  line('');
+  await delay(1400 * speed());
+  if (idx + 1 < LEVELS.length && playing) playLevel(idx + 1);
+  else if (idx + 1 >= LEVELS.length) { statusEl.textContent = 'Game complete — all 34 levels (0–33)'; }
+}
+playBtn.onclick = () => { playing = !playing; playBtn.textContent = playing ? '⏸ Pause' : '▶ Play'; };
+document.getElementById('restartBtn').onclick = () => { playing = true; playBtn.textContent = '⏸ Pause'; playLevel(cur); };
+jump.onchange = () => { playing = true; playBtn.textContent = '⏸ Pause'; playLevel(parseInt(jump.value, 10)); };
+playLevel(0);
+</script>
+</body>
+</html>
