@@ -20,6 +20,7 @@
   .term .out { color:#b6ffc7; }
   .term .pw { color:#eaffea; background:rgba(51,255,102,.14); padding:0 3px; border-radius:3px; }
   .term .note { color:var(--dim); font-style: italic; }
+  .term .goal { color:#eaffea; border:1px solid var(--dim); border-left:4px solid var(--green); background:rgba(51,255,102,.06); padding:8px 10px; margin:6px 0 12px; white-space:pre-wrap; }
   .cursor { display:inline-block; width:9px; height:1.05em; background:var(--green);
             vertical-align:text-bottom; animation: blink 0.9s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
@@ -99,6 +100,43 @@ const LEVELS = [
 {lvl:33, user:"bandit33", cmds:[["cat ~/README.txt"]], out:["Congratulations on solving the last level of this game!"], pw:null, note:"bandit33 is the final level — there is no bandit34 account. Game complete."},
 ];
 
+const GOALS = {
+0: 'Read the password stored in ~/readme.',
+1: "Read a file literally named '-' in the home directory.",
+2: 'Read a file whose name contains spaces (and leading dashes).',
+3: 'Find the hidden file inside the inhere directory.',
+4: 'Among many binary files in inhere, find the one human-readable file.',
+5: 'Find a file that is 1033 bytes, not executable, human-readable, somewhere under inhere.',
+6: 'Find a 33-byte file owned by user bandit7 and group bandit6, anywhere on the system.',
+7: "Find the password next to the word 'millionth' in data.txt.",
+8: 'Find the one line in data.txt that occurs only once.',
+9: "Find the password hidden in a binary file, in a human-readable string preceded by several '=' characters.",
+10: 'data.txt is base64-encoded; decode it.',
+11: 'data.txt is ROT13-encoded; rotate the letters back.',
+12: 'data.txt is a hexdump of a file compressed many times over (gzip / bzip2 / xz / tar layers).',
+13: 'The home directory contains a private SSH key (sshkey.private) for bandit14 instead of password data.',
+14: "Submit the current level's password to a daemon listening on localhost port 30000.",
+15: 'Same idea as 14, but the daemon on localhost port 30001 requires SSL.',
+16: 'Several services listen on localhost ports 31000-32000; most just echo input back. One (SSL) returns credentials for bandit17 when given the current password.',
+17: 'passwords.old and passwords.new differ in exactly one line; the new line is the next password.',
+18: "The password is in ~/readme, but bandit18's .bashrc logs you out immediately on interactive login.",
+19: 'Use the setuid binary bandit20-do in the home directory, which runs any command as bandit20.',
+20: 'The setuid binary suconnect connects to a TCP port on localhost; if it reads the current password from that port, it sends back the next password.',
+21: 'A cron job for bandit22 runs every minute; find where it leaves the password.',
+22: "Same pattern, but the cron script's output filename is an MD5 hash of a known string.",
+23: 'A cron job running as bandit24 executes every bandit23-owned script placed in /var/spool/bandit24/foo, then deletes it.',
+24: "A daemon on localhost gives out bandit25's password if given bandit24's password plus a secret 4-digit PIN - brute-force all 10,000 PINs.",
+25: "bandit25's home holds bandit26.sshkey, but bandit26's login shell is /usr/bin/showtext (more ~/text.txt) - escape it to a real shell.",
+26: "Use the setuid binary bandit27-do in bandit26's home.",
+27: 'Clone a git repository over SSH and read the password from it.',
+28: 'Same git setup; the README in HEAD has the password redacted, but history remembers.',
+29: 'Same git setup; production has no password, but another branch does.',
+30: 'Same git setup; look beyond commits and branches - at tags.',
+31: "Push a file to the remote repository: key.txt containing 'May I come in?' on branch master.",
+32: "bandit32's login shell is the setuid 'uppercase shell': it uppercases everything you type, so no normal command works.",
+33: "None left: logging in as bandit33, its ~/README.txt reads 'Congratulations on solving the last level of this game!' There is no bandit34 account. Game complete.",
+};
+
 const term = document.getElementById('term');
 const playBtn = document.getElementById('playBtn');
 const statusEl = document.getElementById('status');
@@ -136,6 +174,8 @@ async function playLevel(idx){
   jump.value = L.lvl;
   fill.style.width = (idx / (LEVELS.length - 1) * 100) + '%';
   statusEl.textContent = 'Level ' + L.lvl + ' / 33';
+  line('', '');
+  line('LEVEL ' + L.lvl + ' — PROBLEM STATEMENT\n' + (GOALS[L.lvl] || ''), 'goal');
   line('<span class="note">── ssh ' + L.user + '@bandit.labs.overthewire.org -p 2220 ──</span>', 'note');
   await delay(500 * speed());
   for (const group of L.cmds){
