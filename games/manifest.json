@@ -24,6 +24,16 @@
    "key": "behemoth",
    "title": "Behemoth",
    "host": "behemoth.labs.overthewire.org"
+  },
+  {
+   "key": "utumno",
+   "title": "Utumno",
+   "host": "utumno.labs.overthewire.org"
+  },
+  {
+   "key": "vortex",
+   "title": "Vortex",
+   "host": "vortex.labs.overthewire.org"
   }
  ]
 }
