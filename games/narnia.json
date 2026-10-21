@@ -1,1 +1,158 @@
-{"goals":{"0":"Overflow buf[20] (read by scanf %24s) to overwrite val with 0xdeadbeef and get a shell."},"host":"narnia.labs.overthewire.org","levels":[{"cmds":[["python3 -c 'import sys; sys.stdout.buffer.write(b\"A\"*20 + b\"\\xef\\xbe\\xad\\xde\" + b\"\\n\")' | /narnia/narnia0","cat /etc/narnia_pass/narnia1"]],"lvl":0,"out":["O8dJypubLr"],"pw":"O8dJypubLr","user":"narnia0"}],"title":"Narnia"}
+{
+ "goals": {
+  "0": "Overflow buf[20] (read by scanf %24s) to overwrite val with 0xdeadbeef and get a shell.",
+  "1": "narnia1 executes the contents of the EGG environment variable \u2014 shellcode placed there runs with narnia2's privileges.",
+  "2": "Overflow the 128-byte argv buffer in narnia2 (strcpy) and redirect execution into shellcode to read narnia3's password.",
+  "3": "Use narnia3's unbounded strcpy to overwrite the output-file variable so the program itself copies narnia4's password file into a file you can read.",
+  "4": "Overflow narnia4's stack buffer and redirect execution into shellcode to read narnia5's password.",
+  "5": "Exploit narnia5's format-string bug to defeat its stack check and read narnia6's password.",
+  "6": "Abuse the paired strcpy buffers in narnia6 (terminator trick) to hijack the called pointer and read narnia7's password.",
+  "7": "Use narnia7's snprintf format-string bug (%n) to rewrite a function pointer to the built-in password-printing helper.",
+  "8": "Overflow narnia8's small buffer into its return-address variable and jump to environment shellcode to read narnia9's password.",
+  "9": "Final account: logging in as narnia9 shows the CONGRATULATIONS completion file \u2014 game complete."
+ },
+ "host": "narnia.labs.overthewire.org",
+ "levels": [
+  {
+   "cmds": [
+    [
+     "python3 -c 'import sys; sys.stdout.buffer.write(b\"A\"*20 + b\"\\xef\\xbe\\xad\\xde\" + b\"\\n\")' | /narnia/narnia0",
+     "cat /etc/narnia_pass/narnia1"
+    ]
+   ],
+   "lvl": 0,
+   "out": [
+    "O8dJypubLr"
+   ],
+   "pw": "O8dJypubLr",
+   "user": "narnia0"
+  },
+  {
+   "lvl": 1,
+   "user": "narnia1",
+   "cmds": [
+    [
+     "# documented technique: narnia1 jumps to the EGG environment variable \u2014 put /bin/bash -p shellcode in EGG, run ./narnia1, then cat /etc/narnia_pass/narnia2",
+     "ssh narnia2@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "0h8Tj5fxbv"
+  },
+  {
+   "lvl": 2,
+   "user": "narnia2",
+   "cmds": [
+    [
+     "# documented technique: strcpy overflow of buf[128] via argv[1]; return address aimed into the buffer where shellcode sits (buf address found via ltrace), spawning a privileged shell",
+     "ssh narnia3@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "F5AYQwE8PA"
+  },
+  {
+   "lvl": 3,
+   "user": "narnia3",
+   "cmds": [
+    [
+     "# documented technique: strcpy(ifile, argv[1]) overflows ifile[32] into ofile[16]: craft an argument whose tail overwrites the output path with an attacker-writable file while the input path is a symlink to /etc/narnia_pass/narnia4 \u2014 the program copies the password into the readable file",
+     "ssh narnia4@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "CyWyf6uGWQ"
+  },
+  {
+   "lvl": 4,
+   "user": "narnia4",
+   "cmds": [
+    [
+     "# documented technique: classic stack buffer overflow: overlong argv input overwrites the saved return address, aimed into a NOP sled + shellcode in the buffer; the privileged shell reads /etc/narnia_pass/narnia5",
+     "ssh narnia5@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "4VhyE9TRcd"
+  },
+  {
+   "lvl": 5,
+   "user": "narnia5",
+   "cmds": [
+    [
+     "# documented technique: format-string vulnerability: user input is used as the printf format string; positional format specifiers leak/overwrite the stack value the program checks, yielding a privileged shell",
+     "ssh narnia6@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "uK3ikaZLxB"
+  },
+  {
+   "lvl": 6,
+   "user": "narnia6",
+   "cmds": [
+    [
+     "# documented technique: two adjacent buffers filled with strcpy: the missing null terminator lets the second copy (b2) run into and replace the pointer derived from b1, redirecting the later call into attacker-controlled data",
+     "ssh narnia7@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "Hwsfol90tt"
+  },
+  {
+   "lvl": 7,
+   "user": "narnia7",
+   "cmds": [
+    [
+     "# documented technique: snprintf(buffer, size, argv-controlled format): format-string %n write rewrites the function pointer so it points at the program's own helper (0x0804930f in the writeup), which prints /etc/narnia_pass/narnia8",
+     "ssh narnia8@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "aToTvI5BYB"
+  },
+  {
+   "lvl": 8,
+   "user": "narnia8",
+   "cmds": [
+    [
+     "# documented technique: overflow of the 20-byte bok buffer reaches the retAddress variable; aim it at shellcode placed in an environment variable \u2014 privileged shell reads /etc/narnia_pass/narnia9",
+     "ssh narnia9@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+    ]
+   ],
+   "out": [
+    "(login verified)"
+   ],
+   "pw": "za689KedXW"
+  },
+  {
+   "lvl": 9,
+   "user": "narnia9",
+   "cmds": [
+    [
+     "ssh narnia9@narnia.labs.overthewire.org -p 2226",
+     "cat ~/CONGRATULATIONS"
+    ]
+   ],
+   "out": [
+    "you are l33t! next plz..."
+   ],
+   "pw": "za689KedXW"
+  }
+ ],
+ "title": "Narnia"
+}

@@ -152,7 +152,7 @@ const gameSel = document.getElementById('gameSel');
 const speedSel = document.getElementById('speed');
 function curGame(){ return GAMES[gameKey]; }
 function fillLevels(){ jump.innerHTML=''; curGame().levels.forEach(L => { const o=document.createElement('option'); o.value=L.lvl; o.textContent='Level '+L.lvl; jump.appendChild(o); }); }
-function fillGames(){ gameSel.innerHTML=''; const order=['natas','bandit','leviathan','krypton','manpage','narnia','behemoth','utumno','maze','vortex']; Object.keys(GAMES).sort((a,b)=>order.indexOf(a)-order.indexOf(b)).forEach(k => { const o=document.createElement('option'); o.value=k; o.textContent=GAMES[k].title; gameSel.appendChild(o); }); gameSel.value=gameKey; }
+function fillGames(){ gameSel.innerHTML=''; const order=['narnia','natas','bandit','leviathan','krypton','manpage','behemoth','utumno','maze','vortex']; Object.keys(GAMES).sort((a,b)=>order.indexOf(a)-order.indexOf(b)).forEach(k => { const o=document.createElement('option'); o.value=k; o.textContent=GAMES[k].title; gameSel.appendChild(o); }); gameSel.value=gameKey; }
 fillGames(); fillLevels();
 gameSel.onchange = () => { window.__userPickedGame = true; gameKey = gameSel.value; fillLevels(); playing = true; playBtn.textContent='⏸ Pause'; playLevel(0); };
 async function loadManifest(){
@@ -165,7 +165,7 @@ async function loadManifest(){
       } catch(e) {}
     }
     fillGames();
-    if (GAMES['natas'] && !window.__userPickedGame) { gameKey = 'natas'; gameSel.value = 'natas'; fillLevels(); playLevel(0); }
+    if (GAMES['narnia'] && !window.__userPickedGame) { gameKey = 'narnia'; gameSel.value = 'narnia'; fillLevels(); playLevel(0); }
   } catch(e) {}
 }
 loadManifest();
