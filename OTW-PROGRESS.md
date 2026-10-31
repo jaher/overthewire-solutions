@@ -25,3 +25,4 @@ Bandit | L20 | nc listener + setuid suconnect password handshake | recordings/ba
 Bandit | L21 | read cron job script, grab password it writes to /tmp | recordings/bandit/L21.cast
 Bandit | L22 | reproduce md5 filename computed by cron script | recordings/bandit/L22.cast
 Bandit | L23 | drop executable script in bandit24 cron spool | recordings/bandit/L23.cast
+Bandit | L24 | brute-force 10,000 pincodes against nc daemon | recordings/bandit/L24.cast

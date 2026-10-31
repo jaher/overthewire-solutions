@@ -338,3 +338,17 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit24` with this password.
 - **Recording:** `recordings/bandit/L23.cast`
 
+## Level 24 → bandit25
+- **Account:** `bandit24`.
+- **Goal:** A daemon on `localhost:30002` gives out bandit25's password to whoever supplies bandit24's password plus a secret 4-digit PIN on one line.
+- **Technique and why it works:** The PIN space is only 10,000 values (`0000`–`9999`), so exhaustive search is trivial. The daemon reads one line per attempt on the same connection, so we generate all candidate lines up front (`seq -w 0 9999` zero-pads to 4 digits) and pipe them through a single `nc`. `grep -v Wrong` drops the rejection messages, leaving the greeting and the success line with the password.
+- **Commands:**
+  ```
+  echo hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv 0000 | nc -q 2 localhost 30002   # shows the protocol
+  for i in $(seq -w 0 9999); do echo "hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv $i"; done \
+    | nc -q 2 localhost 30002 | grep -v Wrong
+  ```
+- **Password for bandit25:** `SoHfqMOEqIX2IYKVciZxvgpR9a2Djx4P`
+- **Verification:** logged in as `bandit25` with this password.
+- **Recording:** `recordings/bandit/L24.cast`
+
