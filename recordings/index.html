@@ -95,7 +95,24 @@ const LEVELS = [
   ["Bandit",29,"git tag 'secret' holds the password"],
   ["Bandit",30,"force-add ignored key.txt, push; hook prints password"],
   ["Bandit",31,"$0 breaks the uppercase restricted shell"],
-  ["Bandit",32,"final level: README confirms game complete"]
+  ["Bandit",32,"final level: README confirms game complete"],
+  ["Natas",0,"password in HTML comment"],
+  ["Natas",1,"raw HTTP fetch bypasses right-click block"],
+  ["Natas",2,"open directory index + users.txt"],
+  ["Natas",3,"robots.txt leaks /s3cr3t/, open index"],
+  ["Natas",4,"spoof Referer header"],
+  ["Natas",5,"forge loggedin=1 cookie"],
+  ["Natas",6,"fetch included secret.inc"],
+  ["Natas",7,"page= LFI to /etc/natas_webpass"],
+  ["Natas",8,"reverse encodeSecret: hex->rev->base64"],
+  ["Natas",9,"command injection via passthru"],
+  ["Natas",10,"argument injection: grep extra file"],
+  ["Natas",11,"recover XOR key, forge cookie"],
+  ["Natas",12,"unrestricted upload as .php"],
+  ["Natas",13,"GIF89a polyglot bypasses exif_imagetype"],
+  ["Natas",14,"SQL injection OR 1=1"],
+  ["Natas",15,"blind SQLi binary search"],
+  ["Natas",16,"$(...) command substitution oracle, binary search"]
 ];
 
 const rows = document.getElementById('rows');
