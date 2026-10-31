@@ -56,3 +56,4 @@ Leviathan | L2 | printfile access()/cat split: symlink + space in name | recordi
 Natas | L16 | $(...) substitution oracle + binary search | recordings/natas/L16.cast
 Leviathan | L3 | setuid level3 accepts snlprintf, spawns shell | recordings/leviathan/L3.cast
 Leviathan | L4 | decode binary output of .trash/bin | recordings/leviathan/L4.cast
+Leviathan | L5 | symlink /tmp/file.log to leviathan6 password | recordings/leviathan/L5.cast

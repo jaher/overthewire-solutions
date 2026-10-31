@@ -83,3 +83,17 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `leviathan5` with this password.
 - **Recording:** `recordings/leviathan/L4.cast`
 
+## Level 5 → leviathan6
+- **Account:** `leviathan5`.
+- **Goal:** The setuid binary `leviathan5` (owned by leviathan6) reads a fixed file, `/tmp/file.log`, prints it, and deletes it. Use it to read leviathan6's password.
+- **Technique and why it works:** `strings` shows the hardcoded path `/tmp/file.log` and calls to `fopen`, `fgetc`, `putchar`, and `unlink`. The program opens that path with its own (leviathan6) privileges, prints the contents character by character, then unlinks it. Because `/tmp` is world-writable and the path is fixed, we can replace `/tmp/file.log` with a symlink to `/etc/leviathan_pass/leviathan6`; the setuid program follows the symlink, reads the protected password file, and prints it. The `unlink` then removes the symlink (which is why `ls` afterwards shows the file gone). This is a symlink-following bug in a privileged program operating on a world-writable path.
+- **Commands:**
+  ```
+  ssh leviathan5@leviathan.labs.overthewire.org -p 2223
+  ln -sf /etc/leviathan_pass/leviathan6 /tmp/file.log
+  ./leviathan5
+  ```
+- **Password for leviathan6:** `JRGj9iWNOb`
+- **Verification:** logged in as `leviathan6` with this password.
+- **Recording:** `recordings/leviathan/L5.cast`
+
