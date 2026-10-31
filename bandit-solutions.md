@@ -164,3 +164,24 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit12` with this password.
 - **Recording:** `recordings/bandit/L11.cast`
 
+## Level 12 → bandit13
+- **Account:** `bandit12`.
+- **Goal:** `data.txt` is a hexdump of a file that has been repeatedly compressed; recover the password from the innermost layer.
+- **Technique and why it works:** Each layer must be identified before it can be peeled. `xxd -r` reverses the hexdump into the first binary; `file -b` names each layer; `gzip -dc` / `bzip2 -dc` decompress; `tar -xf` extracts an archive. The chain here is gzip → bzip2 → gzip → tar → (data5.bin) tar → (data6.bin) bzip2 → tar → (data8.bin) gzip → plaintext. Compression tools key off content, not extensions, but `tar` is happier with an archive-looking name; each step is therefore renamed to its real type before use. Working in `/tmp` (world-writable, unlike the home directory) is needed because the home dir is read-only for this account.
+- **Commands:**
+  ```
+  mkdir -p /tmp/b12live && cd /tmp/b12live
+  xxd -r ~/data.txt > d1.bin
+  mv d1.bin d1.gz && gzip -dc d1.gz > d2.bin && file -b d2.bin
+  mv d2.bin d2.bz2 && bzip2 -dc d2.bz2 > d3.bin && file -b d3.bin
+  mv d3.bin d3.gz && gzip -dc d3.gz > d4.tar && file -b d4.tar
+  tar -xf d4.tar && tar -tf data5.bin
+  tar -xf data5.bin && file -b data6.bin
+  mv data6.bin d6.bz2 && bzip2 -dc d6.bz2 > d7.tar && tar -tf d7.tar
+  tar -xf d7.tar && file -b data8.bin
+  mv data8.bin d8.gz && gzip -dc d8.gz
+  ```
+- **Password for bandit13:** `qQYQiHOBPR8zR61qxYqX45quvihF2uzk`
+- **Verification:** logged in as `bandit13` with this password.
+- **Recording:** `recordings/bandit/L12.cast`
+
