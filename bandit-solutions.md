@@ -252,3 +252,15 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit18` with this password.
 - **Recording:** `recordings/bandit/L17.cast`
 
+## Level 18 → bandit19
+- **Account:** `bandit18`.
+- **Goal:** The password is in `readme`, but logging in interactively is immediately terminated.
+- **Technique and why it works:** bandit18's shell startup (`.bashrc`) logs the session out, so an interactive `ssh` dies before you can type anything. Running a command non-interactively makes ssh execute it directly and return its output without ever starting the interactive shell that would exit: `ssh host 'cat readme'`. No PTY is requested, so the logout hook never matters.
+- **Commands:**
+  ```
+  ssh bandit18@bandit.labs.overthewire.org -p 2220 'cat readme'
+  ```
+- **Password for bandit19:** `KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI`
+- **Verification:** logged in as `bandit19` with this password.
+- **Recording:** `recordings/bandit/L18.cast`
+
