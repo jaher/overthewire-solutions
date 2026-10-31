@@ -21,3 +21,15 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** fetched `http://natas1.natas.labs.overthewire.org/` with `natas1:<password>` and got the level-1 page (HTTP 200 with natas1 content), which also displays the same password in its wechall info.
 - **Recording:** `recordings/natas/L0.cast`
 
+## Level 1 → natas2
+- **Account:** `natas1`.
+- **Goal:** The password for natas2 is on the level-1 page, but right-clicking is blocked by the page's `oncontextmenu` handler.
+- **Technique and why it works:** The right-click block is a client-side JavaScript attribute on `<body>` — it only affects a browser's context menu, not the data. The password is in an HTML comment (`<!--The password for natas2 is ... -->`), and comments are part of the raw response, so fetching the page with curl and grepping the comment line retrieves it without needing a browser or defeating any server-side control.
+- **Commands:**
+  ```
+  curl -s -u natas1:<pw> http://natas1.natas.labs.overthewire.org/ | grep "natas2 is"
+  ```
+- **Password for natas2:** `vsDOxoXyq3wckCP1ZmTZ71ngIA606odB`
+- **Verification:** fetched `http://natas2.natas.labs.overthewire.org/` with `natas2:<password>` → HTTP 200 with the level-2 page.
+- **Recording:** `recordings/natas/L1.cast`
+

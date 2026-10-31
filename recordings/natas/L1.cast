@@ -1,0 +1,4 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793468674,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L1.sh","title":"Natas L1: comment hidden by right-click block","env":{"SHELL":"/bin/bash"}}
+[0.013, "o", "$ curl -s -u natas1:scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7 http://natas1.natas.labs.overthewire.org/ | grep \"natas2 is\"\r\r\n"]
+[1.108, "o", "<!--The password for natas2 is vsDOxoXyq3wckCP1ZmTZ71ngIA606odB -->\r\r\n"]
+[0.004, "x", "0"]
