@@ -33,3 +33,4 @@ Bandit | L28 | git branch -a, password on origin/dev | recordings/bandit/L28.cas
 Bandit | L29 | git tag "secret" holds the password | recordings/bandit/L29.cast
 Bandit | L30 | force-add ignored key.txt, push; hook prints password | recordings/bandit/L30.cast
 Bandit | L31 | $0 breaks the uppercase restricted shell | recordings/bandit/L31.cast
+Bandit | L32 | final level: README confirms game complete, no bandit34 | recordings/bandit/L32.cast

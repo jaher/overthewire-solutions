@@ -462,3 +462,17 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit33` with this password; `~/README.txt` confirms it is the last level and `getent passwd bandit34` returns nothing.
 - **Recording:** `recordings/bandit/L31.cast`
 
+## Level 32 — final level (no next account)
+- **Account:** `bandit33`.
+- **Goal:** Confirm the game is complete.
+- **Technique and why it works:** bandit33 is the final account. Its home contains `README.txt`, which reads "Congratulations on solving the last level of this game! At this moment, there are no more levels to play." `getent passwd bandit34` returns nothing, so there is no bandit34 account and no further password to find. Nothing to exploit here; the level is the end marker of the game.
+- **Commands:**
+  ```
+  ssh bandit33@bandit.labs.overthewire.org -p 2220
+  cat ~/README.txt
+  getent passwd bandit34 || echo "no bandit34"
+  ```
+- **Password for bandit34:** none — the game ends at bandit33.
+- **Verification:** login as bandit33 succeeds; the README states the game is complete; no bandit34 user exists on the host.
+- **Recording:** `recordings/bandit/L32.cast`
+
