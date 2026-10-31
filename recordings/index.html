@@ -88,7 +88,14 @@ const LEVELS = [
   ["Bandit",22,"reproduce md5 filename computed by cron"],
   ["Bandit",23,"drop script in bandit24 cron spool"],
   ["Bandit",24,"brute-force 10,000 pincodes"],
-  ["Bandit",25,"more->vi :shell escape on tiny PTY"]
+  ["Bandit",25,"more->vi :shell escape on tiny PTY"],
+  ["Bandit",26,"clone git repo over ssh, read README"],
+  ["Bandit",27,"git history leaks redacted password (HEAD~1)"],
+  ["Bandit",28,"git branch -a, password on origin/dev"],
+  ["Bandit",29,"git tag 'secret' holds the password"],
+  ["Bandit",30,"force-add ignored key.txt, push; hook prints password"],
+  ["Bandit",31,"$0 breaks the uppercase restricted shell"],
+  ["Bandit",32,"final level: README confirms game complete"]
 ];
 
 const rows = document.getElementById('rows');
