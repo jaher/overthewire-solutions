@@ -1,0 +1,4 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793466137,"idle_time_limit":2.0,"command":"bash /home/claude/solves/bandit/L18.sh","title":"Bandit L18: non-interactive ssh cat readme","env":{"SHELL":"/bin/bash"}}
+[0.003, "o", "$ ssh bandit18@bandit.labs.overthewire.org -p 2220 \"cat readme\"   # bandit18 .bashrc kills interactive shells\r\n"]
+[4.402, "o", "KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI\r\n"]
+[0.001, "x", "0"]
