@@ -75,3 +75,17 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `krypton5` with this password.
 - **Recording:** `recordings/krypton/L4.cast`
 
+## Level 5 → krypton6
+- **Account:** `krypton5`.
+- **Goal:** A Vigenère cipher with an *unknown* key length; `found1`–`found3` are English messages encrypted with the same key, and `krypton6` holds the next password.
+- **Technique and why it works:** First determine the key length. The index of coincidence (IC) of a text shifted by the key length measures how close each column's letter distribution is to English; computing the average column IC for each candidate length 1–30 peaks at 9 (with multiples 18 and 27), so the key is 9 letters. Then treat each of the 9 columns as a Caesar cipher and pick, per column, the shift whose decrypted column best matches English letter frequencies (chi-squared). All three found texts independently give `XRLYRATGU`, confirming the key. Decrypting `krypton6` with that key gives `ENAQBZ`, which is ROT13; ROT13 gives `RANDOM`.
+- **Commands:**
+  ```
+  cat /krypton/krypton5/found1 /krypton/krypton5/found2 /krypton/krypton5/found3
+  # IC over key lengths 1..30 -> 9; per-column chi-squared -> key XRLYRATGU
+  # Vigenere-decrypt krypton6, then ROT13
+  ```
+- **Password for krypton6:** `RANDOM`
+- **Verification:** logged in as `krypton6` with this password.
+- **Recording:** `recordings/krypton/L5.cast`
+

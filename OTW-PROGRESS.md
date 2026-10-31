@@ -64,3 +64,4 @@ Krypton | L1 | ROT13 via tr | recordings/krypton/L1.cast
 Krypton | L2 | Caesar chosen-plaintext oracle -> shift +12 | recordings/krypton/L2.cast
 Krypton | L3 | monoalphabetic substitution: frequency + quadgram hill-climb | recordings/krypton/L3.cast
 Krypton | L4 | Vigenere keylen 6: per-column chi-squared -> SERXRL, then ROT13 | recordings/krypton/L4.cast
+Krypton | L5 | Vigenere unknown keylen: IC->9, per-column chi-squared->XRLYRATGU, then ROT13 | recordings/krypton/L5.cast

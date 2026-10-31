@@ -1,0 +1,13 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793474063,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/krypton/L5.sh","title":"Krypton L5 solve","env":{"SHELL":"/bin/bash"}}
+[0.008, "o", "$ ssh krypton5@krypton.labs.overthewire.org -p 2231   # password CLEARTEXT\r\r\n$ cat /krypton/krypton5/README   # Vigenere, key length UNKNOWN\r\r\n$ ssh krypton5@krypton.labs.overthewire.org -p 2231 cat /krypton/krypton5/README\r\r\n"]
+[2.655, "o", "Frequency analysis can break a known key length as well.  Lets try one\r\r\nlast polyalphabetic cipher, but this time the key length is unknown.\r\r\n\r\r\n\r\r\nEnjoy.\r\r\n\r\r\n\r\r\n"]
+[2.707, "o", "$ index of coincidence over key lengths 1..30 -> strongest at 9 (and multiples 18,27)\r\r\n"]
+[0.009, "o", "IC overall 0.041\r\r\n"]
+[0.006, "o", "[(0.0479, 9), (0.0478, 18), (0.0475, 27), (0.0445, 30), (0.0445, 24)]\r\r\n"]
+[0.002, "o", "$ per-column chi-squared at K=9 on each found text -> key XRLYRATGU (all three agree)\r\r\n"]
+[0.015, "o", "['XRLYRATGU', 'XRLYRATGU', 'XRLYRATGU']\r\r\n"]
+[0.002, "o", "$ Vigenere-decrypt krypton6 with XRLYRATGU, then ROT13\r\r\n"]
+[0.004, "o", "vig: ENAQBZ  rot13: RANDOM\r\r\n"]
+[0.001, "o", "$ ssh krypton6@krypton.labs.overthewire.org -p 2231   # verify RANDOM\r\r\n$ ssh krypton6@krypton.labs.overthewire.org -p 2231 whoami\r\r\n"]
+[2.851, "o", "krypton6\r\r\n"]
+[0.004, "x", "0"]
