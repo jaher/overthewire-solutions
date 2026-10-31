@@ -19,3 +19,4 @@ Bandit | L15 | SSL submission with openssl s_client to localhost:30001 | recordi
 Bandit | L16 | nmap port scan + SSL key exchange on 31790, login as bandit17 | recordings/bandit/L16.cast
 Bandit | L17 | diff passwords.old passwords.new | recordings/bandit/L17.cast
 Bandit | L18 | non-interactive ssh command (bashrc logs out interactive) | recordings/bandit/L18.cast
+Bandit | L19 | setuid bandit20-do runs command as bandit20 | recordings/bandit/L19.cast
