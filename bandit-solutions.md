@@ -240,3 +240,15 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit17` with this password (and the returned key authenticated as bandit17 before that).
 - **Recording:** `recordings/bandit/L16.cast`
 
+## Level 17 → bandit18
+- **Account:** `bandit17`.
+- **Goal:** There are two files, `passwords.old` and `passwords.new`; the password for bandit18 is the one line that changed.
+- **Technique and why it works:** `diff` reports only differing lines; the single hunk `42c42` shows the old value (`<`) and the new value (`>`). The new side is the password for the next level.
+- **Commands:**
+  ```
+  diff passwords.old passwords.new
+  ```
+- **Password for bandit18:** `OQxXZjELndr90zuhOTDYBEomI0SZITXI`
+- **Verification:** logged in as `bandit18` with this password.
+- **Recording:** `recordings/bandit/L17.cast`
+
