@@ -21,3 +21,4 @@ Bandit | L16 | nmap port scan + SSL key exchange on 31790, login as bandit17 | r
 Bandit | L17 | diff passwords.old passwords.new | recordings/bandit/L17.cast
 Bandit | L18 | non-interactive ssh command (bashrc logs out interactive) | recordings/bandit/L18.cast
 Bandit | L19 | setuid bandit20-do runs command as bandit20 | recordings/bandit/L19.cast
+Bandit | L20 | nc listener + setuid suconnect password handshake | recordings/bandit/L20.cast

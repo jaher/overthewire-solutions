@@ -277,3 +277,17 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit20` with this password.
 - **Recording:** `recordings/bandit/L19.cast`
 
+## Level 20 → bandit21
+- **Account:** `bandit20`.
+- **Goal:** `suconnect` connects to a TCP port on localhost, sends the current password, and if it matches, sends back the next password. Provide a matching listener.
+- **Technique and why it works:** The binary is setuid bandit21, so the reply it receives is bandit21's password. We start our own listener on an arbitrary port (4000) with `nc -l -p 4000` and feed it bandit20's password (the value suconnect compares against), then run `./suconnect 4000`. `(echo ...; sleep 3)` keeps the connection open long enough for suconnect to read and reply; the sleep matters because nc would otherwise close stdin immediately.
+- **Commands:**
+  ```
+  (echo 4pIjcunZ0fK2vmp3IwfG8Vf7VhxD6pOA; sleep 3) | nc -l -p 4000 &
+  sleep 1
+  ./suconnect 4000
+  ```
+- **Password for bandit21:** `bW9kBv5WC3P4yoDyf12LSdGuNz5ka6hY`
+- **Verification:** logged in as `bandit21` with this password.
+- **Recording:** `recordings/bandit/L20.cast`
+
