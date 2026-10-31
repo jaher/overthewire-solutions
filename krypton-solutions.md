@@ -19,3 +19,16 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `krypton1` with this password.
 - **Recording:** `recordings/krypton/L0.cast`
 
+## Level 1 → krypton2
+- **Account:** `krypton1`.
+- **Goal:** `/krypton/krypton1/krypton2` holds the password for krypton2, encrypted with ROT13 (per the README).
+- **Technique and why it works:** ROT13 shifts each letter by 13 positions, half the alphabet, so applying it twice returns the original text — it is its own inverse. `tr 'A-Za-z' 'N-ZA-Mn-za-m'` performs the shift on both cases. The file `YRIRY GJB CNFFJBEQ EBGGRA` decodes to `LEVEL TWO PASSWORD ROTTEN`.
+- **Commands:**
+  ```
+  cat /krypton/krypton1/krypton2
+  cat /krypton/krypton1/krypton2 | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+  ```
+- **Password for krypton2:** `ROTTEN`
+- **Verification:** logged in as `krypton2` with this password.
+- **Recording:** `recordings/krypton/L1.cast`
+

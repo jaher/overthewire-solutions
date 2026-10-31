@@ -60,3 +60,4 @@ Leviathan | L5 | symlink /tmp/file.log to leviathan6 password | recordings/levia
 Leviathan | L6 | read hardcoded code 7123 from disassembly | recordings/leviathan/L6.cast
 Leviathan | L7 | final level: CONGRATULATIONS, no leviathan8 | recordings/leviathan/L7.cast
 Krypton | L0 | Base64 decode of the level-page string | recordings/krypton/L0.cast
+Krypton | L1 | ROT13 via tr | recordings/krypton/L1.cast
