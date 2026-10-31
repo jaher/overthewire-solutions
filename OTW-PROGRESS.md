@@ -15,3 +15,4 @@ Bandit | L11 | ROT13 via tr | recordings/bandit/L11.cast
 Bandit | L12 | peel xxd/gzip/bzip2/tar layers with file | recordings/bandit/L12.cast
 Bandit | L13 | ssh private key, log in to bandit14 from client (localhost hop blocked) | recordings/bandit/L13.cast
 Bandit | L14 | pipe current password into nc localhost:30000 | recordings/bandit/L14.cast
+Bandit | L15 | SSL submission with openssl s_client to localhost:30001 | recordings/bandit/L15.cast
