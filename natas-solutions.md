@@ -100,3 +100,15 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas7.natas.labs.overthewire.org/` with `natas7:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L6.cast`
 
+## Level 7 → natas8
+- **Account:** `natas7`.
+- **Goal:** The page's hint comment says the password for natas8 is in `/etc/natas_webpass/natas8`; the page links to `index.php?page=home` and `index.php?page=about`.
+- **Technique and why it works:** The `page` parameter is used to include a file without validation — a local file inclusion / path traversal. Passing an absolute path (`page=/etc/natas_webpass/natas8`) makes PHP read that file and print it into the page, giving us the password. There is no need for `../` because the parameter accepts absolute paths directly.
+- **Commands:**
+  ```
+  curl -s -u natas7:<pw> 'http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8'
+  ```
+- **Password for natas8:** `ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc`
+- **Verification:** `http://natas8.natas.labs.overthewire.org/` with `natas8:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L7.cast`
+
