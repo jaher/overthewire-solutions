@@ -111,3 +111,16 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `leviathan7` with this password.
 - **Recording:** `recordings/leviathan/L6.cast`
 
+## Level 7 — final level
+- **Account:** `leviathan7`.
+- **Goal:** Confirm the game is complete.
+- **Technique and why it works:** leviathan7 is the final account. Its home contains a readable `CONGRATULATIONS` file stating "Well Done, you seem to have used a *nix system before, now try something more serious." There is no leviathan8 account, so there is nothing further to solve; this level is the end marker of the game.
+- **Commands:**
+  ```
+  ssh leviathan7@leviathan.labs.overthewire.org -p 2223
+  cat CONGRATULATIONS
+  ```
+- **Password for leviathan8:** none — the game ends at leviathan7.
+- **Verification:** login as leviathan7 succeeds; `CONGRATULATIONS` confirms completion.
+- **Recording:** `recordings/leviathan/L7.cast`
+

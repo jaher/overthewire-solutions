@@ -1,0 +1,5 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793471903,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/leviathan/L7.sh","title":"Leviathan L7 solve","env":{"SHELL":"/bin/bash"}}
+[0.012, "o", "$ ssh leviathan7@leviathan.labs.overthewire.org -p 2223   # final level, password 3zrlkaPTfH\r\r\n$ cat CONGRATULATIONS   # game complete\r\r\n$ ssh leviathan7@leviathan.labs.overthewire.org -p 2223 ls -la; cat CONGRATULATIONS\r\r\n"]
+[4.423, "o", "total 24\r\r\ndrwxr-xr-x   2 root       root       4096 Oct 25 13:39 .\r\r\ndrwxr-xr-x 150 root       root       4096 Oct 25 13:40 ..\r\r\n-rw-r--r--   1 root       root        220 Feb 13  2026 .bash_logout\r\r\n-rw-r--r--   1 root       root       3851 Oct 25 13:21 .bashrc\r\r\n-rw-r--r--   1 root       root        807 Feb 13  2026 .profile\r\r\n-r--r-----   1 leviathan7 leviathan7  178 Oct 25 13:39 CONGRATULATIONS\r\r\n"]
+[0.004, "o", "Well Done, you seem to have used a *nix system before, now try something more serious.\r\r\n(Please don't post writeups, solutions or spoilers about the games on the web. Thank you!)\r\r\n"]
+[0.005, "x", "0"]
