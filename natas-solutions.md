@@ -126,3 +126,15 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas9.natas.labs.overthewire.org/` with `natas9:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L8.cast`
 
+## Level 9 → natas10
+- **Account:** `natas9`.
+- **Goal:** The form takes a search term and runs `passthru("grep -i $key dictionary.txt")`. Use it to read natas10's password.
+- **Technique and why it works:** `$key` is interpolated straight into a shell command, so shell metacharacters in the input are executed by `sh`. Sending `; cat /etc/natas_webpass/natas10 #` terminates the grep command and runs `cat` on the password file; the trailing `#` comments out the remaining ` dictionary.txt`. The output of both commands is printed. This is classic OS command injection: user input reaching `passthru` unescaped.
+- **Commands:**
+  ```
+  curl -s -u natas9:<pw> --data-urlencode 'needle=; cat /etc/natas_webpass/natas10 #' http://natas9.natas.labs.overthewire.org/
+  ```
+- **Password for natas10:** `EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv`
+- **Verification:** `http://natas10.natas.labs.overthewire.org/` with `natas10:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L9.cast`
+

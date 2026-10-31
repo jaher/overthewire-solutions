@@ -43,3 +43,4 @@ Natas | L5 | forge loggedin=1 cookie | recordings/natas/L5.cast
 Natas | L6 | fetch included secret.inc | recordings/natas/L6.cast
 Natas | L7 | page= path traversal / LFI to /etc/natas_webpass | recordings/natas/L7.cast
 Natas | L8 | reverse encodeSecret: hex->rev->base64 | recordings/natas/L8.cast
+Natas | L9 | command injection via passthru | recordings/natas/L9.cast

