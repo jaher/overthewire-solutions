@@ -320,3 +320,21 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit23` with this password.
 - **Recording:** `recordings/bandit/L22.cast`
 
+## Level 23 → bandit24
+- **Account:** `bandit23`.
+- **Goal:** A cron job runs every script dropped into `/var/spool/bandit24/foo` as bandit24; get it to read bandit24's password.
+- **Technique and why it works:** `/var/spool/bandit24/foo` is mode `drwxrwx-wx` with group `bandit24` — bandit23 can create files but cannot list the directory. The cron script (`cronjob_bandit24.sh`) iterates the directory, checks each file's owner is `bandit23`, and if it is a regular file, runs it with `timeout -s 9 60 ./file` **as bandit24**. So a script we write is executed with bandit24's privileges; it can read `/etc/bandit_pass/bandit24` and copy it to a world-readable location. The script must be executable (the cron job invokes it directly). Cron fires every minute, so wait ~70 s and read the output.
+- **Commands:**
+  ```
+  cat /etc/cron.d/cronjob_bandit24
+  cat /usr/bin/cronjob_bandit24.sh
+  ls -ld /var/spool/bandit24/foo
+  echo 'cat /etc/bandit_pass/bandit24 > /tmp/b23out; chmod 644 /tmp/b23out' > /var/spool/bandit24/foo/grab.sh
+  chmod +x /var/spool/bandit24/foo/grab.sh
+  # wait for the next cron minute, then:
+  cat /tmp/b23out
+  ```
+- **Password for bandit24:** `hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv`
+- **Verification:** logged in as `bandit24` with this password.
+- **Recording:** `recordings/bandit/L23.cast`
+
