@@ -1,0 +1,8 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793471890,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/leviathan/L6.sh","title":"Leviathan L6 solve","env":{"SHELL":"/bin/bash"}}
+[0.008, "o", "$ ssh leviathan6@leviathan.labs.overthewire.org -p 2223   # password JRGj9iWNOb\r\r\n$ objdump -d leviathan6 | grep \"mov DWORD PTR [ebp-0xc],0x1bd3\"   # hardcoded code 0x1bd3 = 7123\r\r\n$ ssh leviathan6@leviathan.labs.overthewire.org -p 2223 objdump -d -M intel leviathan6 | grep -m1 \"0x1bd3\"\r\r\n"]
+[3.566, "o", " 80491da:\tc7 45 f4 d3 1b 00 00 \tmov    DWORD PTR [ebp-0xc],0x1bd3\r\r\n"]
+[0.000, "o", "$ ./leviathan6 7123   # setreuid(leviathan7), /bin/sh\r\r\n$ ssh leviathan6@leviathan.labs.overthewire.org -p 2223 echo \"cat /etc/leviathan_pass/leviathan7\" | ./leviathan6 7123\r\r\n"]
+[4.985, "o", "3zrlkaPTfH\r\r\n"]
+[0.001, "o", "$ ssh leviathan7@leviathan.labs.overthewire.org -p 2223   # verify 3zrlkaPTfH\r\r\n$ ssh leviathan7@leviathan.labs.overthewire.org -p 2223 whoami; cat CONGRATULATIONS\r\r\n"]
+[4.327, "o", "leviathan7\r\r\nWell Done, you seem to have used a *nix system before, now try something more serious.\r\r\n(Please don't post writeups, solutions or spoilers about the games on the web. Thank you!)\r\r\n"]
+[0.003, "x", "0"]

@@ -97,3 +97,17 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `leviathan6` with this password.
 - **Recording:** `recordings/leviathan/L5.cast`
 
+## Level 6 → leviathan7
+- **Account:** `leviathan6`.
+- **Goal:** The setuid binary `leviathan6` takes a 4-digit code and spawns a shell as leviathan7 if the code is right.
+- **Technique and why it works:** Disassembly shows `atoi(argv[1])` compared against an immediate stored at `[ebp-0xc]`: `0x1bd3`, i.e. decimal 7123. Passing `7123` satisfies the comparison; the binary then `setreuid`s to leviathan7 and runs `/bin/sh`, so we can `cat /etc/leviathan_pass/leviathan7`. Reading the constant from the binary is faster and more reliable than trying all 10,000 codes.
+- **Commands:**
+  ```
+  ssh leviathan6@leviathan.labs.overthewire.org -p 2223
+  objdump -d -M intel leviathan6 | grep -m1 '0x1bd3'
+  echo 'cat /etc/leviathan_pass/leviathan7' | ./leviathan6 7123
+  ```
+- **Password for leviathan7:** `3zrlkaPTfH`
+- **Verification:** logged in as `leviathan7` with this password.
+- **Recording:** `recordings/leviathan/L6.cast`
+

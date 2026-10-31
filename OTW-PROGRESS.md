@@ -57,3 +57,4 @@ Natas | L16 | $(...) substitution oracle + binary search | recordings/natas/L16.
 Leviathan | L3 | setuid level3 accepts snlprintf, spawns shell | recordings/leviathan/L3.cast
 Leviathan | L4 | decode binary output of .trash/bin | recordings/leviathan/L4.cast
 Leviathan | L5 | symlink /tmp/file.log to leviathan6 password | recordings/leviathan/L5.cast
+Leviathan | L6 | read hardcoded code 7123 from disassembly | recordings/leviathan/L6.cast
