@@ -24,3 +24,18 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `narnia1` with this password.
 - **Recording:** `recordings/narnia/L0.cast`
 
+## Level 1 → narnia2
+- **Account:** `narnia1`.
+- **Goal:** The program takes the environment variable `EGG`, casts it to a function pointer, and calls it: `ret = (int (*)())getenv("EGG"); ret();`. Put shellcode there.
+- **Technique and why it works:** Any string in the environment can be executed if we place valid machine code in it. We set `EGG` to a NOP sled followed by shellcode. The binary is setuid narnia2, so at the call its effective UID is narnia2. Two details matter: (1) the shellcode must first call `setreuid(geteuid(), geteuid())` — otherwise `execve("/bin/sh")` drops the effective UID back to narnia1 (the binary itself does exactly this); (2) the environment must be passed as *bytes* (`os.execve` with a bytes dict) because Python's `os.environ` UTF-8-encodes `\x90` into `\xc2\x90`, corrupting the code. The shellcode: `geteuid` (201), `setreuid(ebx,ebx)` (70), then `execve("/bin/sh")` (11).
+- **Commands:**
+  ```
+  ssh narnia1@narnia.labs.overthewire.org -p 2226
+  # set EGG to NOP*200 + [geteuid; setreuid(euid,euid); execve("/bin/sh")] and exec the binary
+  id                                  # uid=14002(narnia2)
+  cat /etc/narnia_pass/narnia2
+  ```
+- **Password for narnia2:** `0h8Tj5fxbv`
+- **Verification:** logged in as `narnia2` with this password.
+- **Recording:** `recordings/narnia/L1.cast`
+

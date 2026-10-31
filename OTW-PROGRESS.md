@@ -69,3 +69,4 @@ Krypton | L6 | chosen-plaintext recovers periodic LFSR keystream (period 30) | r
 Krypton | L7 | final level: README confirms game complete | recordings/krypton/L7.cast
 Manpage | L0 | BLOCKED: setuid bit not honored on lab host (euid stays manpage0 at main entry; /manpage/manpage0 is -r-sr-x--- manpage1:manpage0); the setuid(getuid()) drop makes the saved UID 17000, so the strcpy overflow cannot regain manpage1. Level appears bit-rotted upstream. | (no recording)
 Narnia | L0 | overwrite val via 24-byte scanf into 20-byte buf | recordings/narnia/L0.cast
+Narnia | L1 | EGG env var shellcode (setreuid euid + execve), bytes env | recordings/narnia/L1.cast
