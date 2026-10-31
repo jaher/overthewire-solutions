@@ -1,0 +1,9 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793473448,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/krypton/L3.sh","title":"Krypton L3 solve","env":{"SHELL":"/bin/bash"}}
+[0.013, "o", "$ ssh krypton3@krypton.labs.overthewire.org -p 2231   # password CAESARISEASY\r\r\n$ cat /krypton/krypton3/README   # simple substitution, English plaintext, 3 found texts + krypton4\r\r\n"]
+[4.219, "o", "$ frequency analysis: S Q J U B N C ... vs English E T A O I N S ...\r\r\n"]
+[0.010, "o", "S:13.0% Q:9.6% J:8.5% U:7.3% B:7.0% N:6.8% C:6.4% G:6.4% D:5.9% V:3.8%\r\r\n"]
+[0.002, "o", "$ hill-climb a monoalphabetic substitution with quadgram scoring -> plaintext\r\r\n"]
+[33.183, "o", "K4 plaintext: WELLD ONETH ELEVE LFOUR PASSW ORDIS BRUTE\r\r\n"]
+[0.003, "o", "$ ssh krypton4@krypton.labs.overthewire.org -p 2231   # verify BRUTE\r\r\n$ ssh krypton4@krypton.labs.overthewire.org -p 2231 whoami\r\r\n"]
+[5.614, "o", "krypton4\r\r\n"]
+[0.004, "x", "0"]

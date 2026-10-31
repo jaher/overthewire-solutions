@@ -49,3 +49,16 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `krypton3` with this password.
 - **Recording:** `recordings/krypton/L2.cast`
 
+## Level 3 → krypton4
+- **Account:** `krypton3`.
+- **Goal:** `/krypton/krypton3/krypton4` holds the password for krypton4, encrypted with a simple (monoalphabetic) substitution cipher. We also have `found1`, `found2`, `found3` — intercepted English messages encrypted with the same key.
+- **Technique and why it works:** A monoalphabetic substitution maps each plaintext letter to one ciphertext letter, so letter frequencies are preserved. Counting letters across all the intercepted text gives S≈13%, Q≈9.6%, J≈8.5%, U≈7.3%, B≈7.0% — the shape of English (E,T,A,O,I,N,...). A frequency-based initial mapping plus a hill-climb that swaps plaintext assignments to maximise the quadgram log-likelihood of the decrypted corpus recovers the full key. The recovered plaintext of `krypton4` reads "WELL DONE THE LEVEL FOUR PASSWORD IS BRUTE", giving the password `BRUTE`. (The same hill-climb also recovers the found-texts' plaintext, an Alice-in-Wonderland passage.)
+- **Commands:**
+  ```
+  cat /krypton/krypton3/found1 /krypton/krypton3/found2 /krypton/krypton3/found3 /krypton/krypton3/krypton4
+  # frequency count, then hill-climb substitution with quadgram scoring (script in the recording)
+  ```
+- **Password for krypton4:** `BRUTE`
+- **Verification:** logged in as `krypton4` with this password.
+- **Recording:** `recordings/krypton/L3.cast`
+

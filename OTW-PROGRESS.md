@@ -62,3 +62,4 @@ Leviathan | L7 | final level: CONGRATULATIONS, no leviathan8 | recordings/leviat
 Krypton | L0 | Base64 decode of the level-page string | recordings/krypton/L0.cast
 Krypton | L1 | ROT13 via tr | recordings/krypton/L1.cast
 Krypton | L2 | Caesar chosen-plaintext oracle -> shift +12 | recordings/krypton/L2.cast
+Krypton | L3 | monoalphabetic substitution: frequency + quadgram hill-climb | recordings/krypton/L3.cast
