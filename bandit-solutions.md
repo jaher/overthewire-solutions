@@ -352,3 +352,20 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit25` with this password.
 - **Recording:** `recordings/bandit/L24.cast`
 
+## Level 25 → bandit26
+- **Account:** `bandit25`.
+- **Goal:** bandit25's home holds `bandit26.sshkey`, the private key for bandit26 — but bandit26's login shell is `/usr/bin/showtext`, which runs `exec more ~/text.txt` and then exits. Get a real shell as bandit26.
+- **Technique and why it works:** `more` has an interactive escape hatch: pressing `v` opens the current file in `vi`. Inside `vi`, `:set shell=/bin/bash` then `:shell` starts a bash under bandit26's identity. The catch is that `~/text.txt` is only 6 lines: on a normal terminal `more` prints it all and exits without ever showing the `--More--` prompt, so there is no chance to press `v`. Shrinking the terminal to ~5 rows forces `more` to paginate, keeping the prompt on screen; that is why the recording runs the session on a 60x5 PTY. The key is then used from this client (the localhost hop is blocked on the lab), and `./bandit27-do` (setuid bandit27) reads bandit27's password.
+- **Commands:**
+  ```
+  ssh -i bandit26.sshkey bandit26@bandit.labs.overthewire.org -p 2220   # on a ~5-row terminal
+  # at the --More--(66%) prompt: press  v
+  # in vi:
+  :set shell=/bin/bash
+  :shell
+  ./bandit27-do cat /etc/bandit_pass/bandit27
+  ```
+- **Password for bandit27:** `STJLJBRRphMxKB392CT4iOr5CbzPU9ER`
+- **Verification:** logged in as `bandit27` with this password.
+- **Recording:** `recordings/bandit/L25.cast`
+

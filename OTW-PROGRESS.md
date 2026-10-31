@@ -26,3 +26,4 @@ Bandit | L21 | read cron job script, grab password it writes to /tmp | recording
 Bandit | L22 | reproduce md5 filename computed by cron script | recordings/bandit/L22.cast
 Bandit | L23 | drop executable script in bandit24 cron spool | recordings/bandit/L23.cast
 Bandit | L24 | brute-force 10,000 pincodes against nc daemon | recordings/bandit/L24.cast
+Bandit | L25 | more->vi :shell escape on a tiny PTY | recordings/bandit/L25.cast
