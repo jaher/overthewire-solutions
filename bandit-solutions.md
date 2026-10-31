@@ -104,6 +104,18 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit7` with this password.
 - **Recording:** `recordings/bandit/L6.cast`
 
+## Level 7 → bandit8
+- **Account:** `bandit7`.
+- **Goal:** The password is on the line next to the word `millionth` in `data.txt`.
+- **Technique and why it works:** `grep` prints the whole matching line; the data file is `word<TAB>value`, so the matching line contains the password after the tab.
+- **Commands:**
+  ```
+  grep millionth data.txt
+  ```
+- **Password for bandit8:** `VR1ljMayciFxbnUokuQmJFw6QC9VKtub`
+- **Verification:** logged in as `bandit8` with this password.
+- **Recording:** `recordings/bandit/L7.cast`
+
 ## Level 10 → bandit11
 - **Account:** `bandit10`.
 - **Goal:** `data.txt` contains base64-encoded data; the password is the decoded text.
