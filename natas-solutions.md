@@ -47,3 +47,17 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** fetched `http://natas3.natas.labs.overthewire.org/` with `natas3:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L2.cast`
 
+## Level 3 → natas4
+- **Account:** `natas3`.
+- **Goal:** The page says "There is nothing on this page" and the comment says not even Google will find it. Find the password for natas4.
+- **Technique and why it works:** The hint points at search-engine indexing, so we read `robots.txt`, which lists `Disallow: /s3cr3t/`. robots.txt is a public file that *reveals* paths rather than hiding them; it only asks well-behaved crawlers to stay out. That directory has Apache directory indexing enabled, so `s3cr3t/` lists `users.txt`, which contains `natas4:<password>`.
+- **Commands:**
+  ```
+  curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/robots.txt
+  curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/s3cr3t/
+  curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/s3cr3t/users.txt
+  ```
+- **Password for natas4:** `JDrPnuZAKyl6MkiqQGFIddrqpvgOASth`
+- **Verification:** `http://natas4.natas.labs.overthewire.org/` with `natas4:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L3.cast`
+

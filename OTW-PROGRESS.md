@@ -37,3 +37,4 @@ Bandit | L32 | final level: README confirms game complete, no bandit34 | recordi
 Natas | L0 | password in HTML comment | recordings/natas/L0.cast
 Natas | L1 | raw HTTP fetch bypasses client-side right-click block | recordings/natas/L1.cast
 Natas | L2 | open directory index + users.txt | recordings/natas/L2.cast
+Natas | L3 | robots.txt leaks /s3cr3t/, open index, users.txt | recordings/natas/L3.cast
