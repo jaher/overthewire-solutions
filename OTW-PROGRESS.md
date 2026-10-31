@@ -61,3 +61,4 @@ Leviathan | L6 | read hardcoded code 7123 from disassembly | recordings/leviatha
 Leviathan | L7 | final level: CONGRATULATIONS, no leviathan8 | recordings/leviathan/L7.cast
 Krypton | L0 | Base64 decode of the level-page string | recordings/krypton/L0.cast
 Krypton | L1 | ROT13 via tr | recordings/krypton/L1.cast
+Krypton | L2 | Caesar chosen-plaintext oracle -> shift +12 | recordings/krypton/L2.cast

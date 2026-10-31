@@ -32,3 +32,20 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `krypton2` with this password.
 - **Recording:** `recordings/krypton/L1.cast`
 
+## Level 2 → krypton3
+- **Account:** `krypton2`.
+- **Goal:** `/krypton/krypton2/krypton3` holds the password for krypton3, encrypted with a Caesar cipher. The key is in `keyfile.dat` (unreadable), but a setuid-`krypton3` `encrypt` program encrypts any file we give it.
+- **Technique and why it works:** A Caesar cipher is a fixed shift over the alphabet. Rather than brute-forcing all 26 shifts, we use the oracle with a chosen plaintext: encrypt the alphabet `ABCDEFGHIJKLMNOPQRSTUVWXYZ` and read `ciphertext`. The result is `MNOPQRSTUVWXYZABCDEFGHIJKL`, which shows the mapping A→M, i.e. a shift of +12 (not the ROT13 one might assume). Decrypting the target therefore means shifting by −12, which `tr 'A-Z' 'O-ZA-N'` does. `OMQEMDUEQMEK` becomes `CAESARISEASY`. The setuid binary needs to read `keyfile.dat` from our working directory, so we create a directory in `/tmp`, symlink the keyfile into it, make the directory traversable for krypton3, and run the binary there.
+- **Commands:**
+  ```
+  cat /krypton/krypton2/krypton3                 # OMQEMDUEQMEK
+  D=$(mktemp -d); cd "$D"
+  ln -s /krypton/krypton2/keyfile.dat; chmod 777 .
+  printf 'ABCDEFGHIJKLMNOPQRSTUVWXYZ\n' > p.txt
+  /krypton/krypton2/encrypt p.txt; cat ciphertext   # MNOPQRSTUVWXYZABCDEFGHIJKL => shift +12
+  cat /krypton/krypton2/krypton3 | tr 'A-Z' 'O-ZA-N'   # CAESARISEASY
+  ```
+- **Password for krypton3:** `CAESARISEASY`
+- **Verification:** logged in as `krypton3` with this password.
+- **Recording:** `recordings/krypton/L2.cast`
+
