@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OverTheWire — recordings &amp; narration</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/asciinema-player@3.9.0/dist/bundle/asciinema-player.css">
+<style>
+  :root { --green:#33ff66; --dim:#1fae4a; --bg:#050805; --panel:#0a0f0a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--green);
+         font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; }
+  .sub { color: var(--dim); font-size: 13px; margin-bottom: 16px; }
+  a { color:#7dff9e; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid #123a1f; }
+  th { color: var(--dim); font-weight: 600; }
+  td.tech { color:#b6ffc7; }
+  .badge { color: var(--dim); font-size: 11px; border:1px solid var(--dim); border-radius:4px; padding:0 4px; }
+  .player-wrap { margin-top: 20px; }
+  #player { width: 100%; }
+  .controls { display:flex; gap:8px; align-items:center; margin: 10px 0; flex-wrap: wrap; }
+  button { background:var(--panel); color:var(--green); border:1px solid var(--dim);
+           border-radius:6px; padding:6px 12px; font:inherit; font-size:13px; cursor:pointer; }
+  button:hover { background:#0f1f0f; }
+  .now { color:#eaffea; font-size:15px; font-weight:700; margin: 6px 0; }
+  audio { height: 32px; }
+  .narration { color:#b6ffc7; font-size:13px; line-height:1.6; white-space:pre-wrap;
+               background:#000; border:1px solid #14532d; border-radius:8px; padding:12px 14px; margin-top:10px; }
+  footer { color:var(--dim); font-size:12px; margin-top:24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>OverTheWire — solved live, recorded</h1>
+  <div class="sub">Every level solved live over SSH against the OTW labs, with the asciinema
+  recording of the session. Each recording has a spoken narration that starts together with
+  the cast playback. Solutions: <a href="bandit-solutions.md">Bandit</a>.</div>
+
+  <table>
+    <thead><tr><th>Game</th><th>Level</th><th>Technique</th><th>Recording</th><th>Narration</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <div class="player-wrap">
+    <div class="now" id="now">Select a level above.</div>
+    <div class="controls">
+      <button id="playBtn">⏯ Play</button>
+      <button id="restartBtn">⟲ Restart</button>
+      <audio id="audio" controls preload="none"></audio>
+    </div>
+    <div id="player"></div>
+    <div class="narration" id="narration"></div>
+  </div>
+
+  <footer>Recordings are live sessions (asciinema v3 casts). Narration audio starts with playback.</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/asciinema-player@3.9.0/dist/bundle/asciinema-player.min.js"></script>
+<script>
+// Level index. Each entry: game, level, technique, cast path, narration text path.
+// Narration audio lives next to the script as narration/<game>/L<n>.mp3.
+const LEVELS = [
+  ["Bandit",0,"read ~/readme with cat"],
+  ["Bandit",1,"cat ./- (dash-prefixed filename)"],
+  ["Bandit",2,"quote a filename containing spaces"],
+  ["Bandit",3,"ls -la reveals the hidden file in inhere/"],
+  ["Bandit",4,"file inhere/* to find the only ASCII text file"],
+  ["Bandit",5,"find -size 1033c ! -executable under inhere"],
+  ["Bandit",6,"find / -user bandit7 -group bandit6 -size 33c"],
+  ["Bandit",7,"grep millionth data.txt"],
+  ["Bandit",8,"sort data.txt | uniq -u"],
+  ["Bandit",9,"strings data.txt | grep \"===\""],
+  ["Bandit",10,"base64 -d data.txt"],
+  ["Bandit",11,"ROT13 via tr"],
+  ["Bandit",12,"peel xxd/gzip/bzip2/tar layers"],
+  ["Bandit",13,"ssh private key, log in as bandit14"],
+  ["Bandit",14,"pipe password into nc localhost:30000"],
+  ["Bandit",15,"SSL submission via openssl s_client"],
+  ["Bandit",16,"nmap scan + SSL key exchange on 31790"],
+  ["Bandit",17,"diff passwords.old passwords.new"],
+  ["Bandit",18,"non-interactive ssh command"],
+  ["Bandit",19,"setuid bandit20-do"],
+  ["Bandit",20,"nc listener + suconnect"],
+  ["Bandit",21,"cron job writes password to /tmp"],
+  ["Bandit",22,"reproduce md5 filename computed by cron"],
+  ["Bandit",23,"drop script in bandit24 cron spool"],
+  ["Bandit",24,"brute-force 10,000 pincodes"],
+  ["Bandit",25,"more->vi :shell escape on tiny PTY"]
+];
+
+const rows = document.getElementById('rows');
+const key = (g,n) => g.toLowerCase() + "/L" + n;
+let current = null, player = null, audio = document.getElementById('audio');
+
+for (const [game, lvl, tech] of LEVELS) {
+  const tr = document.createElement('tr');
+  const cast = `recordings/${game.toLowerCase()}/L${lvl}.cast`;
+  tr.innerHTML = `<td>${game}</td><td>L${lvl}</td><td class="tech">${tech}</td>
+    <td><a href="${cast}">${cast}</a></td>
+    <td><a href="narration/${game.toLowerCase()}/L${lvl}.txt">script</a>
+        <span class="badge">audio: narration/${game.toLowerCase()}/L${lvl}.mp3</span></td>`;
+  tr.style.cursor = 'pointer';
+  tr.onclick = () => select(game, lvl, tech);
+  rows.appendChild(tr);
+}
+
+async function select(game, lvl, tech) {
+  current = { game, lvl };
+  const g = game.toLowerCase();
+  document.getElementById('now').textContent = `${game} L${lvl} — ${tech}`;
+
+  if (player) { player.dispose(); player = null; }
+  document.getElementById('player').innerHTML = '';
+  player = AsciinemaPlayer.create(`recordings/${g}/L${lvl}.cast`,
+    document.getElementById('player'), {
+      autoPlay: false, loop: false, fit: 'width', idleTimeLimit: 2,
+      preload: true
+    });
+
+  audio.pause();
+  audio.src = `narration/${g}/L${lvl}.mp3`;
+  audio.currentTime = 0;
+
+  const n = await fetch(`narration/${g}/L${lvl}.txt`, {cache:'no-store'})
+      .then(r => r.ok ? r.text() : '').catch(() => '');
+  document.getElementById('narration').textContent = n;
+}
+
+function playBoth() {
+  if (!player) return;
+  player.play();
+  // start narration with the cast; if the mp3 is missing this is a no-op error.
+  audio.currentTime = 0;
+  audio.play().catch(() => {});
+}
+
+document.getElementById('playBtn').onclick = playBoth;
+document.getElementById('restartBtn').onclick = () => {
+  if (current) select(current.game, current.lvl, '');
+};
+// Audio starts with playback: clicking Play (or the cast itself) starts both.
+document.getElementById('player').addEventListener('click', () => {
+  audio.currentTime = 0;
+  audio.play().catch(() => {});
+});
+</script>
+</body>
+</html>
