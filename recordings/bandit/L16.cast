@@ -1,0 +1,7 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793466041,"idle_time_limit":2.0,"command":"bash /home/claude/solves/bandit/L16.sh","title":"Bandit L16: scan ports, SSL key exchange on 31790, login as bandit17","env":{"SHELL":"/bin/bash"}}
+[0.005, "o", "$ nmap -p 31000-32000 localhost   # run as bandit16\r\n"]
+[5.064, "o", "Starting Nmap 7.98 ( https://nmap.org ) at 2026-10-31 17:00 +0000\r\nNmap scan report for localhost (127.0.0.1)\r\nHost is up (0.00013s latency).\r\nOther addresses for localhost (not scanned): ::1\r\nNot shown: 996 closed tcp ports (conn-refused)\r\nPORT      STATE SERVICE\r\n31046/tcp open  unknown\r\n31518/tcp open  unknown\r\n31691/tcp open  unknown\r\n31790/tcp open  unknown\r\n31960/tcp open  unknown\r\n\r\nNmap done: 1 IP address (1 host up) scanned in 0.05 seconds\r\n"]
+[0.225, "o", "\r\n$ echo <bandit16 pw> | openssl s_client -connect localhost:31790 -quiet   # real service is SSL on 31790\r\n"]
+[4.570, "o", "Saved returned private key -> -----BEGIN OPENSSH PRIVATE KEY-----\r\n$ ssh -i key bandit17@bandit.labs.overthewire.org -p 2220 \"cat /etc/bandit_pass/bandit17\"\r\n"]
+[4.208, "o", "pWXMAZoxGC8JmDMfmT5MGEsobMM3vnj2\r\n"]
+[0.003, "x", "0"]
