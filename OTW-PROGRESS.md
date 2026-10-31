@@ -66,3 +66,4 @@ Krypton | L3 | monoalphabetic substitution: frequency + quadgram hill-climb | re
 Krypton | L4 | Vigenere keylen 6: per-column chi-squared -> SERXRL, then ROT13 | recordings/krypton/L4.cast
 Krypton | L5 | Vigenere unknown keylen: IC->9, per-column chi-squared->XRLYRATGU, then ROT13 | recordings/krypton/L5.cast
 Krypton | L6 | chosen-plaintext recovers periodic LFSR keystream (period 30) | recordings/krypton/L6.cast
+Krypton | L7 | final level: README confirms game complete | recordings/krypton/L7.cast

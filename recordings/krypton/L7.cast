@@ -1,0 +1,4 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793474084,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/krypton/L7.sh","title":"Krypton L7 solve","env":{"SHELL":"/bin/bash"}}
+[0.012, "o", "$ ssh krypton7@krypton.labs.overthewire.org -p 2231   # final level, password LFSRISNOTRANDOM\r\r\n$ cat /krypton/krypton7/README\r\r\n$ ssh krypton7@krypton.labs.overthewire.org -p 2231 ls -la /krypton/krypton7; cat /krypton/krypton7/README\r\r\n"]
+[5.827, "o", "total 12\r\r\ndrwxr-xr-x 2 root     root     4096 Oct 25 13:38 .\r\r\ndrwxr-xr-x 9 root     root     4096 Oct 25 13:38 ..\r\r\n-rw-r----- 1 krypton7 krypton7   36 Oct 25 13:38 README\r\r\nCongratulations on beating Krypton!\r\r\n"]
+[0.004, "x", "0"]

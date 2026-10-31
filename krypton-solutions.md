@@ -105,3 +105,16 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `krypton7` with this password.
 - **Recording:** `recordings/krypton/L6.cast`
 
+## Level 7 — final level
+- **Account:** `krypton7`.
+- **Goal:** Confirm the game is complete.
+- **Technique and why it works:** krypton7 is the final account. `/krypton/krypton7/README` reads "Congratulations on beating Krypton!" and there is no krypton8 account, so the game ends here. Nothing to exploit; this is the end marker.
+- **Commands:**
+  ```
+  ssh krypton7@krypton.labs.overthewire.org -p 2231
+  cat /krypton/krypton7/README
+  ```
+- **Password for krypton8:** none — the game ends at krypton7.
+- **Verification:** login as krypton7 succeeds; the README confirms completion.
+- **Recording:** `recordings/krypton/L7.cast`
+
