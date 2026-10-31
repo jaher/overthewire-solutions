@@ -201,3 +201,15 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit14` with this password.
 - **Recording:** `recordings/bandit/L13.cast`
 
+## Level 14 → bandit15
+- **Account:** `bandit14`.
+- **Goal:** Submit the current level's password to the service on `localhost:30000`; it answers with the next password.
+- **Technique and why it works:** The level runs a plain TCP daemon on port 30000 that reads a line and checks it against bandit14's password. `nc` connects, and the shell pipeline feeds the password line on stdin. `-q 2` closes after 2 seconds once stdin ends so the read completes and the connection tears down cleanly.
+- **Commands:**
+  ```
+  echo aaWecNkG4FhxJQxz07uiwzVP6bJiYS65 | nc -q 2 localhost 30000
+  ```
+- **Password for bandit15:** `pbLYuZtTg4MgaqfJx8jbA9gKKGqM68A7`
+- **Verification:** logged in as `bandit15` with this password.
+- **Recording:** `recordings/bandit/L14.cast`
+
