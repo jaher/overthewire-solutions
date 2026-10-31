@@ -383,3 +383,19 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit28` with this password.
 - **Recording:** `recordings/bandit/L26.cast`
 
+## Level 27 → bandit28
+- **Account:** `bandit27`.
+- **Goal:** Clone the `bandit28-git` repository and obtain bandit28's password.
+- **Technique and why it works:** The repository's `README.md` in the current commit (HEAD) shows the password redacted as `xxxxxxxxxx`; the HEAD commit is literally titled "fix info leak". But git keeps every version of every file, and the previous commit (`HEAD~1`) still contains the real password. `git log --oneline` reveals the history, and `git show HEAD~1:README.md` prints the old file version. Removing a secret from the working tree does not remove it from history.
+- **Commands:**
+  ```
+  git clone ssh://bandit28-git@bandit.labs.overthewire.org:2220/home/bandit28-git/repo
+  cd repo
+  cat README.md               # redacted at HEAD
+  git --no-pager log --oneline
+  git --no-pager show HEAD~1:README.md
+  ```
+- **Password for bandit28:** `Em7eGtqaMySwNFjCpwzzHhLhospOcdt0`
+- **Verification:** logged in as `bandit29` with this password.
+- **Recording:** `recordings/bandit/L27.cast`
+

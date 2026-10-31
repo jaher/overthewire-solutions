@@ -28,3 +28,4 @@ Bandit | L23 | drop executable script in bandit24 cron spool | recordings/bandit
 Bandit | L24 | brute-force 10,000 pincodes against nc daemon | recordings/bandit/L24.cast
 Bandit | L25 | more->vi :shell escape on a tiny PTY | recordings/bandit/L25.cast
 Bandit | L26 | clone git repo over ssh, read README | recordings/bandit/L26.cast
+Bandit | L27 | git history leaks redacted password (HEAD~1) | recordings/bandit/L27.cast
