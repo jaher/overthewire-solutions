@@ -8,3 +8,4 @@ Bandit | L3 | ls -la to reveal the hidden file in inhere/ | recordings/bandit/L3
 Bandit | L4 | file inhere/* to find the only ASCII text file | recordings/bandit/L4.cast
 Bandit | L5 | find -size 1033c ! -executable under inhere | recordings/bandit/L5.cast
 Bandit | L6 | find / -user bandit7 -group bandit6 -size 33c 2>/dev/null | recordings/bandit/L6.cast
+Bandit | L7 | grep millionth data.txt | recordings/bandit/L7.cast
