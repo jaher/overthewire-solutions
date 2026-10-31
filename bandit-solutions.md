@@ -213,3 +213,15 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit15` with this password.
 - **Recording:** `recordings/bandit/L14.cast`
 
+## Level 15 → bandit16
+- **Account:** `bandit15`.
+- **Goal:** Same idea as level 14, but the service on `localhost:30001` speaks TLS.
+- **Technique and why it works:** A plain `nc` to 30001 fails because the daemon expects a TLS handshake. `openssl s_client` performs the handshake (and, with `-quiet`, suppresses the certificate chatter); the password is then written over the encrypted channel. `2>/dev/null` drops the handshake diagnostics on stderr so the transcript shows only the daemon's reply.
+- **Commands:**
+  ```
+  echo pbLYuZtTg4MgaqfJx8jbA9gKKGqM68A7 | openssl s_client -connect localhost:30001 -quiet 2>/dev/null
+  ```
+- **Password for bandit16:** `kS0Hf0u5HiXFwKMKFqXvPdOTNGGa0X8V`
+- **Verification:** logged in as `bandit16` with this password.
+- **Recording:** `recordings/bandit/L15.cast`
+
