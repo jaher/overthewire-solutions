@@ -112,3 +112,17 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas8.natas.labs.overthewire.org/` with `natas8:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L7.cast`
 
+## Level 8 → natas9
+- **Account:** `natas8`.
+- **Goal:** Submit the correct secret; the source shows the check is `encodeSecret($_POST['secret']) == "3d3d516343746d4d6d6c315669563362"`.
+- **Technique and why it works:** `encodeSecret` is `bin2hex(strrev(base64_encode($secret)))`. To invert it, undo the operations in reverse order: hex-decode, reverse the string, then base64-decode. Hex-decoding yields `==QcCtmMml1ViV3b`; reversing yields `b3ViV1lmMmtCcQ==`; base64-decoding yields `oubWYf2kBq`. Posting that value satisfies the comparison and returns natas9's password. This is obfuscation, not hashing — every step is reversible.
+- **Commands:**
+  ```
+  curl -s -u natas8:<pw> http://natas8.natas.labs.overthewire.org/index-source.html
+  python3 -c "import base64; h='3d3d516343746d4d6d6c315669563362'; s=bytes.fromhex(h).decode()[::-1]; print(base64.b64decode(s).decode())"
+  curl -s -u natas8:<pw> -d 'secret=oubWYf2kBq&submit=1' http://natas8.natas.labs.overthewire.org/
+  ```
+- **Password for natas9:** `UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9`
+- **Verification:** `http://natas9.natas.labs.overthewire.org/` with `natas9:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L8.cast`
+

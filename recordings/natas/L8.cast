@@ -1,0 +1,7 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469352,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L8.sh","title":"Natas L8 solve","env":{"SHELL":"/bin/bash"}}
+[0.012, "o", "$ curl -s -u natas8:<pw> http://natas8.natas.labs.overthewire.org/index-source.html    # encodedSecret = 3d3d51...\r\r\n"]
+[0.452, "o", "$ python3: hex-decode, reverse, base64-decode\r\r\n"]
+[0.012, "o", "oubWYf2kBq\r\r\n"]
+[0.002, "o", "$ curl -s -u natas8:<pw> -d \"secret=oubWYf2kBq&submit=1\" http://natas8.natas.labs.overthewire.org/\r\r\n"]
+[0.915, "o", "Access granted. The password for natas9 is UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9\r\r\n"]
+[0.003, "x", "0"]
