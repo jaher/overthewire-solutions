@@ -13,3 +13,4 @@ Bandit | L8 | sort data.txt | uniq -u | recordings/bandit/L8.cast
 Bandit | L9 | strings data.txt | grep "===" | recordings/bandit/L9.cast
 Bandit | L11 | ROT13 via tr | recordings/bandit/L11.cast
 Bandit | L12 | peel xxd/gzip/bzip2/tar layers with file | recordings/bandit/L12.cast
+Bandit | L13 | ssh private key, log in to bandit14 from client (localhost hop blocked) | recordings/bandit/L13.cast
