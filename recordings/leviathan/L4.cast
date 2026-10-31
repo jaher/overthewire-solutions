@@ -1,0 +1,10 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793471862,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/leviathan/L4.sh","title":"Leviathan L4 solve","env":{"SHELL":"/bin/bash"}}
+[0.012, "o", "$ ssh leviathan4@leviathan.labs.overthewire.org -p 2223   # password XIyBbRwAPt\r\r\n$ ls -la .trash   # setuid leviathan5 binary \"bin\"\r\r\n$ ssh leviathan4@leviathan.labs.overthewire.org -p 2223 ls -la .trash\r\r\n"]
+[4.555, "o", "total 24\r\r\ndr-xr-x--- 2 root       leviathan4  4096 Oct 25 13:39 .\r\r\ndrwxr-xr-x 3 root       root        4096 Oct 25 13:39 ..\r\r\n-r-sr-x--- 1 leviathan5 leviathan4 14936 Oct 25 13:39 bin\r\r\n"]
+[0.003, "o", "$ ./.trash/bin   # prints the next password as binary bits\r\r\n$ ssh leviathan4@leviathan.labs.overthewire.org -p 2223 ./.trash/bin\r\r\n"]
+[6.164, "o", "01000010 01110101 01100010 00111001 01100111 01011010 00110011 01000010 01000111 01010101 00001010 \r\r\n"]
+[0.001, "o", "$ python3: convert each 8-bit group to a character\r\r\n"]
+[0.005, "o", "Bub9gZ3BGU\r\r\n\r\r\n"]
+[0.001, "o", "$ ssh leviathan5@leviathan.labs.overthewire.org -p 2223   # verify Bub9gZ3BGU\r\r\n$ ssh leviathan5@leviathan.labs.overthewire.org -p 2223 whoami\r\r\n"]
+[4.347, "o", "leviathan5\r\r\n"]
+[0.004, "x", "0"]

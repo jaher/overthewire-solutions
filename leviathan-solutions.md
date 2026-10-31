@@ -68,3 +68,18 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `leviathan4` with this password.
 - **Recording:** `recordings/leviathan/L3.cast`
 
+## Level 4 → leviathan5
+- **Account:** `leviathan4`.
+- **Goal:** There is a setuid binary in the hidden `.trash` directory; run it to get leviathan5's password.
+- **Technique and why it works:** `ls -la .trash` shows `bin`, mode `-r-sr-x---`, owned by leviathan5. Running it prints a sequence of 8-bit binary numbers separated by spaces, one per character of the password, ending with `00001010` (a newline). Converting each group of eight bits to its ASCII character reconstructs the password, `Bub9gZ3BGU`. No exploit is needed beyond decoding the binary's output format.
+- **Commands:**
+  ```
+  ssh leviathan4@leviathan.labs.overthewire.org -p 2223
+  ls -la .trash
+  ./.trash/bin
+  python3 -c "print(''.join(chr(int(b,2)) for b in '01000010 01110101 ...'.split()))"
+  ```
+- **Password for leviathan5:** `Bub9gZ3BGU`
+- **Verification:** logged in as `leviathan5` with this password.
+- **Recording:** `recordings/leviathan/L4.cast`
+
