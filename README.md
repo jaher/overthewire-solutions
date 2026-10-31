@@ -8,8 +8,8 @@ Solutions to **every OverTheWire wargame**, solved from a DGX Spark ("DGX 5"). E
 
 | Game | Type | Levels | Status |
 |---|---|---|---|
-| Bandit | Linux basics over SSH | 0–33 | ✅ Complete — [writeup](bandit-writeup.md) |
-| Natas | Web security | 0–34 | 🔄 Solving |
+| Bandit | Linux basics over SSH | 0–33 | ✅ Complete — [solutions](bandit-solutions.md) |
+| Natas | Web security | 0–34 | 🔄 Solving — [solutions](natas-solutions.md) |
 | Leviathan | Linux/binary basics | 0–7 | 🔄 Solving |
 | Krypton | Classical cryptography | 0–6 | 🔄 Solving |
 | Manpage | Linux privilege basics | 0–6 | 🔄 Solving |
