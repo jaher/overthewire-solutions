@@ -23,3 +23,4 @@ Bandit | L18 | non-interactive ssh command (bashrc logs out interactive) | recor
 Bandit | L19 | setuid bandit20-do runs command as bandit20 | recordings/bandit/L19.cast
 Bandit | L20 | nc listener + setuid suconnect password handshake | recordings/bandit/L20.cast
 Bandit | L21 | read cron job script, grab password it writes to /tmp | recordings/bandit/L21.cast
+Bandit | L22 | reproduce md5 filename computed by cron script | recordings/bandit/L22.cast

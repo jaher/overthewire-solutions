@@ -305,3 +305,18 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit22` with this password.
 - **Recording:** `recordings/bandit/L21.cast`
 
+## Level 22 → bandit23
+- **Account:** `bandit22`.
+- **Goal:** Another cron job copies a password into `/tmp` under a name computed at runtime; work out the name.
+- **Technique and why it works:** `/usr/bin/cronjob_bandit23.sh` computes `myname=$(whoami)` — which is `bandit23` when cron runs it — then `mytarget=$(echo I am user $myname | md5sum | cut -d ' ' -f 1)`, and writes `/etc/bandit_pass/$myname` to `/tmp/$mytarget`. Reproducing the exact pipeline on our side gives the same MD5 name, so the file can be read directly.
+- **Commands:**
+  ```
+  cat /etc/cron.d/cronjob_bandit23
+  cat /usr/bin/cronjob_bandit23.sh
+  echo I am user bandit23 | md5sum | cut -d ' ' -f 1     # 8ca319486bfbbc3663ea0fbe81326349
+  cat /tmp/8ca319486bfbbc3663ea0fbe81326349
+  ```
+- **Password for bandit23:** `gKXDTAXnIz3OBxiPjRZ2uqutUlPZrBsw`
+- **Verification:** logged in as `bandit23` with this password.
+- **Recording:** `recordings/bandit/L22.cast`
+
