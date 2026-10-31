@@ -39,3 +39,4 @@ Natas | L1 | raw HTTP fetch bypasses client-side right-click block | recordings/
 Natas | L2 | open directory index + users.txt | recordings/natas/L2.cast
 Natas | L3 | robots.txt leaks /s3cr3t/, open index, users.txt | recordings/natas/L3.cast
 Natas | L4 | spoof Referer header | recordings/natas/L4.cast
+Natas | L5 | forge loggedin=1 cookie | recordings/natas/L5.cast

