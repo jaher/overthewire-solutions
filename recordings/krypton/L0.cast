@@ -1,0 +1,6 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793472581,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/krypton/L0.sh","title":"Krypton L0 solve","env":{"SHELL":"/bin/bash"}}
+[0.008, "o", "$ # Krypton L0: the level page gives Base64: S1JZUFRPTklTR1JFQVQ=\r\r\n$ echo S1JZUFRPTklTR1JFQVQ= | base64 -d\r\r\n"]
+[0.001, "o", "KRYPTONISGREAT\r\r\n$ ssh krypton1@krypton.labs.overthewire.org -p 2231   # verify KRYPTONISGREAT\r\r\n"]
+[0.000, "o", "$ ssh krypton1@krypton.labs.overthewire.org -p 2231 whoami\r\r\n"]
+[7.634, "o", "krypton1\r\r\n"]
+[0.003, "x", "0"]
