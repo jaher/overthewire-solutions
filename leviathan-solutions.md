@@ -36,3 +36,19 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `leviathan2` with this password.
 - **Recording:** `recordings/leviathan/L1.cast`
 
+## Level 2 → leviathan3
+- **Account:** `leviathan2`.
+- **Goal:** The setuid binary `printfile` (owned by leviathan3) prints a file. Read leviathan3's password.
+- **Technique and why it works:** `printfile` first calls `access()` on the path we give it — an access check performed with *our* real UID, so it only passes for files we can already read — and then builds a shell command `"/bin/cat %s"` with that path. Two bugs combine. First, `access()` and the later `cat` disagree about the path: we can make `access()` succeed on a path whose *prefix* is a symlink to the password file. We create `/tmp/l2/a` as a symlink to `/etc/leviathan_pass/leviathan3`, and a real, readable file named `/tmp/l2/a b` (with a space). `access("/tmp/l2/a b")` succeeds because that real file exists and we can read it. But `/bin/cat %s` is word-split by the shell, so cat receives two arguments: `/tmp/l2/a` (the symlink, now resolved with the setuid binary's privileges) and `b`. Cat prints the symlinked password file. The classic TOCTOU/argument-splitting flaw.
+- **Commands:**
+  ```
+  ssh leviathan2@leviathan.labs.overthewire.org -p 2223
+  rm -rf /tmp/l2; mkdir -p /tmp/l2
+  ln -s /etc/leviathan_pass/leviathan3 /tmp/l2/a
+  touch "/tmp/l2/a b"
+  ./printfile "/tmp/l2/a b"
+  ```
+- **Password for leviathan3:** `PiEpxxknZH`
+- **Verification:** logged in as `leviathan3` with this password.
+- **Recording:** `recordings/leviathan/L2.cast`
+
