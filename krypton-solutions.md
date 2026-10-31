@@ -89,3 +89,19 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `krypton6` with this password.
 - **Recording:** `recordings/krypton/L5.cast`
 
+## Level 6 → krypton7
+- **Account:** `krypton6`.
+- **Goal:** The setuid `encrypt6` binary encrypts a file using a secret `keyfile.dat` plus a weak "random" keystream (HINT2: an 8-bit LFSR). Recover `krypton7`'s password.
+- **Technique and why it works:** Disassembly of `encrypt6` shows the cipher per letter: it uppercases, maps to 0–25, and outputs `(lfsr + key[i % 10] + (P − 0x41) − 0x41) mod 26` — i.e. a Vigenère-style addition of a 10-byte key plus an LFSR byte, with the LFSR advanced once per output letter. Because the LFSR is deterministic and periodic, a chosen-plaintext attack recovers the combined offset: encrypt 600 `A`s, subtract `A` from each output, and the resulting sequence has period 30. Decrypting `krypton7` with that periodic offset gives `LFSRISNOTRANDOM`. (The period is 30 because the 8-bit LFSR's maximal cycle is 255, and combined with the 10-letter key cycling the effective pattern repeats; empirically the period observed is 30 for this keyfile.)
+- **Commands:**
+  ```
+  D=$(mktemp -d); cd "$D"; chmod 777 .
+  ln -s /krypton/krypton6/keyfile.dat
+  python3 -c 'open("p.txt","wb").write(b"A"*600)'
+  /krypton/krypton6/encrypt6 p.txt o.bin
+  # offset[i] = (o.bin[i]-65) mod 26 ; find period (30); decrypt krypton7 with it
+  ```
+- **Password for krypton7:** `LFSRISNOTRANDOM`
+- **Verification:** logged in as `krypton7` with this password.
+- **Recording:** `recordings/krypton/L6.cast`
+

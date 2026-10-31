@@ -1,0 +1,8 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793474071,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/krypton/L6.sh","title":"Krypton L6 solve","env":{"SHELL":"/bin/bash"}}
+[0.013, "o", "$ ssh krypton6@krypton.labs.overthewire.org -p 2231   # password RANDOM\r\r\n$ cat README/HINT1/HINT2   # encrypt6 = keyfile XOR-ish + weak LFSR keystream\r\r\n$ ssh krypton6@krypton.labs.overthewire.org -p 2231 cat /krypton/krypton6/HINT2\r\r\n"]
+[2.743, "o", "8 bit LFSR\r\r\n"]
+[0.001, "o", "$ chosen plaintext: encrypt 600 A bytes, subtract \"A\" -> keystream offsets, find period 30\r\r\n$ ssh krypton6@krypton.labs.overthewire.org -p 2231 D=$(mktemp -d); cd \"$D\"; chmod 777 .; ln -s /krypton/krypton6/keyfile.dat\r\r\npython3 -c \"open(\\\"p.txt\\\",\\\"wb\\\").write(b\\\"A\\\"*600)\"; /krypton/krypton6/encrypt6 p.txt o.bin\r\r\npython3 - <<PY\r\r\nc=open(\"o.bin\",\"rb\").read(); off=bytes((b-65)%26 for b in c)\r\r\nfor P in range(1,300):\r\r\n    if all(off[i]==off[i%P] for i in range(len(off))):\r\r\n        print(\"period\",P,\"K:\",list(off[:P])); break\r\r\nct=[b for b in open(\"/krypton/krypton6/krypton7\",\"rb\").read() if 65<=b<=90]\r\r\npt=bytes(65+((ct[i]-65-off[i%P])%26) for i in range(len(ct)))\r\r\nprint(\"krypton7 plaintext:\",pt)\r\r\nPY\r\r\n"]
+[2.859, "o", "period 30 K: [4, 8, 2, 19, 3, 6, 24, 8, 24, 25, 10, 19, 7, 13, 18, 8, 17, 5, 23, 24, 2, 15, 5, 20, 4, 14, 2, 10, 17, 13]\r\r\nkrypton7 plaintext: b'LFSRISNOTRANDOM'\r\r\n"]
+[0.005, "o", "$ ssh krypton7@krypton.labs.overthewire.org -p 2231   # verify LFSRISNOTRANDOM\r\r\n$ ssh krypton7@krypton.labs.overthewire.org -p 2231 whoami\r\r\n"]
+[6.691, "o", "krypton7\r\r\n"]
+[0.003, "x", "0"]
