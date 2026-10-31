@@ -36,3 +36,4 @@ Bandit | L31 | $0 breaks the uppercase restricted shell | recordings/bandit/L31.
 Bandit | L32 | final level: README confirms game complete, no bandit34 | recordings/bandit/L32.cast
 Natas | L0 | password in HTML comment | recordings/natas/L0.cast
 Natas | L1 | raw HTTP fetch bypasses client-side right-click block | recordings/natas/L1.cast
+Natas | L2 | open directory index + users.txt | recordings/natas/L2.cast
