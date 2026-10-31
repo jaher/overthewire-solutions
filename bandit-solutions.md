@@ -52,6 +52,19 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit3` with this password.
 - **Recording:** `recordings/bandit/L2.cast`
 
+## Level 3 → bandit4
+- **Account:** `bandit3`.
+- **Goal:** The password is in a hidden file inside the `inhere` directory.
+- **Technique and why it works:** `ls` hides dot-files by default; `ls -la` lists all entries including names beginning with `.`, which reveals `...Hiding-From-You`. It is a normal (non-dot) file here, but the directory listing is what exposes the name.
+- **Commands:**
+  ```
+  ls -la inhere/
+  cat inhere/...Hiding-From-You
+  ```
+- **Password for bandit4:** `xzTXq1rDJQVVAzdv5cHq1TQytTWufAMq`
+- **Verification:** logged in as `bandit4` with this password.
+- **Recording:** `recordings/bandit/L3.cast`
+
 ## Level 10 → bandit11
 - **Account:** `bandit10`.
 - **Goal:** `data.txt` contains base64-encoded data; the password is the decoded text.
