@@ -49,3 +49,4 @@ Natas | L11 | recover XOR key from known plaintext, forge cookie | recordings/na
 Natas | L12 | unrestricted upload with filename=shell.php | recordings/natas/L12.cast
 Natas | L13 | GIF89a polyglot bypasses exif_imagetype | recordings/natas/L13.cast
 Natas | L14 | SQL injection OR 1=1 | recordings/natas/L14.cast
+Natas | L15 | blind SQLi: binary search on ORD(SUBSTR(password)) | recordings/natas/L15.cast

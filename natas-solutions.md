@@ -205,3 +205,16 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas15.natas.labs.overthewire.org/` with `natas15:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L14.cast`
 
+## Level 15 → natas16
+- **Account:** `natas15`.
+- **Goal:** A username form runs `SELECT * from users where username="$u"`, and the only feedback is whether a user exists ("This user exists" / "This user doesn't exist"). There is no password output, so this is blind SQL injection.
+- **Technique and why it works:** The username is concatenated into the query, so we can append conditions. `username=natas16" AND password LIKE "%` returns "exists", proving the user `natas16` exists and that we can test predicates on its password. To read the password without a visible value, we test one character position at a time with a binary search: `AND ORD(SUBSTR(password,<pos>,1)) > <mid>`. The "exists" / "doesn't exist" response is the one-bit oracle; each step halves the character range (ASCII 32–126), so ~7 requests per character recover it. The script below extracts all 32 characters and prints the password.
+- **Commands:**
+  ```
+  curl -s -u natas15:<pw> --data-urlencode 'username=natas16" AND password LIKE "%' http://natas15.natas.labs.overthewire.org/
+  # python: binary search on ORD(SUBSTR(password,pos,1)) over ASCII 32..126
+  ```
+- **Password for natas16:** `Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb`
+- **Verification:** `http://natas16.natas.labs.overthewire.org/` with `natas16:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L15.cast`
+
