@@ -218,3 +218,17 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas16.natas.labs.overthewire.org/` with `natas16:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L15.cast`
 
+## Level 16 → natas17
+- **Account:** `natas16`.
+- **Goal:** The search box runs `passthru("grep -i \"$key\" dictionary.txt")`. This time `;`, `|`, `&`, backtick, single quote, and double quote are filtered — but the value is inside *double quotes*, so `$(...)` command substitution still runs.
+- **Technique and why it works:** We inject `$(grep <pattern> /etc/natas_webpass/natas17)`. The shell substitutes the output of that grep into the argument of the outer `grep`, so the outer grep searches the dictionary for the *result*. If the inner grep matches, it prints the natas17 password, which is unlikely to appear in dictionary.txt — so the outer grep outputs nothing. If the inner grep does not match, it prints nothing, the outer grep is run with an empty pattern, and it dumps the whole dictionary (a large response, ~460 KB). That gives a yes/no oracle: empty output means the pattern matched. Using bracket classes (which need no quotes) we binary-search each character with `grep ^<prefix>[<range>] /etc/natas_webpass/natas17`, recovering the full password with ~6–7 requests per character.
+- **Commands:**
+  ```
+  curl -s -u natas16:<pw> --data-urlencode 'needle=$(grep ^[A-M] /etc/natas_webpass/natas17)' http://natas16.natas.labs.overthewire.org/
+  # empty <pre> output => prefix matches; full dictionary dump => no match
+  # python: binary search over [0-9A-Za-z] for each position (script in the recording)
+  ```
+- **Password for natas17:** `KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx`
+- **Verification:** `http://natas17.natas.labs.overthewire.org/` with `natas17:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L16.cast`
+

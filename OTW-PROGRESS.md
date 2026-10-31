@@ -53,3 +53,4 @@ Natas | L15 | blind SQLi: binary search on ORD(SUBSTR(password)) | recordings/na
 Leviathan | L0 | grep backup bookmarks.html for password | recordings/leviathan/L0.cast
 Leviathan | L1 | setuid check accepts sex, spawns leviathan2 shell | recordings/leviathan/L1.cast
 Leviathan | L2 | printfile access()/cat split: symlink + space in name | recordings/leviathan/L2.cast
+Natas | L16 | $(...) substitution oracle + binary search | recordings/natas/L16.cast
