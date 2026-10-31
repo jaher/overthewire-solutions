@@ -13,6 +13,19 @@ levels that are "ssh to the next account from inside" (13, 16) are solved by bri
 the key/credential to this client machine and connecting directly to the public host.
 
 ---
+## Level 0 → bandit1
+- **Account:** `bandit0`, password `bandit0` (given by the game).
+- **Goal:** Read the password for bandit1, stored in the home directory's `readme`.
+- **Technique and why it works:** The level is a plain file read. `cat` writes the file's bytes to stdout; the file is group-readable by `bandit0` (`-rw-r----- bandit1 bandit0`), so no privilege trick is needed — the password file is simply handed to this level's account.
+- **Commands:**
+  ```
+  ssh bandit0@bandit.labs.overthewire.org -p 2220
+  cat ~/readme
+  ```
+- **Password for bandit1:** `6y2kwnwK6grgvwvpvLaa2T1cpFEKOhNR`
+- **Verification:** logged in as `bandit1` with this password (`whoami` → `bandit1`).
+- **Recording:** `recordings/bandit/L0.cast`
+
 ## Level 10 → bandit11
 - **Account:** `bandit10`.
 - **Goal:** `data.txt` contains base64-encoded data; the password is the decoded text.
