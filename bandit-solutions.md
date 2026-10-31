@@ -415,3 +415,19 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit30` with this password.
 - **Recording:** `recordings/bandit/L28.cast`
 
+## Level 29 → bandit30
+- **Account:** `bandit29`.
+- **Goal:** Clone the `bandit30-git` repository and find bandit30's password.
+- **Technique and why it works:** The working tree is a decoy — the README says "just an epmty file... muahaha" and there are no branches of interest. But git tags are separate refs that can carry their own objects/messages; `git tag` lists one tag named `secret`, and `git show secret` prints its content, which is the password. Git stores more than files and commits: tags, notes, and stashes can all hold data.
+- **Commands:**
+  ```
+  git clone ssh://bandit30-git@bandit.labs.overthewire.org:2220/home/bandit30-git/repo
+  cd repo
+  cat README.md
+  git --no-pager tag
+  git --no-pager show secret
+  ```
+- **Password for bandit30:** `82NkymblpGBYmIXG6ZQ8YldBYstHpfUf`
+- **Verification:** logged in as `bandit31` with this password.
+- **Recording:** `recordings/bandit/L29.cast`
+

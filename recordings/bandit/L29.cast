@@ -1,0 +1,10 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793468074,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/bandit/L29.sh","title":"Bandit L30: password in git tag","env":{"SHELL":"/bin/bash"}}
+[0.009, "o", "$ git clone ssh://bandit30-git@bandit.labs.overthewire.org:2220/home/bandit30-git/repo\r\r\n"]
+[0.001, "o", "Cloning into 'repo'...\r\r\n"]
+[4.520, "o", "$ cat README.md\r\r\n"]
+[0.001, "o", "just an epmty file... muahaha\r\r\n"]
+[0.000, "o", "$ git --no-pager tag\r\r\n"]
+[0.001, "o", "secret\r\r\n"]
+[0.000, "o", "$ git --no-pager show secret\r\r\n"]
+[0.002, "o", "82NkymblpGBYmIXG6ZQ8YldBYstHpfUf\r\r\n"]
+[0.003, "x", "0"]
