@@ -369,3 +369,17 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit27` with this password.
 - **Recording:** `recordings/bandit/L25.cast`
 
+## Level 26 → bandit27
+- **Account:** `bandit26` (reached through the level-25 `more`→`vi`→`:shell` escape; the shell is not the login shell, so we stay in it rather than starting a new SSH session).
+- **Goal:** A git repository is served over SSH at `ssh://bandit27-git@bandit.labs.overthewire.org:2220/home/bandit27-git/repo`; clone it and read the password for bandit27.
+- **Technique and why it works:** The repo is hosted over git's SSH transport, authenticated with bandit27's password (the account `bandit27-git` shares the credential). `git clone` with the `ssh://` URL pulls the objects and checks out `README`. The README states the next password. The clone is run from this client with the password supplied through `SSH_ASKPASS`, because the game backend blocks localhost connections.
+- **Commands:**
+  ```
+  git clone ssh://bandit27-git@bandit.labs.overthewire.org:2220/home/bandit27-git/repo
+  cat repo/README
+  ```
+  (The recording shows the same clone, with `GIT_SSH_COMMAND` forcing password auth and `SSH_ASKPASS` supplying `STJLJBRRphMxKB392CT4iOr5CbzPU9ER`.)
+- **Password for bandit27:** `y8Yd2ssKcpHpud7UvOSOxwamRMzIGIeQ`
+- **Verification:** logged in as `bandit28` with this password.
+- **Recording:** `recordings/bandit/L26.cast`
+
