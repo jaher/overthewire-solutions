@@ -185,3 +185,19 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit13` with this password.
 - **Recording:** `recordings/bandit/L12.cast`
 
+## Level 13 → bandit14
+- **Account:** `bandit13`.
+- **Goal:** The home directory contains `sshkey.private`, a private key that can log in as bandit14; use it to read bandit14's password.
+- **Technique and why it works:** SSH public-key auth: the private key proves possession of the identity whose public half is in bandit14's `~/.ssh/authorized_keys`. `ssh -i key` selects it. The official level page suggests `ssh -i sshkey.private bandit14@localhost`, but the OTW backend refuses connections from localhost; so the key is copied to the client machine (fetched by `cat` over an authenticated session) and used to connect to the public host directly. The key must be mode 600 or ssh refuses to use it.
+- **Commands:**
+  ```
+  # on the client: fetch the key out of bandit13's home
+  ssh bandit13@bandit.labs.overthewire.org -p 2220 'cat sshkey.private' > key
+  chmod 600 key
+  ssh -i key bandit14@bandit.labs.overthewire.org -p 2220 'cat /etc/bandit_pass/bandit14'
+  ```
+  (Inside bandit13, `cat HINT` and `cat sshkey.private` confirm the intended route; the localhost hop is rejected with "Connecting from/to localhost is blocked".)
+- **Password for bandit14:** `aaWecNkG4FhxJQxz07uiwzVP6bJiYS65`
+- **Verification:** logged in as `bandit14` with this password.
+- **Recording:** `recordings/bandit/L13.cast`
+
