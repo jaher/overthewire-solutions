@@ -78,6 +78,19 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit5` with this password.
 - **Recording:** `recordings/bandit/L4.cast`
 
+## Level 5 → bandit6
+- **Account:** `bandit5`.
+- **Goal:** Find a file under `inhere` that is human-readable, 1033 bytes, and not executable.
+- **Technique and why it works:** `find` can select by exact byte size (`-size 1033c`), type (`-type f`), and permission (`! -executable`). Combining all three predicates narrows the tree to a single path, `inhere/maybehere07/.file2`.
+- **Commands:**
+  ```
+  find inhere -type f -size 1033c ! -executable
+  cat inhere/maybehere07/.file2
+  ```
+- **Password for bandit6:** `pXa26xhMWaC2SvDotA4r9EgZkulOeSBW`
+- **Verification:** logged in as `bandit6` with this password.
+- **Recording:** `recordings/bandit/L5.cast`
+
 ## Level 10 → bandit11
 - **Account:** `bandit10`.
 - **Goal:** `data.txt` contains base64-encoded data; the password is the decoded text.
