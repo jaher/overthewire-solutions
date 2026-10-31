@@ -67,3 +67,4 @@ Krypton | L4 | Vigenere keylen 6: per-column chi-squared -> SERXRL, then ROT13 |
 Krypton | L5 | Vigenere unknown keylen: IC->9, per-column chi-squared->XRLYRATGU, then ROT13 | recordings/krypton/L5.cast
 Krypton | L6 | chosen-plaintext recovers periodic LFSR keystream (period 30) | recordings/krypton/L6.cast
 Krypton | L7 | final level: README confirms game complete | recordings/krypton/L7.cast
+Manpage | L0 | BLOCKED: setuid bit not honored on lab host (euid stays manpage0 at main entry; /manpage/manpage0 is -r-sr-x--- manpage1:manpage0); the setuid(getuid()) drop makes the saved UID 17000, so the strcpy overflow cannot regain manpage1. Level appears bit-rotted upstream. | (no recording)
