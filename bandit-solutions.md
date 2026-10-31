@@ -39,6 +39,19 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit2` with this password.
 - **Recording:** `recordings/bandit/L1.cast`
 
+## Level 2 → bandit3
+- **Account:** `bandit2`.
+- **Goal:** Read the password in a file whose name contains spaces: `--spaces in this filename--`.
+- **Technique and why it works:** The shell splits unquoted whitespace into separate arguments, so the name must be kept as one word. Either quoting (`cat "./--spaces in this filename--"`) or backslash-escaping each space (`cat ./--spaces\ in\ this\ filename--`) passes a single argument; `./` also stops the leading dashes being parsed as options.
+- **Commands:**
+  ```
+  ls -la
+  cat ./--spaces\ in\ this\ filename--
+  ```
+- **Password for bandit3:** `7ZZ2LFrykP2zEyvBl4m3clcL7tGYJPME`
+- **Verification:** logged in as `bandit3` with this password.
+- **Recording:** `recordings/bandit/L2.cast`
+
 ## Level 10 → bandit11
 - **Account:** `bandit10`.
 - **Goal:** `data.txt` contains base64-encoded data; the password is the decoded text.
