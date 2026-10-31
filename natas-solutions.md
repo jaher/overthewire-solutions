@@ -61,3 +61,15 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas4.natas.labs.overthewire.org/` with `natas4:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L3.cast`
 
+## Level 4 → natas5
+- **Account:** `natas4`.
+- **Goal:** The page refuses access unless you arrive from `http://natas5.natas.labs.overthewire.org/`.
+- **Technique and why it works:** The check is on the HTTP `Referer` header, which the *client* supplies. It is not a security boundary — it is trivially spoofed with `curl -H 'Referer: ...'`. We send the header claiming we came from natas5, and the server grants access and prints natas5's password. The lesson: client-controlled headers cannot be trusted for access control.
+- **Commands:**
+  ```
+  curl -s -u natas4:<pw> -H 'Referer: http://natas5.natas.labs.overthewire.org/' http://natas4.natas.labs.overthewire.org/
+  ```
+- **Password for natas5:** `e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M`
+- **Verification:** `http://natas5.natas.labs.overthewire.org/` with `natas5:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L4.cast`
+
