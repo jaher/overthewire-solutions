@@ -116,6 +116,18 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit8` with this password.
 - **Recording:** `recordings/bandit/L7.cast`
 
+## Level 8 → bandit9
+- **Account:** `bandit8`.
+- **Goal:** `data.txt` contains many repeated lines; exactly one line occurs only once — that line is the password.
+- **Technique and why it works:** `uniq` only collapses adjacent duplicates, so the file is sorted first. `uniq -u` prints only lines that occur exactly once in the sorted input, which leaves the unique password line.
+- **Commands:**
+  ```
+  sort data.txt | uniq -u
+  ```
+- **Password for bandit9:** `EjmOSvuAu7sGAHqHVcBDPirRe9T03kxl`
+- **Verification:** logged in as `bandit9` with this password.
+- **Recording:** `recordings/bandit/L8.cast`
+
 ## Level 10 → bandit11
 - **Account:** `bandit10`.
 - **Goal:** `data.txt` contains base64-encoded data; the password is the decoded text.
