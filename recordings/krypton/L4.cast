@@ -1,0 +1,9 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793473491,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/krypton/L4.sh","title":"Krypton L4 solve","env":{"SHELL":"/bin/bash"}}
+[0.009, "o", "$ ssh krypton4@krypton.labs.overthewire.org -p 2231   # password BRUTE\r\r\n$ cat /krypton/krypton4/README   # Vigenere, key length 6; found1/found2 are two messages\r\r\n"]
+[4.670, "o", "$ per-key-position chi-squared over each found text (each starts at key offset 0) -> key SERXRL\r\r\n"]
+[0.023, "o", "keys: ['SERXRL', 'SERXRL']\r\r\n"]
+[0.002, "o", "$ Vigenere-decrypt with SERXRL, then ROT13 (the level text is ROT13-encoded)\r\r\n"]
+[0.006, "o", "vig  : PYRNEGRKG\r\r\nrot13: CLEARTEXT\r\r\n"]
+[0.002, "o", "$ ssh krypton5@krypton.labs.overthewire.org -p 2231   # verify CLEARTEXT\r\r\n$ ssh krypton5@krypton.labs.overthewire.org -p 2231 whoami\r\r\n"]
+[6.466, "o", "krypton5\r\r\n"]
+[0.003, "x", "0"]

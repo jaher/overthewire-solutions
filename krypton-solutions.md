@@ -62,3 +62,16 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `krypton4` with this password.
 - **Recording:** `recordings/krypton/L3.cast`
 
+## Level 4 → krypton5
+- **Account:** `krypton4`.
+- **Goal:** A Vigenère cipher with a 6-letter key; `found1` and `found2` are two long intercepted English messages, and `krypton5` holds the next password encrypted with the same key.
+- **Technique and why it works:** In a Vigenère cipher each plaintext letter is shifted by the key letter at that position, cycling every 6 characters. So the ciphertext splits into 6 interleaved Caesar ciphers — one per key position — each of which can be attacked by frequency analysis. We take each found text separately (each message restarts at key offset 0), split it into 6 columns, and pick the shift per column that best matches English letter frequencies (chi-squared). Both texts independently give the key `SERXRL`, confirming it. The README's example uses the convention C = P + K (mod 26), so decryption is C − K. Decrypting `HCIKV RJOX` with `SERXRL` yields `PYRNEGRKG`, which is itself ROT13 — applying ROT13 gives `CLEARTEXT`.
+- **Commands:**
+  ```
+  cat /krypton/krypton4/found1; cat /krypton/krypton4/found2
+  # per-position chi-squared key recovery -> SERXRL; Vigenere-decrypt krypton5, then ROT13
+  ```
+- **Password for krypton5:** `CLEARTEXT`
+- **Verification:** logged in as `krypton5` with this password.
+- **Recording:** `recordings/krypton/L4.cast`
+
