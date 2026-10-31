@@ -91,6 +91,19 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit6` with this password.
 - **Recording:** `recordings/bandit/L5.cast`
 
+## Level 6 → bandit7
+- **Account:** `bandit6`.
+- **Goal:** Find a file anywhere on the filesystem owned by user `bandit7`, group `bandit6`, exactly 33 bytes.
+- **Technique and why it works:** `find /` walks the whole tree; `-user`, `-group` and `-size 33c` are exact-match predicates. `2>/dev/null` discards the permission errors from directories `bandit6` cannot read, leaving the single hit `/var/lib/dpkg/info/bandit7.password`.
+- **Commands:**
+  ```
+  find / -user bandit7 -group bandit6 -size 33c 2>/dev/null
+  cat /var/lib/dpkg/info/bandit7.password
+  ```
+- **Password for bandit7:** `Bmnnvf82KzQlfxgAI2d1zYbr1u9pr3E3`
+- **Verification:** logged in as `bandit7` with this password.
+- **Recording:** `recordings/bandit/L6.cast`
+
 ## Level 10 → bandit11
 - **Account:** `bandit10`.
 - **Goal:** `data.txt` contains base64-encoded data; the password is the decoded text.
