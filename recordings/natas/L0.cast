@@ -1,0 +1,4 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793468652,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L0.sh","title":"Natas L0: password in HTML comment","env":{"SHELL":"/bin/bash"}}
+[0.022, "o", "$ curl -s -u natas0:natas0 http://natas0.natas.labs.overthewire.org/ | grep natas1\r\r\n"]
+[1.289, "o", "<!--The password for natas1 is scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7 -->\r\r\n"]
+[0.003, "x", "0"]
