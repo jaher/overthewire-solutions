@@ -65,6 +65,19 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit4` with this password.
 - **Recording:** `recordings/bandit/L3.cast`
 
+## Level 4 → bandit5
+- **Account:** `bandit4`.
+- **Goal:** In `inhere` there are ten files; find the one that is human-readable.
+- **Technique and why it works:** `file` classifies content from magic bytes rather than names. Nine files are binary `data`; only `-file07` is reported as `ASCII text`, so it is the human-readable one. Note the leading dash again, so the path is passed as `inhere/-file07` (the directory prefix removes the option ambiguity).
+- **Commands:**
+  ```
+  file inhere/* 2>/dev/null
+  cat inhere/-file07
+  ```
+- **Password for bandit5:** `6C7h9GD8M6ai5nr7wo1RonrzFjj9yIrG`
+- **Verification:** logged in as `bandit5` with this password.
+- **Recording:** `recordings/bandit/L4.cast`
+
 ## Level 10 → bandit11
 - **Account:** `bandit10`.
 - **Goal:** `data.txt` contains base64-encoded data; the password is the decoded text.
