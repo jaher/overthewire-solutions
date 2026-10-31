@@ -39,3 +39,19 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `narnia2` with this password.
 - **Recording:** `recordings/narnia/L1.cast`
 
+## Level 2 → narnia3
+- **Account:** `narnia2`.
+- **Goal:** `main` does `char buf[128]; strcpy(buf, argv[1]);` — an unbounded copy into a 128-byte stack buffer.
+- **Technique and why it works:** `strcpy` copies until the NUL, so an argv longer than 128 bytes overwrites the saved frame pointer (offset 128) and the return address (offset 132). ASLR is off and the stack is executable, so we put NOP sled + shellcode inside `argv[1]` and return into the sled. The shellcode calls `setreuid(geteuid(), geteuid())` first (the binary is setuid narnia3, so euid is narnia3; without it `execve("/bin/sh")` would drop back to narnia2) and then `execve("/bin/sh")`. Because the environment shifts the stack, the exploit sweeps candidate return addresses, detecting success by a "PWN!" marker the shellcode writes before spawning the shell, then re-execs with the found address.
+- **Commands:**
+  ```
+  ssh narnia2@narnia.labs.overthewire.org -p 2226
+  # run the python exploit (base64-transferred to /tmp/e_narnia2.py):
+  #   payload = NOP*87 + shellcode + 'B'*4 + <ret addr>;  sweep 0xffffd000..0xffffe800
+  id                                  # uid=14003(narnia3)
+  cat /etc/narnia_pass/narnia3
+  ```
+- **Password for narnia3:** `F5AYQwE8PA`
+- **Verification:** logged in as `narnia3` with this password.
+- **Recording:** `recordings/narnia/L2.cast`
+
