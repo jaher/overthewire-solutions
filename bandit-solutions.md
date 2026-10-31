@@ -448,3 +448,17 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit32` with this password (the account presents the uppercase-only shell).
 - **Recording:** `recordings/bandit/L30.cast`
 
+## Level 31 → bandit32
+- **Account:** `bandit31`.
+- **Goal:** bandit32's login shell is a restricted shell ("WELCOME TO THE UPPERCASE SHELL") that uppercases every command before executing it. Break out and read bandit33's password.
+- **Technique and why it works:** The wrapper uppercases the input string and then executes it. A command made only of characters with no case — like `$0` — is unchanged by uppercasing, and in a POSIX shell `$0` expands to the shell's own name, so `$0` re-executes the shell. That new shell is a normal `/bin/sh` (or bash) inherited with bandit32's effective UID, i.e. it keeps the privileges of the game account, and from it `cat /etc/bandit_pass/bandit33` works.
+- **Commands:**
+  ```
+  $0
+  id                            # uid=bandit33 — we are running as the next level's user
+  cat /etc/bandit_pass/bandit33
+  ```
+- **Password for bandit32:** `u4P2CyPOwPGLe94RdD9Uo2FxFwvnFswM`
+- **Verification:** logged in as `bandit33` with this password; `~/README.txt` confirms it is the last level and `getent passwd bandit34` returns nothing.
+- **Recording:** `recordings/bandit/L31.cast`
+
