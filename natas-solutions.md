@@ -138,3 +138,15 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas10.natas.labs.overthewire.org/` with `natas10:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L9.cast`
 
+## Level 10 → natas11
+- **Account:** `natas10`.
+- **Goal:** Same `passthru("grep -i $key dictionary.txt")` construct, but `preg_match('/[;|&]/', $key)` now rejects `;`, `|`, and `&`.
+- **Technique and why it works:** Blocking shell separators is not enough: the unquoted `$key` is still split by the shell, and grep itself takes multiple file arguments. We pass a pattern followed by a space and a path, `^ /etc/natas_webpass/natas11`. The shell builds `grep -i ^ /etc/natas_webpass/natas11 dictionary.txt`; grep treats `/etc/natas_webpass/natas11` as a second input file, and the `^` pattern matches every line of it, printing the password prefixed by the filename. No metacharacter is needed — argument injection suffices.
+- **Commands:**
+  ```
+  curl -s -u natas10:<pw> --data-urlencode 'needle=^ /etc/natas_webpass/natas11' http://natas10.natas.labs.overthewire.org/
+  ```
+- **Password for natas11:** `VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd`
+- **Verification:** `http://natas11.natas.labs.overthewire.org/` with `natas11:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L10.cast`
+

@@ -44,3 +44,4 @@ Natas | L6 | fetch included secret.inc | recordings/natas/L6.cast
 Natas | L7 | page= path traversal / LFI to /etc/natas_webpass | recordings/natas/L7.cast
 Natas | L8 | reverse encodeSecret: hex->rev->base64 | recordings/natas/L8.cast
 Natas | L9 | command injection via passthru | recordings/natas/L9.cast
+Natas | L10 | argument injection: grep extra file, blocks ;|& | recordings/natas/L10.cast
