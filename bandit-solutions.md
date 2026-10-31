@@ -264,3 +264,16 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit19` with this password.
 - **Recording:** `recordings/bandit/L18.cast`
 
+## Level 19 → bandit20
+- **Account:** `bandit19`.
+- **Goal:** Use the setuid binary `bandit20-do` to read bandit20's password.
+- **Technique and why it works:** `bandit20-do` is mode `-rwsr-x---` owned by bandit20: when executed it runs with bandit20's effective UID. It execs the command given as its arguments with that euid, so `cat /etc/bandit_pass/bandit20` is performed as bandit20 and can read the `0400 bandit20` password file.
+- **Commands:**
+  ```
+  ls -la                 # shows -rwsr-x--- 1 bandit20 bandit19 bandit20-do
+  ./bandit20-do cat /etc/bandit_pass/bandit20
+  ```
+- **Password for bandit20:** `4pIjcunZ0fK2vmp3IwfG8Vf7VhxD6pOA`
+- **Verification:** logged in as `bandit20` with this password.
+- **Recording:** `recordings/bandit/L19.cast`
+
