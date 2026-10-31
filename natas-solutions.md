@@ -86,3 +86,17 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas6.natas.labs.overthewire.org/` with `natas6:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L5.cast`
 
+## Level 6 → natas7
+- **Account:** `natas6`.
+- **Goal:** Submit the correct "secret" to the form to get natas7's password.
+- **Technique and why it works:** The page exposes its source (`index-source.html`), which shows the form compares `$_POST['secret']` with `$secret`, loaded by `include "includes/secret.inc"`. The include file is directly fetchable from the web root, so requesting `includes/secret.inc` reveals `$secret = "FOEIUWGHFEEUHOFUOIU"`. Posting that value passes the comparison and prints the next password. The bug is that a PHP include is served as plain text over HTTP.
+- **Commands:**
+  ```
+  curl -s -u natas6:<pw> http://natas6.natas.labs.overthewire.org/index-source.html
+  curl -s -u natas6:<pw> http://natas6.natas.labs.overthewire.org/includes/secret.inc
+  curl -s -u natas6:<pw> -d 'secret=FOEIUWGHFEEUHOFUOIU&submit=1' http://natas6.natas.labs.overthewire.org/
+  ```
+- **Password for natas7:** `B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0`
+- **Verification:** `http://natas7.natas.labs.overthewire.org/` with `natas7:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L6.cast`
+
