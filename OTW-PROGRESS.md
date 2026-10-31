@@ -47,3 +47,4 @@ Natas | L9 | command injection via passthru | recordings/natas/L9.cast
 Natas | L10 | argument injection: grep extra file, blocks ;|& | recordings/natas/L10.cast
 Natas | L11 | recover XOR key from known plaintext, forge cookie | recordings/natas/L11.cast
 Natas | L12 | unrestricted upload with filename=shell.php | recordings/natas/L12.cast
+Natas | L13 | GIF89a polyglot bypasses exif_imagetype | recordings/natas/L13.cast

