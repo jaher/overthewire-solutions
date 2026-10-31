@@ -291,3 +291,17 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit21` with this password.
 - **Recording:** `recordings/bandit/L20.cast`
 
+## Level 21 → bandit22
+- **Account:** `bandit21`.
+- **Goal:** A cron job runs a script as bandit22; find what it does and where the password lands.
+- **Technique and why it works:** Cron jobs are defined in `/etc/cron.d/`, and the job runs `/usr/bin/cronjob_bandit22.sh` every minute as user bandit22. The script is world-readable and does two things: `chmod 644` a fixed file in `/tmp`, then copy `/etc/bandit_pass/bandit22` into it. Because the script runs as bandit22 it can read that file, and the `chmod 644` makes the copy readable by us. Reading the output file yields the password.
+- **Commands:**
+  ```
+  cat /etc/cron.d/cronjob_bandit22
+  cat /usr/bin/cronjob_bandit22.sh
+  cat /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+  ```
+- **Password for bandit22:** `RYVux2rHEm9tiXHmLFzuR7Vhx6AZQMEz`
+- **Verification:** logged in as `bandit22` with this password.
+- **Recording:** `recordings/bandit/L21.cast`
+
