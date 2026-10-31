@@ -31,3 +31,4 @@ Bandit | L26 | clone git repo over ssh, read README | recordings/bandit/L26.cast
 Bandit | L27 | git history leaks redacted password (HEAD~1) | recordings/bandit/L27.cast
 Bandit | L28 | git branch -a, password on origin/dev | recordings/bandit/L28.cast
 Bandit | L29 | git tag "secret" holds the password | recordings/bandit/L29.cast
+Bandit | L30 | force-add ignored key.txt, push; hook prints password | recordings/bandit/L30.cast

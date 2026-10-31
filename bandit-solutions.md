@@ -431,3 +431,20 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit31` with this password.
 - **Recording:** `recordings/bandit/L29.cast`
 
+## Level 30 → bandit31
+- **Account:** `bandit30`.
+- **Goal:** The repository's README sets a task: push a file named `key.txt` containing `May I come in?` to branch `master` on the remote.
+- **Technique and why it works:** The repo's `.gitignore` contains `*.txt`, so `git add key.txt` silently does nothing; `git add -f` overrides the ignore rule and stages it. After committing, `git push origin master` is deliberately rejected by a remote pre-receive hook — but that hook validates the pushed content and prints the password for bandit31 in its "remote:" output before declining the push. The password appears in the push output, not in the repository.
+- **Commands:**
+  ```
+  git clone ssh://bandit31-git@bandit.labs.overthewire.org:2220/home/bandit31-git/repo
+  cd repo
+  echo 'May I come in?' > key.txt
+  git add -f key.txt
+  git commit -m 'key'
+  git push origin master        # hook prints the password
+  ```
+- **Password for bandit31:** `pWuj5jBQ6IgV0NXwiH6g1pXRF8S1YvbT`
+- **Verification:** logged in as `bandit32` with this password (the account presents the uppercase-only shell).
+- **Recording:** `recordings/bandit/L30.cast`
+
