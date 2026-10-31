@@ -225,3 +225,18 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit16` with this password.
 - **Recording:** `recordings/bandit/L15.cast`
 
+## Level 16 → bandit17
+- **Account:** `bandit16`.
+- **Goal:** Credentials for the next level are served by one of the ports in 31000–32000; find the right one and speak its protocol. A correct submission returns an SSH private key for bandit17.
+- **Technique and why it works:** `nmap -p 31000-32000 localhost` lists the open ports (31046, 31518, 31691, 31790, 31960). Some are decoys (echo services that just return the input); the real service is TLS on 31790: submitting bandit16's password there yields `Correct!` followed by a PEM private key. The key is saved, mode 600, and used to log in to bandit17 on the public host (the localhost hop is blocked by OTW, same as level 13).
+- **Commands:**
+  ```
+  nmap -p 31000-32000 localhost
+  echo kS0Hf0u5HiXFwKMKFqXvPdOTNGGa0X8V | openssl s_client -connect localhost:31790 -quiet
+  # save the returned key, chmod 600, then:
+  ssh -i key bandit17@bandit.labs.overthewire.org -p 2220 'cat /etc/bandit_pass/bandit17'
+  ```
+- **Password for bandit17:** `pWXMAZoxGC8JmDMfmT5MGEsobMM3vnj2`
+- **Verification:** logged in as `bandit17` with this password (and the returned key authenticated as bandit17 before that).
+- **Recording:** `recordings/bandit/L16.cast`
+
