@@ -17,3 +17,4 @@ Bandit | L13 | ssh private key, log in to bandit14 from client (localhost hop bl
 Bandit | L14 | pipe current password into nc localhost:30000 | recordings/bandit/L14.cast
 Bandit | L15 | SSL submission with openssl s_client to localhost:30001 | recordings/bandit/L15.cast
 Bandit | L16 | nmap port scan + SSL key exchange on 31790, login as bandit17 | recordings/bandit/L16.cast
+Bandit | L17 | diff passwords.old passwords.new | recordings/bandit/L17.cast
