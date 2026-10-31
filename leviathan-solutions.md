@@ -52,3 +52,19 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `leviathan3` with this password.
 - **Recording:** `recordings/leviathan/L2.cast`
 
+## Level 3 → leviathan4
+- **Account:** `leviathan3`.
+- **Goal:** The setuid binary `level3` (owned by leviathan4) asks for a password; supply it to get leviathan4's password.
+- **Technique and why it works:** `strings` shows the comparison target `snlprintf` and a `/bin/sh` string. Disassembly of `do_stuff` confirms the flow: `fgets` reads a line, `strcmp` compares it with `snlprintf`; on a match it prints a success line, calls `setreuid(geteuid(), geteuid())` to become leviathan4, and runs `system("/bin/sh")`. Entering `snlprintf` therefore drops us into a shell as leviathan4, from which we read `/etc/leviathan_pass/leviathan4`. This is the same hardcoded-password + setuid-shell pattern as level 1, but with a longer, non-dictionary password found by reading the binary.
+- **Commands:**
+  ```
+  ssh leviathan3@leviathan.labs.overthewire.org -p 2223
+  strings level3 | grep -E 'snlp|bin/sh'
+  ./level3        # enter: snlprintf
+  id              # uid=leviathan4
+  cat /etc/leviathan_pass/leviathan4
+  ```
+- **Password for leviathan4:** `XIyBbRwAPt`
+- **Verification:** logged in as `leviathan4` with this password.
+- **Recording:** `recordings/leviathan/L3.cast`
+
