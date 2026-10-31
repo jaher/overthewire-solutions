@@ -1,0 +1,8 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469434,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L11.sh","title":"Natas L11: forge XOR cookie","env":{"SHELL":"/bin/bash"}}
+[0.012, "o", "$ curl -s -D- -o /dev/null -u natas11:<pw> http://natas11.natas.labs.overthewire.org/ | grep -i set-cookie\r\r\n"]
+[1.093, "o", "Set-Cookie: data=EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0%2FGBlgaVVIJDURDSQ1VRY%3D\r\r\r\n"]
+[0.000, "o", "$ python3: XOR cookie with known plaintext {\"showpassword\":\"no\",\"bgcolor\":\"#ffffff\"} to recover key (period 4: kBSw)\r\r\n"]
+[0.017, "o", "recovered key: b'kBSw'\r\r\nforged cookie: EGAgHwQ1IxYYMSQYGSZxTUk7NgRJbnEVDCE8GwQwcU1JYTURDSQ1EUk%2F\r\r\n"]
+[0.002, "o", "$ curl -s -u natas11:<pw> -b \"data=<forged>\" http://natas11.natas.labs.overthewire.org/\r\r\n"]
+[1.389, "o", "The password for natas12 is EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng<br>\r\r\n"]
+[0.003, "x", "0"]

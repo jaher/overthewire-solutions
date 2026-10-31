@@ -150,3 +150,17 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas11.natas.labs.overthewire.org/` with `natas11:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L10.cast`
 
+## Level 11 → natas12
+- **Account:** `natas11`.
+- **Goal:** The page stores your background color in a cookie, base64-encoded and XOR-encrypted with a secret key; set `showpassword=yes` in that data to get natas12's password.
+- **Technique and why it works:** The source shows `xor_encrypt` XORs each byte of the JSON with the repeating key, and `saveData` base64-encodes the result into the `data` cookie. We know the plaintext for the default cookie (`{"showpassword":"no","bgcolor":"#ffffff"}`), so XORing the decoded cookie with that plaintext recovers the key; it turns out to be the 4-byte key `kBSw` repeating. With the key we encrypt a new JSON object whose `showpassword` is `"yes"`, base64-encode it, and send it as the cookie. The server decrypts it, sees the flag, and prints natas12's password. XOR with a short repeating key and known plaintext is a classic keystream-recovery break.
+- **Commands:**
+  ```
+  curl -s -D- -o /dev/null -u natas11:<pw> http://natas11.natas.labs.overthewire.org/ | grep -i set-cookie
+  # python: decode cookie, XOR with known plaintext -> key b'kBSw'; forge cookie for showpassword=yes
+  curl -s -u natas11:<pw> -b 'data=EGAgHwQ1IxYYMSQYGSZxTUk7NgRJbnEVDCE8GwQwcU1JYTURDSQ1EUk%2F' http://natas11.natas.labs.overthewire.org/
+  ```
+- **Password for natas12:** `EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng`
+- **Verification:** `http://natas12.natas.labs.overthewire.org/` with `natas12:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L11.cast`
+
