@@ -399,3 +399,19 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit29` with this password.
 - **Recording:** `recordings/bandit/L27.cast`
 
+## Level 28 → bandit29
+- **Account:** `bandit28`.
+- **Goal:** Clone the `bandit29-git` repository and find bandit29's password.
+- **Technique and why it works:** On the default branch (`master`) the README says `<no passwords in production!>`, but `git branch -a` shows remote branches, including `dev`. The password lives in a development branch that was never merged: `git show origin/dev:README.md` prints that branch's version of the file, which contains the real password.
+- **Commands:**
+  ```
+  git clone ssh://bandit29-git@bandit.labs.overthewire.org:2220/home/bandit29-git/repo
+  cd repo
+  cat README.md
+  git --no-pager branch -a
+  git --no-pager show origin/dev:README.md
+  ```
+- **Password for bandit29:** `jq9Dfg2rXsfYsWMgFuKlXhphjdH7USgX`
+- **Verification:** logged in as `bandit30` with this password.
+- **Recording:** `recordings/bandit/L28.cast`
+

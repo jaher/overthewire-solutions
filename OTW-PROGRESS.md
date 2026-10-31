@@ -29,3 +29,4 @@ Bandit | L24 | brute-force 10,000 pincodes against nc daemon | recordings/bandit
 Bandit | L25 | more->vi :shell escape on a tiny PTY | recordings/bandit/L25.cast
 Bandit | L26 | clone git repo over ssh, read README | recordings/bandit/L26.cast
 Bandit | L27 | git history leaks redacted password (HEAD~1) | recordings/bandit/L27.cast
+Bandit | L28 | git branch -a, password on origin/dev | recordings/bandit/L28.cast
