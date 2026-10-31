@@ -193,3 +193,15 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas14.natas.labs.overthewire.org/` with `natas14:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L13.cast`
 
+## Level 14 → natas15
+- **Account:** `natas14`.
+- **Goal:** A login form checks a MySQL query; log in as an existing user to get natas15's password.
+- **Technique and why it works:** The source builds `SELECT * from users where username="$u" and password="$p"` by string concatenation, so both fields are injectable. Supplying `username=" OR 1=1 -- ` closes the string and appends a tautology; `-- ` comments out the password clause, so the query returns every row and `mysqli_num_rows(...) > 0` is true. The page prints the success message with natas15's password. This is SQL injection via unparameterised input; prepared statements would prevent it.
+- **Commands:**
+  ```
+  curl -s -u natas14:<pw> --data-urlencode 'username=" OR 1=1 -- ' --data-urlencode 'password=x' http://natas14.natas.labs.overthewire.org/
+  ```
+- **Password for natas15:** `GB6USCJYJjwLyYhZUNkE1NwDueiTow6g`
+- **Verification:** `http://natas15.natas.labs.overthewire.org/` with `natas15:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L14.cast`
+
