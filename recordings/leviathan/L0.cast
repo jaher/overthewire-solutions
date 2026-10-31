@@ -1,0 +1,7 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793470671,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/leviathan/L0.sh","title":"Leviathan L0: password in backup bookmarks","env":{"SHELL":"/bin/bash"}}
+[0.009, "o", "$ ssh leviathan0@leviathan.labs.overthewire.org -p 2223   # password leviathan0\r\r\n$ ls -la .backup; grep -i \"leviathan1\" .backup/bookmarks.html\r\r\n"]
+[0.000, "o", "$ ssh leviathan0@leviathan.labs.overthewire.org -p 2223 ls -la .backup; grep -i \"leviathan1\" .backup/bookmarks.html\r\r\n"]
+[3.559, "o", "total 140\r\r\ndrwxr-x--- 2 leviathan1 leviathan0   4096 Oct 25 13:39 .\r\r\ndrwxr-xr-x 3 root       root         4096 Oct 25 13:39 ..\r\r\n-rw-r----- 1 leviathan1 leviathan0 133259 Oct 25 13:39 bookmarks.html\r\r\n<DT><A HREF=\"http://leviathan.labs.overthewire.org/passwordus.html | This will be fixed later, the password for leviathan1 is PiXaSWQqHq\" ADD_DATE=\"1155384634\" LAST_CHARSET=\"ISO-8859-1\" ID=\"rdf:#$2wIU71\">password to leviathan1</A>\r\r\n"]
+[0.001, "o", "$ ssh leviathan1@leviathan.labs.overthewire.org -p 2223   # verify with PiXaSWQqHq\r\r\n$ ssh leviathan1@leviathan.labs.overthewire.org -p 2223 whoami\r\r\n"]
+[5.337, "o", "leviathan1\r\r\n"]
+[0.003, "x", "0"]

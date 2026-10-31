@@ -50,3 +50,4 @@ Natas | L12 | unrestricted upload with filename=shell.php | recordings/natas/L12
 Natas | L13 | GIF89a polyglot bypasses exif_imagetype | recordings/natas/L13.cast
 Natas | L14 | SQL injection OR 1=1 | recordings/natas/L14.cast
 Natas | L15 | blind SQLi: binary search on ORD(SUBSTR(password)) | recordings/natas/L15.cast
+Leviathan | L0 | grep backup bookmarks.html for password | recordings/leviathan/L0.cast
