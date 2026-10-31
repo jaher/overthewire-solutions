@@ -51,3 +51,4 @@ Natas | L13 | GIF89a polyglot bypasses exif_imagetype | recordings/natas/L13.cas
 Natas | L14 | SQL injection OR 1=1 | recordings/natas/L14.cast
 Natas | L15 | blind SQLi: binary search on ORD(SUBSTR(password)) | recordings/natas/L15.cast
 Leviathan | L0 | grep backup bookmarks.html for password | recordings/leviathan/L0.cast
+Leviathan | L1 | setuid check accepts sex, spawns leviathan2 shell | recordings/leviathan/L1.cast
