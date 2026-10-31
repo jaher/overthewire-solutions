@@ -26,6 +26,19 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit1` with this password (`whoami` → `bandit1`).
 - **Recording:** `recordings/bandit/L0.cast`
 
+## Level 1 → bandit2
+- **Account:** `bandit1`.
+- **Goal:** Read the password for bandit2, which is stored in a file literally named `-`.
+- **Technique and why it works:** A bare `-` is not treated as a filename by most GNU tools: `cat -` means "read standard input". Prefixing the path with `./` makes it an explicit relative path, so it is no longer an option-looking argument; `cat -- -` is an equivalent alternative (`--` ends option parsing).
+- **Commands:**
+  ```
+  ls -la          # shows the file named "-"
+  cat ./-
+  ```
+- **Password for bandit2:** `PK8fYLZg2hnHSz83plBL1iEPKdD3QToB`
+- **Verification:** logged in as `bandit2` with this password.
+- **Recording:** `recordings/bandit/L1.cast`
+
 ## Level 10 → bandit11
 - **Account:** `bandit10`.
 - **Goal:** `data.txt` contains base64-encoded data; the password is the decoded text.
