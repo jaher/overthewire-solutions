@@ -152,3 +152,15 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit11` with this password.
 - **Recording:** `recordings/bandit/L10.cast`
 
+## Level 11 → bandit12
+- **Account:** `bandit11`.
+- **Goal:** The password in `data.txt` has been rotated 13 positions (ROT13).
+- **Technique and why it works:** ROT13 is a Caesar shift by 13 over the 26-letter alphabet; it is its own inverse, so applying it to the ciphertext returns the plaintext. `tr` maps each character range: `A-Z` → `N-ZA-M` and `a-z` → `n-za-m`.
+- **Commands:**
+  ```
+  cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+  ```
+- **Password for bandit12:** `GROozWPO8QyN0mGrjUkID0WCYkZiQxrN`
+- **Verification:** logged in as `bandit12` with this password.
+- **Recording:** `recordings/bandit/L11.cast`
+
