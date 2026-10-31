@@ -128,6 +128,18 @@ the key/credential to this client machine and connecting directly to the public 
 - **Verification:** logged in as `bandit9` with this password.
 - **Recording:** `recordings/bandit/L8.cast`
 
+## Level 9 → bandit10
+- **Account:** `bandit9`.
+- **Goal:** The password is stored in a binary file (`data.txt`) as human-readable text, preceded by several `=` characters.
+- **Technique and why it works:** `strings` extracts printable runs from binary data; filtering with `grep "==="` keeps the marker lines. The last of them is `========== <password>`.
+- **Commands:**
+  ```
+  strings data.txt | grep "==="
+  ```
+- **Password for bandit10:** `B0s2khmbT9u0geKuOoVGW3JZKhndE3BG`
+- **Verification:** logged in as `bandit10` with this password.
+- **Recording:** `recordings/bandit/L9.cast`
+
 ## Level 10 → bandit11
 - **Account:** `bandit10`.
 - **Goal:** `data.txt` contains base64-encoded data; the password is the decoded text.
