@@ -565,3 +565,24 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas30:** `frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF`
 - **Verification:** `http://natas30.natas.labs.overthewire.org/` with `natas30:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L29.cast`
+
+## Level 30 → natas31
+- **Account:** `natas30`, password `frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF`.
+- **Goal:** A Perl login form. The query is built with `$dbh->quote(param('username'))` and `$dbh->quote(param('password'))`.
+- **Technique and why it works:** **DBI `quote()` type-argument injection through CGI list context**. `quote()` escapes quotes correctly, so a normal string cannot break out. But `DBI->quote($value, $data_type)` takes a *second* argument: the SQL type of the value. And CGI's `param('password')` returns a **list** when the parameter is sent more than once — so the two values we send become the two arguments of `quote()`. The second one is interpreted as the data type; `4` is `SQL_INTEGER`, which tells DBI the value is a number. DBI then does not quote the string at all, and our first value `1 OR 1=1` is spliced into the SQL raw. The query becomes `... and password =1 OR 1=1`, which is true for any row, so the first user row is returned (and printed).
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `index-source.html` shows the `quote(param(...))` construction — no interpolation, but also no check that `param` returned a scalar.
+2. **Try the obvious injection.** A single `password=' OR 1=1 -- ` is escaped and fails (`fail :(`).
+3. **Send the parameter twice.** `password=1 OR 1=1` then `password=4` makes `param('password')` a two-element list: value and type.
+   ```
+   curl -s -u natas30:<pw> -d 'username=natas31' \
+        -d 'password=1 OR 1=1' -d 'password=4' \
+        http://natas30.natas.labs.overthewire.org/index.pl
+   # win! here is your result: natas31aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z
+   ```
+   `quote('1 OR 1=1', 4)` returns the value unquoted (SQL_INTEGER), so the SQL runs `password =1 OR 1=1`.
+4. **Verify.** `curl -u natas31:<pw> http://natas31.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas31:** `aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z`
+- **Verification:** `http://natas31.natas.labs.overthewire.org/` with `natas31:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L30.cast`

