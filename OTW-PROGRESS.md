@@ -95,3 +95,4 @@ Natas | L29 | Perl two-arg open("$f.txt") pipe injection + glob n?tas bypass of 
 Natas | L30 | DBI quote() second arg is the SQL type: repeated password=1 OR 1=1 & password=4 -> SQL_INTEGER, unquoted | recordings/natas/L30.cast
 Natas | L31 | CGI param/ARGV injection: plain file=ARGV field -> open("ARGV") reads @ARGV from the query string | recordings/natas/L31.cast
 Natas | L32 | ARGV injection with " #" to defuse CGI quoting; run setuid getpassword in the webroot | recordings/natas/L32.cast
+Natas | L33 | phar deserialization: md5_file(phar://...) unserializes metadata -> Executor __destruct passthru | recordings/natas/L33.cast
