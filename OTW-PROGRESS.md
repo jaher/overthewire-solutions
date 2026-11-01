@@ -111,3 +111,4 @@ Utumno | L5 | strncpy caps long strings at 20 bytes: ret is overwritten, shellco
 Utumno | L6 | signed table index -1 rewrites the strcpy destination pointer; argv[2] is parsed as hex | recordings/utumno/L6.cast
 Maze | L0 | BLOCKED: maze0 login refused — maze.labs.overthewire.org answers ssh with 'Permission denied (publickey)', so password auth is not available for this game from this host. | (no recording)
 Vortex | L0 | BLOCKED: vortex0 login refused — vortex.labs.overthewire.org answers ssh with 'Permission denied (publickey)', so password auth is not available for this game from this host. | (no recording)
+Utumno | L7 | longjmp restores an attacker-controlled ebp inside the overflowed buffer; 144-byte payload keeps esp/eip intact | recordings/utumno/L7.cast
