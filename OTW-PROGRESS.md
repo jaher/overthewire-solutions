@@ -87,3 +87,4 @@ Natas | L21 | colocated experimenter sets $_SESSION[key]=val; POST admin=1 then 
 Natas | L22 | ?revelio GET parameter alone prints credentials (no auth check) | recordings/natas/L22.cast
 Natas | L23 | PHP loose comparison: "10111iloveyou" contains iloveyou and converts to 10111 > 10 | recordings/natas/L23.cast
 Natas | L24 | passwd[]=x makes strcmp() receive an array -> NULL -> !NULL passes | recordings/natas/L24.cast
+Natas | L25 | log poisoning via UA + ....// bypass of str_replace("../","") -> include the log | recordings/natas/L25.cast
