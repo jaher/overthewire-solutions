@@ -180,8 +180,12 @@ function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 function promptHost(user, cmd){
   // Every transcript opens with the ssh into the level, typed at a local
   // shell; everything after it is typed on the OTW host the page header shows.
+  // Before the ssh, and for levels with no shell account at all (the first
+  // Krypton level is a puzzle on the level page), the prompt is local.
   if (cmd.trim().startsWith('ssh ')) return 'localhost';
   const G = curGame();
+  const cmds = (G.levels && G.levels[cur] && G.levels[cur].cmds && G.levels[cur].cmds[0]) || [];
+  if (!cmds.some(c => c.trim().startsWith('ssh '))) return 'localhost';
   return G.host || (gameKey + '.labs.overthewire.org');
 }
 
@@ -214,7 +218,7 @@ async function playLevel(idx){
   statusEl.textContent = G.title + ' — Level ' + L.lvl + ' / ' + G.levels[G.levels.length-1].lvl;
   line('', '');
   line(G.title.toUpperCase() + ' LEVEL ' + L.lvl + ' — PROBLEM STATEMENT\n' + ((G.goals && G.goals[L.lvl]) || L.goal || ''), 'goal');
-  line('<span class="note">── ' + L.user + '@' + (G.host || 'bandit.labs.overthewire.org') + ' ──</span>', 'note');
+  line('<span class="note">── ' + L.user + '@' + (L.cmds[0].some(c => c.trim().startsWith('ssh ')) ? (G.host || 'bandit.labs.overthewire.org') : 'localhost') + ' ──</span>', 'note');
   await delay(500 * speed());
   for (const group of L.cmds){
     for (const c of group){

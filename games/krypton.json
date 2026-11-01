@@ -7,7 +7,6 @@
    "user": "krypton0",
    "cmds": [
     [
-     "# the OTW Krypton0 page itself gives this Base64 string",
      "echo S1JZUFRPTklTR1JFQVQ= | base64 -d"
     ]
    ],
@@ -21,7 +20,7 @@
    "user": "krypton1",
    "cmds": [
     [
-     "# README: krypton2 is ROT13",
+     "ssh krypton1@krypton.labs.overthewire.org -p 2231",
      "cat /krypton/krypton1/krypton2",
      "cat /krypton/krypton1/krypton2 | tr 'A-Za-z' 'N-ZA-Mn-za-m'"
     ]
@@ -37,12 +36,12 @@
    "user": "krypton2",
    "cmds": [
     [
-     "# README: encrypt reads keyfile.dat from the cwd, setuid krypton3",
+     "ssh krypton2@krypton.labs.overthewire.org -p 2231",
      "cat /krypton/krypton2/krypton3",
      "D=$(mktemp -d); cd \"$D\"",
      "ln -s /krypton/krypton2/keyfile.dat; chmod 777 .",
      "printf 'ABCDEFGHIJKLMNOPQRSTUVWXYZ\\n' > p.txt",
-     "/krypton/krypton2/encrypt p.txt; cat ciphertext",
+     "/krypton/krypton2/encrypt p.txt; cat ciphertext; echo",
      "cat /krypton/krypton2/krypton3 | tr 'A-Z' 'O-ZA-N'"
     ]
    ],
@@ -58,14 +57,119 @@
    "user": "krypton3",
    "cmds": [
     [
-     "# README: all messages share one monoalphabetic key; plaintexts are English",
+     "ssh krypton3@krypton.labs.overthewire.org -p 2231",
      "cat /krypton/krypton3/found1 /krypton/krypton3/found2 /krypton/krypton3/found3 /krypton/krypton3/krypton4 > /tmp/k3.txt",
-     "# letter frequencies match English (S 13.0%, Q 9.6%, J 8.5% ...)",
-     "# hill-climb the substitution with quadgram scoring (script in the recording)",
-     "# decode krypton4 with the recovered key"
+     "cat /krypton/krypton3/README",
+     "python3 /tmp/L3solve.py"
     ]
    ],
    "out": [
+    "      ,----..            ,----,          .---.",
+    "     /   /   \\         ,/   .`|         /. ./|",
+    "    /   .     :      ,`   .'  :     .--'.  ' ;",
+    "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+    "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+    "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+    "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+    "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+    "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+    "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+    "    ;   :    /       '   :  |     :   '  |--\"",
+    "     \\   \\ .'        ;   |.'       \\   \\ ;",
+    "  www. `---` ver     '---' he       '---\" ire.org",
+    "",
+    "",
+    "Welcome to OverTheWire!",
+    "",
+    "If you find any problems, please report them to the #wargames channel on",
+    "discord or IRC.",
+    "",
+    "--[ Playing the games ]--",
+    "",
+    "  This machine might hold several wargames.",
+    "  If you are playing \"somegame\", then:",
+    "",
+    "    * USERNAMES are somegame0, somegame1, ...",
+    "    * Most LEVELS are stored in /somegame/.",
+    "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+    "",
+    "  Write-access to homedirectories is disabled. It is advised to create a",
+    "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+    "  command \"mktemp -d\" in order to generate a random and hard to guess",
+    "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+    "  restricted so that users cannot snoop on eachother. Files and directories",
+    "  with easily guessable or short names will be periodically deleted! The /tmp",
+    "  directory is regularly wiped.",
+    "  Please play nice:",
+    "",
+    "    * don't leave orphan processes running",
+    "    * don't leave exploit-files laying around",
+    "    * don't annoy other players",
+    "    * don't post passwords or spoilers",
+    "    * again, DONT POST SPOILERS!",
+    "      This includes writeups of your solution on your blog or website!",
+    "",
+    "--[ Tips ]--",
+    "",
+    "  This machine has a 64bit processor and many security-features enabled",
+    "  by default, although ASLR has been switched off.  The following",
+    "  compiler flags might be interesting:",
+    "",
+    "    -m32                    compile for 32bit",
+    "    -fno-stack-protector    disable ProPolice",
+    "    -Wl,-z,norelro          disable relro",
+    "",
+    "  In addition, the execstack tool can be used to flag the stack as",
+    "  executable on ELF binaries.",
+    "",
+    "  Finally, network-access is limited for most levels by a local",
+    "  firewall.",
+    "",
+    "--[ Tools ]--",
+    "",
+    " For your convenience we have installed a few useful tools which you can find",
+    " in the following locations:",
+    "",
+    "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+    "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+    "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+    "    * pwntools (https://github.com/Gallopsled/pwntools)",
+    "    * radare2 (http://www.radare.org/)",
+    "",
+    "--[ More information ]--",
+    "",
+    "  For more information regarding individual wargames, visit",
+    "  http://www.overthewire.org/wargames/",
+    "",
+    "  For support, questions or comments, contact us on discord or IRC.",
+    "",
+    "  Enjoy your stay!",
+    "",
+    "cat /krypton/krypton3/found1 /krypton/krypton3/found2 /krypton/krypton3/found3 /krypton/krypton3/krypton4 > /tmp/k3.txt",
+    "krypton3@krypton:~$ cat /krypton/krypton3/found1 /krypton/krypton3/found2 /krypton/krypton3/found3 /krypton/krypton3/krypton4 > /tmp/k3.txt",
+    "Well done.  You've moved past an easy substitution cipher.",
+    "",
+    "Hopefully you just encrypted the alphabet a plaintext ",
+    "to fully expose the key in one swoop.",
+    "",
+    "The main weakness of a simple substitution cipher is ",
+    "repeated use of a simple key.  In the previous exercise",
+    "you were able to introduce arbitrary plaintext to expose",
+    "the key.  In this example, the cipher mechanism is not ",
+    "available to you, the attacker.",
+    "",
+    "However, you have been lucky.  You have intercepted more",
+    "than one message.  The password to the next level is found",
+    "in the file 'krypton4'.  You have also found 3 other files.",
+    "(found1, found2, found3)",
+    "",
+    "You know the following important details:",
+    "",
+    "- The message plaintexts are in English (*** very important)",
+    "- They were produced from the same key (*** even better!)",
+    "",
+    "",
+    "Enjoy.",
     "S:13.0% Q:9.6% J:8.5% U:7.3% B:7.0% N:6.8% C:6.4% G:6.4% D:5.9% V:3.8%",
     "K4 plaintext: WELLD ONETH ELEVE LFOUR PASSW ORDIS BRUTE"
    ],
@@ -76,16 +180,56 @@
    "user": "krypton4",
    "cmds": [
     [
-     "# Vigenere, key length 6: the ciphertext splits into 6 interleaved Caesars",
-     "cat /krypton/krypton4/found1; cat /krypton/krypton4/found2",
-     "# per-position chi-squared key recovery",
-     "# Vigenere-decrypt krypton5 with the key, then ROT13"
+     "ssh krypton4@krypton.labs.overthewire.org -p 2231",
+     "cat /krypton/krypton4/README",
+     "{ cat /krypton/krypton4/found1; echo; echo ---; cat /krypton/krypton4/found2; } > /tmp/k4.txt",
+     "python3 /tmp/L4solve.py"
     ]
    ],
    "out": [
+    "Good job!",
+    "",
+    "You more than likely used frequency analysis and some common sense",
+    "to solve that one.",
+    "",
+    "So far we have worked with simple substitution ciphers.  They have",
+    "also been 'monoalphabetic', meaning using a fixed key, and ",
+    "giving a one to one mapping of plaintext (P) to ciphertext (C).",
+    "Another type of substitution cipher is referred to as 'polyalphabetic',",
+    "where one character of P may map to many, or all, possible ciphertext ",
+    "characters.",
+    "",
+    "An example of a polyalphabetic cipher is called a Vigen\ufffdre Cipher.  It works",
+    "like this:",
+    "",
+    "If we use the key(K)  'GOLD', and P = PROCEED MEETING AS AGREED, then \"add\"",
+    "P to K, we get C.  When adding, if we exceed 25, then we roll to 0 (modulo 26).",
+    "",
+    "",
+    "P     P R O C E   E D M E E   T I N G A   S A G R E   E D",
+    "K     G O L D G   O L D G O   L D G O L   D G O L D   G O",
+    "",
+    "becomes:",
+    "",
+    "P     15 17 14 2  4  4  3 12  4 4  19  8 13 6  0  18 0  6 17 4 4   3",
+    "K     6  14 11 3  6 14 11  3  6 14 11  3  6 14 11  3 6 14 11 3 6  14",
+    "C     21 5  25 5 10 18 14 15 10 18  4 11 19 20 11 21 6 20  2 8 10 17",
+    "",
+    "So, we get a ciphertext of:",
+    "",
+    "VFZFK SOPKS ELTUL VGUCH KR",
+    "",
+    "This level is a Vigen\ufffdre Cipher.  You have intercepted two longer, english ",
+    "language messages.  You also have a key piece of information.  You know the ",
+    "key length!",
+    "",
+    "For this exercise, the key length is 6.  The password to level five is in the usual",
+    "place, encrypted with the 6 letter key.",
+    "",
+    "Have fun!",
     "keys: ['SERXRL', 'SERXRL']",
-    "vig  : PYRNEGRKG",
-    "rot13: CLEARTEXT"
+    "vig  : CLEAR TEXT",
+    "password (spaces removed): CLEARTEXT"
    ],
    "pw": "CLEARTEXT"
   },
@@ -94,18 +238,24 @@
    "user": "krypton5",
    "cmds": [
     [
-     "# Vigenere, key length unknown: find it first",
-     "cat /krypton/krypton5/found1 /krypton/krypton5/found2 /krypton/krypton5/found3",
-     "# index of coincidence over key lengths 1..30",
-     "# per-column chi-squared key recovery",
-     "# Vigenere-decrypt krypton6, then ROT13"
+     "ssh krypton5@krypton.labs.overthewire.org -p 2231",
+     "cat /krypton/krypton5/README",
+     "{ cat /krypton/krypton5/found1; echo; echo ---; cat /krypton/krypton5/found2; echo; echo ---; cat /krypton/krypton5/found3; } > /tmp/k5.txt",
+     "python3 /tmp/L5solve.py"
     ]
    ],
    "out": [
-    "IC overall 0.041",
+    "Frequency analysis can break a known key length as well.  Lets try one",
+    "last polyalphabetic cipher, but this time the key length is unknown.",
+    "",
+    "",
+    "Enjoy.",
+    "IC overall 0.0410",
     "[(0.0479, 9), (0.0478, 18), (0.0475, 27), (0.0445, 30), (0.0445, 24)]",
     "['XRLYRATGU', 'XRLYRATGU', 'XRLYRATGU']",
-    "vig: ENAQBZ  rot13: RANDOM"
+    "vig   : ENAQB Z",
+    "rot13 : RANDO M",
+    "password (spaces removed): RANDOM"
    ],
    "pw": "RANDOM"
   },
@@ -114,17 +264,17 @@
    "user": "krypton6",
    "cmds": [
     [
-     "# encrypt6: (lfsr + key[i % 10] + (P - 0x41) - 0x41) mod 26",
-     "D=$(mktemp -d); cd \"$D\"; chmod 777 .",
-     "ln -s /krypton/krypton6/keyfile.dat",
+     "ssh krypton6@krypton.labs.overthewire.org -p 2231",
+     "cat /krypton/krypton6/HINT2",
+     "D=$(mktemp -d); cd \"$D\"; chmod 777 .; ln -s /krypton/krypton6/keyfile.dat",
      "python3 -c 'open(\"p.txt\",\"wb\").write(b\"A\"*600)'",
      "/krypton/krypton6/encrypt6 p.txt o.bin",
-     "# offset[i] = (o.bin[i]-65) mod 26; keystream period is 30",
-     "# decrypt krypton7 with the recovered keystream"
+     "python3 /tmp/L6solve.py"
     ]
    ],
    "out": [
-    "period 30",
+    "8 bit LFSR",
+    "period 30 K: [4, 8, 2, 19, 3, 6, 24, 8, 24, 25, 10, 19, 7, 13, 18, 8, 17, 5, 23, 24, 2, 15, 5, 20, 4, 14, 2, 10, 17, 13]",
     "krypton7 plaintext: b'LFSRISNOTRANDOM'"
    ],
    "pw": "LFSRISNOTRANDOM"
@@ -134,11 +284,12 @@
    "user": "krypton7",
    "cmds": [
     [
-     "ssh krypton7@krypton.labs.overthewire.org -p 2231"
+     "ssh krypton7@krypton.labs.overthewire.org -p 2231",
+     "cat /krypton/krypton7/README"
     ]
    ],
    "out": [
-    "(login verified \u2014 final account; Krypton series complete)"
+    "Congratulations on beating Krypton!"
    ],
    "pw": "LFSRISNOTRANDOM"
   }
