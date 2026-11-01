@@ -128,6 +128,7 @@ const LEVELS = [
   ["Natas",29,"Perl 2-arg open pipe injection; glob n?tas bypasses the /natas/ filter"],
   ["Natas",30,"DBI quote() type arg: repeated password turns SQL_INTEGER, injection unquoted"],
   ["Natas",31,"CGI ARGV injection: plain file=ARGV field makes open() read @ARGV"],
+  ["Natas",32,"ARGV injection with trailing # to defuse CGI quoting; run setuid getpassword"],
   ["Narnia",0,"overwrite val via 24-byte scanf into 20-byte buf"],
   ["Narnia",1,"EGG env var shellcode: nasm, setreuid, execve"],
   ["Narnia",2,"buf[128] strcpy overflow; shellcode written in vim + nasm, swept ret addr"],

