@@ -72,3 +72,4 @@ Narnia | L0 | overwrite val via 24-byte scanf into 20-byte buf | recordings/narn
 Narnia | L1 | EGG env var shellcode (setreuid euid + execve), bytes env | recordings/narnia/L1.cast
 Narnia | L2 | strcpy overflow: NOP sled + shellcode, swept return address | recordings/narnia/L2.cast
 Narnia | L3 | ifile strcpy overflow rewrites ofile path to writable file | recordings/narnia/L3.cast
+Narnia | L4 | buffer[256] strcpy overflow; setuid(euid) shellcode so the privilege survives execve; shellcode placed at buffer offset 0 to avoid its own execve pushes | recordings/narnia/L4.cast

@@ -112,7 +112,12 @@ const LEVELS = [
   ["Natas",13,"GIF89a polyglot bypasses exif_imagetype"],
   ["Natas",14,"SQL injection OR 1=1"],
   ["Natas",15,"blind SQLi binary search"],
-  ["Natas",16,"$(...) command substitution oracle, binary search"]
+  ["Natas",16,"$(...) command substitution oracle, binary search"],
+  ["Narnia",0,"overwrite val via 24-byte scanf into 20-byte buf"],
+  ["Narnia",1,"EGG env var shellcode: nasm, setreuid, execve"],
+  ["Narnia",2,"buf[128] strcpy overflow, nasm shellcode, swept return address"],
+  ["Narnia",3,"ifile strcpy overflow rewrites ofile path to a symlink"],
+  ["Narnia",4,"buffer[256] overflow, setuid(euid) shellcode so privilege survives execve"]
 ];
 
 const rows = document.getElementById('rows');
