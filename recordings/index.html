@@ -141,6 +141,7 @@ const LEVELS = [
   ["Narnia",8,"bok[20] copy-loop overflow; keep blah valid via argv addr; ret into argv sled"],
   ["Behemoth",0,"memfrob (XOR 42) obfuscated secret -> eatmyshorts"],
   ["Behemoth",1,"gets() overflow, stack shellcode (RWE, ASLR off), swept ret"]
+  ["Behemoth",2,"pid-file race: swap the touched file for a symlink; program cats it after sleep(2000)"]
 ];
 
 const rows = document.getElementById('rows');
