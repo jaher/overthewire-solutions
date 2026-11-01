@@ -29,15 +29,6 @@
   audio { height: 32px; }
   .narration { color:#b6ffc7; font-size:13px; line-height:1.6; white-space:pre-wrap;
                background:#000; border:1px solid #14532d; border-radius:8px; padding:12px 14px; margin-top:10px; }
-  .solution { color:#d7ffe0; font-size:14px; line-height:1.6;
-               background:#000; border:1px solid #14532d; border-radius:8px; padding:12px 16px; margin-top:10px; }
-  .solution h3 { color:#eaffea; font-size:17px; margin:14px 0 6px; }
-  .solution h4 { color:#eaffea; font-size:15px; margin:12px 0 4px; }
-  .solution pre { background:#0a0f0a; border:1px solid #123a1f; border-radius:6px;
-                  padding:10px 12px; overflow-x:auto; font-size:13px; line-height:1.45; }
-  .solution code { color:#7dff9e; }
-  .solution ul { margin:6px 0; padding-left:22px; }
-  .solution li { margin:3px 0; }
   footer { color:var(--dim); font-size:12px; margin-top:24px; }
 </style>
 </head>
@@ -62,7 +53,6 @@
     </div>
     <div id="player"></div>
     <div class="narration" id="narration"></div>
-    <div class="solution" id="solution"></div>
   </div>
 
   <footer>Recordings are live sessions (asciinema v3 casts). Narration audio starts with playback.</footer>
@@ -140,22 +130,6 @@ const LEVELS = [
   ["Natas",31,"CGI ARGV injection: plain file=ARGV field makes open() read @ARGV"],
   ["Natas",32,"ARGV injection with trailing # to defuse CGI quoting; run setuid getpassword"],
   ["Natas",33,"phar metadata deserialization: md5_file(phar://) rebuilds Executor, __destruct passthru"],
-  ["Leviathan",0,"ls -la shows a hidden .backup directory readable by group leviathan0"],
-  ["Leviathan",1,"check is a setuid helper owned by leviathan2; password check via ltrace"],
-  ["Leviathan",2,"printfile calls access() as us but cat as root: symlink race via /tmp"],
-  ["Leviathan",3,"strings shows comparison target snlprintf and a /bin/sh string"],
-  ["Leviathan",4,"ls -la .trash shows bin, mode -r-sr-x---, owned by leviathan5"],
-  ["Leviathan",5,"strings shows hardcoded /tmp/file.log with fopen, fgetc, putchar"],
-  ["Leviathan",6,"atoi(argv[1]) compared against immediate 0x1bd3 at ebp-0xc"],
-  ["Leviathan",7,"final level: CONGRATULATIONS file, no leviathan8 account"],
-  ["Krypton",0,"base64 is reversible: base64 -d decodes it back"],
-  ["Krypton",1,"ROT13 shifts each letter by 13, so applying it twice restores it"],
-  ["Krypton",2,"a Caesar cipher is a fixed shift over the alphabet"],
-  ["Krypton",3,"monoalphabetic substitution: letter frequency analysis"],
-  ["Krypton",4,"Vigenere: each letter shifted by the key letter, cycling"],
-  ["Krypton",5,"first determine the key length, then solve each Caesar column"],
-  ["Krypton",6,"encrypt6 per letter: uppercase, map to 0-25, output shifted text"],
-  ["Krypton",7,"final level: README congratulations, no krypton8 account"],
   ["Narnia",0,"overwrite val via 24-byte scanf into 20-byte buf"],
   ["Narnia",1,"EGG env var shellcode: nasm, setreuid, execve"],
   ["Narnia",2,"buf[128] strcpy overflow; shellcode written in vim + nasm, swept ret addr"],
@@ -199,73 +173,6 @@ for (const [game, lvl, tech] of LEVELS) {
   rows.appendChild(tr);
 }
 
-const BLOCKED_ROWS = [
-  ["Manpage",0,"BLOCKED: setuid bit not honoured on the lab host","Manpage L0 is blocked in the fresh solve: the setuid bit is not honoured on the lab host, so the level cannot be completed from there."],
-  ["Maze",0,"BLOCKED: password login refused (publickey only)","Maze L0 is blocked in the fresh solve: the host answers ssh with publickey only, so password login is not available from here."],
-  ["Vortex",0,"BLOCKED: password login refused (publickey only)","Vortex L0 is blocked in the fresh solve: the host answers ssh with publickey only, so password login is not available from here."],
-];
-for (const [game, lvl, tech, note] of BLOCKED_ROWS) {
-  const tr = document.createElement('tr');
-  tr.innerHTML = `<td>${game}</td><td>L${lvl}</td><td class="tech">${tech}</td><td>—</td><td>—</td>`;
-  tr.style.cursor = 'pointer';
-  tr.onclick = () => showBlocked(game, lvl, note);
-  rows.appendChild(tr);
-}
-
-function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function inline(s){
-  s = s.replace(/`([^`]+)`/g,'<code>$1</code>');
-  s = s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
-  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2">$1</a>');
-  return s;
-}
-function mdToHtml(md){
-  const lines = md.split('\n'); let html='', inCode=false, inList=false, para=[];
-  function flushPara(){ if(para.length){ html+='<p>'+para.map(inline).join(' ')+'</p>'; para=[]; } }
-  function closeList(){ if(inList){ html+='</ul>'; inList=false; } }
-  for (let raw of lines){
-    if (raw.startsWith('```')){ if(inCode){ html+='</code></pre>'; inCode=false; } else { flushPara(); closeList(); html+='<pre><code>'; inCode=true; } continue; }
-    if (inCode){ html+=esc(raw)+'\n'; continue; }
-    const m3 = raw.match(/^###\s+(.*)/); if(m3){ flushPara(); closeList(); html+='<h4>'+inline(esc(m3[1]))+'</h4>'; continue; }
-    const m2 = raw.match(/^##\s+(.*)/); if(m2){ flushPara(); closeList(); html+='<h3>'+inline(esc(m2[1]))+'</h3>'; continue; }
-    const li = raw.match(/^\s*[-*]\s+(.*)/); if(li){ flushPara(); if(!inList){ html+='<ul>'; inList=true; } html+='<li>'+inline(esc(li[1]))+'</li>'; continue; }
-    const ol = raw.match(/^\s*\d+[.)]\s+(.*)/); if(ol){ flushPara(); if(!inList){ html+='<ul>'; inList=true; } html+='<li>'+inline(esc(ol[1]))+'</li>'; continue; }
-    if (/^\s*$/.test(raw)){ flushPara(); closeList(); continue; }
-    para.push(esc(raw));
-  }
-  flushPara(); closeList(); if(inCode) html+='</code></pre>';
-  return html;
-}
-function extractLevelSection(md, lvl){
-  const lines = md.split('\n');
-  let start=-1, end=lines.length;
-  const head = new RegExp('^## Level '+lvl+'\\b');
-  for (let i=0;i<lines.length;i++){ if (head.test(lines[i])) { start=i; break; } }
-  if (start<0) return null;
-  for (let i=start+1;i<lines.length;i++){ if (/^## Level \d+/.test(lines[i])) { end=i; break; } }
-  return lines.slice(start,end).join('\n').trim();
-}
-async function renderSolution(game, lvl){
-  const el = document.getElementById('solution');
-  el.innerHTML = '<p>Loading solution…</p>';
-  const g = game.toLowerCase();
-  let md = '';
-  try { const r = await fetch(`${g}-solutions.md`, {cache:'no-store'}); if (r.ok) md = await r.text(); } catch(e) {}
-  if (!md) { el.innerHTML = '<p>No detailed write-up for this level yet.</p>'; return; }
-  const sec = extractLevelSection(md, lvl);
-  if (!sec) { el.innerHTML = '<p>No detailed write-up for this level yet.</p>'; return; }
-  el.innerHTML = mdToHtml(sec);
-}
-function showBlocked(game, lvl, note){
-  current = null;
-  document.getElementById('now').textContent = `${game} L${lvl} — blocked`;
-  if (player) { player.dispose(); player = null; }
-  document.getElementById('player').innerHTML = '';
-  document.getElementById('narration').textContent = '';
-  audio.pause(); audio.removeAttribute('src');
-  document.getElementById('solution').innerHTML = '<p>'+esc(note)+'</p>';
-}
-
 async function select(game, lvl, tech) {
   current = { game, lvl };
   const g = game.toLowerCase();
@@ -286,7 +193,6 @@ async function select(game, lvl, tech) {
   const n = await fetch(`narration/${g}/L${lvl}.txt`, {cache:'no-store'})
       .then(r => r.ok ? r.text() : '').catch(() => '');
   document.getElementById('narration').textContent = n;
-  renderSolution(game, lvl);
 }
 
 function playBoth() {

@@ -1,1 +1,178 @@
-{"goals":{"0":"Execute-only setuid binary: hook it with LD_PRELOAD and dump its own memory to read the password embedded in .rodata.","1":"utumno1 runs any file whose name starts with sh_ in a given directory, executing the filename bytes as code on an RWX page.","2":"utumno2 only proceeds when argc==0 (launch it via execve with an empty argv); it then strcpy()s an environment entry over the saved return address.","3":"utumno3 reads (index, byte) pairs and writes each byte at a computed stack offset (XORed per iteration) — 8 writes overwrite the return address.","4":"utumno4 checks only the low 16 bits of the size argument against 63, then memcpy()s that many bytes into a 0xf000 stack buffer — pass 65536 and overflow.","5":"Same argc==0 gate as level 2; hihi() strcpy/strncpy copies envp[10] into a 20-byte buffer and overflows.","6":"utumno6 indexes a function-pointer table with a signed value: index -1 writes attacker-controlled data over a GOT/pointer entry.","7":"utumno7's vuln() strcpy()s argv[1] into a stack buffer; the return address is overwritten at ~140 bytes.","8":"Final account: log in as utumno8 and read the CONGRATULATIONS file."},"host":"utumno.labs.overthewire.org","levels":[{"cmds":[["# /utumno/utumno0 is execute-only (no read permission) and just prints 'Read me! :P'","# LD_PRELOAD a 32-bit constructor dumper: read /proc/self/maps, dump the binary's own mappings","# the password sits in .rodata as the literal string 'password: g0Vpiw3aZt'","sshpass -p g0Vpiw3aZt ssh -p 2227 utumno1@utumno.labs.overthewire.org  # verify"]],"lvl":0,"out":["(login verified)"],"pw":"g0Vpiw3aZt","user":"utumno0"}],"title":"Utumno"}
+{
+ "goals": {
+  "0": "Execute-only setuid binary: hook it with LD_PRELOAD and dump its own memory to read the password embedded in .rodata.",
+  "1": "utumno1 runs any file whose name starts with sh_ in a given directory, executing the filename bytes as code on an RWX page.",
+  "2": "utumno2 only proceeds when argc==0 (launch it via execve with an empty argv); it then strcpy()s an environment entry over the saved return address.",
+  "3": "utumno3 reads (index, byte) pairs and writes each byte at a computed stack offset (XORed per iteration) \u2014 8 writes overwrite the return address.",
+  "4": "utumno4 checks only the low 16 bits of the size argument against 63, then memcpy()s that many bytes into a 0xf000 stack buffer \u2014 pass 65536 and overflow.",
+  "5": "Same argc==0 gate as level 2; hihi() strcpy/strncpy copies envp[10] into a 20-byte buffer and overflows.",
+  "6": "utumno6 indexes a function-pointer table with a signed value: index -1 writes attacker-controlled data over a GOT/pointer entry.",
+  "7": "utumno7's vuln() strcpy()s argv[1] into a stack buffer; the return address is overwritten at ~140 bytes.",
+  "8": "Final account: log in as utumno8 and read the CONGRATULATIONS file."
+ },
+ "host": "utumno.labs.overthewire.org",
+ "levels": [
+  {
+   "lvl": 0,
+   "user": "utumno0",
+   "cmds": [
+    [
+     "# utumno0 is execute-only: strings/objdump/readelf all refuse it",
+     "ls -l /utumno/utumno0",
+     "strings /utumno/utumno0",
+     "objdump -d /utumno/utumno0",
+     "/utumno/utumno0 < /dev/null",
+     "# LD_PRELOAD a 32-bit constructor dumper: read /proc/self/maps, dump the binary's own mappings",
+     "# compile 32-bit and load it, then treat the dump as an ordinary binary",
+     "objdump -d -M intel /tmp/utumno0.dump | sed -n '/<main>:/,/^$/p'"
+    ]
+   ],
+   "out": [
+    "strings: Permission denied",
+    "objdump: Permission denied",
+    "readelf: not readable",
+    "Read me! :P"
+   ],
+   "pw": "g0Vpiw3aZt"
+  },
+  {
+   "lvl": 1,
+   "user": "utumno1",
+   "cmds": [
+    [
+     "# the binary mmaps an RWX page, copies a string into it and calls it",
+     "file /utumno/utumno1",
+     "objdump -d -M intel /utumno/utumno1 | sed -n '/<main>:/,/^$/p'",
+     "readelf -lW /utumno/utumno1 | grep GNU_STACK",
+     "cat /proc/sys/kernel/randomize_va_space",
+     "# write the shellcode in vim: no NUL bytes, no slashes, builds /bin/sh byte by byte",
+     "nasm -f elf32 l1.asm -o l1.o",
+     "objcopy -O binary --only-section=.text l1.o l1.bin",
+     "xxd -p l1.bin",
+     "# build the file name (sh_ + shellcode) and run it"
+    ]
+   ],
+   "out": [
+    "GNU_STACK RWE",
+    "ASLR off"
+   ],
+   "pw": "WaSwuXNhvg",
+   "note": "the shellcode runs from the RWX page and prints the password file"
+  },
+  {
+   "lvl": 2,
+   "user": "utumno2",
+   "cmds": [
+    [
+     "/utumno/utumno2 </dev/null",
+     "/utumno/utumno2 AAAA </dev/null",
+     "# both refuse: the guard wants argc == 1 and an empty argv[0]",
+     "objdump -d -M intel /utumno/utumno2 | sed -n '/<main>:/,/^$/p'",
+     "# with one argument, argv[10] is envp[8] \u2014 the payload rides there",
+     "# write the shellcode in vim, drive it from ctypes with an empty argv[0]",
+     "# sweep for a working return address, re-run the hit with shell commands"
+    ]
+   ],
+   "out": [
+    "Aw.."
+   ],
+   "pw": "yiTcaZbpJ9"
+  },
+  {
+   "lvl": 3,
+   "user": "utumno3",
+   "cmds": [
+    [
+     "# loop: index = getchar() ^ 3*k, value = getchar(), buffer[index] = value",
+     "# index is a signed char used as an offset \u2014 it can go negative and past the buffer",
+     "objdump -d -M intel /utumno/utumno3 | sed -n '/<main>:/,/^$/p'",
+     "# confirm the arithmetic in gdb, choose the shellcode location",
+     "# write the shellcode in vim, build the exploit in vim",
+     "# sweep the return address, re-run the hit"
+    ]
+   ],
+   "out": [],
+   "pw": "06nx2CS7rS",
+   "note": "the signed-char write redirects the return address to shellcode in argv[0]"
+  },
+  {
+   "lvl": 4,
+   "user": "utumno4",
+   "cmds": [
+    [
+     "/utumno/utumno4 </dev/null",
+     "# segfault with no args \u2014 the interesting path needs arguments",
+     "objdump -d -M intel /utumno/utumno4 | sed -n '/<main>:/,/^$/p'",
+     "# the guard reads only a WORD (16 bits) of the length; memcpy uses the DWORD",
+     "readelf -lW /utumno/utumno4 | grep GNU_STACK",
+     "cat /proc/sys/kernel/randomize_va_space",
+     "# buf = ebp-0xff02, return address at offset 0xff06 = 65286",
+     "# len = 65536 + 63 = 65599 passes the guard and reaches the return address",
+     "# write the shellcode in vim, build the exploit in vim, run it"
+    ]
+   ],
+   "out": [
+    "rc=139 (segfault)",
+    "GNU_STACK RWE",
+    "ASLR off"
+   ],
+   "pw": "ZigV4d7wiU"
+  },
+  {
+   "lvl": 5,
+   "user": "utumno5",
+   "cmds": [
+    [
+     "# same argc/argv guard as utumno2; argv[10] is envp[8]",
+     "objdump -d -M intel /utumno/utumno5 | sed -n '/<main>:/,/^$/p'",
+     "# hihi: strings longer than 0x13 are strncpy-capped at 20 bytes",
+     "# the return address is overwritten, but the shellcode stays in envp[8]",
+     "# write the shellcode in vim, build the exploit in vim",
+     "# sweep the return address, re-run the hit"
+    ]
+   ],
+   "out": [],
+   "pw": "HhEXDIzqg9",
+   "note": "strncpy caps long strings at 20 bytes: ret is overwritten, shellcode stays in envp[8]"
+  },
+  {
+   "lvl": 6,
+   "user": "utumno6",
+   "cmds": [
+    [
+     "/utumno/utumno6",
+     "/utumno/utumno6 1 deadbeef hello",
+     "# the bounds check is signed: (int)pos > 0xa \u2014 but pos is used as a full 32-bit index",
+     "objdump -d -M intel /utumno/utumno6 | sed -n '/<main>:/,/^$/p'",
+     "# pos = 4294967295 (-1) passes the check and rewrites the strcpy destination pointer",
+     "/utumno/utumno6 4294967295 41414141 BBBB",
+     "# measure the layout in gdb, write the shellcode and the exploit in vim, run it"
+    ]
+   ],
+   "out": [
+    "Missing args"
+   ],
+   "pw": "V7U1ZvQCbP"
+  },
+  {
+   "lvl": 7,
+   "user": "utumno7",
+   "cmds": [
+    [
+     "/utumno/utumno7",
+     "/utumno/utumno7 AAAA",
+     "# vuln(): buffer[0x120] at ebp-0x120, jmp_buf at buffer+0x80 \u2014 inside the buffer",
+     "objdump -d -M intel /utumno/utumno7 | sed -n '/<vuln>:/,/^$/p'",
+     "# strcpy runs straight through the jmp_buf; longjmp restores our ebp",
+     "# exactly 144 bytes: buffer[140..143] becomes ebp, the NUL lands on esp's low byte",
+     "# write the shellcode and the exploit in vim, run it"
+    ]
+   ],
+   "out": [
+    "lol ulrich && fuck hector"
+   ],
+   "pw": "2bvITuqzN4"
+  }
+ ],
+ "title": "Utumno"
+}
