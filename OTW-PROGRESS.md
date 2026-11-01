@@ -109,3 +109,5 @@ Utumno | L3 | signed-char byte-write primitive: return address -> shellcode in a
 Utumno | L4 | the length guard checks only 16 bits: 65599 passes and copies 65599 bytes, overwriting the return address at offset 65286 | recordings/utumno/L4.cast
 Utumno | L5 | strncpy caps long strings at 20 bytes: ret is overwritten, shellcode stays in envp[8] | recordings/utumno/L5.cast
 Utumno | L6 | signed table index -1 rewrites the strcpy destination pointer; argv[2] is parsed as hex | recordings/utumno/L6.cast
+Maze | L0 | BLOCKED: maze0 login refused — maze.labs.overthewire.org answers ssh with 'Permission denied (publickey)', so password auth is not available for this game from this host. | (no recording)
+Vortex | L0 | BLOCKED: vortex0 login refused — vortex.labs.overthewire.org answers ssh with 'Permission denied (publickey)', so password auth is not available for this game from this host. | (no recording)
