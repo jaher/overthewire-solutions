@@ -215,3 +215,20 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Password for behemoth6:** `gLmUCSSlkL`
 - **Verification:** logged in as `behemoth6` with this password.
 - **Recording:** `recordings/behemoth/L5.cast`
+
+## Level 6 → behemoth7
+- **Account:** `behemoth6`, password `gLmUCSSlkL`.
+- **Goal:** `behemoth6` runs `popen("/behemoth/behemoth6_reader","r")`, reads 10 bytes, and compares them with `"HelloKitty"`; on success it does `setreuid(euid,euid)` and `execl("/bin/sh")`. `behemoth6_reader` `mmap`s `shellcode.txt` with `PROT_READ|PROT_WRITE|PROT_EXEC` and calls the mapping. The reader refuses any file containing byte `0x0b`.
+- **Technique and why it works:** **write shellcode that satisfies the string check**. The "shellcode.txt" file is executable memory for the reader, so we control code. The program only proceeds to the shell if the code prints exactly `HelloKitty`. So the payload is `write(1,"HelloKitty",10); exit(0)` — it proves code execution *and* satisfies the comparison, and then `behemoth6` itself gives us a shell with euid behemoth7. The `0x0b` check is a (weak) anti-shellcode filter: the byte must simply not appear in the file.
+
+  The shellcode is assembled from `vim /tmp/b6.asm` with `nasm -f elf32`, `objdump -d -M intel`, `objcopy -O binary --only-section=.text`, `xxd -p`. The string is built with three little-endian pushes (`"Hell"`, `"oKit"`, `"ty\0\0"`) because a 10-byte string does not fit in one immediate.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read both programs.** `strings` shows `HelloKitty`, `shellcode.txt`, `Couldn't open shellcode.txt!`, `Write your own shellcode.`; `objdump -d` shows the `mmap(..., PROT_READ|WRITE|EXEC, MAP_ANON, fd, 0)` call and `call *%eax`, and the `0x0b` scan loop.
+2. **Write `/tmp/b6.asm` in vim** and assemble it (nasm/objdump/objcopy/xxd → 41 bytes).
+3. **Write `/tmp/e_behemoth6.py` in vim**: it writes the assembled bytes to `./shellcode.txt` in a writable directory, runs `behemoth6` on a raw pty, and feeds `id` / `cat /etc/behemoth_pass/behemoth7` to the shell.
+4. **Run it.** The recording shows `Correct.`, `uid=13007(behemoth7)`, and `aHHctqVRgi`.
+5. **Verify.** Log in as behemoth7.
+- **Password for behemoth7:** `aHHctqVRgi`
+- **Verification:** logged in as `behemoth7` with this password.
+- **Recording:** `recordings/behemoth/L6.cast`
