@@ -667,7 +667,10 @@ Verification: each password was accepted by logging in as the next level's accou
    a2[RET_OFF:RET_OFF+4] = struct.pack("<I", ADDR)
    a2 += b"\x90" * (LEN - len(a2))
    ```
-   The run waits for the marker (up to 5 s) and retries up to three times, because the 64 KB copy makes the child slow enough that a fixed short timeout can miss the output.
+   The run reads the child's output **to EOF** rather than stopping at the
+   marker: the shellcode prints `PWN!` and the password in one write, so a
+   loop that breaks on `PWN` truncates the password (that was the first
+   failure in this level). A short retry loop covers the slow 64 KB copy.
 8. **Run it.**
    ```
    python3 e.py
