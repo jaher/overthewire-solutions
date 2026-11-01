@@ -120,7 +120,8 @@ const LEVELS = [
   ["Narnia",4,"buffer[256] overflow, setuid(euid) shellcode so privilege survives execve"],
   ["Narnia",5,"format string: %440c%15$n writes 500 into i (snprintf dest overlaps varargs)"],
   ["Narnia",6,"overflow b1[8] into fp -> libc system(); sh;# hides the address bytes"],
-  ["Narnia",7,"format string writes hackedfunction into ptrf (%152$hn/%153$hn)"]
+  ["Narnia",7,"format string writes hackedfunction into ptrf (%152$hn/%153$hn)"],
+  ["Narnia",8,"bok[20] copy-loop overflow; keep blah valid via argv addr; ret into argv sled"]
 ];
 
 const rows = document.getElementById('rows');

