@@ -86,3 +86,4 @@ Natas | L20 | session-file injection: name="x\nadmin 1" adds an admin=1 line to 
 Natas | L21 | colocated experimenter sets $_SESSION[key]=val; POST admin=1 then reuse PHPSESSID on main host | recordings/natas/L21.cast
 Natas | L22 | ?revelio GET parameter alone prints credentials (no auth check) | recordings/natas/L22.cast
 Natas | L23 | PHP loose comparison: "10111iloveyou" contains iloveyou and converts to 10111 > 10 | recordings/natas/L23.cast
+Natas | L24 | passwd[]=x makes strcmp() receive an array -> NULL -> !NULL passes | recordings/natas/L24.cast

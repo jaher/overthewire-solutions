@@ -396,3 +396,23 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas24:** `shlL4BvOtawNCd81dwdKRHFzmTEjYYQX`
 - **Verification:** `http://natas24.natas.labs.overthewire.org/` with `natas24:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L23.cast`
+
+## Level 24 → natas25
+- **Account:** `natas24`, password `shlL4BvOtawNCd81dwdKRHFzmTEjYYQX`.
+- **Goal:** The page prints the credentials when `!strcmp($_REQUEST["passwd"],"<censored>")` is true — the classic "correct password" idiom.
+- **Technique and why it works:** **type confusion into `strcmp`**. `strcmp` expects two strings. PHP's `$_REQUEST` can deliver an *array* when the parameter is written `passwd[]=x`. Calling `strcmp` with an array raises a warning ("expects parameter 1 to be string, array given") and returns `NULL` instead of an integer. `!NULL` is `true`, so the condition passes — the password is never compared at all. Crucially PHP does not abort on that warning, so execution continues into the success branch. The level teaches that type checks must be explicit: `is_string()` before `strcmp`, or a strict comparison against a known hash.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `index-source.html` shows `if(!strcmp($_REQUEST["passwd"],"<censored>"))`.
+2. **Try the normal case.** `?passwd=x` → `Wrong!` (a real string comparison, non-zero result).
+3. **Send an array instead.** `?passwd[]=x` makes `$_REQUEST["passwd"]` an array:
+   ```
+   curl -s -u natas24:<pw> 'http://natas24.natas.labs.overthewire.org/?passwd[]=x'
+   # Warning: strcmp() expects parameter 1 to be string, array given ...
+   # The credentials for the next level are: ... Password: UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo
+   ```
+   The warning is visible in the response — it is the proof that the argument was an array, and the credentials appear in the same response.
+4. **Verify.** `curl -u natas25:<pw> http://natas25.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas25:** `UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo`
+- **Verification:** `http://natas25.natas.labs.overthewire.org/` with `natas25:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L24.cast`
