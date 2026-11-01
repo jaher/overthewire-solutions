@@ -355,3 +355,21 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas22:** `964laB0r7TuDqJj5b3HFtwsQoc0GhjBF`
 - **Verification:** `http://natas22.natas.labs.overthewire.org/` with `natas22:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L21.cast`
+
+## Level 22 → natas23
+- **Account:** `natas22`, password `964laB0r7TuDqJj5b3HFtwsQoc0GhjBF`.
+- **Goal:** The source shows `if(array_key_exists("revelio", $_GET))` prints the credentials. There is no authentication check around it.
+- **Technique and why it works:** the credentials are gated only on the *presence* of a GET parameter named `revelio`. There is no login check and no admin session test — a client-supplied parameter alone unlocks the output. Adding `?revelio` to the URL is enough.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `index-source.html` shows the `revelio` check with no auth around it.
+2. **Send the parameter.**
+   ```
+   curl -u natas22:<pw> 'http://natas22.natas.labs.overthewire.org/?revelio'
+   # You are an admin. ...
+   # Password: CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5
+   ```
+3. **Verify.** `curl -u natas23:<pw> http://natas23.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas23:** `CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5`
+- **Verification:** `http://natas23.natas.labs.overthewire.org/` with `natas23:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L22.cast`
