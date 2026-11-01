@@ -96,3 +96,4 @@ Natas | L30 | DBI quote() second arg is the SQL type: repeated password=1 OR 1=1
 Natas | L31 | CGI param/ARGV injection: plain file=ARGV field -> open("ARGV") reads @ARGV from the query string | recordings/natas/L31.cast
 Natas | L32 | ARGV injection with " #" to defuse CGI quoting; run setuid getpassword in the webroot | recordings/natas/L32.cast
 Natas | L33 | phar deserialization: md5_file(phar://...) unserializes metadata -> Executor __destruct passthru | recordings/natas/L33.cast
+Behemoth | L2 | pid-file race: replace the touched <pid> file with a symlink to the password; program cats it as behemoth3 after sleep(2000) | recordings/behemoth/L2.cast

