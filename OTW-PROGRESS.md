@@ -104,3 +104,5 @@ Behemoth | L6 | shellcode.txt must write "HelloKitty" (nasm shellcode); behemoth
 Behemoth | L7 | alphanumeric filter checks only the first 512 chars; strcpy overflow carries nasm shellcode -> behemoth8 (CONGRATULATIONS) | recordings/behemoth/L7.cast
 Utumno | L0 | execute-only binary dumped from inside the process with a 32-bit LD_PRELOAD constructor reading /proc/self/maps | recordings/utumno/L0.cast
 Utumno | L1 | RWX mmap + strncpy shellcode runner: filename "sh_" + slash-free/NUL-free shellcode that builds /bin/sh byte by byte | recordings/utumno/L1.cast
+Utumno | L2 | strcpy(argv[10]) aliases envp[8]: empty argv[0] via libc.execve, stack shellcode in the env value | recordings/utumno/L2.cast
+Utumno | L3 | signed-char byte-write primitive: return address -> shellcode in argv[0]; shellcode reads the password file itself | recordings/utumno/L3.cast
