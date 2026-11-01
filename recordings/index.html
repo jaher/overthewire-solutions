@@ -147,6 +147,14 @@ const LEVELS = [
   ["Behemoth",5,"bind UDP 1337 first; the program sendto()s the password datagram"]
   ["Behemoth",6,"shellcode.txt must print HelloKitty; behemoth6 then execs /bin/sh"]
   ["Behemoth",7,"filter window: only first 512 chars are checked, overflow carries shellcode"]
+  ["Utumno",0,"execute-only binary dumped from inside via LD_PRELOAD constructor"],
+  ["Utumno",1,"RWX mmap + strncpy: a file name named sh_ + slash-free shellcode"],
+  ["Utumno",2,"strcpy(argv[10]) with argc==1 reads envp[8]; empty argv[0] via libc.execve"],
+  ["Utumno",3,"signed-char byte write redirects the return address to argv[0] shellcode"],
+  ["Utumno",4,"length guard truncates to 16 bits; 65599 copies 65599 bytes"],
+  ["Utumno",5,"strncpy caps long strings at 20 bytes; shellcode stays in envp[8]"],
+  ["Utumno",6,"signed table index -1 rewrites the strcpy destination pointer"],
+  ["Utumno",7,"longjmp restores an attacker-controlled ebp inside the overflowed buffer"],
 ];
 
 const rows = document.getElementById('rows');

