@@ -139,3 +139,30 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Password for behemoth3:** `3gr7EdpaSr`
 - **Verification:** logged in as `behemoth3` with this password.
 - **Recording:** `recordings/behemoth/L2.cast`
+
+## Level 3 → behemoth4
+- **Account:** `behemoth3`, password `3gr7EdpaSr`.
+- **Goal:** The binary asks "Identify yourself", reads up to 200 bytes with `fgets(buf, 0xc8, stdin)`, then does `printf(buf)` — the buffer is used as the format string.
+- **Technique and why it works:** **format-string arbitrary write**. `printf(buf)` with attacker-controlled text lets us use `%n`/`%hn` to write a value to an address we choose. The addresses are supplied through the varargs: on i386 the arguments are read from the stack above the call, and here the stack happens to hold *the buffer itself*, so argument *k* is the dword at `buf + 4*(k-1)`. That is confirmed in the recording: `printf '%1$p|%2$p|%3$p'` prints the first three dwords of the buffer.
+
+  The plan:
+  1. Leak `argv[0]` with `%54$p`; with an empty environment `buf = argv[0] - 0x194`, verified by printing `%41$s` after placing that address at `buf+160`.
+  2. The saved return address lives at `buf+204` (buf is at `ebp-0xc8`, saved ebp at +200). Put `buf+204` and `buf+206` at `buf+160`/`buf+164` — those become varargs 41 and 42.
+  3. Write the shellcode's address with `%<low>c%41$hn%<high-low>c%42$hn`. The crucial subtlety: `%hn` writes the **total** number of characters printed so far, not just the width of the current conversion, so the first width is the low half and the second is the difference to the high half (mod 65536).
+  4. The format string's own length determines where the shellcode starts, so the address is computed by iterating to a fixed point.
+
+  The shellcode (written in `vim /tmp/b3.asm`, assembled with `nasm -f elf32`, extracted with `objcopy -O binary --only-section=.text`, dumped with `xxd`) prints `PWN!`, then `geteuid(); setreuid(euid,euid); setuid(euid)` so the behemoth4 euid survives `execve`, then `execve("/bin/sh")`. It contains no NUL (fgets would stop) and no `%` (printf would consume it) — both asserted in the exploit.
+
+  The exploit runs behemoth3 on a **raw-mode pty**: the payload is binary and a canonical terminal would eat bytes such as `0x04` (EOF) or `0x03` (SIGINT). It then feeds `id` and `cat /etc/behemoth_pass/behemoth4` to the shell it spawned.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the code.** `strings`/`objdump -d` show `fgets(buf,0xc8,stdin)` then `printf(buf)`; `objdump -R` shows `printf@0x804b230`, `fgets@0x804b234`, `puts@0x804b238` (no RELRO), but we do not need the GOT — we target the saved return address.
+2. **gdb** gives `$ebp-0xc8` and `$ebp+4`, confirming buf/saved-ebp/ret offsets 0/200/204.
+3. **Probe the varargs.** `printf '%p %p %p %p %p %p'` shows stack words, and `%1$p|%2$p|%3$p` shows the buffer's first dwords — the varargs *are* the buffer.
+4. **Write the shellcode in vim**, `nasm`, `objdump -d -M intel`, `objcopy`, `xxd -p`, `wc -c` → 78 bytes.
+5. **Write the exploit in vim**: leak `argv[0]` (`%54$p`), derive `buf`, verify with `%41$s`, compute the two writes, build `fmt + sc + padding + [ret_slot, ret_slot+2]`, and drive a raw pty.
+6. **Run it.** The recording shows the leak, the format string `%56681c%41$hn%8854c%42$hn`, `PWN!`, `uid=13004(behemoth4)`, and `ABTmcqez7l`.
+7. **Verify.** Log in as behemoth4 (`whoami` → `behemoth4`).
+- **Password for behemoth4:** `ABTmcqez7l`
+- **Verification:** logged in as `behemoth4` with this password.
+- **Recording:** `recordings/behemoth/L3.cast`

@@ -142,6 +142,7 @@ const LEVELS = [
   ["Behemoth",0,"memfrob (XOR 42) obfuscated secret -> eatmyshorts"],
   ["Behemoth",1,"gets() overflow, stack shellcode (RWE, ASLR off), swept ret"]
   ["Behemoth",2,"pid-file race: swap the touched file for a symlink; program cats it after sleep(2000)"]
+  ["Behemoth",3,"printf(buf) format string: %hn writes the ret slot, shellcode in the buffer"]
 ];
 
 const rows = document.getElementById('rows');
