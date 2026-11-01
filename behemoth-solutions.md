@@ -166,3 +166,28 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Password for behemoth4:** `ABTmcqez7l`
 - **Verification:** logged in as `behemoth4` with this password.
 - **Recording:** `recordings/behemoth/L3.cast`
+
+## Level 4 → behemoth5
+- **Account:** `behemoth4`, password `ABTmcqez7l`.
+- **Goal:** `objdump -d` shows `sprintf(buf,"/tmp/%d",getpid()); fopen(buf,"r"); sleep(1);` then a `putchar()` loop printing the file byte by byte.
+- **Technique and why it works:** **predicted-pid symlink race**. The file name is derived from the program's own pid, but we can know the pid *before* the program runs: fork first, read the child's pid in the parent, then have the child `execve` behemoth4. The parent plants `/tmp/<child pid>` as a symlink to `/etc/behemoth_pass/behemoth5` while the child is still doing dynamic linking, so the symlink exists by the time `fopen` runs. The program then opens it and prints the password — as behemoth5, because the binary is setuid.
+
+  Note the difference from behemoth2: there the program created the file itself and slept 2000 s; here the file is only opened, so the window is milliseconds, but the pid is fully predictable, which makes the race deterministic rather than lucky.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the flow.** `strings`/`objdump`: `/tmp/%d` with `getpid()`, `fopen(buf,"r")`, `sleep(1)`, `puts("Finished sleeping, fgetcing")`, then `fgetc`/`putchar` until EOF.
+2. **Write `/tmp/e_behemoth4.py` in vim**:
+   ```python
+   pid = os.fork()
+   if pid == 0:
+       os.execve(b"/behemoth/behemoth4", [b"/behemoth/behemoth4"], {})
+   path = "/tmp/%d" % pid
+   os.symlink("/etc/behemoth_pass/behemoth5", path)
+   os.waitpid(pid, 0)
+   ```
+   The parent knows the pid because `fork()` returns it.
+3. **Run it.** The recording shows `planted /tmp/78 -> /etc/behemoth_pass/behemoth5`, `Finished sleeping, fgetcing`, and `UCEVVD7tz3`.
+4. **Verify.** Log in as behemoth5 (`whoami` → `behemoth5`).
+- **Password for behemoth5:** `UCEVVD7tz3`
+- **Verification:** logged in as `behemoth5` with this password.
+- **Recording:** `recordings/behemoth/L4.cast`

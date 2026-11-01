@@ -98,3 +98,4 @@ Natas | L32 | ARGV injection with " #" to defuse CGI quoting; run setuid getpass
 Natas | L33 | phar deserialization: md5_file(phar://...) unserializes metadata -> Executor __destruct passthru | recordings/natas/L33.cast
 Behemoth | L2 | pid-file race: replace the touched <pid> file with a symlink to the password; program cats it as behemoth3 after sleep(2000) | recordings/behemoth/L2.cast
 Behemoth | L3 | printf(buf) format string:  rewrites the saved return address; shellcode in vim+nasm, raw pty | recordings/behemoth/L3.cast
+Behemoth | L4 | /tmp/<pid> symlink race with a predicted child pid (fork before exec) | recordings/behemoth/L4.cast

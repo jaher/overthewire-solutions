@@ -143,6 +143,7 @@ const LEVELS = [
   ["Behemoth",1,"gets() overflow, stack shellcode (RWE, ASLR off), swept ret"]
   ["Behemoth",2,"pid-file race: swap the touched file for a symlink; program cats it after sleep(2000)"]
   ["Behemoth",3,"printf(buf) format string: %hn writes the ret slot, shellcode in the buffer"]
+  ["Behemoth",4,"predicted-pid symlink race: /tmp/<child pid> -> password file"]
 ];
 
 const rows = document.getElementById('rows');
