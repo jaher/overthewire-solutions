@@ -85,3 +85,4 @@ Natas | L19 | session id = bin2hex("<n>-admin"); brute-force n 1..640, found n=2
 Natas | L20 | session-file injection: name="x\nadmin 1" adds an admin=1 line to the session | recordings/natas/L20.cast
 Natas | L21 | colocated experimenter sets $_SESSION[key]=val; POST admin=1 then reuse PHPSESSID on main host | recordings/natas/L21.cast
 Natas | L22 | ?revelio GET parameter alone prints credentials (no auth check) | recordings/natas/L22.cast
+Natas | L23 | PHP loose comparison: "10111iloveyou" contains iloveyou and converts to 10111 > 10 | recordings/natas/L23.cast

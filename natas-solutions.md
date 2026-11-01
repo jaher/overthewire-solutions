@@ -373,3 +373,26 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas23:** `CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5`
 - **Verification:** `http://natas23.natas.labs.overthewire.org/` with `natas23:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L22.cast`
+
+## Level 23 → natas24
+- **Account:** `natas23`, password `CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5`.
+- **Goal:** The page accepts a password in `?passwd=` and prints the credentials when `strstr($_REQUEST["passwd"],"iloveyou") && ($_REQUEST["passwd"] > 10)`.
+- **Technique and why it works:** **PHP loose comparison / numeric-prefix parsing**. Two conditions must hold at once: the string must *contain* `iloveyou` (a substring test), and the same string must compare *greater than 10* as a number. When PHP compares a string with an integer in this style, it converts the string to a number by reading its leading numeric prefix and ignoring the rest. So `"10111iloveyou"` becomes `10111` — greater than 10 — while still containing `iloveyou`. The inverse order `"iloveyou10111"` has no leading digits, converts to `0`, and fails the numeric test. The level is a lesson in type juggling: one value can satisfy a string test and a numeric test at the same time if it is crafted so each check looks at a different part of it.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `index-source.html` shows the two-part check. `strstr` needs the literal substring; the `>` comparison is a loose numeric comparison.
+2. **Reason about the conversion.** PHP takes the leading digits as the numeric value, so put the number *first* and the magic word after it.
+3. **Try the three candidates.**
+   ```
+   curl -s -u natas23:<pw> 'http://natas23.natas.labs.overthewire.org/?passwd=iloveyou'
+   # Wrong!            (contains the word, but converts to 0)
+   curl -s -u natas23:<pw> 'http://natas23.natas.labs.overthewire.org/?passwd=10111iloveyou'
+   # The credentials for the next level are: ... Password: shlL4BvOtawNCd81dwdKRHFzmTEjYYQX
+   curl -s -u natas23:<pw> 'http://natas23.natas.labs.overthewire.org/?passwd=iloveyou10111'
+   # Wrong!            (no leading digits -> 0)
+   ```
+   The recording shows all three responses side by side, which makes the rule visible.
+4. **Verify.** `curl -u natas24:<pw> http://natas24.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas24:** `shlL4BvOtawNCd81dwdKRHFzmTEjYYQX`
+- **Verification:** `http://natas24.natas.labs.overthewire.org/` with `natas24:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L23.cast`
