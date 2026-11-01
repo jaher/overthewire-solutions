@@ -60,7 +60,8 @@
     "GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10",
     "0",
     " 8049234:\t6a 00                 \tpush   0x0",
-    "uid=16002(utumno2) gid=16001(utumno1) groups=16001(utumno1)"
+    "uid=16002(utumno2) gid=16001(utumno1) groups=16001(utumno1)",
+    "WaSwuXNhvg"
    ],
    "pw": "WaSwuXNhvg",
    "note": "the shellcode runs from the RWX page and prints the password file"
