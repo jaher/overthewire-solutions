@@ -177,9 +177,17 @@ function delay(ms){ return new Promise(r => { let t = 0; const iv = setInterval(
 function line(html, cls){ const d = document.createElement('div'); if (cls) d.className = cls; d.innerHTML = html; term.appendChild(d); term.scrollTop = term.scrollHeight; return d; }
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
+function promptHost(user, cmd){
+  // Every transcript opens with the ssh into the level, typed at a local
+  // shell; everything after it is typed on the OTW host the page header shows.
+  if (cmd.trim().startsWith('ssh ')) return 'localhost';
+  const G = curGame();
+  return G.host || (gameKey + '.labs.overthewire.org');
+}
+
 async function typeCmd(user, cmd, my){
   const d = line('<span class="prompt"></span><span class="cmd"></span><span class="cursor"></span>');
-  d.querySelector('.prompt').textContent = user + '@' + (gameKey === 'bandit' ? 'bandit' : 'dgx5') + ':~$ ';
+  d.querySelector('.prompt').textContent = user + '@' + promptHost(user, cmd) + ':~$ ';
   const span = d.querySelector('.cmd');
   for (let i = 0; i < cmd.length; i++){
     if (my !== runId) return;
