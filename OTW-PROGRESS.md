@@ -79,3 +79,5 @@ Narnia | L7 | format string writes hackedfunction into ptrf via %152$hn/%153$hn 
 Narnia | L8 | bok[20] copy-loop overflow: loop overwrites its own blah pointer; argv[20..23]=argv addr keeps it valid; ret into argv sled; final level (CONGRATULATIONS) | recordings/narnia/L8.cast
 Behemoth | L0 | memfrob (XOR 42) obfuscated secret read from movl immediates -> "eatmyshorts" | recordings/behemoth/L0.cast
 Behemoth | L1 | gets() overflow into buf[67]; RWE stack + ASLR off -> stack shellcode (nasm), swept ret 0xffffde20 | recordings/behemoth/L1.cast
+Natas | L17 | time-based blind SQLi: OR IF(cond,SLEEP(5)) fires per row (~20s true vs <1s false); binary search ORD(SUBSTR(password,pos,1)); len 32 | recordings/natas/L17.cast
+Natas | L18 | brute-force PHPSESSID 1..640 (session_id=rand(1,640)); sid 119 is admin | recordings/natas/L18.cast
