@@ -317,3 +317,22 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas20:** `slOKYGsjlJhaqKliGvrgWAzln0JyrWao`
 - **Verification:** `http://natas20.natas.labs.overthewire.org/` with `natas20:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L19.cast`
+
+## Level 20 → natas21
+- **Account:** `natas20`, password `slOKYGsjlJhaqKliGvrgWAzln0JyrWao`.
+- **Goal:** The level uses a custom session save handler. `mywrite` serialises `$_SESSION` as one `key value` per line (`"$key $value\n"`), and `myread` rebuilds `$_SESSION` by splitting each line on the first space. Credentials are printed when `$_SESSION["admin"] == 1`.
+- **Technique and why it works:** **session-file injection**. The `name` parameter is stored into `$_SESSION["name"]`, and the write handler appends it verbatim as a line. If we send a name containing a newline followed by `admin 1`, the session file ends up with a separate line `admin 1`. On the *next* request the read handler parses that line as `$_SESSION["admin"] = 1`, so we are treated as admin. The handler does not escape newlines, so the "value" of one key becomes new keys.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `mywrite` builds `"$key $value\n"` lines; `myread` does `explode(" ", $line, 2)` and assigns `$_SESSION[$parts[0]] = $parts[1]`.
+2. **Inject a newline.** Send `name = "x\nadmin 1"`. The write handler stores two lines: `name x` and `admin 1`.
+3. **Read it back.** The same cookie's session file now contains `admin 1`, so `myread` sets `$_SESSION["admin"] = 1`; `print_credentials()` reveals the password.
+   ```
+   You are an admin: True
+   Username: natas21
+   Password: 7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU
+   ```
+4. **Verify.** `curl -u natas21:<pw> http://natas21.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas21:** `7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU`
+- **Verification:** `http://natas21.natas.labs.overthewire.org/` with `natas21:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L20.cast`
