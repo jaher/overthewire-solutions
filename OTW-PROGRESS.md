@@ -102,3 +102,5 @@ Behemoth | L4 | /tmp/<pid> symlink race with a predicted child pid (fork before 
 Behemoth | L5 | bind UDP 127.0.0.1:1337 before running; the program sendto()s the password to us | recordings/behemoth/L5.cast
 Behemoth | L6 | shellcode.txt must write "HelloKitty" (nasm shellcode); behemoth6 then execs a shell | recordings/behemoth/L6.cast
 Behemoth | L7 | alphanumeric filter checks only the first 512 chars; strcpy overflow carries nasm shellcode -> behemoth8 (CONGRATULATIONS) | recordings/behemoth/L7.cast
+Utumno | L0 | execute-only binary dumped from inside the process with a 32-bit LD_PRELOAD constructor reading /proc/self/maps | recordings/utumno/L0.cast
+Utumno | L1 | RWX mmap + strncpy shellcode runner: filename "sh_" + slash-free/NUL-free shellcode that builds /bin/sh byte by byte | recordings/utumno/L1.cast
