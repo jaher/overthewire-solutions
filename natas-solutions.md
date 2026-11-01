@@ -336,3 +336,22 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas21:** `7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU`
 - **Verification:** `http://natas21.natas.labs.overthewire.org/` with `natas21:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L20.cast`
+
+## Level 21 → natas22
+- **Account:** `natas21`, password `7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU`.
+- **Goal:** The main page starts a session and prints credentials when `$_SESSION["admin"] == 1`. It is colocated with `natas21-experimenter.natas.labs.overthewire.org`, which shares the same session store.
+- **Technique and why it works:** **shared-session privilege injection**. The experimenter page copies every request parameter into the session: `foreach($_REQUEST as $key => $val) { $_SESSION[$key] = $val; }`. Because both hosts use the same PHP session storage, we POST `admin=1` to the experimenter, which writes `admin=1` into the shared session. Then we load the main page with the *same* `PHPSESSID` and it reads `admin=1` from the shared session.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read both sources.** The main page checks `$_SESSION["admin"]`; the experimenter sets `$_SESSION[$key] = $val` for every request key on `submit`.
+2. **Inject via the experimenter.** POST `submit=1&admin=1&...` to the experimenter; it returns `Set-Cookie: PHPSESSID=<sid>`.
+3. **Reuse the session on the main host.** GET the main page with `Cookie: PHPSESSID=<sid>`; the session now has `admin=1`:
+   ```
+   admin: True
+   Username: natas22
+   Password: 964laB0r7TuDqJj5b3HFtwsQoc0GhjBF
+   ```
+4. **Verify.** `curl -u natas22:<pw> http://natas22.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas22:** `964laB0r7TuDqJj5b3HFtwsQoc0GhjBF`
+- **Verification:** `http://natas22.natas.labs.overthewire.org/` with `natas22:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L21.cast`

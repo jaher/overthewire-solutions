@@ -83,3 +83,4 @@ Natas | L17 | time-based blind SQLi: OR IF(cond,SLEEP(5)) fires per row (~20s tr
 Natas | L18 | brute-force PHPSESSID 1..640 (session_id=rand(1,640)); sid 119 is admin | recordings/natas/L18.cast
 Natas | L19 | session id = bin2hex("<n>-admin"); brute-force n 1..640, found n=281 | recordings/natas/L19.cast
 Natas | L20 | session-file injection: name="x\nadmin 1" adds an admin=1 line to the session | recordings/natas/L20.cast
+Natas | L21 | colocated experimenter sets $_SESSION[key]=val; POST admin=1 then reuse PHPSESSID on main host | recordings/natas/L21.cast

