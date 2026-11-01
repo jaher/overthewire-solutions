@@ -106,3 +106,5 @@ Utumno | L0 | execute-only binary dumped from inside the process with a 32-bit L
 Utumno | L1 | RWX mmap + strncpy shellcode runner: filename "sh_" + slash-free/NUL-free shellcode that builds /bin/sh byte by byte | recordings/utumno/L1.cast
 Utumno | L2 | strcpy(argv[10]) aliases envp[8]: empty argv[0] via libc.execve, stack shellcode in the env value | recordings/utumno/L2.cast
 Utumno | L3 | signed-char byte-write primitive: return address -> shellcode in argv[0]; shellcode reads the password file itself | recordings/utumno/L3.cast
+Utumno | L4 | the length guard checks only 16 bits: 65599 passes and copies 65599 bytes, overwriting the return address at offset 65286 | recordings/utumno/L4.cast
+Utumno | L5 | strncpy caps long strings at 20 bytes: ret is overwritten, shellcode stays in envp[8] | recordings/utumno/L5.cast
