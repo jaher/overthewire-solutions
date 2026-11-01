@@ -50,6 +50,9 @@
     ]
    ],
    "out": [
+    "lrwxrwxrwx   1 leviathan2 leviathan2   30 Nov  1 16:22 a -> /etc/leviathan_pass/leviathan3",
+    "-rw-rw-r--   1 leviathan2 leviathan2    0 Nov  1 16:22 a b",
+    "PiEpxxknZH",
     "cat: b: No such file or directory"
    ],
    "pw": "PiEpxxknZH",
@@ -71,9 +74,9 @@
     ]
    ],
    "out": [
-    "Enter the password>",
+    "Enter the password> snlprintf",
     "[You've got shell]!",
-    "uid=12004(leviathan4) gid=12003(leviathan3)"
+    "uid=12004(leviathan4) gid=12003(leviathan3) groups=12003(leviathan3)"
    ],
    "pw": "XIyBbRwAPt"
   },
@@ -89,7 +92,8 @@
     ]
    ],
    "out": [
-    "(8-bit groups, ending 00001010)"
+    "01000010 01110101 01100010 00111001 01100111 01011010 00110011 01000010 01000111 01010101 00001010",
+    "Bub9gZ3BGU"
    ],
    "pw": "Bub9gZ3BGU",
    "note": "converting each 8-bit group to ASCII reconstructs the password"
@@ -106,7 +110,11 @@
      "./leviathan5"
     ]
    ],
-   "out": [],
+   "out": [
+    "/tmp/file.log",
+    "Cannot find /tmp/file.log",
+    "JRGj9iWNOb"
+   ],
    "pw": "JRGj9iWNOb",
    "note": "the program prints the password file character by character, then unlinks the link"
   },
@@ -121,7 +129,10 @@
      "echo 'cat /etc/leviathan_pass/leviathan7' | ./leviathan6 7123"
     ]
    ],
-   "out": [],
+   "out": [
+    " 80491da:\tc7 45 f4 d3 1b 00 00 \tmov    DWORD PTR [ebp-0xc],0x1bd3",
+    "3zrlkaPTfH"
+   ],
    "pw": "3zrlkaPTfH",
    "note": "passing 7123 satisfies the comparison and drops into a leviathan7 shell"
   },

