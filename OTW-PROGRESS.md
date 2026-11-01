@@ -99,3 +99,4 @@ Natas | L33 | phar deserialization: md5_file(phar://...) unserializes metadata -
 Behemoth | L2 | pid-file race: replace the touched <pid> file with a symlink to the password; program cats it as behemoth3 after sleep(2000) | recordings/behemoth/L2.cast
 Behemoth | L3 | printf(buf) format string:  rewrites the saved return address; shellcode in vim+nasm, raw pty | recordings/behemoth/L3.cast
 Behemoth | L4 | /tmp/<pid> symlink race with a predicted child pid (fork before exec) | recordings/behemoth/L4.cast
+Behemoth | L5 | bind UDP 127.0.0.1:1337 before running; the program sendto()s the password to us | recordings/behemoth/L5.cast

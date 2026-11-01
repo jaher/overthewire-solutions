@@ -144,6 +144,7 @@ const LEVELS = [
   ["Behemoth",2,"pid-file race: swap the touched file for a symlink; program cats it after sleep(2000)"]
   ["Behemoth",3,"printf(buf) format string: %hn writes the ret slot, shellcode in the buffer"]
   ["Behemoth",4,"predicted-pid symlink race: /tmp/<child pid> -> password file"]
+  ["Behemoth",5,"bind UDP 1337 first; the program sendto()s the password datagram"]
 ];
 
 const rows = document.getElementById('rows');

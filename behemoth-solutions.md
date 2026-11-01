@@ -191,3 +191,27 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Password for behemoth5:** `UCEVVD7tz3`
 - **Verification:** logged in as `behemoth5` with this password.
 - **Recording:** `recordings/behemoth/L4.cast`
+
+## Level 5 → behemoth6
+- **Account:** `behemoth5`, password `UCEVVD7tz3`.
+- **Goal:** `objdump -d` + `strings` show the program opens `/etc/behemoth_pass/behemoth6`, reads it into a buffer, resolves `localhost`, creates a **UDP** socket, and `sendto()`s the contents to port **1337**.
+- **Technique and why it works:** **receive the exfiltration datagram**. The password is not printed to stdout; it is sent over the network to a fixed local port. Nobody is listening on UDP 1337 by default, so the datagram is simply discarded. If we bind `127.0.0.1:1337` *before* running the program, the kernel queues the datagram to our socket and `recvfrom` returns the password. The program still reads the password file as behemoth6 (setuid), so the privilege is on its side.
+
+  Note that UDP has no connection: binding the port is enough, no listener handshake is involved.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the flow.** `strings`: `/etc/behemoth_pass/behemoth6`, `localhost`, `1337`, `sendto`. `objdump -d` shows `fopen` → `fgets` → `gethostbyname("localhost")` → `socket(AF_INET, SOCK_DGRAM)` → `sendto(fd, buf, strlen(buf), 0, &addr, 16)`.
+2. **Write `/tmp/e_behemoth5.py` in vim**:
+   ```python
+   s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+   s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+   s.bind(("127.0.0.1", 1337))
+   p = subprocess.Popen(["/behemoth/behemoth5"], env={})
+   data, addr = s.recvfrom(4096)
+   print("received %d bytes from %s: %r" % (len(data), addr, data))
+   ```
+3. **Run it.** The recording shows `listening on 127.0.0.1:1337`, then `received 11 bytes from ('127.0.0.1', 39451): b'gLmUCSSlkL\n'`.
+4. **Verify.** Log in as behemoth6 (`whoami` → `behemoth6`).
+- **Password for behemoth6:** `gLmUCSSlkL`
+- **Verification:** logged in as `behemoth6` with this password.
+- **Recording:** `recordings/behemoth/L5.cast`
