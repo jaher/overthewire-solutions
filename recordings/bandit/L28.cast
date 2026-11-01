@@ -1,9 +1,9 @@
-{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793468032,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/bandit/L28.sh","title":"Bandit L29: password on dev branch","env":{"SHELL":"/bin/bash"}}
-[0.015, "o", "$ git clone ssh://bandit29-git@bandit.labs.overthewire.org:2220/home/bandit29-git/repo\r\r\n"]
-[0.001, "o", "Cloning into 'repo'...\r\r\n"]
-[5.152, "o", "$ cat README.md    # master: \"no passwords in production!\"\r\r\n"]
-[0.001, "o", "# Bandit Notes\r\r\nSome notes for bandit30 of bandit.\r\r\n\r\r\n## credentials\r\r\n\r\r\n- username: bandit30\r\r\n- password: <no passwords in production!>\r\r\n\r\r\n"]
-[0.000, "o", "$ git --no-pager branch -a    # dev branch exists remotely\r\r\n"]
-[0.001, "o", "* \u001b[32mmaster\u001b[m\r\r\n  \u001b[31mremotes/origin/HEAD\u001b[m -> origin/master\r\r\n  \u001b[31mremotes/origin/dev\u001b[m\r\r\n  \u001b[31mremotes/origin/master\u001b[m\r\r\n  \u001b[31mremotes/origin/sploits-dev\u001b[m\r\r\n$ git --no-pager show origin/dev:README.md\r\r\n"]
-[0.002, "o", "# Bandit Notes\r\r\nSome notes for bandit30 of bandit.\r\r\n\r\r\n## credentials\r\r\n\r\r\n- username: bandit30\r\r\n- password: jq9Dfg2rXsfYsWMgFuKlXhphjdH7USgX\r\r\n\r\r\n"]
-[0.005, "x", "0"]
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793548425,"idle_time_limit":2.0,"command":"bash /home/claude/solves/bandit/L28.sh","title":"Bandit L28: git history leaks redacted password","env":{"SHELL":"/bin/bash"}}
+[0.007, "o", "$ git clone ssh://bandit28-git@bandit.labs.overthewire.org:2220/home/bandit28-git/repo\r\n"]
+[0.003, "o", "Cloning into 'repo'...\r\n"]
+[2.518, "o", "$ cat README.md    # password redacted in HEAD\r\n"]
+[0.000, "o", "# Bandit Notes\r\nSome notes for level29 of bandit.\r\n\r\n## credentials\r\n\r\n- username: bandit29\r\n- password: xxxxxxxxxx\r\n\r\n"]
+[0.002, "o", "$ git --no-pager log --oneline\r\n"]
+[0.002, "o", "\u001b[33m801b85f\u001b[m\u001b[33m (\u001b[m\u001b[1;36mHEAD -> \u001b[m\u001b[1;32mmaster\u001b[m\u001b[33m, \u001b[m\u001b[1;31morigin/master\u001b[m\u001b[33m, \u001b[m\u001b[1;31morigin/HEAD\u001b[m\u001b[33m)\u001b[m fix info leak\r\n\u001b[33mdf10da1\u001b[m add missing data\r\n\u001b[33m388bcd3\u001b[m initial commit of README.md\r\n$ git --no-pager show HEAD~1:README.md    # \"fix info leak\" commit; parent still has the real value\r\n"]
+[0.003, "o", "# Bandit Notes\r\nSome notes for level29 of bandit.\r\n\r\n## credentials\r\n\r\n- username: bandit29\r\n- password: Em7eGtqaMySwNFjCpwzzHhLhospOcdt0\r\n\r\n"]
+[0.004, "x", "0"]

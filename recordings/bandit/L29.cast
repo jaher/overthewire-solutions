@@ -1,10 +1,8 @@
-{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793468074,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/bandit/L29.sh","title":"Bandit L30: password in git tag","env":{"SHELL":"/bin/bash"}}
-[0.009, "o", "$ git clone ssh://bandit30-git@bandit.labs.overthewire.org:2220/home/bandit30-git/repo\r\r\n"]
-[0.001, "o", "Cloning into 'repo'...\r\r\n"]
-[4.520, "o", "$ cat README.md\r\r\n"]
-[0.001, "o", "just an epmty file... muahaha\r\r\n"]
-[0.000, "o", "$ git --no-pager tag\r\r\n"]
-[0.001, "o", "secret\r\r\n"]
-[0.000, "o", "$ git --no-pager show secret\r\r\n"]
-[0.002, "o", "82NkymblpGBYmIXG6ZQ8YldBYstHpfUf\r\r\n"]
-[0.003, "x", "0"]
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793548428,"idle_time_limit":2.0,"command":"bash /home/claude/solves/bandit/L29.sh","title":"Bandit L29: password on origin/dev branch","env":{"SHELL":"/bin/bash"}}
+[0.012, "o", "$ git clone ssh://bandit29-git@bandit.labs.overthewire.org:2220/home/bandit29-git/repo\r\n"]
+[0.002, "o", "Cloning into 'repo'...\r\n"]
+[2.636, "o", "$ cat README.md    # master: \"no passwords in production!\"\r\n"]
+[0.001, "o", "# Bandit Notes\r\nSome notes for bandit30 of bandit.\r\n\r\n## credentials\r\n\r\n- username: bandit30\r\n- password: <no passwords in production!>\r\n\r\n$ git --no-pager branch -a    # dev branch exists remotely\r\n"]
+[0.002, "o", "* \u001b[32mmaster\u001b[m\r\n  \u001b[31mremotes/origin/HEAD\u001b[m -> origin/master\r\n  \u001b[31mremotes/origin/dev\u001b[m\r\n  \u001b[31mremotes/origin/master\u001b[m\r\n  \u001b[31mremotes/origin/sploits-dev\u001b[m\r\n$ git --no-pager show origin/dev:README.md\r\n"]
+[0.003, "o", "# Bandit Notes\r\nSome notes for bandit30 of bandit.\r\n\r\n## credentials\r\n\r\n- username: bandit30\r\n- password: jq9Dfg2rXsfYsWMgFuKlXhphjdH7USgX\r\n\r\n"]
+[0.004, "x", "0"]

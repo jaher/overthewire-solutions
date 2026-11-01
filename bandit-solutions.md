@@ -458,46 +458,66 @@ the key/credential to this client machine and connecting directly to the public 
 
 ## Level 25 → bandit26
 - **Account:** `bandit25`.
-- **Goal:** bandit25's home holds `bandit26.sshkey`, the private key for bandit26 — but bandit26's login shell is `/usr/bin/showtext`, which runs `exec more ~/text.txt` and then exits. Get a real shell as bandit26.
-- **Technique and why it works:** `more` has an interactive escape hatch: pressing `v` opens the current file in `vi`. Inside `vi`, `:set shell=/bin/bash` then `:shell` starts a bash under bandit26's identity. The catch is that `~/text.txt` is only 6 lines: on a normal terminal `more` prints it all and exits without ever showing the `--More--` prompt, so there is no chance to press `v`. Shrinking the terminal to ~5 rows forces `more` to paginate, keeping the prompt on screen; that is why the recording runs the session on a 60x5 PTY. The key is then used from this client (the localhost hop is blocked on the lab), and `./bandit27-do` (setuid bandit27) reads bandit27's password.
+- **Goal:** bandit25's home holds `bandit26.sshkey`, the private key for bandit26. Log in as bandit26 and read its password from `/etc/bandit_pass/bandit26`. The catch: bandit26's login shell is `/usr/bin/showtext`, which runs `exec more ~/text.txt` and then exits — so logging in never gives you a shell.
+- **Technique and why it works:** `more` has an interactive escape hatch: pressing `v` opens the current file in `vi`. Inside `vi`, `:set shell=/bin/bash` then `:shell` starts a bash under bandit26's identity, and from it `/etc/bandit_pass/bandit26` is readable. The catch is that `~/text.txt` is only 6 lines (258 bytes): on a normal terminal `more` prints it all and exits without ever showing the `--More--` prompt, so there is no chance to press `v`. Shrinking the terminal to ~5 rows forces `more` to paginate and keep the prompt on screen; that is why the recording runs the session on a 60x5 PTY. The localhost hop is blocked on the lab, so the key is fetched over SSH from this client, written to a mode-600 file, and used for a direct connection to the public host.
 - **Commands:**
   ```
-  ssh -i bandit26.sshkey bandit26@bandit.labs.overthewire.org -p 2220   # on a ~5-row terminal
+  ssh bandit25@bandit.labs.overthewire.org -p 2220 'cat bandit26.sshkey'   # save it, chmod 600
+  ssh -i bandit26.sshkey bandit26@bandit.labs.overthewire.org -p 2220      # on a ~5-row terminal
   # at the --More--(66%) prompt: press  v
   # in vi:
   :set shell=/bin/bash
   :shell
-  ./bandit27-do cat /etc/bandit_pass/bandit27
+  cat /etc/bandit_pass/bandit26
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
-1. **Inspect the account.** The home holds `bandit26.sshkey`, but bandit26's login shell is `/usr/bin/showtext`, which runs `exec more ~/text.txt` and exits.
-2. **Find the escape.** `more` lets you press `v` to open the file in `vi`; in `vi`, `:set shell=/bin/bash` then `:shell` starts bash as bandit26.
-3. **Force pagination.** `~/text.txt` is only 6 lines, so on a normal terminal `more` prints it and exits before you can press `v`. Running the session on a 60x5 PTY (as the recording does) forces the `--More--` prompt to appear.
-4. **Use the key.** From this client, `ssh -i bandit26.sshkey bandit26@bandit.labs.overthewire.org -p 2220` (the localhost hop is blocked), then `./bandit27-do cat /etc/bandit_pass/bandit27` with the setuid binary.
-- **Password for bandit27:** `STJLJBRRphMxKB392CT4iOr5CbzPU9ER`
-- **Verification:** logged in as `bandit27` with this password.
+1. **Fetch the key.** `ssh bandit25@… 'ls -la; cat bandit26.sshkey'` shows `bandit26.sshkey` is mode `-r--------` (readable only by bandit25, which is who we are). The recording extracts the PEM block into `bandit26.sshkey` and `chmod 600`s it — ssh refuses a key that is group/other readable.
+2. **Find the shell.** `getent passwd bandit26` / the level goal shows the login shell is `/usr/bin/showtext`, which runs `exec more ~/text.txt` and exits. A plain login therefore prints the banner and drops you straight back out.
+3. **Find the escape.** `more` lets you press `v` to open the file in `vi`; in `vi`, `:set shell=/bin/bash` then `:shell` starts bash as bandit26. The recording shows the `--More--(66%)` prompt, the `v` press, and the vi status line `"~/text.txt" </text.txt> [readonly] 6L, 258B`.
+4. **Force pagination.** `~/text.txt` is 6 lines / 258 bytes, so on a normal terminal `more` prints it and exits before you can press `v`. Running the session on a 60x5 PTY (as the recording does) forces the `--More--` prompt to appear.
+5. **Read the password.** In the escaped shell, `cat /etc/bandit_pass/bandit26` prints it. The recording then logs out and the verification step uses that password on a fresh SSH connection.
+- **Password for bandit26:** `jHdv2ELQhT22BkprMNDjybZDAkw1zeBJ`
+- **Verification:** logged in as `bandit26` with this password (the login runs `showtext`, confirming the account).
 - **Recording:** `recordings/bandit/L25.cast`
 
 ## Level 26 → bandit27
 - **Account:** `bandit26` (reached through the level-25 `more`→`vi`→`:shell` escape; the shell is not the login shell, so we stay in it rather than starting a new SSH session).
-- **Goal:** A git repository is served over SSH at `ssh://bandit27-git@bandit.labs.overthewire.org:2220/home/bandit27-git/repo`; clone it and read the password for bandit27.
-- **Technique and why it works:** The repo is hosted over git's SSH transport, authenticated with bandit27's password (the account `bandit27-git` shares the credential). `git clone` with the `ssh://` URL pulls the objects and checks out `README`. The README states the next password. The clone is run from this client with the password supplied through `SSH_ASKPASS`, because the game backend blocks localhost connections.
+- **Goal:** bandit26's home holds `bandit27-do`, a setuid binary owned by bandit27. Use it to read `/etc/bandit_pass/bandit27`.
+- **Technique and why it works:** `bandit27-do` is setuid bandit27, so it executes whatever command you give it with bandit27's effective UID. `ls -l bandit27-do` shows the `s` bit in the owner execute position; `./bandit27-do cat /etc/bandit_pass/bandit27` therefore cats a file that bandit26 cannot read directly. This is the same setuid primitive as bandit19's `bandit20-do`.
+- **Commands:**
+  ```
+  ls -l ./bandit27-do
+  ./bandit27-do cat /etc/bandit_pass/bandit27
+  ```
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Reach the shell.** Reuse the level-25 escape (`ssh -i bandit26.sshkey bandit26@…` on a 60x5 PTY, `v`, `:set shell=/bin/bash`, `:shell`). The recording repeats it live rather than assuming a saved session.
+2. **Spot the helper.** `ls -l` in `~` shows `bandit27-do` with the setuid bit and owner bandit27. Anything it runs runs as bandit27.
+3. **Run it.** `./bandit27-do cat /etc/bandit_pass/bandit27` prints the password — a direct `cat /etc/bandit_pass/bandit27` as bandit26 would be permission denied.
+- **Password for bandit27:** `STJLJBRRphMxKB392CT4iOr5CbzPU9ER`
+- **Verification:** logged in as `bandit27` with this password.
+- **Recording:** `recordings/bandit/L26.cast`
+
+## Level 27 → bandit28
+- **Account:** `bandit27`.
+- **Goal:** A git repository is served over SSH at `ssh://bandit27-git@bandit.labs.overthewire.org:2220/home/bandit27-git/repo`; clone it and read the password for bandit28.
+- **Technique and why it works:** The repo is hosted over git's SSH transport, authenticated with bandit27's password (the account `bandit27-git` shares the credential). `git clone` with the `ssh://` URL pulls the objects and checks out `README`. The README states the next password in plain text. The clone is run from this client with the password supplied through `SSH_ASKPASS`, because the game backend blocks localhost connections.
 - **Commands:**
   ```
   git clone ssh://bandit27-git@bandit.labs.overthewire.org:2220/home/bandit27-git/repo
   cat repo/README
   ```
-  (The recording shows the same clone, with `GIT_SSH_COMMAND` forcing password auth and `SSH_ASKPASS` supplying `STJLJBRRphMxKB392CT4iOr5CbzPU9ER`.)
+  (The recording shows the same clone, with `GIT_SSH_COMMAND` forcing password auth and `SSH_ASKPASS` supplying the bandit27 password.)
 ### Step-by-step discovery and crafting (what the recording shows)
-1. **Clone the repository.** `git clone ssh://bandit27-git@bandit.labs.overthewire.org:2220/home/bandit27-git/repo` — git's SSH transport, authenticated with bandit27's password via `SSH_ASKPASS`.
-2. **Read the README.** `cat repo/README` states the next password in plain text.
-- **Password for bandit27:** `y8Yd2ssKcpHpud7UvOSOxwamRMzIGIeQ`
+1. **Read the goal.** The level page gives the `ssh://…bandit27-git…/home/bandit27-git/repo` URL and states that `bandit27-git` shares bandit27's password.
+2. **Clone the repository.** `git clone ssh://bandit27-git@bandit.labs.overthewire.org:2220/home/bandit27-git/repo` — git's SSH transport, authenticated with bandit27's password via `SSH_ASKPASS`.
+3. **Read the README.** `cat repo/README` prints `The password to the next level is: …` in plain text.
+- **Password for bandit28:** `y8Yd2ssKcpHpud7UvOSOxwamRMzIGIeQ`
 - **Verification:** logged in as `bandit28` with this password.
-- **Recording:** `recordings/bandit/L26.cast`
+- **Recording:** `recordings/bandit/L27.cast`
 
-## Level 27 → bandit28
-- **Account:** `bandit27`.
-- **Goal:** Clone the `bandit28-git` repository and obtain bandit28's password.
+## Level 28 → bandit29
+- **Account:** `bandit28`.
+- **Goal:** Clone the `bandit28-git` repository and obtain bandit29's password.
 - **Technique and why it works:** The repository's `README.md` in the current commit (HEAD) shows the password redacted as `xxxxxxxxxx`; the HEAD commit is literally titled "fix info leak". But git keeps every version of every file, and the previous commit (`HEAD~1`) still contains the real password. `git log --oneline` reveals the history, and `git show HEAD~1:README.md` prints the old file version. Removing a secret from the working tree does not remove it from history.
 - **Commands:**
   ```
@@ -508,16 +528,16 @@ the key/credential to this client machine and connecting directly to the public 
   git --no-pager show HEAD~1:README.md
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
-1. **Clone and read.** `git clone ...` then `cat README.md` shows the password redacted as `xxxxxxxxxx`, and the commit is titled "fix info leak".
-2. **Look at history.** `git --no-pager log --oneline` shows the commits; the redaction is in HEAD only.
+1. **Clone and read.** `git clone …` then `cat README.md` shows `password: xxxxxxxxxx`, and `git --no-pager log --oneline` shows the tip commit titled "fix info leak" above "add missing data" and "initial commit of README.md".
+2. **Look at history.** The redaction is in HEAD only; the parent commit still has the original file.
 3. **Print the parent version.** `git --no-pager show HEAD~1:README.md` prints the previous file, which still contains the real password. Removing a secret from the working tree does not remove it from history.
-- **Password for bandit28:** `Em7eGtqaMySwNFjCpwzzHhLhospOcdt0`
+- **Password for bandit29:** `Em7eGtqaMySwNFjCpwzzHhLhospOcdt0`
 - **Verification:** logged in as `bandit29` with this password.
-- **Recording:** `recordings/bandit/L27.cast`
+- **Recording:** `recordings/bandit/L28.cast`
 
-## Level 28 → bandit29
-- **Account:** `bandit28`.
-- **Goal:** Clone the `bandit29-git` repository and find bandit29's password.
+## Level 29 → bandit30
+- **Account:** `bandit29`.
+- **Goal:** Clone the `bandit29-git` repository and find bandit30's password.
 - **Technique and why it works:** On the default branch (`master`) the README says `<no passwords in production!>`, but `git branch -a` shows remote branches, including `dev`. The password lives in a development branch that was never merged: `git show origin/dev:README.md` prints that branch's version of the file, which contains the real password.
 - **Commands:**
   ```
@@ -528,16 +548,16 @@ the key/credential to this client machine and connecting directly to the public 
   git --no-pager show origin/dev:README.md
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
-1. **Clone and read.** `git clone ...` then `cat README.md` says `<no passwords in production!>` on `master`.
-2. **List all refs.** `git --no-pager branch -a` shows a remote `dev` branch.
+1. **Clone and read.** `git clone …` then `cat README.md` says `<no passwords in production!>` on `master`.
+2. **List all refs.** `git --no-pager branch -a` shows `remotes/origin/dev` and `remotes/origin/sploits-dev` beside `master`.
 3. **Read that branch's file.** `git --no-pager show origin/dev:README.md` prints the password — it was committed on a branch that was never merged.
-- **Password for bandit29:** `jq9Dfg2rXsfYsWMgFuKlXhphjdH7USgX`
+- **Password for bandit30:** `jq9Dfg2rXsfYsWMgFuKlXhphjdH7USgX`
 - **Verification:** logged in as `bandit30` with this password.
-- **Recording:** `recordings/bandit/L28.cast`
+- **Recording:** `recordings/bandit/L29.cast`
 
-## Level 29 → bandit30
-- **Account:** `bandit29`.
-- **Goal:** Clone the `bandit30-git` repository and find bandit30's password.
+## Level 30 → bandit31
+- **Account:** `bandit30`.
+- **Goal:** Clone the `bandit30-git` repository and find bandit31's password.
 - **Technique and why it works:** The working tree is a decoy — the README says "just an epmty file... muahaha" and there are no branches of interest. But git tags are separate refs that can carry their own objects/messages; `git tag` lists one tag named `secret`, and `git show secret` prints its content, which is the password. Git stores more than files and commits: tags, notes, and stashes can all hold data.
 - **Commands:**
   ```
@@ -551,14 +571,14 @@ the key/credential to this client machine and connecting directly to the public 
 1. **Clone and read.** `cat README.md` is a decoy ("just an epmty file... muahaha").
 2. **List tags.** `git --no-pager tag` shows a tag named `secret`.
 3. **Show the tag.** `git --no-pager show secret` prints its content — tags are refs that can carry their own objects and messages.
-- **Password for bandit30:** `82NkymblpGBYmIXG6ZQ8YldBYstHpfUf`
+- **Password for bandit31:** `82NkymblpGBYmIXG6ZQ8YldBYstHpfUf`
 - **Verification:** logged in as `bandit31` with this password.
-- **Recording:** `recordings/bandit/L29.cast`
+- **Recording:** `recordings/bandit/L30.cast`
 
-## Level 30 → bandit31
-- **Account:** `bandit30`.
+## Level 31 → bandit32
+- **Account:** `bandit31`.
 - **Goal:** The repository's README sets a task: push a file named `key.txt` containing `May I come in?` to branch `master` on the remote.
-- **Technique and why it works:** The repo's `.gitignore` contains `*.txt`, so `git add key.txt` silently does nothing; `git add -f` overrides the ignore rule and stages it. After committing, `git push origin master` is deliberately rejected by a remote pre-receive hook — but that hook validates the pushed content and prints the password for bandit31 in its "remote:" output before declining the push. The password appears in the push output, not in the repository.
+- **Technique and why it works:** The repo's `.gitignore` contains `*.txt`, so `git add key.txt` silently does nothing; `git add -f` overrides the ignore rule and stages it. After committing, `git push origin master` is deliberately rejected by a remote pre-receive hook — but that hook validates the pushed content and prints the password for bandit32 in its "remote:" output before declining the push. The password appears in the push output, not in the repository.
 - **Commands:**
   ```
   git clone ssh://bandit31-git@bandit.labs.overthewire.org:2220/home/bandit31-git/repo
@@ -573,33 +593,33 @@ the key/credential to this client machine and connecting directly to the public 
 2. **Create the file.** `echo "May I come in?" > key.txt`.
 3. **Defeat the ignore rule.** `git add -f key.txt` (plain `git add` would silently skip it).
 4. **Commit and push.** `git commit -m "key"` then `git push origin master`.
-5. **Read the hook output.** The remote pre-receive hook rejects the push but validates the content and prints the password for bandit31 in its `remote:` lines.
-- **Password for bandit31:** `pWuj5jBQ6IgV0NXwiH6g1pXRF8S1YvbT`
+5. **Read the hook output.** The remote pre-receive hook prints "Well done! Here is the password for the next level:" in its `remote:` lines, then declines the push.
+- **Password for bandit32:** `pWuj5jBQ6IgV0NXwiH6g1pXRF8S1YvbT`
 - **Verification:** logged in as `bandit32` with this password (the account presents the uppercase-only shell).
-- **Recording:** `recordings/bandit/L30.cast`
+- **Recording:** `recordings/bandit/L31.cast`
 
-## Level 31 → bandit32
-- **Account:** `bandit31`.
+## Level 32 → bandit33
+- **Account:** `bandit32`.
 - **Goal:** bandit32's login shell is a restricted shell ("WELCOME TO THE UPPERCASE SHELL") that uppercases every command before executing it. Break out and read bandit33's password.
 - **Technique and why it works:** The wrapper uppercases the input string and then executes it. A command made only of characters with no case — like `$0` — is unchanged by uppercasing, and in a POSIX shell `$0` expands to the shell's own name, so `$0` re-executes the shell. That new shell is a normal `/bin/sh` (or bash) inherited with bandit32's effective UID, i.e. it keeps the privileges of the game account, and from it `cat /etc/bandit_pass/bandit33` works.
 - **Commands:**
   ```
   $0
-  id                            # uid=bandit33 — we are running as the next level's user
+  id                            # uid=11033(bandit33) — we are running as the next level's user
   cat /etc/bandit_pass/bandit33
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Observe the shell.** bandit32's login shell prints "WELCOME TO THE UPPERCASE SHELL" and uppercases every command before executing it.
 2. **Find a case-free command.** `$0` contains no letters, so uppercasing leaves it unchanged; in a POSIX shell `$0` expands to the shell's own name, so it re-executes the shell.
-3. **Use the new shell.** The re-executed shell is a normal shell inheriting bandit32's identity; `id` shows the account, and `cat /etc/bandit_pass/bandit33` prints the final password.
-- **Password for bandit32:** `u4P2CyPOwPGLe94RdD9Uo2FxFwvnFswM`
+3. **Use the new shell.** The re-executed shell is a normal shell; `id` prints `uid=11033(bandit33) gid=11032(bandit32)`, and `cat /etc/bandit_pass/bandit33` prints the final password.
+- **Password for bandit33:** `u4P2CyPOwPGLe94RdD9Uo2FxFwvnFswM`
 - **Verification:** logged in as `bandit33` with this password; `~/README.txt` confirms it is the last level and `getent passwd bandit34` returns nothing.
-- **Recording:** `recordings/bandit/L31.cast`
+- **Recording:** `recordings/bandit/L32.cast`
 
-## Level 32 — final level (no next account)
+## Level 33 — final level (no next account)
 - **Account:** `bandit33`.
 - **Goal:** Confirm the game is complete.
-- **Technique and why it works:** bandit33 is the final account. Its home contains `README.txt`, which reads "Congratulations on solving the last level of this game! At this moment, there are no more levels to play." `getent passwd bandit34` returns nothing, so there is no bandit34 account and no further password to find. Nothing to exploit here; the level is the end marker of the game.
+- **Technique and why it works:** bandit33 is the final account. Its home contains `README.txt`, which reads "Congratulations on solving the last level of this game! At this moment, there are no more levels to play." `getent passwd bandit34` returns nothing, so there is no bandit34 account and no further password to find. OTW's own `games.json` reports `lastlevel: 34` and `bandit34.html` says "At this moment, level 34 does not exist yet." Nothing to exploit here; the level is the end marker of the game.
 - **Commands:**
   ```
   ssh bandit33@bandit.labs.overthewire.org -p 2220
@@ -611,5 +631,4 @@ the key/credential to this client machine and connecting directly to the public 
 2. **Confirm there is no next account.** `getent passwd bandit34 || echo "no bandit34"` prints `no bandit34`, so the game ends at bandit33.
 - **Password for bandit34:** none — the game ends at bandit33.
 - **Verification:** login as bandit33 succeeds; the README states the game is complete; no bandit34 user exists on the host.
-- **Recording:** `recordings/bandit/L32.cast`
-
+- **Recording:** `recordings/bandit/L33.cast`

@@ -26,14 +26,15 @@ Bandit | L21 | read cron job script, grab password it writes to /tmp | recording
 Bandit | L22 | reproduce md5 filename computed by cron script | recordings/bandit/L22.cast
 Bandit | L23 | drop executable script in bandit24 cron spool | recordings/bandit/L23.cast
 Bandit | L24 | brute-force 10,000 pincodes against nc daemon | recordings/bandit/L24.cast
-Bandit | L25 | more->vi :shell escape on a tiny PTY | recordings/bandit/L25.cast
-Bandit | L26 | clone git repo over ssh, read README | recordings/bandit/L26.cast
-Bandit | L27 | git history leaks redacted password (HEAD~1) | recordings/bandit/L27.cast
-Bandit | L28 | git branch -a, password on origin/dev | recordings/bandit/L28.cast
-Bandit | L29 | git tag "secret" holds the password | recordings/bandit/L29.cast
-Bandit | L30 | force-add ignored key.txt, push; hook prints password | recordings/bandit/L30.cast
-Bandit | L31 | $0 breaks the uppercase restricted shell | recordings/bandit/L31.cast
-Bandit | L32 | final level: README confirms game complete, no bandit34 | recordings/bandit/L32.cast
+Bandit | L25 | escape showtext/more via vi on a tiny PTY, read bandit26 password | recordings/bandit/L25.cast
+Bandit | L26 | setuid bandit27-do from the escaped bandit26 shell | recordings/bandit/L26.cast
+Bandit | L27 | clone git repo over ssh, read README | recordings/bandit/L27.cast
+Bandit | L28 | git history leaks redacted password (HEAD~1) | recordings/bandit/L28.cast
+Bandit | L29 | git branch -a, password on origin/dev | recordings/bandit/L29.cast
+Bandit | L30 | git tag "secret" holds the password | recordings/bandit/L30.cast
+Bandit | L31 | force-add ignored key.txt, push; hook prints password | recordings/bandit/L31.cast
+Bandit | L32 | $0 breaks the uppercase restricted shell | recordings/bandit/L32.cast
+Bandit | L33 | final level: README confirms game complete, no bandit34 | recordings/bandit/L33.cast
 Natas | L0 | password in HTML comment | recordings/natas/L0.cast
 Natas | L1 | raw HTTP fetch bypasses client-side right-click block | recordings/natas/L1.cast
 Natas | L2 | open directory index + users.txt | recordings/natas/L2.cast
