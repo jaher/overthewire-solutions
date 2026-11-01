@@ -117,7 +117,8 @@ const LEVELS = [
   ["Narnia",1,"EGG env var shellcode: nasm, setreuid, execve"],
   ["Narnia",2,"buf[128] strcpy overflow, nasm shellcode, swept return address"],
   ["Narnia",3,"ifile strcpy overflow rewrites ofile path to a symlink"],
-  ["Narnia",4,"buffer[256] overflow, setuid(euid) shellcode so privilege survives execve"]
+  ["Narnia",4,"buffer[256] overflow, setuid(euid) shellcode so privilege survives execve"],
+  ["Narnia",5,"format string: %440c%15$n writes 500 into i (snprintf dest overlaps varargs)"]
 ];
 
 const rows = document.getElementById('rows');

