@@ -77,3 +77,4 @@ Narnia | L5 | format string: snprintf dest overlaps varargs; 56 filler + &i + %4
 Narnia | L6 | overflow b1[8] into function pointer fp (b1+8==fp); point fp at libc system; "sh;#AAAA"+addr comments out the address bytes | recordings/narnia/L6.cast
 Narnia | L7 | format string writes hackedfunction into ptrf via %152$hn/%153$hn (arg index found by sweep) | recordings/narnia/L7.cast
 Narnia | L8 | bok[20] copy-loop overflow: loop overwrites its own blah pointer; argv[20..23]=argv addr keeps it valid; ret into argv sled; final level (CONGRATULATIONS) | recordings/narnia/L8.cast
+Behemoth | L0 | memfrob (XOR 42) obfuscated secret read from movl immediates -> "eatmyshorts" | recordings/behemoth/L0.cast
