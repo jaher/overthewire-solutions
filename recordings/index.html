@@ -146,6 +146,7 @@ const LEVELS = [
   ["Behemoth",4,"predicted-pid symlink race: /tmp/<child pid> -> password file"]
   ["Behemoth",5,"bind UDP 1337 first; the program sendto()s the password datagram"]
   ["Behemoth",6,"shellcode.txt must print HelloKitty; behemoth6 then execs /bin/sh"]
+  ["Behemoth",7,"filter window: only first 512 chars are checked, overflow carries shellcode"]
 ];
 
 const rows = document.getElementById('rows');

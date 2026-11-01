@@ -101,3 +101,4 @@ Behemoth | L3 | printf(buf) format string:  rewrites the saved return address; s
 Behemoth | L4 | /tmp/<pid> symlink race with a predicted child pid (fork before exec) | recordings/behemoth/L4.cast
 Behemoth | L5 | bind UDP 127.0.0.1:1337 before running; the program sendto()s the password to us | recordings/behemoth/L5.cast
 Behemoth | L6 | shellcode.txt must write "HelloKitty" (nasm shellcode); behemoth6 then execs a shell | recordings/behemoth/L6.cast
+Behemoth | L7 | alphanumeric filter checks only the first 512 chars; strcpy overflow carries nasm shellcode -> behemoth8 (CONGRATULATIONS) | recordings/behemoth/L7.cast
