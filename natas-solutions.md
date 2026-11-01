@@ -520,3 +520,24 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas28:** `Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3`
 - **Verification:** `http://natas28.natas.labs.overthewire.org/` with `natas28:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L27.cast`
+
+## Level 28 → natas29
+- **Account:** `natas28`, password `Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3`.
+- **Goal:** A joke search. `POST query=...` returns `302` to `search.php/?query=<base64 ciphertext>`; the search page decrypts it and runs a SQL query. No source is available ("out of sauce"), so this is a black-box level.
+- **Technique and why it works:** **ECB cut-and-paste against the encrypted query**. The ciphertext is the raw AES-ECB encryption of a plaintext of the form `<10-byte prefix><our query><padding>`, base64-encoded. ECB encrypts each 16-byte block independently, so equal plaintext blocks produce equal ciphertext blocks — visible immediately: `A*64` yields three identical blocks. That lets us splice blocks from different ciphertexts. We choose a query that places our SQL exactly at the start of a block, and we keep the original prefix blocks from a benign query. The resulting ciphertext decrypts to `<prefix><our SQL>`, and the server runs it inside `... WHERE joke LIKE '<input>%'`, so our payload closes the quote and uses `-- ` to comment out the rest.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Probe the ciphertext length.** Posting `a`*0..16 shows lengths 80 and 96 bytes: 16-byte blocks, and our input starts inside the first few blocks (boundary at 13 input bytes: 10-byte prefix + 6 = 16).
+2. **Confirm ECB.** `A*64` produces three identical ciphertext blocks (`f633e6b05f86` repeated) — deterministic, per-block encryption.
+3. **Find the splice point.** `a*8` and `a*12` share block 2 (`c0872dee8bc9` = prefix + `aaaaaa`), and `a*13` changes block 2. So block 2 is the prefix plus 6 input bytes; input bytes 7.. start at block 3.
+4. **Build the payload query.** `"b"*10 + " UNION SELECT 1-- "` puts ` UNION SELECT 1-- ` at the start of block 3 (10 bytes of `b` fill the rest of block 2).
+5. **Splice.** Take blocks 0–2 from the `a*8` ciphertext and blocks 3.. from the payload ciphertext:
+   ```
+   spliced = base[0:3] + payload_ct[3:]
+   ```
+   Requesting `search.php/?query=<b64(spliced)>` returns `<li>1</li>` — proof that our SQL executed.
+6. **Exfiltrate.** Same splice with ` UNION SELECT password FROM users-- ` returns `<li>hwgoYUiGWoSZAqphtCAZf7u1jS16KEah</li>`.
+7. **Verify.** `curl -u natas29:<pw> http://natas29.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas29:** `hwgoYUiGWoSZAqphtCAZf7u1jS16KEah`
+- **Verification:** `http://natas29.natas.labs.overthewire.org/` with `natas29:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L28.cast`
