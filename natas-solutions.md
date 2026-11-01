@@ -490,3 +490,33 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas27:** `mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV`
 - **Verification:** `http://natas27.natas.labs.overthewire.org/` with `natas27:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L26.cast`
+
+## Level 27 → natas28
+- **Account:** `natas27`, password `mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV`.
+- **Goal:** A user database with `username varchar(64)` and `password varchar(64)`. `createUser()` rejects input where `$usr != trim($usr)` and inserts `substr($usr,0,64)`; `validUser()`/`checkCredentials()` do exact string comparisons; `dumpData()` selects `WHERE username=trim($usr)` and `print_r`s the row. The target row is the existing `natas28` account.
+- **Technique and why it works:** **truncation + MySQL trailing-space semantics**. Three quirks combine:
+  1. `createUser()` compares against `trim($usr)` but stores `substr($usr, 0, 64)`. If we send 65 characters — `"natas28" + 57 spaces + "x"` — `trim()` leaves it intact (it ends in `x`), so the check passes, but `substr` cuts the trailing `x` and stores a username of exactly 64 bytes: `"natas28" + 57 spaces`, with **our** password.
+  2. MySQL's `=` on `VARCHAR` ignores trailing spaces, so `username='natas28'+57 spaces` matches the row we just inserted — and also the real `natas28` row (for `validUser`, the first matching row wins).
+  3. `dumpData()` trims the username before its query: `trim("natas28"+57 spaces)` = `"natas28"`, which selects the real `natas28` row, and `print_r` prints its password.
+
+  So the padded username authenticates against the row we created, but the data dump uses the trimmed name and returns the genuine natas28 password.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** Note the three different treatments of the username: `trim()` in the guard, `substr(...,0,64)` in the INSERT, `trim()` again in `dumpData()`.
+2. **Register the padded account.** `"natas28" + 57 spaces + "x"` = 65 chars, password empty:
+   ```
+   POST username=<65 chars> password=
+   # User natas28                                                         x was created!
+   ```
+   The stored row is `username = "natas28" + 57 spaces`, `password = ""`.
+3. **Log in with the 64-char padded name.**
+   ```
+   POST username="natas28" + 57 spaces, password=
+   # Welcome natas28   ! Here is your data: Array
+   # ( [username] => natas28  [password] => Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3 )
+   ```
+   `validUser` found our row (trailing-space match), `checkCredentials` accepted our empty password, and `dumpData(trim(...))` selected the real `natas28` row and printed its password.
+4. **Verify.** `curl -u natas28:<pw> http://natas28.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas28:** `Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3`
+- **Verification:** `http://natas28.natas.labs.overthewire.org/` with `natas28:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L27.cast`

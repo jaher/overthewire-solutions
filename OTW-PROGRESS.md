@@ -89,3 +89,4 @@ Natas | L23 | PHP loose comparison: "10111iloveyou" contains iloveyou and conver
 Natas | L24 | passwd[]=x makes strcmp() receive an array -> NULL -> !NULL passes | recordings/natas/L24.cast
 Natas | L25 | log poisoning via UA + ....// bypass of str_replace("../","") -> include the log | recordings/natas/L25.cast
 Natas | L26 | PHP object injection: Logger __destruct writes PHP into img/natas26_<sid>.php | recordings/natas/L26.cast
+Natas | L27 | truncation + MySQL trailing-space match: register padded natas28 row, login, dumpData(trim) prints the real row | recordings/natas/L27.cast
