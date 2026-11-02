@@ -176,14 +176,26 @@ function delay(ms){ return new Promise(r => { let t = 0; const iv = setInterval(
 function line(html, cls){ const d = document.createElement('div'); if (cls) d.className = cls; d.innerHTML = html; term.appendChild(d); term.scrollTop = term.scrollHeight; return d; }
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
+// Every level is a list of steps: each step is one command and exactly the
+// output lines that command printed. Older levels still carry the legacy
+// cmds/out pair, which the player falls back to.
+function flatCmds(L){
+  if (!L) return [];
+  if (L.steps) return L.steps.map(s => s.cmd);
+  const out = [];
+  for (const group of (L.cmds || [])) for (const c of group) out.push(c);
+  return out;
+}
+
 function promptHost(user, cmd){
   // Every transcript opens with the ssh into the level, typed at a local
   // shell; everything after it is typed on the OTW host the page header shows.
   // Before the ssh, and for levels with no shell account at all (the first
-  // Krypton level is a puzzle on the level page), the prompt is local.
+  // Krypton level is a puzzle on the level page, and Natas is web-only), the
+  // prompt is local.
   if (cmd.trim().startsWith('ssh ')) return 'localhost';
   const G = curGame();
-  const cmds = (G.levels && G.levels[cur] && G.levels[cur].cmds && G.levels[cur].cmds[0]) || [];
+  const cmds = flatCmds(G.levels && G.levels[cur]);
   if (!cmds.some(c => c.trim().startsWith('ssh '))) return 'localhost';
   return G.host || (gameKey + '.labs.overthewire.org');
 }
@@ -217,16 +229,26 @@ async function playLevel(idx){
   statusEl.textContent = G.title + ' — Level ' + L.lvl + ' / ' + G.levels[G.levels.length-1].lvl;
   line('', '');
   line(G.title.toUpperCase() + ' LEVEL ' + L.lvl + ' — PROBLEM STATEMENT\n' + ((G.goals && G.goals[L.lvl]) || L.goal || ''), 'goal');
-  line('<span class="note">── ' + L.user + '@' + (L.cmds[0].some(c => c.trim().startsWith('ssh ')) ? (G.host || 'bandit.labs.overthewire.org') : 'localhost') + ' ──</span>', 'note');
+  line('<span class="note">── ' + L.user + '@' + (flatCmds(L).some(c => c.trim().startsWith('ssh ')) ? (G.host || 'bandit.labs.overthewire.org') : 'localhost') + ' ──</span>', 'note');
   await delay(500 * speed());
-  for (const group of L.cmds){
-    for (const c of group){
+  if (L.steps){
+    // Interleave: type a command, print the lines it produced, next command.
+    for (const st of L.steps){
       if (my !== runId) return;
-      if (c.startsWith('#')) { line('<span class="note">' + esc(c) + '</span>', 'note'); await delay(420 * speed()); }
-      else await typeCmd(L.user, c, my);
+      if (st.cmd.startsWith('#')) { line('<span class="note">' + esc(st.cmd) + '</span>', 'note'); await delay(420 * speed()); }
+      else await typeCmd(L.user, st.cmd, my);
+      for (const o of (st.out || [])) { if (my !== runId) return; line(esc(o), 'out'); await delay(160 * speed()); }
     }
+  } else {
+    for (const group of L.cmds){
+      for (const c of group){
+        if (my !== runId) return;
+        if (c.startsWith('#')) { line('<span class="note">' + esc(c) + '</span>', 'note'); await delay(420 * speed()); }
+        else await typeCmd(L.user, c, my);
+      }
+    }
+    for (const o of (L.out || [])) { if (my !== runId) return; line(esc(o), 'out'); await delay(160 * speed()); }
   }
-  for (const o of (L.out || [])) { if (my !== runId) return; line(esc(o), 'out'); await delay(160 * speed()); }
   if (L.pw) { line('The password is <span class="pw">' + L.pw + '</span>', 'out'); }
   if (L.note) { line('<span class="note">' + esc(L.note) + '</span>', 'note'); }
   line('');
