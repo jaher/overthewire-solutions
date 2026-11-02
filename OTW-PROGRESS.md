@@ -54,7 +54,7 @@ Natas | L15 | blind SQLi: binary search on ORD(SUBSTR(password)) | recordings/na
 Leviathan | L0 | grep backup bookmarks.html for password | recordings/leviathan/L0.cast
 Leviathan | L1 | setuid check accepts sex, spawns leviathan2 shell | recordings/leviathan/L1.cast
 Leviathan | L2 | printfile access()/cat split: symlink + space in name | recordings/leviathan/L2.cast
-Natas | L16 | $(...) substitution oracle + binary search | recordings/natas/L16.cast
+Natas | L16 | $(...) substitution oracle (13 B match vs 460891 B dump) + binary search | recordings/natas/L16.cast
 Leviathan | L3 | setuid level3 accepts snlprintf, spawns shell | recordings/leviathan/L3.cast
 Leviathan | L4 | decode binary output of .trash/bin | recordings/leviathan/L4.cast
 Leviathan | L5 | symlink /tmp/file.log to leviathan6 password | recordings/leviathan/L5.cast
@@ -80,7 +80,7 @@ Narnia | L7 | format string writes hackedfunction into ptrf via %152$hn/%153$hn 
 Narnia | L8 | bok[20] copy-loop overflow: loop overwrites its own blah pointer; argv[20..23]=argv addr keeps it valid; ret into argv sled; final level (CONGRATULATIONS) | recordings/narnia/L8.cast
 Behemoth | L0 | memfrob (XOR 42) obfuscated secret read from movl immediates -> "eatmyshorts" | recordings/behemoth/L0.cast
 Behemoth | L1 | gets() overflow into buf[67]; RWE stack + ASLR off -> stack shellcode (nasm), swept ret 0xffffde20 | recordings/behemoth/L1.cast
-Natas | L17 | time-based blind SQLi: OR IF(cond,SLEEP(5)) fires per row (~20s true vs <1s false); binary search ORD(SUBSTR(password,pos,1)); len 32 | recordings/natas/L17.cast
+Natas | L17 | time-based blind SQLi: scalar-subquery IF(cond,SLEEP(5)) for one sleep per query; binary search ORD(SUBSTR(password,pos,1)); len 32 | recordings/natas/L17.cast
 Natas | L18 | brute-force PHPSESSID 1..640 (session_id=rand(1,640)); sid 119 is admin | recordings/natas/L18.cast
 Natas | L19 | session id = bin2hex("<n>-admin"); brute-force n 1..640, found n=281 | recordings/natas/L19.cast
 Natas | L20 | session-file injection: name="x\nadmin 1" adds an admin=1 line to the session | recordings/natas/L20.cast
