@@ -1394,7 +1394,7 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Technique and why it works:** **PHP phar deserialization (a.k.a. phar metadata object injection)**. `$filename` is private, so we cannot set it through the POST array — but we *can* choose what is passed to `md5_file()` indirectly, because the upload's destination name is ours. If the filename is `phar:///tmp/our.phar`, then `md5_file()` opens a `phar://` stream, and PHP **unserializes the phar's metadata** in that moment. The metadata is attacker-controlled, so we serialize an `Executor` object ourselves with `filename = /tmp/n33payload.php` and `signature = md5(payload)`. PHP rebuilds that object; when it goes out of scope at request end, `__destruct()` runs with *our* properties: `md5_file("/tmp/n33payload.php")` matches *our* signature, and `passthru("php /tmp/n33payload.php")` executes our payload — which reads the natas34 password file.
 
   Two details make this work in practice:
-  1. The phar must be a *valid* phar: stub `<?php __HALT_COMPILER(); ?>\r\n`, a manifest with API 1.1 and global flag `0x10000`, the metadata, one file entry, then a SHA1 of everything before the digest plus the `GBMB` trailer. The recording builds it with a small Python writer (`/tmp/pharbuild.py`) instead of `Phar` (whose `phar.readonly` ini is on by default on the lab).
+  1. The phar must be a *valid* phar: stub `<?php __HALT_COMPILER(); ?>\r\n`, a manifest with API 1.1 and global flag `0x10000`, the metadata, one file entry, then a SHA1 of everything before the digest plus the `GBMB` trailer. The transcript builds it byte by byte with a Python heredoc instead of `Phar` (whose `phar.readonly` ini is on by default on the lab).
   2. Private property names in the serialized string must be mangled as `\x00Executor\x00filename` etc., with exact `s:N:` lengths — a wrong length silently drops the property.
 
 - **Commands:**
@@ -1436,7 +1436,12 @@ Verification rule used throughout: a password is accepted only if a request to
 2. **Write the payload.** `<?php echo file_get_contents("/etc/natas_webpass/natas34"); ?>` → md5 `8a54d751b7e2bbbb2643d355d49e81be`.
 3. **Build the phar** whose metadata is `O:8:"Executor":3:{s:18:"\x00Executor\x00filename";s:19:"/tmp/n33payload.php";s:19:"\x00Executor\x00signature";s:32:"8a54d751...";s:14:"\x00Executor\x00init";b:0;}`:
    ```
-   python3 /tmp/pharbuild.py /tmp/n33payload.php /tmp/n33r.phar
+   python3 - <<'PY'
+   import struct, zlib, hashlib
+   ... (the writer shown in the Commands block above; it emits the stub, the
+        manifest with the mangled private property names, the file entry, and
+        the SHA1 + GBMB trailer)
+   PY
    # payload md5=8a54d751b7e2bbbb2643d355d49e81be -> /tmp/n33r.phar (274 bytes)
    ```
 4. **Upload both files.** The form lets us pick the destination name, so `filename=../../../tmp/n33payload.php` and `filename=../../../tmp/n33r.phar` land in `/tmp` (the upload directory is `/natas33/upload`, three levels below `/`).
