@@ -68,7 +68,7 @@ Krypton | L4 | Vigenere keylen 6: per-column chi-squared -> SERXRL, then ROT13 |
 Krypton | L5 | Vigenere unknown keylen: IC->9, per-column chi-squared->XRLYRATGU, then ROT13 | recordings/krypton/L5.cast
 Krypton | L6 | chosen-plaintext recovers periodic LFSR keystream (period 30) | recordings/krypton/L6.cast
 Krypton | L7 | final level: README confirms game complete | recordings/krypton/L7.cast
-Manpage | L0 | BLOCKED: setuid bit not honored on lab host (euid stays manpage0 at main entry; /manpage/manpage0 is -r-sr-x--- manpage1:manpage0); the setuid(getuid()) drop makes the saved UID 17000, so the strcpy overflow cannot regain manpage1. Level appears bit-rotted upstream. | (no recording)
+Manpage | L0 | BLOCKED: no account reachable — manpage.labs.overthewire.org:2224 refuses password auth for manpage0 and manpage1 ('Permission denied (publickey,password)'), so the levels cannot be replayed live from this host. Earlier attempts also found the setuid bit not honoured (euid stays manpage0 at main entry), so the level appears bit-rotted upstream. | (no recording)
 Narnia | L0 | overwrite val via 24-byte scanf into 20-byte buf | recordings/narnia/L0.cast
 Narnia | L1 | EGG env var shellcode (setreuid euid + execve), bytes env | recordings/narnia/L1.cast
 Narnia | L2 | strcpy overflow: NOP sled + shellcode, swept return address | recordings/narnia/L2.cast
