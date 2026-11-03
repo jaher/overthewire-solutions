@@ -37,7 +37,7 @@
   <h1>OverTheWire — solved live, recorded</h1>
   <div class="sub">Every level solved live over SSH against the OTW labs, with the asciinema
   recording of the session. Each recording has a spoken narration that starts together with
-  the cast playback. Solutions: <a href="bandit-solutions.md">Bandit</a>, <a href="natas-solutions.md">Natas</a>, <a href="leviathan-solutions.md">Leviathan</a>, <a href="krypton-solutions.md">Krypton</a>, <a href="narnia-solutions.md">Narnia</a>, <a href="behemoth-solutions.md">Behemoth</a>, <a href="utumno-solutions.md">Utumno</a>.</div>
+  the cast playback. Solutions: <a href="bandit-solutions.md">Bandit</a>, <a href="natas-solutions.md">Natas</a>, <a href="leviathan-solutions.md">Leviathan</a>, <a href="krypton-solutions.md">Krypton</a>, <a href="narnia-solutions.md">Narnia</a>, <a href="behemoth-solutions.md">Behemoth</a>, <a href="utumno-solutions.md">Utumno</a>, <a href="vortex-solutions.md">Vortex</a>.</div>
 
   <table>
     <thead><tr><th>Game</th><th>Level</th><th>Technique</th><th>Recording</th><th>Narration</th></tr></thead>
@@ -156,6 +156,7 @@ const LEVELS = [
   ["Utumno",5,"strncpy caps long strings at 20 bytes; shellcode stays in envp[8]"],
   ["Utumno",6,"signed table index -1 rewrites the strcpy destination pointer"],
   ["Utumno",7,"longjmp restores an attacker-controlled ebp inside the overflowed buffer"],
+  ["Vortex",0,"TCP arithmetic service on 5842: read four uint32s, send the sum back; client written in vim"],
 ];
 
 const rows = document.getElementById('rows');

@@ -1,1 +1,118 @@
-{"goals":{"0":"Connect to the service on port 5842, sum the four uint32 values it sends, return the sum to receive the vortex1 credentials.","1":"Canary Values: abuse the pointer-underflow in vortex1 to overwrite the high byte of a stack pointer so the program's exit path lands in attacker-controlled data, yielding a vortex2 shell to read /etc/vortex_pass/vortex2. NOTE: published passwords for this level could not be verified by login (all stale) — chain blocked here; see vortex-writeup.md."},"host":"vortex.labs.overthewire.org","levels":[{"cmds":[["# Level 0 is a network service challenge (documented technique, public writeups):","# connect to vortex.labs.overthewire.org:5842, read 4 little-endian uint32 values,","# send back their sum (mod 2^32) as a uint32 — the service replies with the vortex1 credentials.","# Password below was taken from a public writeup (antoinet/vortex passwords.txt) and verified by login:","sshpass -p 'Gq#qu3bF3' ssh -p 2228 vortex1@vortex.labs.overthewire.org"]],"lvl":0,"out":["(login verified)"],"pw":"Gq#qu3bF3","user":"vortex0"}],"title":"Vortex"}
+{
+ "goals": {
+  "0": "Connect to the service on port 5842, sum the four uint32 values it sends, return the sum to receive the vortex1 credentials.",
+  "1": "Canary Values: abuse the pointer-underflow in vortex1 to overwrite the high byte of a stack pointer so the program's exit path lands in attacker-controlled data, yielding a vortex2 shell to read /etc/vortex_pass/vortex2."
+ },
+ "host": "vortex.labs.overthewire.org",
+ "levels": [
+  {
+   "lvl": 0,
+   "pw": "Gq#qu3bF3",
+   "user": "vortex0",
+   "steps": [
+    {
+     "cmd": "vim v0.c",
+     "out": [
+      "\"/tmp/vortexL0/v0.c\" [New]"
+     ]
+    },
+    {
+     "cmd": "#include <stdio.h>\n#include <string.h>\n#include <unistd.h>\n#include <sys/socket.h>\n#include <netinet/in.h>\n#include <arpa/inet.h>\n#include <netdb.h>\n\n/* vortex L0: sum the four uint32s the service sends, send it back */\nint main(void) {\n    int fd, i;\n    struct sockaddr_in sa;\n    unsigned char buf[16];\n    char reply[256];\n    unsigned int v[4], sum = 0;\n    ssize_t n;\n\n    fd = socket(AF_INET, SOCK_STREAM, 0);\n    if (fd < 0) { perror(\"socket\"); return 1; }\n\n    memset(&sa, 0, sizeof(sa));\n    sa.sin_family = AF_INET;\n    sa.sin_port = htons(5842);\n    /* resolve the host name first; inet_pton only takes a literal IP */\n    {\n        struct hostent *he = gethostbyname(\"vortex.labs.overthewire.org\");\n        if (!he) { perror(\"gethostbyname\"); return 1; }\n        memcpy(&sa.sin_addr, he->h_addr_list[0], he->h_length);\n    }\n\n    if (connect(fd, (struct sockaddr *)&sa, sizeof(sa)) < 0) {\n        perror(\"connect\");\n        return 1;\n    }\n\n    n = 0;\n    while (n < 16) {\n        ssize_t r = read(fd, buf + n, 16 - n);\n        if (r <= 0) { perror(\"read\"); return 1; }\n        n += r;\n    }\n\n    for (i = 0; i < 4; i++) {\n        memcpy(&v[i], buf + 4 * i, 4);\n        sum += v[i];\n    }\n\n    printf(\"received: %u %u %u %u\\n\", v[0], v[1], v[2], v[3]);\n    printf(\"sum:      %u (0x%08x)\\n\", sum, sum);\n\n    if (write(fd, &sum, 4) != 4) { perror(\"write\"); return 1; }\n\n    /* the reply can arrive in several chunks: read until the peer closes */\n    memset(reply, 0, sizeof(reply));\n    n = 0;\n    while (n < (ssize_t)sizeof(reply) - 1) {\n        ssize_t r = read(fd, reply + n, sizeof(reply) - 1 - n);\n        if (r <= 0) break;\n        n += r;\n    }\n    reply[n] = 0;\n    printf(\"%s\\n\", reply);\n\n    close(fd);\n    return 0;\n}",
+     "out": [],
+     "text": "typing into vim (insert mode)"
+    },
+    {
+     "cmd": ":wq",
+     "out": [
+      "  0-1::wq\"v0.c\" [New] 67L, 1742B written"
+     ]
+    },
+    {
+     "cmd": "cat -n v0.c",
+     "out": [
+      "     1\t#include <stdio.h>",
+      "     2\t#include <string.h>",
+      "     3\t#include <unistd.h>",
+      "     4\t#include <sys/socket.h>",
+      "     5\t#include <netinet/in.h>",
+      "     6\t#include <arpa/inet.h>",
+      "     7\t#include <netdb.h>",
+      "     8\t",
+      "     9\t/* vortex L0: sum the four uint32s the service sends, send it back */",
+      "    10\tint main(void) {",
+      "    11\t    int fd, i;",
+      "    12\t    struct sockaddr_in sa;",
+      "    13\t    unsigned char buf[16];",
+      "    14\t    char reply[256];",
+      "    15\t    unsigned int v[4], sum = 0;",
+      "    16\t    ssize_t n;",
+      "    17\t",
+      "    18\t    fd = socket(AF_INET, SOCK_STREAM, 0);",
+      "    19\t    if (fd < 0) { perror(\"socket\"); return 1; }",
+      "    20\t",
+      "    21\t    memset(&sa, 0, sizeof(sa));",
+      "    22\t    sa.sin_family = AF_INET;",
+      "    23\t    sa.sin_port = htons(5842);",
+      "    24\t    /* resolve the host name first; inet_pton only takes a literal IP */",
+      "    25\t    {",
+      "    26\t        struct hostent *he = gethostbyname(\"vortex.labs.overthewire.org\");",
+      "    27\t        if (!he) { perror(\"gethostbyname\"); return 1; }",
+      "    28\t        memcpy(&sa.sin_addr, he->h_addr_list[0], he->h_length);",
+      "    29\t    }",
+      "    30\t",
+      "    31\t    if (connect(fd, (struct sockaddr *)&sa, sizeof(sa)) < 0) {",
+      "    32\t        perror(\"connect\");",
+      "    33\t        return 1;",
+      "    34\t    }",
+      "    35\t",
+      "    36\t    n = 0;",
+      "    37\t    while (n < 16) {",
+      "    38\t        ssize_t r = read(fd, buf + n, 16 - n);",
+      "    39\t        if (r <= 0) { perror(\"read\"); return 1; }",
+      "    40\t        n += r;",
+      "    41\t    }",
+      "    42\t",
+      "    43\t    for (i = 0; i < 4; i++) {",
+      "    44\t        memcpy(&v[i], buf + 4 * i, 4);",
+      "    45\t        sum += v[i];",
+      "    46\t    }",
+      "    47\t",
+      "    48\t    printf(\"received: %u %u %u %u\\n\", v[0], v[1], v[2], v[3]);",
+      "    49\t    printf(\"sum:      %u (0x%08x)\\n\", sum, sum);",
+      "    50\t",
+      "    51\t    if (write(fd, &sum, 4) != 4) { perror(\"write\"); return 1; }",
+      "    52\t",
+      "    53\t    /* the reply can arrive in several chunks: read until the peer closes */",
+      "    54\t    memset(reply, 0, sizeof(reply));",
+      "    55\t    n = 0;",
+      "    56\t    while (n < (ssize_t)sizeof(reply) - 1) {",
+      "    57\t        ssize_t r = read(fd, reply + n, sizeof(reply) - 1 - n);",
+      "    58\t        if (r <= 0) break;",
+      "    59\t        n += r;",
+      "    60\t    }",
+      "    61\t    reply[n] = 0;",
+      "    62\t    printf(\"%s\\n\", reply);",
+      "    63\t",
+      "    64\t    close(fd);",
+      "    65\t    return 0;",
+      "    66\t}",
+      "    67\t"
+     ]
+    },
+    {
+     "cmd": "gcc -Wall -O2 -o v0 v0.c",
+     "out": []
+    },
+    {
+     "cmd": "./v0",
+     "out": [
+      "received: 928768003 738568258 532716586 1402472015",
+      "sum:      3602524862 (0xd6ba2abe)",
+      "Username: vortex1 Password: Gq#qu3bF3"
+     ]
+    }
+   ]
+  }
+ ],
+ "title": "Vortex"
+}

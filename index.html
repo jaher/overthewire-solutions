@@ -202,8 +202,20 @@ function promptHost(user, cmd){
 }
 
 async function typeCmd(user, cmd, my){
+  return typeInto(user + '@' + promptHost(user, cmd) + ':~$ ', cmd, my);
+}
+
+// A step whose command is the body of an editor session (or any text typed
+// into a program) is rendered as the text itself, one line at a time, under a
+// short label — not as a shell command.
+async function typeText(label, text, my){
+  line('<span class="note">── ' + esc(label) + ' ──</span>', 'note');
+  return typeInto('', text, my);
+}
+
+async function typeInto(prompt, cmd, my){
   const d = line('<span class="prompt"></span><span class="cmd"></span><span class="cursor"></span>');
-  d.querySelector('.prompt').textContent = user + '@' + promptHost(user, cmd) + ':~$ ';
+  d.querySelector('.prompt').textContent = prompt;
   const span = d.querySelector('.cmd');
   for (let i = 0; i < cmd.length; i++){
     if (my !== runId) return;
@@ -236,7 +248,8 @@ async function playLevel(idx){
     // Interleave: type a command, print the lines it produced, next command.
     for (const st of L.steps){
       if (my !== runId) return;
-      if (st.cmd.startsWith('#')) { line('<span class="note">' + esc(st.cmd) + '</span>', 'note'); await delay(420 * speed()); }
+      if (st.text) await typeText(st.text, st.cmd, my);
+      else if (st.cmd.startsWith('#')) { line('<span class="note">' + esc(st.cmd) + '</span>', 'note'); await delay(420 * speed()); }
       else await typeCmd(L.user, st.cmd, my);
       for (const o of (st.out || [])) { if (my !== runId) return; line(esc(o), 'out'); await delay(160 * speed()); }
     }
