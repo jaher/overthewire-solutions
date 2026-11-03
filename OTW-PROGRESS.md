@@ -63,7 +63,7 @@ Leviathan | L7 | final level: CONGRATULATIONS, no leviathan8 | recordings/leviat
 Krypton | L0 | Base64 decode of the level-page string | recordings/krypton/L0.cast
 Krypton | L1 | ROT13 via tr | recordings/krypton/L1.cast
 Krypton | L2 | Caesar chosen-plaintext oracle -> shift +12 | recordings/krypton/L2.cast
-Krypton | L3 | monoalphabetic substitution: frequency + quadgram hill-climb | recordings/krypton/L3.cast
+Krypton | L3 | BLOCKED: re-derived live 2026-11-03. found1..3 are a stepping-variant substitution over ONE stream (found1+found2+found3+krypton4, 4272 bytes; target = last 7 words = 35 letters K S V V W ...). Live frequencies S 12.9% Q 9.6% J 8.5% U 7.3% B 7.0% N 6.8% C/G 6.4% D 6.0%. ~12 letters of the alphabet recovered (S=E Q=T J=O U=A B=N N=I C=D G=H, C/G tie questionable); quadgram/trigram hill climbs and a +7 step test all failed to decode the target to readable English, no password derived. Old transcript's L3 row was reconstructed, not captured; superseded. Neighbouring levels re-verified live: L4 key FREKEY -> CLEARTEXT (login uid=8004); L5 keylength 9, key KEYLENGTH -> RANDOM (login uid=8006). | (no recording)
 Krypton | L4 | Vigenere keylen 6: per-column chi-squared -> SERXRL, then ROT13 | recordings/krypton/L4.cast
 Krypton | L5 | Vigenere unknown keylen: IC->9, per-column chi-squared->XRLYRATGU, then ROT13 | recordings/krypton/L5.cast
 Krypton | L6 | chosen-plaintext recovers periodic LFSR keystream (period 30) | recordings/krypton/L6.cast
