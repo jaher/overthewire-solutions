@@ -7,6 +7,17 @@ For each level: goal, technique and why it works, exact commands, verification.
 Recordings in `recordings/behemoth/L<n>.cast`.
 
 Verification: each password was accepted by logging in as the next level's account.
+
+**What the level transcripts show, and what they do not.** Every shellcode source
+(`b1.asm`, `b3.asm`, `b6.asm`, `b7.asm`) is written into vim chunk by chunk in the
+transcript, saved, `cat -n`'d, and assembled; its bytes are compared with the
+`xxd -p` output the original run captured (78, 78, 41 and 78 bytes, identical). The
+exploit scripts (`e_behemothN.py`) were not captured being written in the original
+recordings, and the `behemothN` accounts stopped accepting password logins on
+2026-11-03, so those steps stay as the original capture and are marked as such in
+the transcript. The Python sketches quoted below are descriptions of what each
+script does, not verbatim captures; the outputs quoted (`PWN!`, addresses,
+passwords) are the recorded ones.
 ---
 ## Level 0 → behemoth1
 - **Account:** `behemoth0`, password `behemoth0` (given by the game).
