@@ -277,6 +277,7 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Password for utumno2:** `WaSwuXNhvg`
 - **Verification:** logged in as `utumno2` with this password (`whoami` → `utumno2`).
 - **Recording:** `recordings/utumno/L1.cast`
+- **Transcript:** the shellcode `l1.asm` is typed into `vim` stage by stage in the level transcript (empty buffer, each chunk, the finished buffer), then `cat -n`'d; its source is the instruction text of this level's own `objdump` listing, and it assembles here to exactly the bytes the original `xxd -p` printed. The exploit script `e.py` is not part of the recording's authoring and is marked as such on its step.
 
 ## Level 2 → utumno3
 - **Account:** `utumno2`, password `WaSwuXNhvg`.
@@ -400,6 +401,7 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Password for utumno3:** `yiTcaZbpJ9`
 - **Verification:** logged in as `utumno3` with this password (`whoami` → `utumno3`, `id` → `uid=16003(utumno3)`).
 - **Recording:** `recordings/utumno/L2.cast`
+- **Transcript:** the shellcode `sc.asm` is typed into `vim` stage by stage in the level transcript (empty buffer, each chunk, the finished buffer), then `cat -n`'d; its source is the instruction text of this level's own `objdump` listing, and it assembles here to exactly the bytes the original `xxd -p` printed. The exploit script `e.py` is not part of the recording's authoring and is marked as such on its step.
 
 ## Level 3 → utumno4
 - **Account:** `utumno3`, password `yiTcaZbpJ9`.
@@ -544,6 +546,7 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Password for utumno4:** `06nx2CS7rS`
 - **Verification:** logged in as `utumno4` with this password (`whoami` → `utumno4`, `id` → `uid=16004(utumno4)`).
 - **Recording:** `recordings/utumno/L3.cast`
+- **Transcript:** the shellcode `sc.asm` is typed into `vim` stage by stage in the level transcript (empty buffer, each chunk, the finished buffer), then `cat -n`'d; its source is the instruction text of this level's own `objdump` listing, and it assembles here to exactly the bytes the original `xxd -p` printed. The exploit script `e.py` is not part of the recording's authoring and is marked as such on its step.
 
 ## Level 4 → utumno5
 - **Account:** `utumno4`, password `06nx2CS7rS`.
@@ -682,6 +685,7 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Password for utumno5:** `ZigV4d7wiU`
 - **Verification:** logged in as `utumno5` with this password (`whoami` → `utumno5`, `id` → `uid=16005(utumno5)`).
 - **Recording:** `recordings/utumno/L4.cast`
+- **Transcript:** the shellcode `sc.asm` is typed into `vim` stage by stage in the level transcript (empty buffer, each chunk, the finished buffer), then `cat -n`'d; its source is the instruction text of this level's own `objdump` listing, and it assembles here to exactly the bytes the original `xxd -p` printed. The exploit script `e.py` is not part of the recording's authoring and is marked as such on its step.
 
 ## Level 5 → utumno6
 - **Account:** `utumno5`, password `ZigV4d7wiU`.
@@ -822,6 +826,7 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Password for utumno6:** `HhEXDIzqg9`
 - **Verification:** logged in as `utumno6` with this password (`whoami` → `utumno6`, `id` → `uid=16006(utumno6)`).
 - **Recording:** `recordings/utumno/L5.cast`
+- **Transcript:** the shellcode `sc.asm` is typed into `vim` stage by stage in the level transcript (empty buffer, each chunk, the finished buffer), then `cat -n`'d; its source is the instruction text of this level's own `objdump` listing, and it assembles here to exactly the bytes the original `xxd -p` printed. The exploit script `e.py` is not part of the recording's authoring and is marked as such on its step.
 
 ## Level 6 → utumno7
 - **Account:** `utumno6`, password `HhEXDIzqg9`.
@@ -961,6 +966,7 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Password for utumno7:** `V7U1ZvQCbP`
 - **Verification:** logged in as `utumno7` with this password (`whoami` → `utumno7`, `id` → `uid=16007(utumno7)`).
 - **Recording:** `recordings/utumno/L6.cast`
+- **Transcript:** the shellcode `sc.asm` is typed into `vim` stage by stage in the level transcript (empty buffer, each chunk, the finished buffer), then `cat -n`'d; its source is the instruction text of this level's own `objdump` listing, and it assembles here to exactly the bytes the original `xxd -p` printed. The exploit script `e.py` is not part of the recording's authoring and is marked as such on its step.
 
 ## Level 7 → utumno8 (final level)
 - **Account:** `utumno7`, password `V7U1ZvQCbP`.
@@ -1104,3 +1110,4 @@ Verification: each password was accepted by logging in as the next level's accou
 - **Password for utumno8:** `2bvITuqzN4`
 - **Verification:** logged in as `utumno8` with this password; the game's congratulations text confirms completion.
 - **Recording:** `recordings/utumno/L7.cast`
+- **Transcript:** the shellcode `sc.asm` is typed into `vim` stage by stage in the level transcript (empty buffer, each chunk, the finished buffer), then `cat -n`'d; its source is the instruction text of this level's own `objdump` listing, and it assembles here to exactly the bytes the original `xxd -p` printed. The exploit script `e.py` is not part of the recording's authoring and is marked as such on its step.
