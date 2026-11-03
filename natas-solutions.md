@@ -1479,3 +1479,13 @@ _Transcript note:_ this helper is typed stage by stage into `vim` in the level t
 - **Password for natas34:** `cT3LVC2sd5RtaRHdAE2xr16nYGuArbbK`
 - **Verification:** `http://natas34.natas.labs.overthewire.org/` with `natas34:<password>` → HTTP 200 ("You have reached the end").
 - **Recording:** `recordings/natas/L33.cast`
+
+**Re-check of 2026-11-03.** The lab still answers for most levels, but natas17, natas18,
+natas20, natas26, natas28 and natas33 returned HTTP 401 to every request from this host, so
+the steps on those levels were not re-run: where their output is shown, it is the original
+capture, and the transcript says so. The helper scripts on natas11/15–21/26–28/33 were never
+captured being written originally; each is now typed stage by stage into `vim` in the level
+transcript (as `/tmp/n<level>_<step>.py`, with a `cat -n` check) and then run. The helpers
+that need nothing but the text already on the page (L8 one-liner, L11 key recovery, L26
+cookie payload, L33 phar) were re-run locally in this pass and their output matched the
+recording.
