@@ -242,7 +242,9 @@ async function playLevel(idx){
   statusEl.textContent = G.title + ' — Level ' + L.lvl + ' / ' + G.levels[G.levels.length-1].lvl;
   line('', '');
   line(G.title.toUpperCase() + ' LEVEL ' + L.lvl + ' — PROBLEM STATEMENT\n' + ((G.goals && G.goals[L.lvl]) || L.goal || ''), 'goal');
-  line('<span class="note">── ' + L.user + '@' + (flatCmds(L).some(c => c.trim().startsWith('ssh ')) ? (G.host || 'bandit.labs.overthewire.org') : 'localhost') + ' ──</span>', 'note');
+  const hostTag = L.user + '@' + (flatCmds(L).some(c => c.trim().startsWith('ssh ')) ? (G.host || 'bandit.labs.overthewire.org') : 'localhost');
+  const desc = (G.goals && G.goals[L.lvl]) || L.goal || '';
+  line('<span class="note">── ' + hostTag + ' ──</span>' + (desc ? '\n<span class="note">Goal: ' + esc(desc) + '</span>' : ''), 'note');
   await delay(500 * speed());
   if (L.steps){
     // Interleave: type a command, print the lines it produced, next command.
