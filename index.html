@@ -18,6 +18,11 @@
           font-size: 14px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
   .term .prompt { color:#7dff9e; }
   .term .out { color:#b6ffc7; }
+  /* recorded sessions were 100 columns wide: a longer output line wrapped
+     there, so break it here at the same column instead of at the browser's
+     width (keeps multi-line dumps lined up with what was on screen) */
+  .term .out { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .term .out.w100 { max-width: 100ch; word-break: break-all; }
   .term .pw { color:#eaffea; background:rgba(51,255,102,.14); padding:0 3px; border-radius:3px; }
   .term .note { color:var(--dim); font-style: italic; }
   .term .goal { color:#eaffea; border:1px solid var(--dim); border-left:4px solid var(--green); background:rgba(51,255,102,.06); padding:8px 10px; margin:6px 0 12px; white-space:pre-wrap; }
@@ -174,7 +179,7 @@ let playing = true, timer = null, cur = 0, runId = 0;
 const speed = () => parseFloat(speedSel.value);
 function sleep(ms){ return new Promise(r => { const iv = setInterval(() => { if (playing) { clearInterval(iv); r(); } }, 60); setTimeout(() => {}, 0); }); }
 function delay(ms){ return new Promise(r => { let t = 0; const iv = setInterval(() => { if (playing) { t += 50; if (t >= ms) { clearInterval(iv); r(); } } }, 50); }); }
-function line(html, cls){ const d = document.createElement('div'); if (cls) d.className = cls; d.innerHTML = html; term.appendChild(d); term.scrollTop = term.scrollHeight; return d; }
+function line(html, cls, colwrap){ const d = document.createElement('div'); if (cls) d.className = cls + (colwrap ? ' w100' : ''); d.innerHTML = html; term.appendChild(d); term.scrollTop = term.scrollHeight; return d; }
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
 // Every level is a list of steps: each step is one command and exactly the
@@ -253,7 +258,7 @@ async function playLevel(idx){
       if (st.text) await typeText(st.text, st.cmd, my);
       else if (st.cmd.startsWith('#')) { line('<span class="note">' + esc(st.cmd) + '</span>', 'note'); await delay(420 * speed()); }
       else await typeCmd(L.user, st.cmd, my);
-      for (const o of (st.out || [])) { if (my !== runId) return; line(esc(o), 'out'); await delay(160 * speed()); }
+      for (const o of (st.out || [])) { if (my !== runId) return; line(esc(o), 'out', o.length > 100); await delay(160 * speed()); }
       if (st.note) { line('<span class="note">' + esc(st.note) + '</span>', 'note'); await delay(260 * speed()); }
     }
   } else {
@@ -264,7 +269,7 @@ async function playLevel(idx){
         else await typeCmd(L.user, c, my);
       }
     }
-    for (const o of (L.out || [])) { if (my !== runId) return; line(esc(o), 'out'); await delay(160 * speed()); }
+    for (const o of (L.out || [])) { if (my !== runId) return; line(esc(o), 'out', o.length > 100); await delay(160 * speed()); }
   }
   if (L.pw) { line('The password is <span class="pw">' + L.pw + '</span>', 'out'); }
   if (L.note) { line('<span class="note">' + esc(L.note) + '</span>', 'note'); }
