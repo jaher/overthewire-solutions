@@ -29,6 +29,14 @@
   .cursor { display:inline-block; width:9px; height:1.05em; background:var(--green);
             vertical-align:text-bottom; animation: blink 0.9s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
+  .term .vimscreen { border:1px solid #14532d; background:#020402; padding:8px 10px; margin:8px 0; border-radius:4px; }
+  .term .vimrow { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .term .vimrow .vln { color:var(--dim); }
+  .term .vimrow .vlc { color:#b6ffc7; }
+  .term .vimrow.vimtilde .vlc { color:#1f6b34; }
+  .term .vimstatus { background:#1d3a24; color:#d8ffd8; margin-top:6px; padding:1px 6px; }
+  .term .vimmode { color:var(--dim); font-style: italic; min-height: 1.55em; }
+  .term .vimcursor { background:var(--green); color:#000; }
   .bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:14px 0 8px; }
   button, select { background:var(--panel); color:var(--green); border:1px solid var(--dim);
                    border-radius:6px; padding:6px 12px; font:inherit; font-size:13px; cursor:pointer; }
@@ -234,6 +242,176 @@ async function typeInto(prompt, cmd, my){
   await delay(280 * speed());
 }
 
+/* Continuous vim sessions (playback only; the steps data is untouched).
+   Consecutive steps that open the same file in vim play as ONE editor
+   session instead of one screen per chunk: the file is typed sequentially,
+   line by line, character by character, in a single window that scrolls
+   like vim, with the cursor moving and lines retyped in place when a
+   snapshot changes an earlier line. A pass that only re-types content
+   already shown (the repeated passes in Narnia L2/L8) is skipped, so the
+   file is typed once, not eight times. */
+const VIM_ROWS = 18;
+function vimFileOf(st){
+  const m = /^vim\s+(.+)$/.exec((st.cmd || '').trim());
+  if (!m) return null;
+  const parts = m[1].trim().split(/\s+/);
+  return parts[parts.length - 1] || null;
+}
+function parseVimScreen(out){
+  const lines = {};
+  for (const ln of (out || [])){
+    const m = /^\s*(\d+)(?: (.*))?$/.exec(ln);
+    if (m) lines[parseInt(m[1], 10)] = (m[2] === undefined ? '' : m[2]);
+  }
+  return lines;
+}
+function buildVimScript(run){
+  const actions = [];
+  let buf = {};
+  const snaps = run.map(s => parseVimScreen(s.out));
+  let i = 0;
+  while (i < snaps.length){
+    const snap = snaps[i];
+    const keys = Object.keys(snap);
+    if (keys.length === 0){
+      const rebuilt = {};
+      let j = i + 1;
+      while (j < snaps.length && Object.keys(snaps[j]).length > 0){ Object.assign(rebuilt, snaps[j]); j++; }
+      const bufKeys = Object.keys(buf);
+      const same = bufKeys.length > 0 &&
+        Object.keys(rebuilt).length === bufKeys.length &&
+        Object.keys(rebuilt).every(k => rebuilt[k] === buf[k]);
+      if (same){ i = j; continue; }
+      // A pass that only extends the buffer (every old line identical,
+      // plus new lines) is a continuation, not a rewrite: skip just the
+      // empty screen and let the new lines type onto what is shown.
+      const superset = bufKeys.length > 0 &&
+        bufKeys.every(k => rebuilt[k] === buf[k]) &&
+        Object.keys(rebuilt).length > bufKeys.length;
+      if (superset){ i++; continue; }
+      if (bufKeys.length > 0){ actions.push({t:'clear'}); buf = {}; }
+      i++;
+      continue;
+    }
+    const nums = keys.map(Number).sort((a, b) => a - b);
+    for (const n of nums){
+      if (!(n in buf)) actions.push({t:'type', n, text: snap[n]});
+      else if (buf[n] !== snap[n]) actions.push({t:'edit', n, text: snap[n]});
+      buf[n] = snap[n];
+    }
+    i++;
+  }
+  actions.push({t:'wq'});
+  return actions;
+}
+async function playVimSession(user, file, run, my){
+  line('<span class="note">── typing ' + esc(file) + ' in vim ──</span>', 'note');
+  await typeCmd(user, 'vim ' + file, my);
+  if (my !== runId) return;
+  const actions = buildVimScript(run);
+  const box = line('', '');
+  box.className = 'vimscreen';
+  const rowsEl = document.createElement('div');
+  const statusEl = document.createElement('div');
+  statusEl.className = 'vimstatus';
+  const modeEl = document.createElement('div');
+  modeEl.className = 'vimmode';
+  box.appendChild(rowsEl); box.appendChild(statusEl); box.appendChild(modeEl);
+  const buf = {};
+  let topLine = 1, curLine = 1, curCol = 1, dirty = false;
+  function gutter(n){ return String(n).padStart(3, ' ') + ' '; }
+  function ensureVisible(){
+    if (curLine < topLine) topLine = curLine;
+    if (curLine >= topLine + VIM_ROWS) topLine = curLine - VIM_ROWS + 1;
+  }
+  function render(){
+    let html = '';
+    for (let r = 0; r < VIM_ROWS; r++){
+      const n = topLine + r;
+      if (n in buf || n === curLine){
+        const content = (n in buf) ? buf[n] : '';
+        let inner;
+        if (n === curLine){
+          const before = esc(content.slice(0, curCol - 1));
+          const at = esc(content.slice(curCol - 1, curCol)) || ' ';
+          const after = esc(content.slice(curCol));
+          inner = before + '<span class="vimcursor">' + at + '</span>' + after;
+        } else inner = esc(content);
+        html += '<div class="vimrow"><span class="vln">' + gutter(n) + '</span><span class="vlc">' + inner + '</span></div>';
+      } else {
+        html += '<div class="vimrow vimtilde"><span class="vln">    </span><span class="vlc">~</span></div>';
+      }
+    }
+    rowsEl.innerHTML = html;
+    statusEl.textContent = file + (dirty ? ' [+]' : '') + '   ' + curLine + ',' + curCol + '   All';
+    term.scrollTop = term.scrollHeight;
+  }
+  async function waitChar(){
+    while (!playing) { await sleep(80); if (my !== runId) return false; }
+    if (my !== runId) return false;
+    await delay((10 + Math.random() * 22) * speed());
+    return my === runId;
+  }
+  async function typeChars(n, text){
+    for (let k = 0; k < text.length; k++){
+      buf[n] += text[k];
+      curCol++;
+      dirty = true;
+      render();
+      if (!(await waitChar())) return false;
+    }
+    return true;
+  }
+  render();
+  await delay(320 * speed());
+  for (const a of actions){
+    if (my !== runId) return;
+    if (a.t === 'clear'){
+      for (const k of Object.keys(buf)) delete buf[k];
+      topLine = 1; curLine = 1; curCol = 1; dirty = false;
+      modeEl.textContent = '';
+      render();
+      await delay(300 * speed());
+    } else if (a.t === 'type'){
+      buf[a.n] = '';
+      curLine = a.n; curCol = 1;
+      ensureVisible();
+      modeEl.textContent = '-- INSERT --';
+      render();
+      if (!(await typeChars(a.n, a.text))) return;
+      curLine = a.n + 1; curCol = 1;
+      ensureVisible();
+      render();
+      await delay(60 * speed());
+    } else if (a.t === 'edit'){
+      modeEl.textContent = '';
+      curLine = a.n; curCol = 1;
+      ensureVisible();
+      render();
+      await delay(240 * speed());
+      if (my !== runId) return;
+      buf[a.n] = '';
+      modeEl.textContent = '-- INSERT --';
+      render();
+      if (!(await typeChars(a.n, a.text))) return;
+      curCol = a.text.length + 1;
+      ensureVisible();
+      render();
+      await delay(120 * speed());
+    } else if (a.t === 'wq'){
+      modeEl.textContent = '';
+      statusEl.textContent = ':wq';
+      await delay(420 * speed());
+      if (my !== runId) return;
+      dirty = false;
+      render();
+      await delay(200 * speed());
+    }
+  }
+  for (const st of run){
+    if (st.note) { line('<span class="note">' + esc(st.note) + '</span>', 'note'); await delay(260 * speed()); }
+  }
+}
 async function playLevel(idx){
   const G = curGame();
   const L = G.levels[idx]; if (!L) return;
@@ -253,13 +431,25 @@ async function playLevel(idx){
   await delay(500 * speed());
   if (L.steps){
     // Interleave: type a command, print the lines it produced, next command.
-    for (const st of L.steps){
+    // Consecutive vim steps for one file play as a single continuous
+    // editor session (see playVimSession); everything else as before.
+    let si = 0;
+    while (si < L.steps.length){
       if (my !== runId) return;
+      const st = L.steps[si];
+      const vf = vimFileOf(st);
+      if (vf){
+        const run = [];
+        while (si < L.steps.length && vimFileOf(L.steps[si]) === vf){ run.push(L.steps[si]); si++; }
+        await playVimSession(L.user, vf, run, my);
+        continue;
+      }
       if (st.text) await typeText(st.text, st.cmd, my);
       else if (st.cmd.startsWith('#')) { line('<span class="note">' + esc(st.cmd) + '</span>', 'note'); await delay(420 * speed()); }
       else await typeCmd(L.user, st.cmd, my);
       for (const o of (st.out || [])) { if (my !== runId) return; line(esc(o), 'out', o.length > 100); await delay(160 * speed()); }
       if (st.note) { line('<span class="note">' + esc(st.note) + '</span>', 'note'); await delay(260 * speed()); }
+      si++;
     }
   } else {
     for (const group of L.cmds){
