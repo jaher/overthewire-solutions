@@ -38,7 +38,7 @@ function listGames() {
 function vitals(name) {
   // a word with an extension is only a file if it is a known code/data type
   // or at least 6 characters long (v0.c yes, p.txt yes, a sentence no)
-  return codeFile(name) || name.length >= 6;
+  return codeFile(name) || name.length >= 6 || /^[A-Za-z].+.php$/.test(name);
 }
 
 function codeFile(name) {
