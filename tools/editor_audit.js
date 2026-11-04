@@ -90,12 +90,13 @@ function auditLevel(game, level) {
         if (t.includes(f)) { stages.push(steps[j]); j += 1; } else break;
       }
       if (EDITOR.test(s.cmd)) {
-        const hasEmpty = stages.some(x => /empty buffer|from an empty/i.test(x.text || ''));
+        const hasEmpty = stages.some(x => /empty buffer|from an empty|new empty|\[New\]/i.test(x.text || '') ||
+                                           (x.out || []).some(y => /\[New\]|^~/.test(y)));
         const hasChunks = stages.filter(x => /insert chunk|chunk \d/i.test(x.text || '')).length;
         // a one-chunk file: the finish stage shows the whole buffer, which is
         // still the buffer growing from empty to full
         const grownInOne = stages.length >= 3;
-        const hasFinished = stages.some(x => /finished/i.test(x.text || ''));
+        const hasFinished = stages.some(x => /finished|then :wq|:wq/i.test(x.text || ''));
         const t = (s.text || '');
         if (/^typing\b/i.test(t) && stages.length === 1 && !/chunk|empty buffer/i.test(t)) {
           findings.push({ file: f, kind: 'HEREDOC', why: 'single vim step shows the finished file' });
