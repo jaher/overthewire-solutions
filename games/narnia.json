@@ -267,7 +267,7 @@
     },
     {
      "cmd": "vim /tmp/e_narnia1.py",
-     "text": "typing /tmp/e_narnia1.py in vim (insert mode), then :wq",
+     "text": "vim /tmp/e_narnia1.py -- what was typed (captured as one step; it is not built up chunk by chunk here)",
      "out": [
       "  1 import os, subprocess, sys",
       "  2",
@@ -459,7 +459,7 @@
     },
     {
      "cmd": "vim /tmp/l2_proto.c",
-     "text": "typing /tmp/l2_proto.c in vim (insert mode), then :wq",
+     "text": "vim /tmp/l2_proto.c -- what was typed (captured as one step; it is not built up chunk by chunk here)",
      "out": [
       "  1 /* l2_proto.c -- the payload logic in C first: print the PWN! marker,",
       "  2  * become the setuid user, then exec /bin/sh.  Compiled with -m32 it shows",
@@ -525,7 +525,7 @@
     },
     {
      "cmd": "vim /tmp/l2.asm",
-     "text": "typing /tmp/l2.asm in vim (insert mode), then :wq",
+     "text": "vim /tmp/l2.asm -- what was typed (captured as one step; it is not built up chunk by chunk here)",
      "out": [
       "  1 BITS 32",
       "  2 global _start",
@@ -630,7 +630,7 @@
     },
     {
      "cmd": "vim /tmp/l2_harness.c",
-     "text": "typing /tmp/l2_harness.c in vim (insert mode), then :wq",
+     "text": "vim /tmp/l2_harness.c -- what was typed (captured as one step; it is not built up chunk by chunk here)",
      "out": [
       "  1 /* l2_harness.c -- mmap a page RWX, copy the assembled shellcode in and",
       "  2  * call it.  Proves the bytes from nasm work before they go into argv[1].",
@@ -721,7 +721,7 @@
     },
     {
      "cmd": "vim /tmp/e_narnia2.py",
-     "text": "typing /tmp/e_narnia2.py in vim (insert mode), then :wq",
+     "text": "vim /tmp/e_narnia2.py -- what was typed (captured as one step; it is not built up chunk by chunk here)",
      "out": [
       "  1 import os, struct, subprocess",
       "  2",
@@ -1231,7 +1231,7 @@
     },
     {
      "cmd": "vim /tmp/l4.asm",
-     "text": "typing /tmp/l4.asm in vim (insert mode), then :wq",
+     "text": "vim /tmp/l4.asm -- what was typed (captured as one step; it is not built up chunk by chunk here)",
      "out": [
       "  1 BITS 32",
       "  2 global _start",
@@ -1384,7 +1384,7 @@
     },
     {
      "cmd": "vim /tmp/e_narnia4.py",
-     "text": "typing /tmp/e_narnia4.py in vim (insert mode), then :wq",
+     "text": "vim /tmp/e_narnia4.py -- what was typed (captured as one step; it is not built up chunk by chunk here)",
      "out": [
       "  1 import os, struct, subprocess",
       "  2",
@@ -1627,7 +1627,7 @@
     },
     {
      "cmd": "vim /tmp/e_narnia5.py",
-     "text": "typing /tmp/e_narnia5.py in vim (insert mode), then :wq",
+     "text": "vim /tmp/e_narnia5.py -- what was typed (captured as one step; it is not built up chunk by chunk here)",
      "out": [
       "  1 import struct, subprocess",
       "  2 import re",
@@ -1900,7 +1900,7 @@
     },
     {
      "cmd": "vim /tmp/e_narnia6.py",
-     "text": "typing /tmp/e_narnia6.py in vim (insert mode), then :wq",
+     "text": "vim /tmp/e_narnia6.py -- what was typed (captured as one step; it is not built up chunk by chunk here)",
      "out": [
       "  1 import re, subprocess",
       "  2",
@@ -2160,7 +2160,7 @@
     },
     {
      "cmd": "vim /tmp/e_narnia7.py",
-     "text": "typing /tmp/e_narnia7.py in vim (insert mode), then :wq",
+     "text": "vim /tmp/e_narnia7.py -- what was typed (captured as one step; it is not built up chunk by chunk here)",
      "out": [
       "  1 import struct, subprocess",
       "  2",
@@ -2398,7 +2398,7 @@
     },
     {
      "cmd": "vim /tmp/l8.asm",
-     "text": "typing /tmp/l8.asm in vim (insert mode), then :wq",
+     "text": "vim /tmp/l8.asm -- what was typed (captured as one step; it is not built up chunk by chunk here)",
      "out": [
       "  1 BITS 32",
       "  2 global _start",
@@ -2552,7 +2552,7 @@
     },
     {
      "cmd": "vim /tmp/e_narnia8.py",
-     "text": "typing /tmp/e_narnia8.py in vim (insert mode), then :wq",
+     "text": "vim /tmp/e_narnia8.py -- what was typed (captured as one step; it is not built up chunk by chunk here)",
      "out": [
       "  1 import struct, subprocess",
       "  2",
