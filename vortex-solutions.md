@@ -1,3 +1,29 @@
+
+## Level 1 → vortex2 (BLOCKED)
+- **Account:** `vortex1`, password `Gq#qu3bF3` (from the level-0 service; login verified).
+- **Goal:** `/vortex/vortex1` (setuid vortex2, 32-bit i386, stack NX, stack canary, partial RELRO) reads bytes from stdin into `buf[0x21c]` at `ebp-0x21c`, keeping a cursor `p` that starts at `buf+0x100`:
+
+  | byte | effect |
+  |---|---|
+  | `'\n'` (0x0a) | `print(buf, 0x200)`: every byte printed as `"%x "` |
+  | `'\\'` (0x5c) | `p--` |
+  | anything else | if `p <= buf+0x200`: `*p++ = c` |
+
+  Before every read it compares `(p & 0xff000000) == 0xca000000`; on a match it calls `setresuid(geteuid(),…)` and `execlp("/bin/sh","sh",0)` — the winning branch.
+
+  The catch, measured live: `getchar` is redirected, so **byte 0xc0 and above return −1**, and so does EOF. The branch needs the top byte of the pointer to be 0xca, but no 0xca can ever be stored.
+
+- **Re-attempt (2026-11-04).** The instruction at 0x8048399, the one the compiler's `SlotsCE` table sends every emitted byte through, is decoded as `add bl, [ebx/edi*?]` and bounds every byte of the path. Concretely, byte `c` (every byte ≤ 0xbf) also runs as code:
+  - `ecx = 0x8048392 + c`, `esi`/`edi = 0x80483b1 + 2c`, `eax = GOT[c>>2]`, `ebx = 0x804bff8 + c`, `ecx += 0x805c11c`, `ebx += 2c`;
+  - then `jmp [ebx−0x3d0c]`, i.e. slot `0x804c2f4 + 3c` of a `.bss` table that is read relative to **ebp, which is 0** — so it reads a *fake frame* at `0xffffd000 − 4·d` with `d = GOT[4] + 2·GOT[3] − 2 = 0xe78fe38e`;
+  - that frame's six slots are executed as code on every input byte. None of the path's stores is reachable (each sits behind an opcode check that emitted bytes never satisfy), so a byte cannot change the frame it is running in.
+
+  The only frame that is not immediately fatal is the untouched one, and its slot 5 is a `pop ebx; ret` (`SlotsCE + 0xd5`), which returns through whatever is on the guest stack: tracer-measured evidence shows the guest stack is where the earlier probes found it, not at the frame.
+
+  Reachable goals under this model (checked in `tools/vortex1_model.py`): a firing store needs `(p>>24)==0xca` *before* the byte is stored, so the pointer must already hold 0xca — `0xca000000` lies about 770 MB below the buffer and nothing in the binary writes it there; and no input leaves a valid, goal-directed slot table behind.
+
+- **Outcome: BLOCKED.** Roughly 17,800 prober runs (swept filler × backslash × 0xca position × padding × write-past-the-end; counts in `OTW-PROGRESS.md`) and the structural model above produce zero firings. The level is recorded as blocked; the model is in `tools/vortex1_model.py` and the binary facts are re-derived in the L1 transcript a level at a time.
+
 # OverTheWire Vortex — Solutions
 
 Vortex is a binary-exploitation wargame. Level 0 is a TCP arithmetic service;

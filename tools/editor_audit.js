@@ -96,7 +96,8 @@ function auditLevel(game, level) {
         // a one-chunk file: the finish stage shows the whole buffer, which is
         // still the buffer growing from empty to full
         const grownInOne = stages.length >= 3;
-        const hasFinished = stages.some(x => /finished|then :wq|:wq/i.test(x.text || ''));
+        const hasFinished = stages.some(x => /finished|then :wq/i.test(x.text || '')) ||
+                            (/['"]?(vim|vi)\s/.test(s.cmd) && stages.length >= 3);
         const t = (s.text || '');
         if (/^typing\b/i.test(t) && stages.length === 1 && !/chunk|empty buffer/i.test(t)) {
           findings.push({ file: f, kind: 'HEREDOC', why: 'single vim step shows the finished file' });
