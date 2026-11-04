@@ -1478,7 +1478,7 @@
       "re-running 0xffffdcd0 with the shell commands",
       "PWN!$ "
      ],
-     "note": "(exploit script e.py on the utumno2 account; the recording shows it running but not being written, and its source is not reconstructed here - the output above is the original capture)"
+     "note": "(recorded, not re-verified: the exploit script e.py was not captured being written, and re-tested live on 2026-11-04 no launch shape reproduced this run - the binary copies from the pointer at argv+0x28, which passes only for 2+ argv entries and then never prints PWN!, and argc==1 is refused; see OTW-PROGRESS.md. The output above is the original capture.)"
     }
    ]
   },
