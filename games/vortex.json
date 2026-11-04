@@ -12,19 +12,24 @@
    "steps": [
     {
      "cmd": "vim v0.c",
+     "text": "vim v0.c -- the empty buffer",
      "out": [
-      "\"/tmp/vortexL0/v0.c\" [New]"
+      "                                                    ",
+      "~"
      ]
     },
     {
-     "cmd": "#include <stdio.h>\n#include <string.h>\n#include <unistd.h>\n#include <sys/socket.h>\n#include <netinet/in.h>\n#include <arpa/inet.h>\n#include <netdb.h>\n\n/* vortex L0: sum the four uint32s the service sends, send it back */\nint main(void) {\n    int fd, i;\n    struct sockaddr_in sa;\n    unsigned char buf[16];\n    char reply[256];\n    unsigned int v[4], sum = 0;\n    ssize_t n;\n\n    fd = socket(AF_INET, SOCK_STREAM, 0);\n    if (fd < 0) { perror(\"socket\"); return 1; }\n\n    memset(&sa, 0, sizeof(sa));\n    sa.sin_family = AF_INET;\n    sa.sin_port = htons(5842);\n    /* resolve the host name first; inet_pton only takes a literal IP */\n    {\n        struct hostent *he = gethostbyname(\"vortex.labs.overthewire.org\");\n        if (!he) { perror(\"gethostbyname\"); return 1; }\n        memcpy(&sa.sin_addr, he->h_addr_list[0], he->h_length);\n    }\n\n    if (connect(fd, (struct sockaddr *)&sa, sizeof(sa)) < 0) {\n        perror(\"connect\");\n        return 1;\n    }\n\n    n = 0;\n    while (n < 16) {\n        ssize_t r = read(fd, buf + n, 16 - n);\n        if (r <= 0) { perror(\"read\"); return 1; }\n        n += r;\n    }\n\n    for (i = 0; i < 4; i++) {\n        memcpy(&v[i], buf + 4 * i, 4);\n        sum += v[i];\n    }\n\n    printf(\"received: %u %u %u %u\\n\", v[0], v[1], v[2], v[3]);\n    printf(\"sum:      %u (0x%08x)\\n\", sum, sum);\n\n    if (write(fd, &sum, 4) != 4) { perror(\"write\"); return 1; }\n\n    /* the reply can arrive in several chunks: read until the peer closes */\n    memset(reply, 0, sizeof(reply));\n    n = 0;\n    while (n < (ssize_t)sizeof(reply) - 1) {\n        ssize_t r = read(fd, reply + n, sizeof(reply) - 1 - n);\n        if (r <= 0) break;\n        n += r;\n    }\n    reply[n] = 0;\n    printf(\"%s\\n\", reply);\n\n    close(fd);\n    return 0;\n}",
-     "out": [],
-     "text": "typing into vim (insert mode)"
+     "cmd": "vim v0.c",
+     "text": "vim v0.c -- insert chunk 1",
+     "out": [
+      "  1 #include <stdio.h>"
+     ]
     },
     {
-     "cmd": ":wq",
+     "cmd": "vim v0.c",
+     "text": "vim v0.c -- finished, before :wq",
      "out": [
-      "  0-1::wq\"v0.c\" [New] 67L, 1742B written"
+      "  1 #include <stdio.h>"
      ]
     },
     {
