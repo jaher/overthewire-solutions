@@ -1,4 +1,27 @@
 
+## Level 2 → vortex3 (open)
+- **Where it comes from:** this level is `0xbadc0ded.org` challenge #02 (2003-07-08, Joel Eriksson), the same origin as L3.
+- **The shipped source** (overthewire.org/wargames/vortex/vortex2.c):
+  ```c
+  int main(int argc, char **argv) {
+      char *args[] = { "/bin/tar", "cf", "/tmp/ownership.$$.tar", argv[1], argv[2], argv[3] };
+      execv(args[0], args);
+  }
+  ```
+  A tar **argument-injection** wrapper: everything after `tar cf <fixed archive>` would come from our arguments.
+- **What the live binary really does** (measured as vortex2, 32-bit i386 build):
+  - 0 arguments: `execv` fails and the program exits 0 silently.
+  - **2 arguments:** the real tar runs as `tar cf /tmp/ownership.$$.tar <arg1> <arg2>`. I could not reconcile this with the three-slot source; a simulator of the source would reach the `argv[3]` slot at argc=2, and the shipped 32-bit build shows 6 pointer slots. That is recorded as measured, with the cause unknown.
+  - **3 or more:** every call fails on argument 3 with EFAULT (strace) and the program exits 0. Launching it through `/lib/ld-linux.so.2` (dropping setuid) makes no difference, so these failures are in the wrapper, not in privileges.
+- **Routes tried live, none fired:**
+  - Published `--checkpoint=1 --checkpoint-action=exec=…` form, and variations (extra arguments, split flag/value, both spellings, both placements, `-T -`, action on stdin, `env -i`).
+  - `-T /vortex/vortex2`, `--files-from …`: tar reads its file list as data only, so nothing is ever executed.
+  - `-T '--checkpoint=1 --checkpoint-action=…'`: that becomes one filename, "Cannot stat".
+  - `--use-compress-program=/vortex/vortex2`, `-I`, `--owner`: no file operand remains, so tar refuses to create an empty archive.
+  - `TAR_OPTIONS=…`: the wrapper passes the environment to tar, but this tar build rejects any `TAR_OPTIONS` value.
+- **Why the two-argument form can't carry the attack:** tar options only exist before the file list, and the fixed archive name takes the `f` slot. Our two arguments therefore sit after the list has started, where tar treats them as names. A name is never executed.
+- **Not marked blocked** (user decision). Transcript of all of the above in `games/vortex.json` L2.
+
 ## Level 1 → vortex2
 - **Account:** `vortex1`, password `Gq#qu3bF3` (from the level-0 service; login verified).
 - **Goal:** `/vortex/vortex1` (setuid vortex2, 32-bit i386, NX stack, stack canary) reads stdin byte by byte into `buf[0x21c]` at `ebp-0x21c`, keeping a cursor `p` that starts at `buf+0x100`:
