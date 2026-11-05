@@ -1,7 +1,8 @@
 {
  "goals": {
   "0": "Connect to the service on port 5842, sum the four uint32 values it sends, return the sum to receive the vortex1 credentials.",
-  "1": "Get a shell from /vortex/vortex1: walk its cursor 261 backslashes to the saved frame pointer and send four raw 0xca bytes (the getchar hook only filters keyboard input, not a pipe) so the cursor's top byte becomes 0xca."
+  "1": "Get a shell from /vortex/vortex1: walk its cursor 261 backslashes to the saved frame pointer and send four raw 0xca bytes (the getchar hook only filters keyboard input, not a pipe) so the cursor's top byte becomes 0xca.",
+  "2": "Get the vortex3 password from /vortex/vortex2. The wrapper calls tar with a fixed \"cf /tmp/ownership.$$.tar\" and copies two of our arguments into option slots. OPEN: no route found yet that makes tar run a program - two-argument forms put our text into options, but tar never invokes a name from its file list."
  },
  "host": "vortex.labs.overthewire.org",
  "levels": [
