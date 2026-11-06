@@ -1,87 +1,90 @@
 # Vortex L3 — where the work stands
 
-## The program (live binary, 2026-11-06)
+## The program (live binary, verified 2026-11-06)
 
-`/vortex/vortex3` is setuid root, mode 4750, group vortex3.  It is the
-0xbadc0ded #02 source compiled for i386 (md5 `17b12585fd1a15df97d13e84364744cf`,
-11300 bytes, PIE, entry 0x8049060, image base 0x55555000).  Full disassembly
-of `main` is in `main.dis`, the relocations in `relocs.txt`:
+`/vortex/vortex3`, mode 4750, setuid root, group vortex3, 11300 bytes,
+md5 `17b12585fd1a15df97d13e84364744cf` (same md5 for `/vortex/vortex3` and a
+copy taken in `/tmp`). The disassembly in `main.dis` was taken from that
+copy: `objdump -d v3copy --start-address=0x8049176 --stop-address=0x80491f4`.
 
 ```c
 int main(int argc, char **argv) {
-    static unsigned long val = 31370;      /* .data 0x804b20c — never written */
-    unsigned long *lp = &val;              /* ebp-0x10 */
-    unsigned long **lpp = &lp;             /* ebp-0xc, starts as 0x804b210 */
-    char buf[128];
+    unsigned long *lp = &val;          /* ebp-0x10 */
+    unsigned long **lpp = &lp;         /* ebp-0xc, starts as 0x804b210 */
+    char buf[128];                     /* ebp-0x90 */
     if (argc != 2) exit(1);
     strcpy(buf, argv[1]);
-    if (((unsigned long) lpp & 0xffff0000) != 0x08040000) exit(2);   /* mov $0,%ax; cmp $0x8040000 */
-    tmp = *lpp;                            /* ebp-0x14 */
+    if (((unsigned long) lpp & 0xffff0000) != 0x08040000) exit(2);  /* mov $0,%ax; cmp $0x8040000 */
+    tmp = *lpp;
     **lpp = (unsigned long) &buf;
     exit(0);
 }
 ```
 
-`buf` is at `ebp-0x90`, so the saved `ebp` lives at `buf+0x94` = `buf+148`.
-The check only keeps the high 16 bits of `lpp`, so an overflow can make it
-`0x080Xxxxx` and `lpp` has to point at readable writable memory.
+`buf` is at `ebp-0x90`, so the saved `ebp` is at `buf+0x94` (`buf+148`).
+`lpp` sits at `buf+0x84` (= 132), `lp` at `buf+0x80` (= 128).
 
-## Live behaviour (re-measured 2026-11-06, plain ssh, stdin /dev/null)
+## Correction (2026-11-06)
 
-| argv[1] length | exit |
-|---|---|
-| 1..131 | 0 |
-| 132, 133 | freezes reading stdin before the check |
-| 134..160 | 2 |
-| 128 "A" + any `0x08..xx xx xx` dword | data abort (139) |
+A `main.dis` committed earlier described a "console bytecode VM" and a stack
+walk. That does not match the binary: re-reading the same addresses from
+several sessions, including a fresh copy of `/vortex/vortex3`, gives the
+code above. The VM text is withdrawn, and so are the notes and scratch
+scripts built on it. The `main` above is the only one the live binary runs.
 
-Length 132 touches the low byte of saved `ebp` (`buf+148`); 133 touches the
-next.  The program then waits for stdin EOF instead of running the check:
-`sleep 30 | vortex3 <arg>` leaves it stopped with `arg_start` 0x454 below the
-top of the stack, and the program consumes stdin to EOF.  A shell
-`$(cat file)` replaces NUL, and `$()` results above 127 bytes go through a
-temporary file, so exactly 140 or 141 bytes reach the program on the
-`$(...)` route; a 139-byte file route keeps its NUL.
+## What the check allows
 
-## Routes tried and closed
+The check keeps only the high 16 bits of `lpp`. Any `lpp` of the form
+`0x080Xxxxx` passes. When the check passes:
 
-- **Lpps to the GOT** (`0x804b1f0..b20c`): the store `**lpp = &buf` corrupts
-  `exit`'s resolution data (or goes through `strcpy`, which writes `&buf`
-  = 0xff..ff around and faults on it), and the frame we return into via
-  `exit(0)` is not the one a shell `exit` builds.
-- **`lpp` to 0x08048000 / 0x08048015** (mapping start, ELF header): the point
-  is read-only (or the dword at 0x8048015 is 0xb8), so the `**lpp` store
-  faults.
-- **Any `0x0804xxxx` as `lpp`**: nothing else in that range is mapped in this
-  non-PIE process.
-- **Session-side frame editing** (`/proc/pid/mem`): the syscall interface
-  refuses the 32-bit `lseek`/`write` pairs; `python3` is a 64-bit binary in
-  a session that has no 32-bit interpreter that can use `lseek64`.
-- **Session channel**: programs started through the channel never appear in
-  `/proc` (`ps` shows only the ssh session itself), so a live address is not
-  observable from inside, and exit codes of channel children are masked.
-  Plain ssh (a command string, no pipe into python) runs on the real host
-  and shows the real signals.
+- `lpp[0]` must be readable (it is read into `tmp`).
+- `lpp[0]` must be writable, because `**lpp = &buf` stores a stack address
+  there.
 
-## Open leads
+The only mapped, writable page in the `0x0804` range is
+`0x804b000..0x804bfff`. That page holds `.got.plt` (`0x804b1ec` up),
+`.init_array`/`.fini_array` (around `0x804b208`), `.data` (`0x804b204`, the
+`31370` test value) and `.bss` (to `0x804b218`).
 
-1. The 132/133 freeze gives a process that is alive, blocked on its stdin,
-   with the saved return address (`buf+144`) already ours: argv[1][144..147]
-   is the four bytes that become the return value of `main`.  A helper that
-   forks and holds a pipe open later has to hold that call to `main` for
-   long enough to either get a ptrace attach (blocked by yama `1` for
-   non-ancestors, and no 32-bit ptrace front-end exists in the session), or
-   to hand over a frame that is actually valid at that address.
-2. The freeze itself must be explained before it can be relied on: nothing
-   in `main` reads stdin after the check fails, so an out-of-process reader
-   must be draining the con terminal.
+## What is measured live
+
+- argv length 1..131: exit 0 (no overflow reaches `ebp`).
+- 132 and 133: the program stops instead of reaching the check. It ends up
+  waiting (state `S`, `do_wait`) on a pipeline; a 139-byte file route gives
+  exit 2, so the saved `ebp` low bytes decide between the two.
+- 134 and up: exit 2. The saved `ebp` is overwritten, so `lpp` reads from
+  inside `argv`; only a dword there that is `0x080Xxxxx` passes.
+- 128 bytes + a `0x08..` dword as `lpp`: the process dies with `139` (a
+  segfault). Over plain ssh the shell reports `Segmentation fault`; over
+  the session channel the code is masked. The crash means the store `**lpp`
+  went to non-writable memory, or that the GOT was changed where `exit`
+  uses it.
+
+## Open routes
+
+1. **Make `exit` survive a GOT change.** Pointing `lpp` at a GOT slot makes
+   `**lpp = &buf` (a stack address near `0x8ff..`) replace a resolved
+   function pointer. The candidates and the frames they need:
+   - `0x804b200` (`exit` itself): the next call is `exit(0)`; the stack
+     frame would have to pass `*(&buf)`, i.e. the dword the store just wrote
+     into `0x804b200` — a function pointer we do not control.
+   - `0x804b1fc` (`strcpy`): not called again before `exit`.
+   - `0x804b1f8` (`__libc_start_main`): not called again.
+   - `0x804b1f4` (PLT0's GOT slot, `_dl_runtime_resolve`): unused once
+     every relevant slot is already resolved.
+   - `.init_array`/`.fini_array` around `0x804b208`: only run at image load
+     and unload, not on `exit`.
+   A writable page in the high half of the `0x0804` range (e.g. `.bss` at
+   `0x804b210..`) cannot be reached: `lpp` must equal `0x080Xxxxx` with
+   `X..` masked off (`mov $0,%ax`).
+2. **Avoid `exit`.** If the store lands somewhere `exit` reads before it
+   jumps (or if `exit` never runs), the stack address we wrote is never
+   called.
 
 ## Files
 
-- `main.dis` — live `main` disassembly; `relocs.txt` — GOT relocations and
-  dynamic symbols.
-- `sshraw.py` — run a command string as vortex3 over plain ssh (argv list,
-  no quoting).
-- `lowhost.py` / `build.py` / `l3.c` — the earlier two-trap low-host draft,
-  kept for the record; the address assumptions in them predate the live
-  binary analysis above.
+- `main.dis` — verified disassembly (from `/tmp/v3copy`, md5 above).
+- `relocs.txt` — GOT relocations and dynamic symbols.
+- `sshraw.py` — runs a command string as vortex3 over plain ssh (argv
+  list, no quoting).
+- `ssh3.py` — same, legacy string form.

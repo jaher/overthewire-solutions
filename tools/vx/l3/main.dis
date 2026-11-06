@@ -1,5 +1,6 @@
+17b12585fd1a15df97d13e84364744cf  v3copy
 
-/tmp/v3bin:     file format elf32-i386
+v3copy:     file format elf32-i386
 
 
 Disassembly of section .text:
@@ -46,7 +47,7 @@ Disassembly of section .text:
  80491ed:	6a 00                	push   $0x0
  80491ef:	e8 5c fe ff ff       	call   8049050 <exit@plt>
 
-/tmp/v3bin:     file format elf32-i386
+v3copy:     file format elf32-i386
 
 Contents of section .got.plt:
  804b1ec 00b10408 00000000 00000000 36900408  ............6...
