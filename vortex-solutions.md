@@ -1,4 +1,12 @@
 
+## Level 3 → vortex4 (OPEN)
+- **The program:** `/vortex/vortex3` (setuid vortex4) is the published 0xbadc0ded #02 source: `strcpy` of `argv[1]` into `buf[128]`, then a check that the `lpp` variable sits in `0x0804xxxx`, then `tmp = *lpp; **lpp = &buf; exit(0)`. `vortex3-hard` adds `*lpp = tmp` and is otherwise identical (same 76-byte code, same data).
+- **Measured live (as vortex3):** one argument → exit 0; 129 → 0; 130 → exit 2 (the check); 132 → SIGSEGV. Crash signatures were only observable over plain ssh (`132:-11`); through the session they are reported as exit codes.
+- **The pivot being built:** point `lpp` at a constant in `0x0804xxxx` so the store writes `&buf` there and the walk out of that (`tmp`, the saved return address, later bytes) reaches a controlled value. The exit state of vortex3 (`exit(0)` return path, eip `0x0804b0dc`, ebx `0x0804b00c`, edi `0x8ca`) is copied to `/tmp/ownership.$$.tar`; the argument routes eax from the mailbox at `0x0804b100` through `[$eax+0x64]` and `[$ebx+1]` (`call [0x0804b0dc]`) into a two-byte syscall that consumes the register file the kernel saved on the child's stack, then `xor eax,eax; jmp 0x08048200`.
+- **What works (each verified alone):** reading and writing a live child's memory through `/proc/<pid>/mem` (native seeks/writes, 32-bit interfaces); locating the argument block via `/proc/<pid>/stat` (`arg_start`/`env_start`/`env_end`); writing the retest frame and the attach slot, and reading them back; saving and restoring the frame page; handing the child a 300-byte argument carrying the syscall and the command `cp /tmp/l3memo/vpw3 /tmp/l3memo/vpw4`; the child always finishes cleanly.
+- **What does not work:** the attach slot ends up holding a value other than the kernel's detached frame, so the hand does not resume into our heredoc. Every staged run left `/tmp/l3memo/vpw4` at the placeholder `BBBB`. The session reverts programs it starts (exit codes recorded 0 or the target's own; a deliberate trap reported without its state), so a clean silent run cannot be told apart from a successful one through that channel.
+- **State:** open. Next attempt for a future session: find the con-side object whose va reads back as our heredoc through the relocated lexer (the console loader's own `heredoc_read`/`heredoc_name`), rather than the frame the kernel writes.
+
 ## Level 2 → vortex3 (SOLVED — password read, verification pending)
 - **Where it comes from:** `0xbadc0ded.org` challenge #02. The shipped source is a tar wrapper:
   ```c
