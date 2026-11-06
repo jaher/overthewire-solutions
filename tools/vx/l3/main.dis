@@ -1,0 +1,55 @@
+
+/tmp/v3bin:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+08049176 <main>:
+ 8049176:	8d 4c 24 04          	lea    0x4(%esp),%ecx
+ 804917a:	83 e4 f0             	and    $0xfffffff0,%esp
+ 804917d:	ff 71 fc             	push   -0x4(%ecx)
+ 8049180:	55                   	push   %ebp
+ 8049181:	89 e5                	mov    %esp,%ebp
+ 8049183:	51                   	push   %ecx
+ 8049184:	81 ec 94 00 00 00    	sub    $0x94,%esp
+ 804918a:	89 c8                	mov    %ecx,%eax
+ 804918c:	c7 45 f4 10 b2 04 08 	movl   $0x804b210,-0xc(%ebp)
+ 8049193:	83 38 02             	cmpl   $0x2,(%eax)
+ 8049196:	74 0a                	je     80491a2 <main+0x2c>
+ 8049198:	83 ec 0c             	sub    $0xc,%esp
+ 804919b:	6a 01                	push   $0x1
+ 804919d:	e8 ae fe ff ff       	call   8049050 <exit@plt>
+ 80491a2:	8b 40 04             	mov    0x4(%eax),%eax
+ 80491a5:	83 c0 04             	add    $0x4,%eax
+ 80491a8:	8b 00                	mov    (%eax),%eax
+ 80491aa:	83 ec 08             	sub    $0x8,%esp
+ 80491ad:	50                   	push   %eax
+ 80491ae:	8d 85 70 ff ff ff    	lea    -0x90(%ebp),%eax
+ 80491b4:	50                   	push   %eax
+ 80491b5:	e8 86 fe ff ff       	call   8049040 <strcpy@plt>
+ 80491ba:	83 c4 10             	add    $0x10,%esp
+ 80491bd:	8b 45 f4             	mov    -0xc(%ebp),%eax
+ 80491c0:	66 b8 00 00          	mov    $0x0,%ax
+ 80491c4:	3d 00 00 04 08       	cmp    $0x8040000,%eax
+ 80491c9:	74 0a                	je     80491d5 <main+0x5f>
+ 80491cb:	83 ec 0c             	sub    $0xc,%esp
+ 80491ce:	6a 02                	push   $0x2
+ 80491d0:	e8 7b fe ff ff       	call   8049050 <exit@plt>
+ 80491d5:	8b 45 f4             	mov    -0xc(%ebp),%eax
+ 80491d8:	8b 00                	mov    (%eax),%eax
+ 80491da:	89 45 f0             	mov    %eax,-0x10(%ebp)
+ 80491dd:	8b 45 f4             	mov    -0xc(%ebp),%eax
+ 80491e0:	8b 00                	mov    (%eax),%eax
+ 80491e2:	8d 95 70 ff ff ff    	lea    -0x90(%ebp),%edx
+ 80491e8:	89 10                	mov    %edx,(%eax)
+ 80491ea:	83 ec 0c             	sub    $0xc,%esp
+ 80491ed:	6a 00                	push   $0x0
+ 80491ef:	e8 5c fe ff ff       	call   8049050 <exit@plt>
+
+/tmp/v3bin:     file format elf32-i386
+
+Contents of section .got.plt:
+ 804b1ec 00b10408 00000000 00000000 36900408  ............6...
+ 804b1fc 46900408 56900408                    F...V...        
+Contents of section .data:
+ 804b204 00000000 00000000 697a0000 0cb20408  ........iz......

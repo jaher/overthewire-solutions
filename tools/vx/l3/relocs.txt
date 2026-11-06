@@ -1,0 +1,23 @@
+
+/tmp/v3bin:     file format elf32-i386
+
+DYNAMIC RELOCATION RECORDS
+OFFSET   TYPE              VALUE
+0804b1e8 R_386_GLOB_DAT    __gmon_start__
+0804b1f8 R_386_JUMP_SLOT   __libc_start_main@GLIBC_2.34
+0804b1fc R_386_JUMP_SLOT   strcpy@GLIBC_2.0
+0804b200 R_386_JUMP_SLOT   exit@GLIBC_2.0
+
+
+
+Symbol table '.dynsym' contains 6 entries:
+   Num:    Value  Size Type    Bind   Vis      Ndx Name
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 00000000     0 FUNC    GLOBAL DEFAULT  UND _[...]@GLIBC_2.34 (2)
+     2: 00000000     0 FUNC    GLOBAL DEFAULT  UND strcpy@GLIBC_2.0 (3)
+     3: 00000000     0 NOTYPE  WEAK   DEFAULT  UND __gmon_start__
+     4: 00000000     0 FUNC    GLOBAL DEFAULT  UND exit@GLIBC_2.0 (3)
+     5: 0804a004     4 OBJECT  GLOBAL DEFAULT   14 _IO_stdin_used
+x86_64
+lrwxrwxrwx 1 root root     22 Oct 25 13:29 /lib/ld-linux.so.2 -> ../lib32/ld-linux.so.2
+-rwxr-xr-x 1 root root 223568 Sep  3 14:09 /lib32/ld-linux.so.2
