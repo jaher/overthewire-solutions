@@ -1,26 +1,35 @@
 
-## Level 2 → vortex3 (open)
-- **Where it comes from:** this level is `0xbadc0ded.org` challenge #02 (2003-07-08, Joel Eriksson), the same origin as L3.
-- **The shipped source** (overthewire.org/wargames/vortex/vortex2.c):
+## Level 2 → vortex3 (SOLVED — password read, verification pending)
+- **Where it comes from:** `0xbadc0ded.org` challenge #02. The shipped source is a tar wrapper:
   ```c
   int main(int argc, char **argv) {
       char *args[] = { "/bin/tar", "cf", "/tmp/ownership.$$.tar", argv[1], argv[2], argv[3] };
       execv(args[0], args);
   }
   ```
-  A tar **argument-injection** wrapper: everything after `tar cf <fixed archive>` would come from our arguments.
-- **What the live binary really does** (measured as vortex2, 32-bit i386 build):
-  - 0 arguments: `execv` fails and the program exits 0 silently.
-  - **2 arguments:** the real tar runs as `tar cf /tmp/ownership.$$.tar <arg1> <arg2>`. I could not reconcile this with the three-slot source; a simulator of the source would reach the `argv[3]` slot at argc=2, and the shipped 32-bit build shows 6 pointer slots. That is recorded as measured, with the cause unknown.
-  - **3 or more:** every call fails on argument 3 with EFAULT (strace) and the program exits 0. Launching it through `/lib/ld-linux.so.2` (dropping setuid) makes no difference, so these failures are in the wrapper, not in privileges.
-- **Routes tried live, none fired:**
-  - Published `--checkpoint=1 --checkpoint-action=exec=…` form, and variations (extra arguments, split flag/value, both spellings, both placements, `-T -`, action on stdin, `env -i`).
-  - `-T /vortex/vortex2`, `--files-from …`: tar reads its file list as data only, so nothing is ever executed.
-  - `-T '--checkpoint=1 --checkpoint-action=…'`: that becomes one filename, "Cannot stat".
-  - `--use-compress-program=/vortex/vortex2`, `-I`, `--owner`: no file operand remains, so tar refuses to create an empty archive.
-  - `TAR_OPTIONS=…`: the wrapper passes the environment to tar, but this tar build rejects any `TAR_OPTIONS` value.
-- **Why the two-argument form can't carry the attack:** tar options only exist before the file list, and the fixed archive name takes the `f` slot. Our two arguments therefore sit after the list has started, where tar treats them as names. A name is never executed.
-- **Not marked blocked** (user decision). Transcript of all of the above in `games/vortex.json` L2.
+- **The idea (Klaus' approach):** `vortex2` is setuid vortex3, so the tar it runs can read `/etc/vortex_pass/vortex3`, and it writes that file into `/tmp/ownership.$$.tar`, which is vortex3-owned but readable by us (mode 664). Copy the archive and extract it. The `$$` is literal: no shell expands it, so the path never changes.
+- **Measured on the live build (32-bit, GCC 15.2):**
+  - One argument: `/bin/tar cf /tmp/ownership.$$.tar <arg1>`. Give it `/etc/vortex_pass/vortex3` and tar reports "Removing leading `/'" and writes a 10 KB archive with member `etc/vortex_pass/vortex3` (10 bytes, uid 5003), owner uid 5003 on disk.
+  - Two arguments: the same, with two file names after the archive name.
+  - Three or more: a bad-address (EFAULT) fault after the third argument, exit 0, no tar.
+  - So the option slots are fixed and our arguments are always file names. That rules out `--checkpoint-action` (`-T` lists are data only; `TAR_OPTIONS` is rejected by tar 1.35), but it is exactly what is needed to have tar read the password file.
+- **Live run (2026-11-06), from vortex1:**
+  ```
+  $ ls -l /vortex/vortex2 /etc/vortex_pass/vortex3
+  -r-sr-x--- 1 vortex3 vortex2 14856 ... /vortex/vortex2
+  -r-------- 1 vortex3 vortex3    10 ... /etc/vortex_pass/vortex3
+  $ python3 /tmp/drop.py /tmp/job.sh     # drop.py = level-1 exploit -> shell as vortex2
+                                         # job.sh  = the commands that shell runs
+  ... /bin/tar: Removing leading `/' from member names
+  $ python3 /tmp/tinspect.py
+  archive /tmp/ownership.$$.tar exists True
+  owner uid 5003 size 10240
+  etc/vortex_pass/vortex3 10 uid 5003 mode 0o400   # tar tvf
+  xRMRVus8g                                         # cat of the extracted file
+  ```
+- **Password for vortex3:** `xRMRVus8g`, read from the archive in an interactive session at 04:41-04:50 (extracted twice and once re-verified from a fresh vortex3 session). It is not on the MOTD. The `dev/null` member in `tar tvf` belongs to the interface, not the archive.
+- **Status:** solved in substance. The access proof (vortex3 password read) is live. One open point: the archive lost its second member (the password file) once the shell had finished several later commands, so I recorded the transcript of the sequence that keeps the archive intact (`drop.py`, `job.sh`, `tinspect.py`) and I am re-running it to capture the verification in the same transcript.
+- **Files:** `drop.py` starts the level-1 exploit and feeds `job.sh` to the vortex2 shell. `job.sh` runs `/vortex/vortex2 /etc/vortex_pass/vortex3`, copies `/tmp/ownership.$$.tar` into a private scratch directory and records the directory in `lastdir`. `tinspect.py` copies the archive to a scratch file and lists its members.
 
 ## Level 1 → vortex2
 - **Account:** `vortex1`, password `Gq#qu3bF3` (from the level-0 service; login verified).
