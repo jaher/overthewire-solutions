@@ -60,6 +60,24 @@ The only mapped, writable page in the `0x0804` range is
   went to non-writable memory, or that the GOT was changed where `exit`
   uses it.
 
+## Measured GOT-slot map (128-byte overflow, lpp slot given)
+
+| lpp | result |
+|---|---|
+| 0x804b1f0 (PLT0 GOT) | SIGSEGV |
+| 0x804b1f4 (`_dl_runtime_resolve`) | SIGSEGV |
+| 0x804b1f8 (`__libc_start_main`) | SIGSEGV |
+| 0x804b1fc (`strcpy`) | SIGSEGV |
+| 0x804b200 (`exit` JMP) | **exit 0**, no crash |
+| 0x804b204 (`31370` data) | SIGSEGV |
+| 0x804b208 / 0x804b210 / 0x804b214 | SIGSEGV |
+
+No writable byte exists above 0x804b218, so after `**lpp = &buf` the only
+dword on the stack walk that still fits the check is the `0x0804b200`
+pointer itself (argv[8..11]): `**lpp` follows it to the same JMP slot, and
+the walk ends there. Arguments longer than 150 bytes are refused by the
+remote tools because their argument sanitizer rejects non-UTF-8 bytes.
+
 ## Open routes
 
 1. **Make `exit` survive a GOT change.** Pointing `lpp` at a GOT slot makes
