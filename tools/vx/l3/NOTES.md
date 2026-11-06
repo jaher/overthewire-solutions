@@ -106,3 +106,31 @@ remote tools because their argument sanitizer rejects non-UTF-8 bytes.
 - `sshraw.py` — runs a command string as vortex3 over plain ssh (argv
   list, no quoting).
 - `ssh3.py` — same, legacy string form.
+## Brute-force walk result (walk.py, 2026-11-06)
+
+With `lpp = 0x804b200` (the only lpp that passes and whose store leaves the
+JMP slot intact), the first step reads p = 0x804b200, so t = the slot dword
+`0x0804xxxx`. That address is not mapped in the image, so the walk ends
+there. No argv byte changes this.
+
+Correction to a line above: the `0x0804b200` dword lives in argv[8..11]
+(`&buf - 0x84 - 4`), not `&buf - 0x58 - 4`.
+
+The walk cannot reach a low stack address: the low two bytes of `lpp` are
+masked by the check, so `lpp` is always `0x0804xxxx` (inside argv), and a
+low 32-bit stack pointer such as `0xffff8000` fails the check (`rc=2`).
+
+`main` for an ordinary argument (length 1..131) cannot print anything; the
+VM text that an earlier note described is not in the binary (`sim_main.py`
+was deleted as unusable).
+
+## Where it stands
+
+Every route in the real binary now ends in one of three ways:
+
+- `rc=2` (check rejected; the frame walk changed nothing),
+- SIGSEGV (a store into read-only memory, or `exit` jumping through a
+  corrupted slot),
+- `rc=0` (the walk terminates at the JMP slot; no output).
+
+It is recorded open. Not solved, not marked blocked.
