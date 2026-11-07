@@ -152,17 +152,23 @@ It is recorded open. Not solved, not marked blocked.
 ## Live environment findings (2026-11-07)
 
 - `/tmp` is `drwxrwx-wt` (1773): writable and sticky, but **no read/search** for
-  group/other, so it cannot be listed and a file can be opened only if its name is
-  known and its mode allows it. `cp` into `/tmp/x` fails when `/tmp/x` already exists
-  with a mode that denies writing.
-- **`.data` is mapped MAP_SHARED** (`/tmp/l3w/vp` showed the patched bytes and
-  `.data` took reloads): vortex3 can write into its own (and any adult's) binary
-  file, e.g. `/vortex/vortex3` itself. This does not give a code path into the
-  password file; `exit()` runs *before* this write, so a later run is needed,
-  which is the same "second `vortex3` run" as the setuid check in the walk.
+  group/other, so it cannot be listed.
+- **`.data` is mapped MAP_SHARED**: after `/tmp/l3w/vp` was patched, a reload
+  returned the patched bytes and `.data` came from the file. A file write by
+  vortex3 to its own binary therefore does not desynchronise MAP_SHARED pages.
+  It still does not create a route to the password file: `exit(0)` runs before
+  any such write lands in a later run, and a later run is just a new process.
 - **glibc 2.43 registers no destructors for this object** (`FINI_ARRAYSZ` 4 = one
-  NULL entry), so `exit` has no dtor to run. A test patch registering a dtor
-  (size 8 + .fini_array point at a write() cave in the RW page) segfaults on startup,
-  because the zone from `0x804b000` to `0x804b0f8` is only part of the writable
-  segment below the DT block: the cave at `0x804b170`/`0x804b150` sits inside the
-  `DT_*` entries, which the loader reads.
+  NULL entry) and `exit()` reads the array again only if it was registered at
+  start, so a dtor-array overwrite during the run has no effect. A test patch
+  (size 8 + `.fini_array` = a write() cave) also could not be made to run its
+  cave within the fixed DT block and the small writable window.
+
+## The remaining obstacle
+
+An ordinary, non-overflowing `vortex3` run can do nothing but exit; the only
+inputs are `argv[1]` and stdin, `main` ignores stdin, and the check passes only
+for `lpp` in `0x0804xxxx`. Every route that writes the writable page of the
+image at `0x804b000..0x804b218` and then returns through `exit` either corrupts
+the GOT (SIGSEGV) or reaches the JMP slot and exits (rc=0). No route has been
+found that produces output.
