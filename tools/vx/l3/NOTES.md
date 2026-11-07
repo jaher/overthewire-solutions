@@ -135,40 +135,24 @@ Every route in the real binary now ends in one of three ways:
 
 It is recorded open. Not solved, not marked blocked.
 
-## Public write-ups (2026-11-07)
+## Systematic attempt (2026-11-07): summary
 
-- **Klaus (klaus.hohenpoelz.de/overthewire-vortex-wargame-level-3.html):** his build is
-  the 2003 binary (`0x8048310`/`0x8097xx`). The trick: `lpp = 0x8048312`, the operand
-  of `jmp DWORD PTR ds:0x80497xx` in the PLT stub; the 16-bit load reads `0x0804`,
-  the suffix `0x97xx` gives an RWX page, `**lpp = &buf` lands in `exit@got.plt`, and
-  `exit` jumps to shellcode in `buf`. Our build differs: the PLT lives in `.text`
-  (`0x8049020`, R+E only, no RELRO), so the same construction faults. Live:
-  `0x8049032`, `0x8049038`, `0x8049048`, `0x8049058` and `0x8049008` all give rc=2
-  (the stub-word trick does not survive the frame check).
-- **OverTheWire brief (vortex3.html):** "A Stack Overflow with a Difference"; the hint
-  is to call `setuid(vortex4)` in the shellcode and notes that ctors/dtors "may no
-  longer be writable"; built with `-Wl,-z,norelro`.
+1. Public write-ups: Klaus (PLT-operand trick) needs the 2003 layout (RWX PLT
+   page). Our binary has the PLT in `.text` (`0x8049020`, R+E), so the store
+   faults; the four stub operands tested live all give rc=2.
+2. The official brief names ctors/dtors; this glibc reads the dtor array again
+   at exit only when it was registered at start, and this object registers
+   none (`FINI_ARRAYSZ` 4). A patched dtor registration could not be run.
+3. The stack walk: with `lpp = 0x804b200`, `**lpp = &buf` and then `p = *p`
+   reads the slot dword `0x0804...`, which is unmapped. The walk ends. Any
+   other in-page target corrupts a used GOT slot and `exit` faults.
+4. The low stack pointer route (attempting to jump to `&buf`) fails the
+   check, which masks the low half of `lpp`.
+5. The environment facts (`/tmp` 1773, MAP_SHARED `.data`, glibc 2.43
+   dtor registration) do not add a route.
+6. `vortex3-hard` (mentioned by Klaus) is not what the vortex3 account can
+   execute into (it is built for the hard variant); irrelevant here.
 
-## Live environment findings (2026-11-07)
-
-- `/tmp` is `drwxrwx-wt` (1773): writable and sticky, but **no read/search** for
-  group/other, so it cannot be listed.
-- **`.data` is mapped MAP_SHARED**: after `/tmp/l3w/vp` was patched, a reload
-  returned the patched bytes and `.data` came from the file. A file write by
-  vortex3 to its own binary therefore does not desynchronise MAP_SHARED pages.
-  It still does not create a route to the password file: `exit(0)` runs before
-  any such write lands in a later run, and a later run is just a new process.
-- **glibc 2.43 registers no destructors for this object** (`FINI_ARRAYSZ` 4 = one
-  NULL entry) and `exit()` reads the array again only if it was registered at
-  start, so a dtor-array overwrite during the run has no effect. A test patch
-  (size 8 + `.fini_array` = a write() cave) also could not be made to run its
-  cave within the fixed DT block and the small writable window.
-
-## The remaining obstacle
-
-An ordinary, non-overflowing `vortex3` run can do nothing but exit; the only
-inputs are `argv[1]` and stdin, `main` ignores stdin, and the check passes only
-for `lpp` in `0x0804xxxx`. Every route that writes the writable page of the
-image at `0x804b000..0x804b218` and then returns through `exit` either corrupts
-the GOT (SIGSEGV) or reaches the JMP slot and exits (rc=0). No route has been
-found that produces output.
+Outcome: systematically attempted, no route to `/etc/vortex_pass/vortex4`.
+Level stays open (not blocked). Every tested route and its result is listed
+above.
