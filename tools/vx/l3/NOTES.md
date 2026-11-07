@@ -134,3 +134,35 @@ Every route in the real binary now ends in one of three ways:
 - `rc=0` (the walk terminates at the JMP slot; no output).
 
 It is recorded open. Not solved, not marked blocked.
+
+## Public write-ups (2026-11-07)
+
+- **Klaus (klaus.hohenpoelz.de/overthewire-vortex-wargame-level-3.html):** his build is
+  the 2003 binary (`0x8048310`/`0x8097xx`). The trick: `lpp = 0x8048312`, the operand
+  of `jmp DWORD PTR ds:0x80497xx` in the PLT stub; the 16-bit load reads `0x0804`,
+  the suffix `0x97xx` gives an RWX page, `**lpp = &buf` lands in `exit@got.plt`, and
+  `exit` jumps to shellcode in `buf`. Our build differs: the PLT lives in `.text`
+  (`0x8049020`, R+E only, no RELRO), so the same construction faults. Live:
+  `0x8049032`, `0x8049038`, `0x8049048`, `0x8049058` and `0x8049008` all give rc=2
+  (the stub-word trick does not survive the frame check).
+- **OverTheWire brief (vortex3.html):** "A Stack Overflow with a Difference"; the hint
+  is to call `setuid(vortex4)` in the shellcode and notes that ctors/dtors "may no
+  longer be writable"; built with `-Wl,-z,norelro`.
+
+## Live environment findings (2026-11-07)
+
+- `/tmp` is `drwxrwx-wt` (1773): writable and sticky, but **no read/search** for
+  group/other, so it cannot be listed and a file can be opened only if its name is
+  known and its mode allows it. `cp` into `/tmp/x` fails when `/tmp/x` already exists
+  with a mode that denies writing.
+- **`.data` is mapped MAP_SHARED** (`/tmp/l3w/vp` showed the patched bytes and
+  `.data` took reloads): vortex3 can write into its own (and any adult's) binary
+  file, e.g. `/vortex/vortex3` itself. This does not give a code path into the
+  password file; `exit()` runs *before* this write, so a later run is needed,
+  which is the same "second `vortex3` run" as the setuid check in the walk.
+- **glibc 2.43 registers no destructors for this object** (`FINI_ARRAYSZ` 4 = one
+  NULL entry), so `exit` has no dtor to run. A test patch registering a dtor
+  (size 8 + .fini_array point at a write() cave in the RW page) segfaults on startup,
+  because the zone from `0x804b000` to `0x804b0f8` is only part of the writable
+  segment below the DT block: the cave at `0x804b170`/`0x804b150` sits inside the
+  `DT_*` entries, which the loader reads.
