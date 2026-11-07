@@ -156,3 +156,22 @@ It is recorded open. Not solved, not marked blocked.
 Outcome: systematically attempted, no route to `/etc/vortex_pass/vortex4`.
 Level stays open (not blocked). Every tested route and its result is listed
 above.
+
+## Unreliability notice (2026-11-07)
+
+Several live results recorded earlier in this file do not reproduce:
+
+- the "walk" (a `p = *p` loop) is not in the bytes. `main` ends with
+  `**lpp = &buf; exit(0)` and the `tmp = *lpp; *lpp = tmp` lines are the
+  2013 fix, with no loop;
+- the GOT-slot table: re-measured today, `lpp = 0x0804b200`, `0x804b1f0`,
+  `0x804b1fc` and `0x804b204` with a 136-byte argument all return **rc=2**
+  (not exit 0 / SIGSEGV as earlier noted);
+- `flow.md` and the `flow}` model line in this note are not backed by
+  anything reproducible.
+
+The only facts reproduced consistently today: **132 bytes gives rc=0**,
+**133-140 give rc=139** (a segfault), and no arrangement tried so far
+produces output. `lpp` must be a value in `0x0804xxxx` to pass the check.
+Everything else in this file should be treated as unverified until
+re-measured.
