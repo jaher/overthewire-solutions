@@ -207,3 +207,31 @@ int main(int c, char **v){ static char buf[4096]; FILE *f=fopen(v[1],"rb");
  size_t n=fread(buf,1,sizeof buf-1,f); fclose(f); buf[n]=0;
  char *a[]={"/vortex/vortex3", buf, 0}; execv(a[0],a); return 51; }
 ```
+
+## Exit-reached probe and finalizer test (2026-11-08)
+
+**Exit-reached probe.** A scratch copy with its `exit` GOT slot (`0x804b200`)
+repointed to a stub at `0x804b1d8` (`_exit(7)`) segfaults with
+`SEGV_ACCERR si_addr=0x804b1d8` (strace). The RW page
+`0x804b000..0x804bfff` is mapped `rw-` (not executable, the `masks32` dump of a
+plain 32-bit process shows the same for any ELF written by gcc). So a jump to
+code placed in the writable page faults on execution. The probe could not
+distinguish "exit reached" from "jump to stub" this way; the stub executes and
+is denied.
+
+**Finalizer test.** Patch the file: a `write(1,"FINI\n",5); ret` snippet in
+`.text` at `0x8049210` (unused gap after `_fini`), and point
+`.fini_array[0]` (`0x804b0fc`) at it (slot overwrite only; the
+`FINI_ARRAYSZ` stays 4). Running that copy prints `FINI` once and then
+segfaults. The print comes from the **dynamic loader's** own
+`DT_FINI_ARRAY` processing (glibc runs the fini array of the main object at
+`exit`, not the program). Changing `FINI_ARRAYSZ` to 8 breaks the load with
+`_dl_check_map_versions: Assertion 'needed != NULL' failed`.
+
+Consequence for the exploit: a store into `.fini_array` made by `vortex3`
+itself (any `lpp` in the writable page) happens *after* `main`'s check and
+*before* `exit`, so it cannot register a finalizer for the run that makes it.
+`lpp` must be `0x0804b200` to pass, and a store there is not at
+`.fini_array`. A second run would see the patched slot (the file is
+MAP_SHARED), but that is just another non-setuid vortex3 run with no
+credential, and the same limit applies to it.
