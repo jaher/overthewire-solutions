@@ -49,24 +49,33 @@
    ]
   },
   {
-   "text": "I open vim and write a script. The first chunk sets up the request helper: it posts a username to the page and returns true when the reply says the user exists.",
+   "text": "I open vim and write the script:",
    "lines": [
     {
      "step": 2,
-     "role": "text"
+     "role": "vimcmd"
     },
     {
-     "step": 3,
-     "role": "text"
+     "step": 2,
+     "role": "vim"
     }
    ]
   },
   {
-   "text": "The second chunk adds the loop: for each of the thirty-two character positions, it binary searches the character code, asking the database whether the code at that position is greater than a midpoint, and the exists or does not exist reply gives a single bit.",
+   "text": "The first chunk sets up the request helper: the imports, the page URL, the basic auth header, and the start of exists, which posts a username to the page.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The second chunk adds the loop: it sends the request and returns true when the reply says the user exists, then for each of the thirty-two character positions, it binary searches the character code, asking the database whether the code at that position is greater than a midpoint, and the exists or does not exist reply gives a single bit.",
    "lines": [
     {
      "step": 4,
-     "role": "text"
+     "role": "vim"
     }
    ]
   },
@@ -74,12 +83,21 @@
    "text": "The third chunk finishes the loop: it stops when a position has no character, appends each recovered character, and prints the growing password as it goes.",
    "lines": [
     {
-     "step": 5,
-     "role": "text"
-    },
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Here is the third chunk.",
+   "lines": [
     {
      "step": 6,
      "role": "text"
+    },
+    {
+     "step": 5,
+     "role": "vim"
     }
    ]
   },
@@ -87,11 +105,7 @@
    "text": "I run the script, and it prints the password one character at a time, finishing with the full thirty-two characters.",
    "lines": [
     {
-     "step": 8,
-     "role": "text"
-    },
-    {
-     "step": 8,
+     "step": 6,
      "role": "out",
      "from": 0,
      "to": 32
