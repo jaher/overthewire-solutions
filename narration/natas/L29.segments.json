@@ -1,0 +1,124 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level twenty-nine.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The page lists text files through a file parameter, and the View sourcecode link is disabled. So the source has to be recovered through the bug itself.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I fetch the page and grep for links. Only the three stylesheet links come back \u2014 no source link, no file list.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "I use the bug to read the source itself. I pipe cat of the index.pl file through the file parameter, dodging the filter with a glob, and grep for the interesting lines.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The program takes the file parameter, and if it contains the word natas it prints a mocking message. Otherwise it opens the input with dot txt appended, using the two-argument form of Perl's open.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 4
+    }
+   ]
+  },
+  {
+   "text": "In the two-argument form, if the string begins with a pipe, Perl does not open a file. It opens a pipe to a shell command, and the command's output goes into the response.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "And the filter is just a pattern match on the word natas, while the shell expands wildcards. N question mark tas matches natas after glob expansion but does not contain the word itself, so the check passes.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I prove execution with id. The command runs as natas29.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "Then I list the webroot. It holds the index.pl and the perl underground text files.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 12
+    }
+   ]
+  },
+  {
+   "text": "Finally I cat the password file directly, again with the glob: slash etc slash n question mark tas underscore webpass slash n question mark tas thirty. It prints the password for natas30.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
