@@ -3,12 +3,12 @@
  "level": 6,
  "audio": "narration/behemoth/L6.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 81.55,
+ "duration": 88.9,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 1.99,
+   "end": 1.97,
    "text": "Behemoth, level six.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 1.99,
-   "end": 5.35,
+   "start": 1.97,
+   "end": 5.33,
    "text": "We log in as behemoth six and look at the two binaries.",
    "lines": [
     {
@@ -35,8 +35,8 @@
   },
   {
    "id": 2,
-   "start": 5.35,
-   "end": 12.98,
+   "start": 5.33,
+   "end": 12.36,
    "text": "ls shows behemoth six is setuid to behemoth seven, and the reader is a plain executable owned by behemoth seven.",
    "lines": [
     {
@@ -53,8 +53,8 @@
   },
   {
    "id": 3,
-   "start": 12.98,
-   "end": 22.39,
+   "start": 12.36,
+   "end": 21.31,
    "text": "strings on the reader shows it opens a file called shellcode dot txt, and the messages could not open shellcode dot txt, and write your own shellcode.",
    "lines": [
     {
@@ -71,8 +71,8 @@
   },
   {
    "id": 4,
-   "start": 22.39,
-   "end": 27.19,
+   "start": 21.31,
+   "end": 26.47,
    "text": "The disassembly shows it opens the file and maps it with read, write and execute permission.",
    "lines": [
     {
@@ -95,8 +95,8 @@
   },
   {
    "id": 5,
-   "start": 27.19,
-   "end": 35.9,
+   "start": 26.47,
+   "end": 34.7,
    "text": "It also scans the first four thousand ninety-six bytes and refuses the file if it contains the byte zero x zero b, and then it calls into the mapping.",
    "lines": [
     {
@@ -121,8 +121,8 @@
   },
   {
    "id": 6,
-   "start": 35.9,
-   "end": 37.87,
+   "start": 34.7,
+   "end": 36.67,
    "text": "Then we write the shellcode in vim.",
    "lines": [
     {
@@ -137,8 +137,8 @@
   },
   {
    "id": 7,
-   "start": 37.87,
-   "end": 48.5,
+   "start": 36.67,
+   "end": 47.16,
    "text": "First the header: thirty-two bit mode, the global entry point, and the start label. It must print exactly ten bytes, HelloKitty, the string the program checks our output against.",
    "lines": [
     {
@@ -149,8 +149,8 @@
   },
   {
    "id": 8,
-   "start": 48.5,
-   "end": 53.83,
+   "start": 47.16,
+   "end": 52.44,
    "text": "It pushes the string onto the stack in three pieces, because ten bytes do not fit in one immediate,",
    "lines": [
     {
@@ -161,9 +161,9 @@
   },
   {
    "id": 9,
-   "start": 53.83,
-   "end": 56.88,
-   "text": "sets up a write to file descriptor one, and exits.",
+   "start": 52.44,
+   "end": 64.63,
+   "text": "sets up a write to file descriptor one, and exits. It loads four as the syscall number and triggers the interrupt, then loads one as the exit syscall, clears the exit status, and triggers the interrupt again.",
    "lines": [
     {
      "role": "vim",
@@ -177,8 +177,8 @@
   },
   {
    "id": 10,
-   "start": 56.88,
-   "end": 66.6,
+   "start": 64.63,
+   "end": 74.06,
    "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: forty-one bytes, with no zero x zero b byte in them.",
    "lines": [
     {
@@ -219,8 +219,8 @@
   },
   {
    "id": 11,
-   "start": 66.6,
-   "end": 74.83,
+   "start": 74.06,
+   "end": 82.34,
    "text": "Then we run the exploit: it writes the bytes to shellcode dot txt in a directory we own and runs behemoth six on a raw terminal.",
    "lines": [
     {
@@ -237,8 +237,8 @@
   },
   {
    "id": 12,
-   "start": 74.83,
-   "end": 81.55,
+   "start": 82.34,
+   "end": 88.9,
    "text": "The program answers Correct, we get a shell as behemoth seven, and it prints the password, and the level is solved.",
    "lines": [
     {

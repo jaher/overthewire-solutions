@@ -138,7 +138,7 @@
      "step": 9
     }
    ],
-   "text": "sets up a write to file descriptor one, and exits."
+   "text": "sets up a write to file descriptor one, and exits. It loads four as the syscall number and triggers the interrupt, then loads one as the exit syscall, clears the exit status, and triggers the interrupt again."
   },
   {
    "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: forty-one bytes, with no zero x zero b byte in them.",
