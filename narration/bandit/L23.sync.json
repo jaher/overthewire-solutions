@@ -1,0 +1,140 @@
+{
+ "game": "bandit",
+ "level": 23,
+ "audio": "narration/bandit/L23.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 45.89,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.16,
+   "text": "Bandit, level twenty-three.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.16,
+   "end": 8.23,
+   "text": "A cron job runs every minute as bandit twenty-four, and executes every script dropped in a spool directory.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 8.23,
+   "end": 17.16,
+   "text": "I log in as bandit23 with ssh bandit23@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 17.16,
+   "end": 19.75,
+   "text": "I read the cron definition for bandit twenty-four.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 19.75,
+   "end": 24.19,
+   "text": "It runs the job every minute as bandit twenty-four, and also at reboot.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 24.19,
+   "end": 30.02,
+   "text": "The note says the job runs every script dropped in var spool bandit twenty-four foo, as bandit twenty-four.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 30.02,
+   "end": 35.98,
+   "text": "So I drop in a script that copies bandit twenty-four's password file to temp slash b23out.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 35.98,
+   "end": 37.85,
+   "text": "I make the script executable.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 37.85,
+   "end": 41.81,
+   "text": "Then I wait sixty seconds for the next run, and cat the output file.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 41.81,
+   "end": 45.89,
+   "text": "The password for bandit twenty-four is there, and the level is solved.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

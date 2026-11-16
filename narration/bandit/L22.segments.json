@@ -1,0 +1,106 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level twenty-two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Another cron job copies a password into temp, but this time the file name is computed at runtime, so I cannot just read it from the script.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit22 with ssh bandit22@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I read the cron script.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It takes whoami, which is bandit twenty-three when cron runs it, builds the string I am user bandit twenty-three, hashes it with MD five, and uses the first field as the file name.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 7
+    }
+   ]
+  },
+  {
+   "text": "The note spells out the target: temp slash, the MD five of I am user bandit twenty-three.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "The hash is deterministic, so I reproduce the exact pipeline myself: echo I am user bandit twenty-three, piped to md5sum.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The hash comes back 8ca319486bfbbc3663ea0fbe81326349.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "text": "I cat that file in temp.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It holds the password for bandit twenty-three, and the level is solved.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
