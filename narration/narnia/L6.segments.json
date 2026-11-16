@@ -1,0 +1,335 @@
+{
+ "segments": [
+  {
+   "text": "Narnia, level six.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Two buffers and a function pointer sit side by side, and the pointer starts out aiming at puts.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as narnia six and read the source.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The source copies both arguments with strcpy.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 43,
+     "to": 44
+    }
+   ]
+  },
+  {
+   "text": "A guard rejects the call if the pointer looks like a stack address, so the pointer must aim at libc instead.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 45,
+     "to": 47
+    }
+   ]
+  },
+  {
+   "text": "Finally the source calls the function pointer on the first buffer.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 49,
+     "to": 49
+    }
+   ]
+  },
+  {
+   "text": "Gdb shows the layout.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 10,
+     "to": 12
+    }
+   ]
+  },
+  {
+   "text": "The first buffer sits eight bytes above the second, and the pointer eight bytes above the first.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 10,
+     "to": 12
+    }
+   ]
+  },
+  {
+   "text": "The library list puts libc at a fixed base, since address randomisation is off.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "The symbol table puts system at offset five three c e zero.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "Adding the two gives the system address, which the driver will use.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "Then I write the driver in vim.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vimcmd"
+    },
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The header comment copies the source layout.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Eight bytes overflow the first buffer and reach the function pointer.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The guard rejects stack addresses, so the pointer aims at libc system, whose address is fixed with randomisation off.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The next chunk records how the address was found.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The library list gives the libc base.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The symbol table gives the offset of system, and the base plus the offset gives the system address.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "That address is the target the function pointer will be overwritten with.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Calling the pointer runs system on the first buffer, so the command hides in the buffer itself.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The command is s h semicolon hash A A A A.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The hash comments out the address bytes that follow.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The second buffer must stay short.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It ends exactly where the first begins, so its null terminator would land on the first byte.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "A one byte second argument keeps that null inside the second buffer and leaves the first intact.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The code sets the system address, builds the twelve byte first argument, and prints it.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It prints the system address too, then runs the target with the two arguments.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The driver is saved, and I quit vim.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I run the driver.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It prints the twelve byte first argument and the system address.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "The shell runs as narnia seven, and the password prints.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "out",
+     "from": 2,
+     "to": 3
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
