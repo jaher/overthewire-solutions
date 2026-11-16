@@ -1,0 +1,131 @@
+{
+ "game": "bandit",
+ "level": 32,
+ "audio": "narration/bandit/L32.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 49.08,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.11,
+   "text": "Bandit, level thirty-two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.11,
+   "end": 9.07,
+   "text": "Logging in as bandit thirty-two drops us into a strange restricted shell: it uppercases every command before running it.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 9.07,
+   "end": 18.84,
+   "text": "I log in as bandit32 with ssh bandit32@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 18.84,
+   "end": 25.97,
+   "text": "The note states the trap: the login shell uppercases every command before running it, so ordinary commands become garbage.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 25.97,
+   "end": 34.49,
+   "text": "The trick is to use something uppercasing cannot change: dollar zero has no letters, so it survives, and in a shell it expands to the shell itself.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 34.49,
+   "end": 36.72,
+   "text": "Running it starts a fresh normal shell.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 36.72,
+   "end": 42.29,
+   "text": "From there I run id, which reports uid eleven thousand and thirty-three, bandit thirty-three.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 42.29,
+   "end": 45.12,
+   "text": "Then I cat bandit thirty-three's password file.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 45.12,
+   "end": 49.08,
+   "text": "It prints the password for bandit thirty-three, and the level is solved.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

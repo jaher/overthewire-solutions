@@ -1,0 +1,98 @@
+{
+ "game": "bandit",
+ "level": 33,
+ "audio": "narration/bandit/L33.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 33.53,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 3.24,
+   "text": "Bandit, level thirty-three, the final level.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 3.24,
+   "end": 7.63,
+   "text": "There is no bandit thirty-four account, so this is the end of the game.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 7.63,
+   "end": 17.18,
+   "text": "I log in as bandit33 with ssh bandit33@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 17.18,
+   "end": 19.18,
+   "text": "I read the README in the home directory.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 19.18,
+   "end": 25.85,
+   "text": "It congratulates you on solving the last level, and says there are no more levels to play at this moment, though new levels may come.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 4
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 25.85,
+   "end": 30.12,
+   "text": "It suggests playing the other wargames, and invites ideas for new levels.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 5,
+     "to": 7
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 30.12,
+   "end": 33.53,
+   "text": "There is no further password to find, and the game is done.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 7
+    }
+   ]
+  }
+ ]
+}

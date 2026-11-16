@@ -1,0 +1,72 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level thirty-three, the final level.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "There is no bandit thirty-four account, so this is the end of the game.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit33 with ssh bandit33@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I read the README in the home directory.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It congratulates you on solving the last level, and says there are no more levels to play at this moment, though new levels may come.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 4
+    }
+   ]
+  },
+  {
+   "text": "It suggests playing the other wargames, and invites ideas for new levels.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 5,
+     "to": 7
+    }
+   ]
+  },
+  {
+   "text": "There is no further password to find, and the game is done.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 7
+    }
+   ]
+  }
+ ]
+}
