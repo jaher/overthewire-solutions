@@ -1,0 +1,141 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level twenty-six.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The page lets us draw a line and stores the drawing in a cookie. That cookie is base64 encoded serialized PHP, and the page deserializes it without any restriction. The source also defines a logger class. Its constructor writes an initial message into a log file, and its destructor writes an exit message into the same log file when the object is destroyed at the end of the request. The log file path is a private property that comes from the serialized data.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I fetch the source and pull out the logger class and the unserialize call.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 9
+    }
+   ]
+  },
+  {
+   "text": "A small helper prints the saved cookie jar, showing the session id.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "We start a session first, because the image path includes the session id and we need to know it.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "This is PHP object injection: because the application has a class with a dangerous destructor, we can rebuild that class from the cookie and choose every property.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "So I open vim and write the payload builder:",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vimcmd"
+    },
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The first chunk reads the session id from the cookie jar, sets the PHP code that reads the natas twenty-seven password file, and the image path with the session id, then starts the serialized logger.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The second chunk finishes the serialized logger: the log file path with its mangled private name, an empty initial message, and the exit message with the PHP code, then prints the base64 payload.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I run it, and it prints the base64 payload.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "Then I build the same payload inline, send it as the drawing cookie with the draw parameters, and fetch the image file the destructor wrote. The page deserializes the object, and at the end of the request the destructor writes our code into the image directory. We fetch that file, the server runs it, and it prints the password for natas twenty-seven, and the level is solved. The lesson is never to deserialize untrusted input, especially when classes with useful magic methods exist.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
