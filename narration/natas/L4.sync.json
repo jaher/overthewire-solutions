@@ -1,0 +1,81 @@
+{
+ "game": "natas",
+ "level": 4,
+ "audio": "narration/natas/L4.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 29.47,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.85,
+   "text": "Natas, level four.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.85,
+   "end": 9.0,
+   "text": "The page refuses access, saying we are visiting from an empty referer while authorised users should come only from natas five.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 9.0,
+   "end": 14.23,
+   "text": "I fetch the page and grep for the refusal, and the message names the referer it expects.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 14.23,
+   "end": 23.11,
+   "text": "The referer is just an HTTP header the client supplies, so I fetch the page again, this time adding a referer header claiming we came from the natas five site.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 23.11,
+   "end": 29.47,
+   "text": "The server accepts the header and grants access, printing the password for natas five, and the level is solved.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
