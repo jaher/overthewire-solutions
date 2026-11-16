@@ -465,8 +465,13 @@ function buildVimScript(run, firstStep){
     }
     const nums = keys.map(Number).sort((a, b) => a - b);
     for (const n of nums){
-      if (!(n in buf)) actions.push({t:'type', n, text: snap[n], s: firstStep + i});
-      else if (buf[n] !== snap[n]) actions.push({t:'edit', n, text: snap[n], s: firstStep + i});
+      // A very long line is pasted, not typed: nobody types a 2947-char
+      // ciphertext char by char, and typing it would take a minute while
+      // the narration runs on. Code lines are short (<= ~82 chars); data
+      // lines are the only ones past this threshold.
+      const kind = snap[n].length > 200 ? 'paste' : 'type';
+      if (!(n in buf)) actions.push({t: kind, n, text: snap[n], s: firstStep + i});
+      else if (buf[n] !== snap[n]) actions.push({t: kind === 'paste' ? 'paste' : 'edit', n, text: snap[n], s: firstStep + i});
       buf[n] = snap[n];
     }
     i++;
@@ -560,6 +565,18 @@ async function playVimSession(user, file, run, my, firstStep){
       for (const k of Object.keys(buf)) delete buf[k];
       topLine = 1; curLine = 1; curCol = 1; dirty = false;
       modeEl.textContent = '';
+      render();
+      await delay(300 * speed());
+    } else if (a.t === 'paste'){
+      // A pasted line: data, not typed code (a 2947-char ciphertext is
+      // pasted, never typed char by char). It appears at once, so the
+      // narration stays aligned with the screen instead of falling a
+      // minute behind the editor.
+      buf[a.n] = a.text;
+      curLine = a.n; curCol = a.text.length + 1;
+      dirty = true;
+      ensureVisible();
+      modeEl.textContent = '-- INSERT --';
       render();
       await delay(300 * speed());
     } else if (a.t === 'type'){
