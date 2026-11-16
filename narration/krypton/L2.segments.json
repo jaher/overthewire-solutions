@@ -46,8 +46,7 @@
     {
      "step": 1,
      "role": "out",
-     "from": 0,
-     "to": 0
+     "from": 0
     }
    ]
   },
@@ -79,21 +78,19 @@
     {
      "step": 4,
      "role": "vim"
+    },
+    {
+     "step": 5,
+     "role": "vim"
     }
    ]
   },
   {
-   "text": "I check it with cat minus n, and it holds the full alphabet.",
+   "text": "then the second half, completing the alphabet.",
    "lines": [
     {
-     "step": 7,
-     "role": "cmd"
-    },
-    {
-     "step": 7,
-     "role": "out",
-     "from": 0,
-     "to": 0
+     "step": 6,
+     "role": "vim"
     }
    ]
   },
@@ -101,7 +98,7 @@
    "text": "Then I run the encrypt program on it and read the ciphertext file,",
    "lines": [
     {
-     "step": 8,
+     "step": 7,
      "role": "cmd"
     }
    ]
@@ -110,10 +107,9 @@
    "text": "and the output is MNOPQRSTUVWXYZABCDEFGHIJKL: A maps to M, a shift of twelve, not the thirteen you might assume.",
    "lines": [
     {
-     "step": 8,
+     "step": 7,
      "role": "out",
-     "from": 0,
-     "to": 0
+     "from": 0
     }
    ]
   },
@@ -121,7 +117,7 @@
    "text": "Encryption added twelve, so I shift the target back by twelve with tr.",
    "lines": [
     {
-     "step": 9,
+     "step": 8,
      "role": "cmd"
     }
    ]
@@ -130,10 +126,9 @@
    "text": "The target decrypts to CAESAR IS EASY, the password for krypton three.",
    "lines": [
     {
-     "step": 9,
+     "step": 8,
      "role": "out",
-     "from": 0,
-     "to": 0
+     "from": 0
     },
     {
      "step": -1,

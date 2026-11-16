@@ -3,12 +3,12 @@
  "level": 2,
  "audio": "narration/krypton/L2.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 99.94,
+ "duration": 120.24,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 1.87,
+   "end": 1.97,
    "text": "Krypton, level two.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 1.87,
-   "end": 8.4,
+   "start": 1.97,
+   "end": 8.69,
    "text": "This time the cipher is a Caesar cipher, a fixed shift, but we do not know the shift, and the key file is unreadable.",
    "lines": [
     {
@@ -31,8 +31,8 @@
   },
   {
    "id": 2,
-   "start": 8.4,
-   "end": 14.71,
+   "start": 8.69,
+   "end": 14.98,
    "text": "There is an encrypt program that reads the key file and encrypts any file we hand it, so we can use it as an oracle.",
    "lines": [
     {
@@ -43,8 +43,8 @@
   },
   {
    "id": 3,
-   "start": 14.71,
-   "end": 16.75,
+   "start": 14.98,
+   "end": 16.9,
    "text": "I log in as krypton two,",
    "lines": [
     {
@@ -55,8 +55,8 @@
   },
   {
    "id": 4,
-   "start": 16.75,
-   "end": 23.52,
+   "start": 16.9,
+   "end": 24.74,
    "text": "and read the target: OMQEMDUEQMEK, twelve letters, no spaces.",
    "lines": [
     {
@@ -66,15 +66,14 @@
     {
      "step": 1,
      "role": "out",
-     "from": 0,
-     "to": 0
+     "from": 0
     }
    ]
   },
   {
    "id": 5,
-   "start": 23.52,
-   "end": 26.81,
+   "start": 24.74,
+   "end": 27.82,
    "text": "First I make a working directory in temp and move into it,",
    "lines": [
     {
@@ -85,8 +84,8 @@
   },
   {
    "id": 6,
-   "start": 26.81,
-   "end": 32.14,
+   "start": 27.82,
+   "end": 33.34,
    "text": "then I link the key file into it and open the directory up, so the encrypt program can reach the key.",
    "lines": [
     {
@@ -97,8 +96,8 @@
   },
   {
    "id": 7,
-   "start": 32.14,
-   "end": 37.49,
+   "start": 33.34,
+   "end": 38.69,
    "text": "I open vim and write the whole alphabet into p dot txt, as a chosen plaintext:",
    "lines": [
     {
@@ -108,76 +107,72 @@
     {
      "step": 4,
      "role": "vim"
+    },
+    {
+     "step": 5,
+     "role": "vim"
     }
    ]
   },
   {
    "id": 8,
-   "start": 37.49,
-   "end": 41.04,
-   "text": "I check it with cat minus n, and it holds the full alphabet.",
+   "start": 38.69,
+   "end": 41.21,
+   "text": "then the second half, completing the alphabet.",
    "lines": [
     {
-     "step": 7,
-     "role": "cmd"
-    },
-    {
-     "step": 7,
-     "role": "out",
-     "from": 0,
-     "to": 0
+     "step": 6,
+     "role": "vim"
     }
    ]
   },
   {
    "id": 9,
-   "start": 41.04,
-   "end": 44.76,
+   "start": 41.21,
+   "end": 65.74,
    "text": "Then I run the encrypt program on it and read the ciphertext file,",
    "lines": [
     {
-     "step": 8,
+     "step": 7,
      "role": "cmd"
     }
    ]
   },
   {
    "id": 10,
-   "start": 44.76,
-   "end": 86.83,
+   "start": 65.74,
+   "end": 107.81,
    "text": "and the output is MNOPQRSTUVWXYZABCDEFGHIJKL: A maps to M, a shift of twelve, not the thirteen you might assume.",
    "lines": [
     {
-     "step": 8,
+     "step": 7,
      "role": "out",
-     "from": 0,
-     "to": 0
+     "from": 0
     }
    ]
   },
   {
    "id": 11,
-   "start": 86.83,
-   "end": 91.44,
+   "start": 107.81,
+   "end": 111.96,
    "text": "Encryption added twelve, so I shift the target back by twelve with tr.",
    "lines": [
     {
-     "step": 9,
+     "step": 8,
      "role": "cmd"
     }
    ]
   },
   {
    "id": 12,
-   "start": 91.44,
-   "end": 95.93,
+   "start": 111.96,
+   "end": 116.23,
    "text": "The target decrypts to CAESAR IS EASY, the password for krypton three.",
    "lines": [
     {
-     "step": 9,
+     "step": 8,
      "role": "out",
-     "from": 0,
-     "to": 0
+     "from": 0
     },
     {
      "step": -1,
@@ -187,8 +182,8 @@
   },
   {
    "id": 13,
-   "start": 95.93,
-   "end": 99.94,
+   "start": 116.23,
+   "end": 120.24,
    "text": "One chosen plaintext, one encryption, and the key is exposed.",
    "lines": [
     {
