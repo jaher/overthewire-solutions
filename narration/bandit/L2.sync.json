@@ -1,0 +1,90 @@
+{
+ "game": "bandit",
+ "level": 2,
+ "audio": "narration/bandit/L2.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 31.78,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.87,
+   "text": "Bandit, level two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.87,
+   "end": 7.39,
+   "text": "The password for bandit three is in a file whose name contains spaces, and begins with two dashes.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 7.39,
+   "end": 16.34,
+   "text": "I log in as bandit2 with ssh bandit2@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 16.34,
+   "end": 21.62,
+   "text": "The shell would split an unquoted name on the spaces, and the leading dashes would look like options.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 21.62,
+   "end": 27.82,
+   "text": "I run cat with the whole name quoted, and prefixed with dot slash so it is clearly a path, not an option.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 27.82,
+   "end": 31.78,
+   "text": "The file prints the password for bandit three, and the level is solved.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
