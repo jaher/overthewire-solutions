@@ -1,0 +1,409 @@
+{
+ "game": "krypton",
+ "level": 4,
+ "audio": "narration/krypton/L4.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 138.36,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.8,
+   "text": "Krypton, level four.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.8,
+   "end": 5.45,
+   "text": "Now the cipher is a Vigenere cipher with a key length of six.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 5.45,
+   "end": 14.74,
+   "text": "In a Vigenere cipher each letter is shifted by a different key letter, cycling every six characters, so the text splits into six interleaved Caesar ciphers.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 14.74,
+   "end": 16.61,
+   "text": "I log in as krypton four,",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 16.61,
+   "end": 18.0,
+   "text": "and read the README.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 18.0,
+   "end": 32.52,
+   "text": "It works an example with the key GOLD: PROCEED MEETING AS AGREED encrypts to VFZFK SOPKS ELTUL VGUCH KR, adding letters modulo twenty-six.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 15,
+     "to": 16
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 30
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 32.52,
+   "end": 35.11,
+   "text": "And it gives us the key length: six.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 36,
+     "to": 37
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 35.11,
+   "end": 41.4,
+   "text": "I need the two intercepted messages as local files, so I open vim and write the first ciphertext into a file,",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vimcmd"
+    },
+    {
+     "step": 2,
+     "role": "vim"
+    },
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 41.4,
+   "end": 43.99,
+   "text": "one long line of five-letter groups.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 43.99,
+   "end": 46.94,
+   "text": "The file is seventeen hundred and forty-one bytes.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 46.94,
+   "end": 53.11,
+   "text": "The second message gets the same treatment: I open vim and write its ciphertext into a second file,",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vimcmd"
+    },
+    {
+     "step": 5,
+     "role": "vim"
+    },
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 53.11,
+   "end": 55.56,
+   "text": "another long line of five-letter groups.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 55.56,
+   "end": 58.87,
+   "text": "The second file is twenty-nine hundred and forty-four bytes.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 58.87,
+   "end": 65.16,
+   "text": "Then I read the target: HCIKV RJOX, nine letters in two groups.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 65.16,
+   "end": 68.81,
+   "text": "Now I write the solver. I open vim and type it in:",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vimcmd"
+    },
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "start": 68.81,
+   "end": 73.25,
+   "text": "The imports: re for the letter filter, and Counter for the tallies.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "start": 73.25,
+   "end": 83.21,
+   "text": "The header comment states the plan: with a six-letter key the text splits into six columns, and the most frequent letter of each column is E, which fixes the key letter.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 17,
+   "start": 83.21,
+   "end": 86.86,
+   "text": "Then the English letter frequency table the scoring measures against.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "start": 86.86,
+   "end": 90.46,
+   "text": "First it strips each file down to just its capital letters,",
+   "lines": [
+    {
+     "step": 13,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 19,
+   "start": 90.46,
+   "end": 98.57,
+   "text": "then, for each of the six key positions, it tries all twenty-six shifts and keeps the one whose decrypted column best matches English letter frequencies.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 20,
+   "start": 98.57,
+   "end": 103.01,
+   "text": "Decoding just subtracts the key letter at each position, cycling every six.",
+   "lines": [
+    {
+     "step": 15,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 21,
+   "start": 103.01,
+   "end": 107.93,
+   "text": "The main part reads both files and recovers the six key letters from the first file's columns.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 22,
+   "start": 107.93,
+   "end": 113.38,
+   "text": "Then it prints the key, the first forty letters of each decoded message, and the decoded target.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 23,
+   "start": 113.38,
+   "end": 114.29,
+   "text": "I run it.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 24,
+   "start": 114.29,
+   "end": 115.9,
+   "text": "The key is FREKEY.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 25,
+   "start": 115.9,
+   "end": 123.74,
+   "text": "The first message decodes to the start of an English sentence: THE SOLDIER WITH THE GREEN WHISKERS LED THEM, cut off at forty letters,",
+   "lines": [
+    {
+     "step": 18,
+     "role": "out",
+     "from": 1
+    }
+   ]
+  },
+  {
+   "id": 26,
+   "start": 123.74,
+   "end": 129.07,
+   "text": "and the second to THEY WERE OBLIGED TO CAMP OUT THAT NIGHT UNDER AL, also cut off at forty letters.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "out",
+     "from": 2
+    }
+   ]
+  },
+  {
+   "id": 27,
+   "start": 129.07,
+   "end": 133.39,
+   "text": "The target decodes straight to CLEARTEXT, the password for krypton five.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "out",
+     "from": 3
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "id": 28,
+   "start": 133.39,
+   "end": 138.36,
+   "text": "Both messages read as English under the same key, which is the confirmation the key is right.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
