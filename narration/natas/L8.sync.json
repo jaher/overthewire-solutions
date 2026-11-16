@@ -3,12 +3,12 @@
  "level": 8,
  "audio": "narration/natas/L8.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 50.88,
+ "duration": 49.49,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 1.8,
+   "end": 2.33,
    "text": "Natas, level eight.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 1.8,
-   "end": 10.92,
+   "start": 2.33,
+   "end": 11.45,
    "text": "The form asks for a secret, and the source shows the check: the submitted value is passed through a function called encode secret and compared against a fixed hex string.",
    "lines": [
     {
@@ -31,8 +31,8 @@
   },
   {
    "id": 2,
-   "start": 10.92,
-   "end": 15.17,
+   "start": 11.45,
+   "end": 15.6,
    "text": "I fetch the source and pull out the encoded secret, a long hex string.",
    "lines": [
     {
@@ -49,8 +49,8 @@
   },
   {
    "id": 3,
-   "start": 15.17,
-   "end": 29.93,
+   "start": 15.6,
+   "end": 31.44,
    "text": "The encoder does three things: base64 encode, reverse the string, and hex encode, so I open vim and write a one-liner that undoes them in reverse order: hex decode first, then reverse the characters, then base64 decode.",
    "lines": [
     {
@@ -69,26 +69,8 @@
   },
   {
    "id": 4,
-   "start": 29.93,
-   "end": 33.05,
-   "text": "I check the file with cat, and it shows the one-liner.",
-   "lines": [
-    {
-     "step": 4,
-     "role": "cmd"
-    },
-    {
-     "step": 4,
-     "role": "out",
-     "from": 0,
-     "to": 0
-    }
-   ]
-  },
-  {
-   "id": 5,
-   "start": 33.05,
-   "end": 36.36,
+   "start": 31.44,
+   "end": 34.85,
    "text": "I run it with python three, and it prints the original secret.",
    "lines": [
     {
@@ -104,9 +86,9 @@
    ]
   },
   {
-   "id": 6,
-   "start": 36.36,
-   "end": 50.88,
+   "id": 5,
+   "start": 34.85,
+   "end": 49.49,
    "text": "I submit that secret through the form, the comparison passes, and the page prints the password for natas nine, and the level is solved. This level teaches the difference between obfuscation and hashing: reversible transformations protect nothing.",
    "lines": [
     {

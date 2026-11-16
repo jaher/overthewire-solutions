@@ -1,0 +1,97 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level eleven.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The site stores your background colour in a cookie, base64 encoded and XOR encrypted with a secret key.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I fetch the page headers and pull out the cookie, a base64 blob named data.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the script. The first chunk imports the helpers, pastes in the cookie, decodes it, and XORs it with the known default plaintext, a JSON object with show password set to no and a white background, which recovers the repeating key, only four bytes long.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "text"
+    },
+    {
+     "step": 2,
+     "role": "text"
+    }
+   ]
+  },
+  {
+   "text": "The second chunk prints the recovered key, builds a new JSON object with show password set to yes, encrypts it with the recovered key, and base64 encodes it into the forged cookie.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "text"
+    },
+    {
+     "step": 4,
+     "role": "text"
+    }
+   ]
+  },
+  {
+   "text": "I run it, and it prints the recovered key and the forged cookie.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "I send the forged cookie back, and the server decrypts it, sees the flag set, and prints the password for natas twelve, and the level is solved.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

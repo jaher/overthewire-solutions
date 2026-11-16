@@ -51,21 +51,6 @@
    ]
   },
   {
-   "text": "I check the file with cat, and it shows the one-liner.",
-   "lines": [
-    {
-     "step": 4,
-     "role": "cmd"
-    },
-    {
-     "step": 4,
-     "role": "out",
-     "from": 0,
-     "to": 0
-    }
-   ]
-  },
-  {
    "text": "I run it with python three, and it prints the original secret.",
    "lines": [
     {
