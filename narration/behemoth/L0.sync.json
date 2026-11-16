@@ -1,0 +1,157 @@
+{
+ "game": "behemoth",
+ "level": 0,
+ "audio": "narration/behemoth/L0.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 59.66,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.87,
+   "text": "Behemoth, level zero.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.87,
+   "end": 7.75,
+   "text": "This is a setuid binary exploitation game, and the first level is a warm-up about reading a binary.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 7.75,
+   "end": 17.88,
+   "text": "We log in as behemoth zero, whose password is simply the account name, and look at the binary with file: it is a setuid, thirty-two bit Intel executable, not stripped.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 17.88,
+   "end": 26.52,
+   "text": "We run strings on it and see the program text, the symbol memfrob, and two short blobs that look like garbage, OK^G and SYBE.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 12,
+     "to": 12
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 19,
+     "to": 20
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 26.52,
+   "end": 34.32,
+   "text": "memfrob is a glibc function that XORs every byte with forty-two, so those blobs are the password with each byte flipped.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 12,
+     "to": 12
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 19,
+     "to": 20
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 34.32,
+   "end": 41.21,
+   "text": "XORing those two blobs with forty-two gives eatm and ysho, the start of the password, eatmyshorts.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 19,
+     "to": 20
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 41.21,
+   "end": 51.1,
+   "text": "We feed it to the binary; because the shell it spawns reads from the same input, we send the password first and then the commands after a short pause, so the scanf does not eat them.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 51.1,
+   "end": 55.34,
+   "text": "The program prints access granted and gives us a shell as behemoth one.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 55.34,
+   "end": 59.66,
+   "text": "The binary prints the password for behemoth one, and the level is solved.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 2,
+     "to": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

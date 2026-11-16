@@ -1,0 +1,125 @@
+{
+ "segments": [
+  {
+   "text": "Behemoth, level zero.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "This is a setuid binary exploitation game, and the first level is a warm-up about reading a binary.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "We log in as behemoth zero, whose password is simply the account name, and look at the binary with file: it is a setuid, thirty-two bit Intel executable, not stripped.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "We run strings on it and see the program text, the symbol memfrob, and two short blobs that look like garbage, OK^G and SYBE.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 12,
+     "to": 12
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 19,
+     "to": 20
+    }
+   ]
+  },
+  {
+   "text": "memfrob is a glibc function that XORs every byte with forty-two, so those blobs are the password with each byte flipped.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 12,
+     "to": 12
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 19,
+     "to": 20
+    }
+   ]
+  },
+  {
+   "text": "XORing those two blobs with forty-two gives eatm and ysho, the start of the password, eatmyshorts.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 19,
+     "to": 20
+    }
+   ]
+  },
+  {
+   "text": "We feed it to the binary; because the shell it spawns reads from the same input, we send the password first and then the commands after a short pause, so the scanf does not eat them.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The program prints access granted and gives us a shell as behemoth one.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "The binary prints the password for behemoth one, and the level is solved.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 2,
+     "to": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
