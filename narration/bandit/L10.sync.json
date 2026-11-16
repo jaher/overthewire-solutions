@@ -1,0 +1,78 @@
+{
+ "game": "bandit",
+ "level": 10,
+ "audio": "narration/bandit/L10.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 32.42,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.85,
+   "text": "Bandit, level ten.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.85,
+   "end": 7.73,
+   "text": "The data file holds base64 encoded text, and decoding it gives the password for bandit eleven.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 7.73,
+   "end": 16.06,
+   "text": "I log in as bandit10 with ssh bandit10@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 16.06,
+   "end": 25.9,
+   "text": "Base64 is a reversible encoding into a safe ASCII alphabet, not encryption, so I run base64 minus d on data dot txt.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 25.9,
+   "end": 32.42,
+   "text": "The decoded output reads, the password is, followed by the password for bandit eleven, and the level is solved.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
