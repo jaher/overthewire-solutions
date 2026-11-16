@@ -56,7 +56,7 @@
    ]
   },
   {
-   "text": "The first chunk sets up the imports, the basic auth header, the two site URLs, and the form data: submit one, admin one, and the colour settings.",
+   "text": "The first chunk sets up the imports, the basic auth header, the two site URLs, and the form data: submit one, admin one, and the colour settings. The form data also sets the background colour to white, the alignment to left, and the font size to one hundred percent.",
    "lines": [
     {
      "step": 2,
@@ -65,7 +65,7 @@
    ]
   },
   {
-   "text": "The second chunk posts that data to the experimenter, pulls the session identifier out of the reply cookies, prints it, and requests the main site with the same identifier.",
+   "text": "The second chunk posts that data to the experimenter with a ten second timeout, then loops over the set cookie headers, splits the session id out on the semicolon, and prints it. Then it requests the main site with the same identifier and a ten second timeout, reading the reply as text.",
    "lines": [
     {
      "step": 3,
@@ -77,19 +77,6 @@
    "text": "The last chunk finds the credentials block and prints whether we are an admin and the block itself.",
    "lines": [
     {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "text": "Here is the last chunk.",
-   "lines": [
-    {
-     "step": 5,
-     "role": "text"
-    },
-    {
      "step": 4,
      "role": "vim"
     }
@@ -98,6 +85,10 @@
   {
    "text": "I run it, and the main site sees admin equals one and prints the password for natas twenty-two, and the level is solved. The lesson is that sharing sessions between applications is dangerous when one of them lets clients write arbitrary session keys.",
    "lines": [
+    {
+     "step": 5,
+     "role": "text"
+    },
     {
      "step": 5,
      "role": "out",
