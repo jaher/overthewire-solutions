@@ -1,4 +1,32 @@
 
+## Level 7 → vortex8 (SOLVED 2026-11-16)
+- **Password for vortex8:** `X2cOOCYnT`, printed by the exploit shellcode from `/etc/vortex_pass/vortex8` and verified by logging in as vortex8 (`uid=5008`, `cat /etc/vortex_pass/vortex8` matches). Recording: `recordings/vortex/L7.cast`.
+- **The program (reconstructed from objdump, no published source — the level page says "Generic Binary Exploitation"):** `/vortex/vortex7`, mode 4750, setuid vortex8, 14956 bytes, md5 `c4f614fe053e5e2f3d4c34e0d34fd878`, not stripped:
+  ```c
+  int main(int argc, char **argv) {
+      unsigned crc = crc32(0, argv[1], strlen(argv[1]));
+      if (crc == 0xe1ca95ee)
+          strcpy(buf, argv[1]);   /* buf = ebp-0x46: 70 bytes to the saved regs */
+      else
+          printf("0x%08x\n", crc);
+  }
+  ```
+  The gate: `crc32(0, argv[1], strlen(argv[1]))` must equal **`0xe1ca95ee`** — and CRC32 is a linear function over GF(2) on the message, so any payload can be patched to any target CRC by solving a 32-variable linear system over 4 free bytes.
+- **The epilogue (measured in objdump, the key to the ret placement):** main ends
+  `lea -0x8(%ebp),%esp; pop %ecx; pop %ebx; pop %ebp; lea -0x4(%ecx),%esp; ret`
+  — the final `ret` does NOT pop the address after the saved registers; it pops it from **`ecx-4`**, where `ecx` is loaded from payload bytes 62..65. So the control flow is: bytes 62..65 → ecx; `esp = ecx-4`; `ret` pops bytes at ecx-4 as the return address. With ecx = buf+78, the ret address is read from bytes 74..77 and execution lands at the address stored there.
+- **The exploit chain:** 350-byte argv[1]:
+  1. `crc32(0, payload)` == 0xe1ca95ee — achieved by appending a 4-byte CRC patch solved over GF(2) (`crcpatch.py`): the CRC of base+patch is linear in the 32 bits of the patch, so build the 32 deltas (one per bit), row-reduce to a basis, and solve for the selection vector. No guessing, deterministic.
+  2. `strcpy` copies all 350 bytes into buf@ebp-0x46 — bytes 62..65 set ecx = buf+78; bytes 74..77 hold ret = buf+160 (mid-sled).
+  3. `ret` lands in a 187-byte NOP sled leading into an 81-byte shellcode on the RWE stack (`GNU_STACK RWE`, ASLR off).
+  4. The shellcode does **`setreuid(5008,5008)`** first (`xor ebx,ebx; mov bh,0x13; mov bl,0x90` = 5008 without NUL bytes — the literal would end the strcpy), then open/read/write `/etc/vortex_pass/vortex8` to stdout and exit(0).
+- **The gotchas (each measured live):**
+  - The buffer address shifts with argv length and the ssh session's environment: 0xffffda22 in the probe sessions, 0xffffd212 in the recorded one. It must be measured under gdb in the *same* session shape (`break *0x804920e` at the crc compare, `p/x $ebp-0x46` with a 350-char dummy) — a 187-byte NOP sled absorbs the remainder.
+  - The vortex8 arg to setuid() is 5008 = 0x1390 — little-endian `90 13 00 00` contains NUL bytes, which terminate strcpy. Built the value with register arithmetic instead (two `mov bh/bl` halfwords).
+  - A ret2libc `system("/bin/sh")` chain spawns a shell whose `id` shows only `uid=5007` — the dynamic loader drops the effective uid for the non-setuid child; the shell then reads the pass file as vortex7 and fails. `setreuid` inside the payload's own shellcode fixes this at the source.
+- **Files:** `tools/vx/l7/crcpatch.py` (GF(2) linear CRC patch solver), `tools/vx/l7/ex7.py` (payload builder), `tools/vx/l7/drv.c` (raw-bytes argv driver: fread a file into a NUL-free buffer, execv `/vortex/vortex7` with it as argv[1]).
+- **Recording:** `recordings/vortex/L7.cast` — local shell, ssh vortex7, unique workdir `/tmp/l7rec-10314`, the binary's md5/PLT/GNU_STACK disassembly (`RWE` stack confirmed), the live CRC gate shown (`/vortex/vortex7 test` → `0xf93ba110`), `crcpatch.py` typed in vim from an empty buffer and self-checked (`crc7(full): 0xe1ca95ee target: 0xe1ca95ee`), the buffer address measured with gdb in the same session (`$1 = 0xffffd212`), `ex7.py` and `drv.c` typed in vim from empty buffers, `drv7` compiled, the payload built (`buf=0xffffd212 sc=81 sled=187 len=350`), `./drv7 pay7.bin` printing `X2cOOCYnT` (RC=0), then login as vortex8 from the local shell (`uid=5008(vortex8)`, password file read).
+
 ## Level 6 → vortex7 (SOLVED 2026-11-16)
 - **Password for vortex7:** `kZ90cmNy9`, read from `/etc/vortex_pass/vortex7` in the shell the restart() execs and verified by logging in as vortex7 (`uid=5007`, `cat /etc/vortex_pass/vortex7` matches). Recording: `recordings/vortex/L6.cast`.
 - **The program (reconstructed from objdump, no published source — the level page says "Generic Binary Exploitation"):** `/vortex/vortex6`, mode 4750, setuid vortex7, 14984 bytes, md5 `db0119220e93bde3024e6f5d1bf185f0`. The binary is not stripped:
