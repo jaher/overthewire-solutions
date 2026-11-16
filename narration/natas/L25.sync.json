@@ -1,0 +1,121 @@
+{
+ "game": "natas",
+ "level": 25,
+ "audio": "narration/natas/L25.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 81.22,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.4,
+   "text": "Natas, level twenty-five.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.4,
+   "end": 17.35,
+   "text": "The page loads a language file from the language directory, using the lang parameter. The include helper tries to block directory traversal by searching for dot dot slash and removing it with a string replace, and it also blocks any path containing the password directory name.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 17.35,
+   "end": 20.04,
+   "text": "I fetch the source and pull out the include helper.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 20.04,
+   "end": 54.07,
+   "text": "But there are two flaws, and they chain together. First, whenever a traversal is detected, the page writes a log entry. That entry contains our user agent header, written verbatim, into a log file inside the web root whose name contains our session id. So we can write PHP code into a file that the server will later execute. Second, the removal of dot dot slash is a single pass. If we send four dots followed by two slashes, the replace finds the dot dot slash starting at the second dot and removes it, which leaves dot dot slash behind. The traversal survives.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 54.07,
+   "end": 57.26,
+   "text": "So we start a session and read its id from the cookie jar.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 57.26,
+   "end": 63.94,
+   "text": "We send a request with a deliberate traversal in lang and PHP code in the user agent, which writes our code into the log.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 63.94,
+   "end": 81.22,
+   "text": "Then we include that log using the four dots two slashes form, and the PHP inside it runs and prints the password for natas twenty-six. The lesson is that string filters that run once can be defeated by overlapping patterns, and that logging attacker input into an executable location is dangerous.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
