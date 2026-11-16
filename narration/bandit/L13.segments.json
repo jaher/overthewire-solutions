@@ -1,0 +1,83 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level thirteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The home directory holds no password file this time: it holds a private SSH key, the credential for bandit fourteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit13 with ssh bandit13@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I list the directory: a HINT file, and sshkey dot private.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "I cat the key, and the whole private key prints, from BEGIN OPENSSH PRIVATE KEY to END.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 37
+    }
+   ]
+  },
+  {
+   "text": "The note explains the catch: the lab blocks the localhost ssh hop, so use this key from the client to log in as bandit fourteen.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "That key is the credential for bandit fourteen, and the level is solved.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "note"
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

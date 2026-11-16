@@ -1,0 +1,94 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level twelve.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The data file is a hexdump of a file compressed again and again, each layer in a different format.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit12 with ssh bandit12@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The home directory is not writable, so I make a scratch directory in temp, move into it, and reverse the hexdump with xxd minus r into data dot bin.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The plan is to peel one layer at a time, asking file what each layer is: gzip first, then bzip2, then tar.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "The loop runs up to eight rounds.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Each round it checks the current file with file minus b, decompresses with gzip minus d c, bzip2 minus d c, or tar minus x O f as appropriate, and moves the result back to data dot bin; anything else breaks the loop.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I cat data dot bin.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It prints the password for bandit thirteen, and the level is solved.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

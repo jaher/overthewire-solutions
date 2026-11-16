@@ -1,0 +1,126 @@
+{
+ "game": "bandit",
+ "level": 12,
+ "audio": "narration/bandit/L12.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 57.19,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.87,
+   "text": "Bandit, level twelve.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.87,
+   "end": 7.7,
+   "text": "The data file is a hexdump of a file compressed again and again, each layer in a different format.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 7.7,
+   "end": 17.02,
+   "text": "I log in as bandit12 with ssh bandit12@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 17.02,
+   "end": 26.18,
+   "text": "The home directory is not writable, so I make a scratch directory in temp, move into it, and reverse the hexdump with xxd minus r into data dot bin.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 26.18,
+   "end": 34.42,
+   "text": "The plan is to peel one layer at a time, asking file what each layer is: gzip first, then bzip2, then tar.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 34.42,
+   "end": 36.26,
+   "text": "The loop runs up to eight rounds.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 36.26,
+   "end": 51.19,
+   "text": "Each round it checks the current file with file minus b, decompresses with gzip minus d c, bzip2 minus d c, or tar minus x O f as appropriate, and moves the result back to data dot bin; anything else breaks the loop.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 51.19,
+   "end": 53.23,
+   "text": "I cat data dot bin.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 53.23,
+   "end": 57.19,
+   "text": "It prints the password for bandit thirteen, and the level is solved.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
