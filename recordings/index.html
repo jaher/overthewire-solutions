@@ -160,6 +160,7 @@ const LEVELS = [
   ["Vortex",3,"lpp=0x08049052 (exit@plt's own GOT immediate) -> **lpp=&buf overwrites exit's GOT slot; final exit(0) jumps to buf; shellcode on the RWE stack"],
   ["Vortex",4,"printf(argv[3]) with argc==1 and empty argv[0]: format = envp[1]; varargs reach the format string's own bytes; two embedded GOT addresses as varargs; %hn x2 -> exit's GOT = shellcode address on RWE stack"],
   ["Vortex",5,"MD5 preimage crack: the level hashes getpass() input and compares to a fixed digest; brute force finds rlTf6; the spawned shell runs as vortex6"],
+  ["Vortex",6,"reconstructed binary: restart(argv[0]) re-execs argv[0] with setreuid(v7,v7) before execlp; execve with argv[0]=/bin/sh gives a shell as vortex7"],
 ];
 
 const rows = document.getElementById('rows');

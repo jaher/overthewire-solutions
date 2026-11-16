@@ -1,4 +1,23 @@
 
+## Level 6 → vortex7 (SOLVED 2026-11-16)
+- **Password for vortex7:** `kZ90cmNy9`, read from `/etc/vortex_pass/vortex7` in the shell the restart() execs and verified by logging in as vortex7 (`uid=5007`, `cat /etc/vortex_pass/vortex7` matches). Recording: `recordings/vortex/L6.cast`.
+- **The program (reconstructed from objdump, no published source — the level page says "Generic Binary Exploitation"):** `/vortex/vortex6`, mode 4750, setuid vortex7, 14984 bytes, md5 `db0119220e93bde3024e6f5d1bf185f0`. The binary is not stripped:
+  ```c
+  void restart(char *arg) {
+      setreuid(geteuid(), geteuid());   /* real uid = euid = vortex7 */
+      execlp(arg, arg, 0);              /* re-exec arg */
+  }
+  int main(int argc, char **argv) {
+      if (argv[0] != NULL) restart(argv[0]);   /* argv[0], not argv[1]! */
+      printf(argv[3]);                          /* a format-string bug */
+      _exit(0x7325);
+  }
+  ```
+- **Measured live:** running `/vortex/vortex6` with no argument HANGS — `argv[0]` is the binary path (non-NULL), so `restart(argv[0])` re-execs the binary itself, whose `argv[0]` is the same path again: an infinite exec loop (the ssh channel blocks even under `timeout 3`; a detached `nohup` run produces a 0-byte output file). `GNU_STACK` is **RW** (not RWE like vortex4/5), so the format-string hole (`printf(argv[3])`, reachable with an argv[0]-NULL exec) cannot run shellcode on the stack.
+- **The exploit — argv[0] is the program restart() re-execs:** `restart` calls `execlp(arg, arg, 0)` where `arg` is `argv[0]` of the current process. The setuid binary elevates to euid=vortex7 and `setreuid(geteuid(), geteuid())` pins the real uid to vortex7 before exec'ing whatever `argv[0]` names. So `execve("/vortex/vortex6", ["/bin/sh"], env)`: main sees `argv[0] = "/bin/sh"` ≠ NULL → `restart("/bin/sh")` → `setreuid(v7, v7)` → `execlp("/bin/sh", "/bin/sh", 0)` → a shell with real uid vortex7.
+- **Gotcha (measured):** a *copy* of the binary does NOT work — `cp` drops the setuid bit and the shell runs as vortex6; the original `/vortex/vortex6` path is required.
+- **Recording:** `recordings/vortex/L6.cast` — local shell, ssh vortex6, the hang shown via a detached run (0-byte output), the copy's md5, the full `restart`/`main`/PLT/GNU_STACK disassembly, `ex.py` typed in vim from an empty buffer (`[New] 12L, 440B written`), the exploit printing `uid=5007(vortex7)` and `kZ90cmNy9`, then login as vortex7 from the local shell (`uid=5007`, password file read).
+
 ## Level 5 → vortex6 (SOLVED 2026-11-16)
 - **Password for vortex6:** `o5kBPzSFM`, read from `/etc/vortex_pass/vortex6` in the shell the level spawns and verified by logging in as vortex6 (`uid=5006`, `cat /etc/vortex_pass/vortex6` matches). Recording: `recordings/vortex/L5.cast`.
 - **The program (verified against the live binary):** `/vortex/vortex5`, mode 4750, setuid vortex6, 15428 bytes. It is the published source (overthewire.org vortex5.c, "A tribute to arc :)"): glibc's MD5 (Colin Plumb) plus `x = getpass("Password: ")`, then `MD5Update(&a, x, strlen(x))`, then a 16-byte memcmp against `155fb95d04287b757c996d77b5ea51f7`; on a match it `setresuid`s to euid and runs `/bin/sh`.
