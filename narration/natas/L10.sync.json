@@ -1,0 +1,81 @@
+{
+ "game": "natas",
+ "level": 10,
+ "audio": "narration/natas/L10.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 40.56,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.21,
+   "text": "Natas, level ten.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.21,
+   "end": 9.6,
+   "text": "The same grep command injection setup, but this time the application filters the input and rejects semicolons, pipes, and ampersands.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 9.6,
+   "end": 15.29,
+   "text": "I fetch the source and pull out the filter, a preg match against semicolon, pipe, and ampersand.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 15.29,
+   "end": 29.4,
+   "text": "Filtering a few shell metacharacters is not enough, because the unquoted search term is still split into separate shell words, and grep itself accepts multiple files, so I send a caret pattern, then a space, then the path to the natas eleven password file.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 29.4,
+   "end": 40.56,
+   "text": "The shell runs grep with our pattern against both the dictionary and that extra file, and the caret matches every line of the password file, which grep prints prefixed with the filename, and the level is solved.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
