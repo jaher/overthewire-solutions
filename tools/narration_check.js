@@ -149,7 +149,13 @@ function expectedChildren(L) {
         while (si < L.steps.length && vimFileOf(L.steps[si]) === vf) { run.push(si); si++; }
         seq.push({ key: null });           // 'typing X in vim' note
         seq.push({ key: firstSi + ':vimcmd:' });
-        seq.push({ key: firstSi + ':vim:' });
+        // The box is created at the session-start gate, which waits on
+        // vimcmd (not vim): when one segment anchors both, the schedule
+        // spreads them (vimcmd at the start, vim at the midpoint), so the
+        // box appears at the vimcmd time. Key it vimcmd so the early/late
+        // checks use the session start; its vim tag lives only in the
+        // div's own dataset, which the highlight check reads directly.
+        seq.push({ key: firstSi + ':vimcmd:' });
         for (const s of run) if (L.steps[s].note) seq.push({ key: s + ':note:' });
         continue;
       }
