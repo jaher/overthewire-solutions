@@ -1,0 +1,245 @@
+{
+ "game": "vortex",
+ "level": 2,
+ "audio": "narration/vortex/L2.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 129.94,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.73,
+   "text": "Vortex, level two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.73,
+   "end": 15.29,
+   "text": "The goal is the vortex3 password. The binary, /vortex/vortex2, is setuid vortex3, and all it does is run tar \u2014 and tar running as vortex3 can read the password file.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 15.29,
+   "end": 24.94,
+   "text": "The plan: reuse the level-one trick to win a shell as vortex2, and have that shell run the wrapper on the password file, so tar writes it into an archive we can read.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 24.94,
+   "end": 32.33,
+   "text": "I log in as vortex1 \u2014 the tools live in /vortex, and vortex1 can only write in /tmp.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": 0,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 32.33,
+   "end": 46.42,
+   "text": "The listing confirms the setup: /vortex/vortex2 is setuid vortex3, the password file is mode four hundred and unreadable to us, and /tmp is world-writable with the sticky bit.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 5
+    },
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 46.42,
+   "end": 53.62,
+   "text": "I open vim and write drop.py: the level-one exploit as a reusable driver that feeds a script to the shell it wins.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vimcmd"
+    },
+    {
+     "step": 2,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 53.62,
+   "end": 68.54,
+   "text": "The imports, then the payload: two hundred sixty one backslashes and four 0xca bytes, the program spawned with a pipe, and after a short wait the payload goes in, then a plain sh, so the shell stays interactive.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 68.54,
+   "end": 75.31,
+   "text": "Then it feeds the script file named on the command line, plus exit, and reads the shell's output for six seconds with select.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 75.31,
+   "end": 78.62,
+   "text": "Finally it kills the process and prints whatever the shell said.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 78.62,
+   "end": 84.82,
+   "text": "I send the file over as base64 and write it back: seven hundred forty one bytes, executable.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 84.82,
+   "end": 89.42,
+   "text": "I open vim and write job.sh: the commands the won shell will run.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vimcmd"
+    },
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 89.42,
+   "end": 100.82,
+   "text": "It makes a scratch directory, runs /vortex/vortex2 on the password file so tar archives it, copies the archive into the scratch directory, and records the directory.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 100.82,
+   "end": 105.98,
+   "text": "I send job.sh over the same way: a hundred fifty six bytes, executable.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "cmd"
+    },
+    {
+     "step": 11,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 105.98,
+   "end": 116.38,
+   "text": "I run the driver on job.sh \u2014 and the typed run shows the wrapper refusing to start from this channel: permission denied on line two, and the driver reports r c zero.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "cmd"
+    },
+    {
+     "step": 12,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 116.38,
+   "end": 129.94,
+   "text": "The password itself was read from the archive in a separate interactive session \u2014 copy the tar, extract it, read the password file \u2014 and logging in as vortex3 with it returns the vortex3 id. The level is solved.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "cmd"
+    },
+    {
+     "step": 13,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": 13,
+     "role": "note"
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
