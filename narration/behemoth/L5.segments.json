@@ -1,0 +1,150 @@
+{
+ "segments": [
+  {
+   "text": "Behemoth, level five.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "We log in as behemoth five and look at the binary.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "strings shows the calls socket and sendto, the behemoth six password file, the name localhost, and the port thirteen thirty seven.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 9,
+     "to": 9
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 15,
+     "to": 15
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 25,
+     "to": 25
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 27,
+     "to": 27
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 30,
+     "to": 30
+    }
+   ]
+  },
+  {
+   "text": "The disassembly shows it opens the password file and reads it, resolves localhost, creates a UDP socket, and sends the contents to port thirteen thirty seven.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 18,
+     "to": 18
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 56,
+     "to": 56
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 71,
+     "to": 71
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 87,
+     "to": 87
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 135,
+     "to": 135
+    }
+   ]
+  },
+  {
+   "text": "So the password is not printed to the terminal at all: it is put into a UDP datagram addressed to a fixed local port.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 135,
+     "to": 135
+    }
+   ]
+  },
+  {
+   "text": "Nothing is listening there by default, so the packet is dropped and we see nothing. But UDP does not need a handshake: if we bind that port before we start the program, the kernel will queue the datagram to our socket, and we can receive it.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "We run the script: it binds to localhost port thirteen thirty seven, starts the program, and waits for the packet.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "The program reads the password file as behemoth six, because the binary is setuid, and sends it to us: eleven bytes, and the level is solved.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
