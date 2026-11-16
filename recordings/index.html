@@ -164,6 +164,7 @@ const LEVELS = [
   ["Vortex",7,"CRC-gated strcpy: GF(2) linear CRC patch hits 0xe1ca95ee; epilogue ret pops from ecx-4; NOP sled into setreuid(5008,5008) shellcode dumping /etc/vortex_pass/vortex8"],
   ["Vortex",8,"thread + privilege-drop race: overflow patches sleep@GOT and returns main into safecode's loop; the thread (keeps euid=vortex9) calls the hijacked sleep and dumps /etc/vortex_pass/vortex9"],
   ["Vortex",9,"the BlackBox: no level binary exists (/vortex/vortex9 missing, vortex10 unreachable by group); the password arrives by mail in /var/mail/vortex9"],
+  ["Vortex",10,"srand-seed echo: reverse the srand seed from the printed 20-value rand() window with a libc-based C cracker; echo it as 4 raw bytes to get setresuid+sh -i"],
 ];
 
 const rows = document.getElementById('rows');

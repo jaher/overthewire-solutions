@@ -1,4 +1,41 @@
 
+## Level 10 → vortex11 (SOLVED 2026-11-16)
+- **Password for vortex11:** `xb4DVZ2av`, read from `/etc/vortex_pass/vortex11` in the shell the level spawns and verified by logging in as vortex11 (`uid=5011`, `cat /etc/vortex_pass/vortex11` matches). Recording: `recordings/vortex/L10.cast`.
+- **The program (reconstructed from objdump):** `/vortex/vortex10`, mode 4550, setuid vortex11, 15352 bytes, md5 `49dcf2fee434ab1eb8f0b5bdc4104729`, not stripped, `GNU_STACK RW` (no shellcode possible), full RELRO-ish GOT (but not needed):
+  ```c
+  int main(void) {
+      struct tms t;
+      unsigned base = times(&t) + t.tms_utime + t.tms_stime
+                    + t.tms_cutime + t.tms_cstime + clock() + time(0);
+      int N = 128 - (base % 256);
+      unsigned seed = N + time(0);      /* the srand argument */
+      srand(seed);
+      setvbuf(stdout, 0, _IONBF, 0);
+      for (int i = 0; i < N; i++) rand();          /* N skipped draws */
+      putchar('[');
+      unsigned arr[20];
+      for (int i = 0; i <= 19; i++) { arr[i] = rand(); printf(" %08x,", arr[i]); }
+      puts("]");
+      alarm(30);
+      unsigned target;
+      read(0, &target, 4);
+      if (target == seed) {           /* must echo the exact srand seed */
+          setresuid(geteuid(), geteuid(), geteuid());
+          execlp("/bin/sh", "sh", "-i", 0);
+      } else
+          puts("Nope, try again");
+  }
+  ```
+  The gate: `read(0, &target, 4)` must equal **the exact `srand()` seed** — `N + time(0)` where `N = 128 - ((times()+clock()+time()) % 256)`. The seed is not printed, but the 20-value `rand()` window is — and glibc's `rand()` is fully deterministic given the seed.
+- **The solve: reverse the seed from the printed rand() window.** Emulating glibc's TYPE_3 rand in python failed (my warmup/output indexing was off for this build), so the cracker uses **the target's own libc**: a C program that, for every candidate seed (time ±600 s) and every skip count (0–500), calls `srand(candidate)`, skips that many draws, and compares the next 20 against the printed array. A 20-value match is ~2⁻¹⁶⁰, so the found `(seed, skip)` is exact.
+- **The gotchas (each measured live):**
+  - The loop count `N` is a *signed* mod (`sar/shr/movzbl/sub` idiom): `128 - (base % 256)` can be negative, in which case zero draws are skipped and the printed window starts at draw #1 — the cracker must therefore cover both positive and negative-seed ranges (`N` as large as ~366 was observed, since the `times()/clock()` jitter shifts `base`).
+  - The two `time()` calls differ by the loop's runtime, so `seed − now` can be a few hundred seconds — the ±600 s window covers it.
+  - The answer is `read(0,&target,4)`: the seed is sent as 4 raw little-endian bytes. On a match the level `setresuid`s to euid and spawns `sh -i` — my driver feeds it `id; cat /etc/vortex_pass/vortex11; exit` on stdin.
+  - The cast driver's prompt regex used `vortex[0-9]` (single digit) — `vortex10`+ needs `vortex[0-9]+`; that's why the first two recording takes timed out.
+- **Files:** `tools/vx/l10/cracke.c` (the libc-based seed cracker), `tools/vx/l10/solve10.py` (run the level, parse the window, crack, answer, verify the spawned shell).
+- **Recording:** `recordings/vortex/L10.cast` — local shell, ssh vortex10, workdir `/tmp/l10rec-25004`, the binary's md5/main disassembly and relocation table, `GNU_STACK RW`, the live gate shown (`Nope, try again`), `cracke.c` and `solve10.py` typed in vim from empty buffers, `cracke` compiled, the crack printing `FOUND seed=1794839484 skip=366`, the spawned shell's `uid=5011(vortex11)` and `xb4DVZ2av`, then login as vortex11 from the local shell (`uid=5011(vortex11)`, password file read).
+
 ## Level 9 → vortex10 (SOLVED 2026-11-16)
 - **Password for vortex10:** `95KsP1i3K`, read from `/var/mail/vortex9` and verified by logging in as vortex10 (`uid=5010`, `cat /etc/vortex_pass/vortex10` matches). Recording: `recordings/vortex/L9.cast`.
 - **This level is the BlackBox.** The official page (overthewire.org vortex9.html) is titled "BlackBox" and says only *"There is no information available for this level. Login to vortex.labs.overthewire.org and check it out."* — no hints, no source.
