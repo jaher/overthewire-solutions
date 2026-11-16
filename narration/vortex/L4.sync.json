@@ -1,0 +1,480 @@
+{
+ "game": "vortex",
+ "level": 4,
+ "audio": "narration/vortex/L4.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 253.49,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.87,
+   "text": "Vortex, level four.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.87,
+   "end": 21.74,
+   "text": "The goal is the vortex5 password, from /vortex/vortex4: a setuid vortex5 binary that calls printf on its third argument. Run with one argument that is an empty string, it reaches printf on the second environment variable instead. The format string is ours, and the stack is executable.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 21.74,
+   "end": 30.91,
+   "text": "Two half-word writes through the format string overwrite exit's GOT slot with the shellcode address. When the program exits, it jumps straight into our shellcode on the stack.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 30.91,
+   "end": 49.51,
+   "text": "The writes land through slots 125 and 126. The first sets the low half to the shellcode address, ffff d f nine e, and the second sets the high half to ffff. The shellcode sits 52 bytes into the format string, which starts at ffff d f six a.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 49.51,
+   "end": 51.67,
+   "text": "I log in as vortex4.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 51.67,
+   "end": 56.42,
+   "text": "I make /tmp/l4rec, move in, and clear any old files.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 56.42,
+   "end": 63.34,
+   "text": "I open vim and write the shellcode in assembly: it opens the password file, reads it, and writes it to standard output.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 63.34,
+   "end": 74.21,
+   "text": "First the path, built backwards on the stack: a zero is pushed to terminate the string, then the pieces of /etc/vortex_pass/vortex5.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 74.21,
+   "end": 83.57,
+   "text": "Then the open call: the stack pointer becomes the path, ecx is zeroed, the syscall number is 5, and int 0x80 opens the file.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 83.57,
+   "end": 97.68,
+   "text": "Then the read: the descriptor moves to ebx, the syscall number is 3, ecx points at the stack, edx is 100 bytes, and int 0x80 reads the password onto the stack.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 97.68,
+   "end": 115.51,
+   "text": "Then the write: the syscall number is 4, ebx is 1 for standard output, ecx still points at the stack, and int 0x80 prints it. Finally exit: the syscall number is 1, ebx is zero, int 0x80.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 115.51,
+   "end": 118.92,
+   "text": "The file is 28 lines, 433 bytes.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 118.92,
+   "end": 121.32,
+   "text": "nasm assembles it to 69 bytes.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 121.32,
+   "end": 124.27,
+   "text": "The hex dump shows the shellcode as one line of hex.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 124.27,
+   "end": 132.67,
+   "text": "The count comes back zero, and the fallback prints NO-NUL-BYTES: the shellcode has no zero bytes, so nothing truncates it.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "cmd"
+    },
+    {
+     "step": 11,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "start": 132.67,
+   "end": 139.8,
+   "text": "I open vim and write the runner: it execs the binary with an empty argument and our format string as the second environment variable.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "start": 139.8,
+   "end": 149.83,
+   "text": "First the imports, the format string loaded from fmt.bin, and the two lists: one empty argument, and PADPAD plus the format string as the environment.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 17,
+   "start": 149.83,
+   "end": 157.39,
+   "text": "Then the library handle, the two C arrays for the argument and environment lists, and the exec call with the binary path from the command line.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "start": 157.39,
+   "end": 160.58,
+   "text": "The runner is 9 lines, 276 bytes.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "cmd"
+    },
+    {
+     "step": 16,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 19,
+   "start": 160.58,
+   "end": 166.42,
+   "text": "I open vim and write the generator: it builds the 121 byte format string from the shellcode.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "id": 20,
+   "start": 166.42,
+   "end": 174.02,
+   "text": "First the imports, the shellcode loaded from sc.bin, and an assert that it has no zero bytes and is 69 bytes.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 21,
+   "start": 174.02,
+   "end": 207.22,
+   "text": "Then a comment naming exit's GOT slot, oh eight oh four c zero zero eight, and the format string itself. Six X's, then the two GOT addresses, then Y Y Y. The first width writes fifty-seven thousand two hundred forty-six, the low half of the shellcode address, through slot 125. The second writes one hundred thirty-one thousand seventy-one, the high half, through slot 126. Five N's pad the string out, and the shellcode goes last, for 121 bytes in all.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 22,
+   "start": 207.22,
+   "end": 213.38,
+   "text": "Then the length assert, the write of fmt.bin, and the print of the length.",
+   "lines": [
+    {
+     "step": 20,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 23,
+   "start": 213.38,
+   "end": 216.86,
+   "text": "The generator is 10 lines, 433 bytes.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "cmd"
+    },
+    {
+     "step": 22,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 24,
+   "start": 216.86,
+   "end": 220.39,
+   "text": "I run it, and it prints fmt 121.",
+   "lines": [
+    {
+     "step": 23,
+     "role": "cmd"
+    },
+    {
+     "step": 23,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 25,
+   "start": 220.39,
+   "end": 223.2,
+   "text": "The format file is 121 bytes.",
+   "lines": [
+    {
+     "step": 24,
+     "role": "cmd"
+    },
+    {
+     "step": 24,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 26,
+   "start": 223.2,
+   "end": 230.28,
+   "text": "The first 60 hex characters confirm the layout: six X's, the two GOT addresses, and Y Y Y.",
+   "lines": [
+    {
+     "step": 25,
+     "role": "cmd"
+    },
+    {
+     "step": 25,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 27,
+   "start": 230.28,
+   "end": 237.55,
+   "text": "I run the runner against /vortex/vortex4, and the shellcode prints the vortex5 password.",
+   "lines": [
+    {
+     "step": 26,
+     "role": "cmd"
+    },
+    {
+     "step": 26,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 28,
+   "start": 237.55,
+   "end": 239.47,
+   "text": "I log out of vortex4.",
+   "lines": [
+    {
+     "step": 27,
+     "role": "cmd"
+    },
+    {
+     "step": 27,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 29,
+   "start": 239.47,
+   "end": 243.5,
+   "text": "Then I log in as vortex5 with the password the shellcode printed.",
+   "lines": [
+    {
+     "step": 28,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 30,
+   "start": 243.5,
+   "end": 247.9,
+   "text": "id confirms uid 5005, vortex5.",
+   "lines": [
+    {
+     "step": 29,
+     "role": "cmd"
+    },
+    {
+     "step": 29,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 31,
+   "start": 247.9,
+   "end": 252.41,
+   "text": "And the password file reads back the same password. The level is solved.",
+   "lines": [
+    {
+     "step": 30,
+     "role": "cmd"
+    },
+    {
+     "step": 30,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 32,
+   "start": 252.41,
+   "end": 253.49,
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": 31,
+     "role": "cmd"
+    },
+    {
+     "step": 31,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
