@@ -1,0 +1,305 @@
+{
+ "game": "natas",
+ "level": 33,
+ "audio": "narration/natas/L33.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 180.12,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 3.41,
+   "text": "Natas, level thirty-three, the final level.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 3.41,
+   "end": 17.4,
+   "text": "The page uploads a firmware file. An executor class stores the filename from the form, moves the upload to a directory under the slash natas thirty-three path, and at the end of the request it checks the md five of that filename against a fixed signature.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 17.4,
+   "end": 20.76,
+   "text": "If they match, it runs the php interpreter on the file.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 20.76,
+   "end": 35.28,
+   "text": "I fetch the source and grep for the class, the private properties, the md five check, the passthru, and the move. The executor moves the uploaded file, then checks its md five against the signature, and if they match it runs php on the file.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 3
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 35.28,
+   "end": 45.17,
+   "text": "The filename and signature are private properties, so we cannot set them through the form. But the upload lets us choose where the file is written, and that choice becomes the filename used in the check.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 45.17,
+   "end": 60.12,
+   "text": "Here is the trick. If the filename is a phar uniform resource locator, then the md five function opens a phar stream. Opening a phar makes php deserialize the metadata stored inside it. And the metadata is completely under our control.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 60.12,
+   "end": 70.37,
+   "text": "So we build a phar whose metadata is a serialized executor object, with a filename pointing to our own php payload and a signature equal to the md five of that payload.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 70.37,
+   "end": 86.74,
+   "text": "When php rebuilds the object from the metadata, its destructor runs at the end of the request. The check now compares our payload's md five with the signature we stored, so it matches, and the page runs php on our payload. The payload reads the natas thirty-four password file.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 86.74,
+   "end": 89.78,
+   "text": "First the payload. I open vim and write it:",
+   "lines": [
+    {
+     "step": 1,
+     "role": "vimcmd"
+    },
+    {
+     "step": 1,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 89.78,
+   "end": 94.63,
+   "text": "One line of php: echo the contents of the natas thirty-four password file.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 94.63,
+   "end": 98.18,
+   "text": "I take its md five, which the builder will need as the signature.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 98.18,
+   "end": 101.66,
+   "text": "Then the builder. I open vim and write the phar script:",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vimcmd"
+    },
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 101.66,
+   "end": 111.55,
+   "text": "First the imports, the payload read, its md five, the phar stub, and the key for the private properties: a null byte, Executor, a null byte.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 111.55,
+   "end": 119.71,
+   "text": "Then the serialized executor metadata: filename set to our payload, signature set to its md five, and init set to false.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 119.71,
+   "end": 125.59,
+   "text": "Then the manifest begins: one file, API version one point one, and the global flag.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "start": 125.59,
+   "end": 133.44,
+   "text": "The last chunk adds the file entry, the trailer with the sha one digest and the G B M B marker, writes the phar, and prints its size.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "start": 133.44,
+   "end": 135.0,
+   "text": "Here is the last chunk.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "text"
+    },
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 17,
+   "start": 135.0,
+   "end": 141.36,
+   "text": "I run the builder. It writes the phar, two hundred seventy-four bytes, and prints the payload md five.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "start": 141.36,
+   "end": 155.16,
+   "text": "I upload both files, naming each with a path that climbs out of the upload directory to slash tmp. Both print failure, md five sum mismatch, from the original object's destructor \u2014 the stored signature does not match.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 19,
+   "start": 155.16,
+   "end": 172.8,
+   "text": "Now the trigger. I upload a dummy file but set the filename to phar colon slash slash slash tmp slash n33r dot phar. The md five check opens the phar stream, php deserializes our metadata, and the rebuilt executor's destructor runs our payload.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 20,
+   "start": 172.8,
+   "end": 180.12,
+   "text": "The page prints congratulations, running firmware update, and the natas thirty-four password. And natas is complete.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
