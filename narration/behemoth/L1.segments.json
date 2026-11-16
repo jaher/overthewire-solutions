@@ -1,0 +1,262 @@
+{
+ "segments": [
+  {
+   "text": "Behemoth, level one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "We log in as behemoth one and look at the binary.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "ls shows it is setuid to behemoth two, and file says it is a thirty-two bit Intel executable, not stripped.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "We disassemble main with objdump: it loads the address of a buffer sixty-seven bytes below the frame pointer and calls gets on it.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 7,
+     "to": 7
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 9,
+     "to": 9
+    }
+   ]
+  },
+  {
+   "text": "gets reads until a newline with no bound, so this is a classic stack overflow: the saved frame pointer sits at offset sixty-seven and the return address at offset seventy-one.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 7,
+     "to": 7
+    }
+   ]
+  },
+  {
+   "text": "We inspect the protections: readelf shows the stack is marked executable, and address randomisation is off.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "That combination means we do not need a return-to-libc chain; we can simply place shellcode on the stack and jump to it.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "Then we write the shellcode in vim.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vimcmd"
+    },
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It writes a marker so our sweep can detect a successful jump.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "out",
+     "from": 3,
+     "to": 14
+    }
+   ]
+  },
+  {
+   "text": "Then it calls geteuid, setreuid with that id twice, and setuid with the same id so the privilege survives the exec.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "out",
+     "from": 15,
+     "to": 32
+    }
+   ]
+  },
+  {
+   "text": "And finally execve on slash bin slash sh.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "out",
+     "from": 33,
+     "to": 44
+    }
+   ]
+  },
+  {
+   "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: seventy-eight bytes.",
+   "lines": [
+    {
+     "step": 15,
+     "role": "cmd"
+    },
+    {
+     "step": 15,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 16,
+     "role": "cmd"
+    },
+    {
+     "step": 17,
+     "role": "cmd"
+    },
+    {
+     "step": 17,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    },
+    {
+     "step": 18,
+     "role": "cmd"
+    },
+    {
+     "step": 18,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "The payload is seventy-one NOP bytes, then the candidate return address, then the shellcode, then a newline.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "cmd"
+    },
+    {
+     "step": 19,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "The exploit forks once per candidate address, feeds the payload on standard input, and watches for the marker.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "When it finds the address that lands in the shellcode, it runs the binary again with that address and feeds the shell commands.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "out",
+     "from": 2,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "We get a shell as behemoth two and read the password, and the level is solved.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "out",
+     "from": 3,
+     "to": 4
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
