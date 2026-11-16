@@ -1,0 +1,76 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level twenty-four.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The page prints the credentials when the negation of strcmp of our password and the secret is true. That is the standard way to test a password: strcmp returns zero when the strings are equal, so negating it means the password matched.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I fetch the source and pull out the check.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "The flaw is that strcmp expects two strings, and PHP lets a request deliver an array. If we send the parameter as passwd with square brackets, the request parser builds an array, and that array is what reaches strcmp. Passing an array where a string is expected makes strcmp emit a warning and return null. Negating null gives true, so the condition passes without the password ever being compared.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "We first send a normal string and get wrong.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "Then we send the array form, and the response shows the warning followed by the credentials for natas twenty-five. The lesson is type confusion: validate the type of user input before using it, and never rely on a warning to stop execution.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 3,
+     "to": 6
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
