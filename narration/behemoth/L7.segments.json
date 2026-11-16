@@ -152,60 +152,87 @@
    ]
   },
   {
-   "text": "It prints a marker so our sweep can detect a successful jump, then raises the effective uid with geteuid and setreuid, and setuid so the privilege survives the exec.",
    "lines": [
     {
-     "step": 14,
-     "role": "out",
-     "from": 3,
-     "to": 32
+     "role": "vim",
+     "step": 8
     }
-   ]
+   ],
+   "text": "First the header: thirty-two bit mode, the global entry point, and the start label."
   },
   {
-   "text": "And finally execve on slash bin slash slash sh, with a double slash to keep the pushed string aligned.",
    "lines": [
     {
-     "step": 14,
-     "role": "out",
-     "from": 33,
-     "to": 44
+     "role": "vim",
+     "step": 9
     }
-   ]
+   ],
+   "text": "It prints a marker so our sweep can detect a successful jump,"
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 10
+    }
+   ],
+   "text": "then raises the effective uid with geteuid and setreuid,"
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 11
+    }
+   ],
+   "text": "and setuid so the privilege survives the exec."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 12
+    },
+    {
+     "role": "vim",
+     "step": 13
+    }
+   ],
+   "text": "And finally execve on slash bin slash slash sh, with a double slash to keep the pushed string aligned."
   },
   {
    "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: seventy-eight bytes.",
    "lines": [
     {
-     "step": 15,
+     "step": 14,
      "role": "cmd"
     },
     {
-     "step": 15,
+     "step": 14,
      "role": "out",
      "from": 0,
      "to": 0
+    },
+    {
+     "step": 15,
+     "role": "cmd"
     },
     {
      "step": 16,
      "role": "cmd"
     },
     {
-     "step": 17,
-     "role": "cmd"
-    },
-    {
-     "step": 17,
+     "step": 16,
      "role": "out",
      "from": 0,
      "to": 2
     },
     {
-     "step": 18,
+     "step": 17,
      "role": "cmd"
     },
     {
-     "step": 18,
+     "step": 17,
      "role": "out",
      "from": 0,
      "to": 0
@@ -216,11 +243,11 @@
    "text": "Because the stack address depends on the environment, the exploit sweeps a range of return addresses and looks for the marker the shellcode prints.",
    "lines": [
     {
-     "step": 19,
+     "step": 18,
      "role": "cmd"
     },
     {
-     "step": 19,
+     "step": 18,
      "role": "out",
      "from": 1,
      "to": 1
@@ -231,7 +258,7 @@
    "text": "It lands in the shellcode, we get a shell as behemoth eight, and it prints the final password, and the level is solved.",
    "lines": [
     {
-     "step": 19,
+     "step": 18,
      "role": "out",
      "from": 2,
      "to": 4
@@ -246,7 +273,7 @@
    "text": "Behemoth is complete: the lesson is that a filter and the operation it protects must cover exactly the same data.",
    "lines": [
     {
-     "step": 19,
+     "step": 18,
      "role": "out",
      "from": 4,
      "to": 4

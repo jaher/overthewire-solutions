@@ -3,12 +3,12 @@
  "level": 7,
  "audio": "narration/behemoth/L7.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 105.86,
+ "duration": 110.47,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 3.19,
+   "end": 3.17,
    "text": "Behemoth, level seven, the final level.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 3.19,
-   "end": 6.14,
+   "start": 3.17,
+   "end": 6.1,
    "text": "We log in as behemoth seven and look at the binary.",
    "lines": [
     {
@@ -35,8 +35,8 @@
   },
   {
    "id": 2,
-   "start": 6.14,
-   "end": 13.94,
+   "start": 6.1,
+   "end": 13.7,
    "text": "The disassembly shows the program copies our first argument into a stack buffer of five hundred twenty-four bytes, but first it runs a filter.",
    "lines": [
     {
@@ -53,8 +53,8 @@
   },
   {
    "id": 3,
-   "start": 13.94,
-   "end": 23.71,
+   "start": 13.7,
+   "end": 23.59,
    "text": "The filter walks the argument character by character and refuses anything that is not a letter or a space, and it stops after five hundred twelve characters, while the copy does not stop there.",
    "lines": [
     {
@@ -85,8 +85,8 @@
   },
   {
    "id": 4,
-   "start": 23.71,
-   "end": 30.38,
+   "start": 23.59,
+   "end": 30.0,
    "text": "We inspect the protections: readelf shows the stack is marked executable, and address randomisation is off.",
    "lines": [
     {
@@ -113,8 +113,8 @@
   },
   {
    "id": 5,
-   "start": 30.38,
-   "end": 38.98,
+   "start": 30.0,
+   "end": 37.92,
    "text": "We probe it: four letters pass, but a percent sign is refused with the message non-alpha chars found in string, possible shellcode.",
    "lines": [
     {
@@ -141,8 +141,8 @@
   },
   {
    "id": 6,
-   "start": 38.98,
-   "end": 50.54,
+   "start": 37.92,
+   "end": 49.27,
    "text": "So we send five hundred twelve letters to satisfy the filter, and then we append the real payload: the saved frame pointer, the return address, and our shellcode, none of which the filter ever inspects.",
    "lines": [
     {
@@ -155,8 +155,8 @@
   },
   {
    "id": 7,
-   "start": 50.54,
-   "end": 57.7,
+   "start": 49.27,
+   "end": 57.07,
    "text": "The buffer sits five hundred twenty-four bytes below the saved frame pointer, so the return address is at offset five hundred twenty-eight.",
    "lines": [
     {
@@ -169,8 +169,8 @@
   },
   {
    "id": 8,
-   "start": 57.7,
-   "end": 59.93,
+   "start": 57.07,
+   "end": 59.3,
    "text": "Then we write the shellcode in vim.",
    "lines": [
     {
@@ -185,68 +185,104 @@
   },
   {
    "id": 9,
-   "start": 59.93,
-   "end": 70.92,
-   "text": "It prints a marker so our sweep can detect a successful jump, then raises the effective uid with geteuid and setreuid, and setuid so the privilege survives the exec.",
+   "start": 59.3,
+   "end": 64.54,
+   "text": "First the header: thirty-two bit mode, the global entry point, and the start label.",
    "lines": [
     {
-     "step": 14,
-     "role": "out",
-     "from": 3,
-     "to": 32
+     "role": "vim",
+     "step": 8
     }
    ]
   },
   {
    "id": 10,
-   "start": 70.92,
-   "end": 77.57,
-   "text": "And finally execve on slash bin slash slash sh, with a double slash to keep the pushed string aligned.",
+   "start": 64.54,
+   "end": 67.9,
+   "text": "It prints a marker so our sweep can detect a successful jump,",
    "lines": [
     {
-     "step": 14,
-     "role": "out",
-     "from": 33,
-     "to": 44
+     "role": "vim",
+     "step": 9
     }
    ]
   },
   {
    "id": 11,
-   "start": 77.57,
-   "end": 84.84,
+   "start": 67.9,
+   "end": 73.25,
+   "text": "then raises the effective uid with geteuid and setreuid,",
+   "lines": [
+    {
+     "role": "vim",
+     "step": 10
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 73.25,
+   "end": 76.49,
+   "text": "and setuid so the privilege survives the exec.",
+   "lines": [
+    {
+     "role": "vim",
+     "step": 11
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 76.49,
+   "end": 82.78,
+   "text": "And finally execve on slash bin slash slash sh, with a double slash to keep the pushed string aligned.",
+   "lines": [
+    {
+     "role": "vim",
+     "step": 12
+    },
+    {
+     "role": "vim",
+     "step": 13
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 82.78,
+   "end": 89.93,
    "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: seventy-eight bytes.",
    "lines": [
     {
-     "step": 15,
+     "step": 14,
      "role": "cmd"
     },
     {
-     "step": 15,
+     "step": 14,
      "role": "out",
      "from": 0,
      "to": 0
+    },
+    {
+     "step": 15,
+     "role": "cmd"
     },
     {
      "step": 16,
      "role": "cmd"
     },
     {
-     "step": 17,
-     "role": "cmd"
-    },
-    {
-     "step": 17,
+     "step": 16,
      "role": "out",
      "from": 0,
      "to": 2
     },
     {
-     "step": 18,
+     "step": 17,
      "role": "cmd"
     },
     {
-     "step": 18,
+     "step": 17,
      "role": "out",
      "from": 0,
      "to": 0
@@ -254,17 +290,17 @@
    ]
   },
   {
-   "id": 12,
-   "start": 84.84,
-   "end": 92.16,
+   "id": 15,
+   "start": 89.93,
+   "end": 97.3,
    "text": "Because the stack address depends on the environment, the exploit sweeps a range of return addresses and looks for the marker the shellcode prints.",
    "lines": [
     {
-     "step": 19,
+     "step": 18,
      "role": "cmd"
     },
     {
-     "step": 19,
+     "step": 18,
      "role": "out",
      "from": 1,
      "to": 1
@@ -272,13 +308,13 @@
    ]
   },
   {
-   "id": 13,
-   "start": 92.16,
-   "end": 99.19,
+   "id": 16,
+   "start": 97.3,
+   "end": 103.7,
    "text": "It lands in the shellcode, we get a shell as behemoth eight, and it prints the final password, and the level is solved.",
    "lines": [
     {
-     "step": 19,
+     "step": 18,
      "role": "out",
      "from": 2,
      "to": 4
@@ -290,13 +326,13 @@
    ]
   },
   {
-   "id": 14,
-   "start": 99.19,
-   "end": 105.86,
+   "id": 17,
+   "start": 103.7,
+   "end": 110.47,
    "text": "Behemoth is complete: the lesson is that a filter and the operation it protects must cover exactly the same data.",
    "lines": [
     {
-     "step": 19,
+     "step": 18,
      "role": "out",
      "from": 4,
      "to": 4
