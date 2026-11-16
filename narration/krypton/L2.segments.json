@@ -1,0 +1,154 @@
+{
+ "segments": [
+  {
+   "text": "Krypton, level two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "This time the cipher is a Caesar cipher, a fixed shift, but we do not know the shift, and the key file is unreadable.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "There is an encrypt program that reads the key file and encrypts any file we hand it, so we can use it as an oracle.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as krypton two,",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "and read the target: OMQEMDUEQMEK, twelve letters, no spaces.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "First I make a working directory in temp and move into it,",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "then I link the key file into it and open the directory up, so the encrypt program can reach the key.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the whole alphabet into p dot txt, as a chosen plaintext:",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vimcmd"
+    },
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I check it with cat minus n, and it holds the full alphabet.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "Then I run the encrypt program on it and read the ciphertext file,",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "and the output is MNOPQRSTUVWXYZABCDEFGHIJKL: A maps to M, a shift of twelve, not the thirteen you might assume.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "Encryption added twelve, so I shift the target back by twelve with tr.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The target decrypts to CAESAR IS EASY, the password for krypton three.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "One chosen plaintext, one encryption, and the key is exposed.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
