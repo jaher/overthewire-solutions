@@ -1,0 +1,161 @@
+{
+ "game": "bandit",
+ "level": 25,
+ "audio": "narration/bandit/L25.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 68.62,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.16,
+   "text": "Bandit, level twenty-five.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.16,
+   "end": 15.05,
+   "text": "The home directory holds the private SSH key for bandit twenty-six, so logging in should be easy. It is not: bandit twenty-six's login shell is a small script that runs the pager more on a text file, then logs out.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 15.05,
+   "end": 24.48,
+   "text": "I log in as bandit25 with ssh bandit25@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 24.48,
+   "end": 29.23,
+   "text": "I check the key file: owner-only permissions, twenty-six hundred and two bytes.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 29.23,
+   "end": 32.28,
+   "text": "I cat the key, and the whole private key prints.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 37
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 32.28,
+   "end": 38.57,
+   "text": "The login shell is usr bin showtext: it runs more on the home text file, then logs out.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 38.57,
+   "end": 50.88,
+   "text": "There is one catch: the text file is only six lines, so on a normal-height terminal more prints all of it and exits without ever pausing, so I shrink the terminal to about five rows, which forces more to paginate.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 50.88,
+   "end": 54.96,
+   "text": "At the More prompt I press v, which opens the file in vi.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 54.96,
+   "end": 61.27,
+   "text": "In vi I set the shell to bin bash, then run shell, which spawns a real bash as bandit twenty-six.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 61.27,
+   "end": 64.82,
+   "text": "From that shell I cat bandit twenty-six's password file.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 64.82,
+   "end": 68.62,
+   "text": "It prints the password for bandit twenty-six, and the level is solved.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

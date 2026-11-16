@@ -1,0 +1,107 @@
+{
+ "game": "bandit",
+ "level": 26,
+ "audio": "narration/bandit/L26.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 39.1,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.97,
+   "text": "Bandit, level twenty-six.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.97,
+   "end": 7.37,
+   "text": "The home directory holds a setuid helper called bandit twenty-seven do, owned by bandit twenty-seven.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 7.37,
+   "end": 17.38,
+   "text": "I log in as bandit26 with ssh bandit26@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 17.38,
+   "end": 24.65,
+   "text": "Same break-out as the last level: showtext, more, v, vi, shell, to get a real shell.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 24.65,
+   "end": 29.57,
+   "text": "I list the helper, and the permissions show the s bit, owned by bandit twenty-seven.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 29.57,
+   "end": 33.1,
+   "text": "I run the helper with cat on bandit twenty-seven's password file.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 33.1,
+   "end": 39.1,
+   "text": "It runs as bandit twenty-seven, and prints the password for bandit twenty-seven, and the level is solved.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

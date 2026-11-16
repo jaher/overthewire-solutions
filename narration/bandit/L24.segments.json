@@ -1,0 +1,77 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level twenty-four.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "A daemon on localhost port thirty thousand and two asks for the current password and a secret four-digit PIN on a single line.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit24 with ssh bandit24@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The note states the deal: get both right, and it hands over bandit twenty-five's password.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "The PIN space is only ten thousand values, so brute force is trivial: I generate every candidate from zero to nine thousand nine hundred ninety-nine, zero-padded to four digits, pair each with the password, and pipe all ten thousand lines through a single netcat connection.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Grep minus v Wrong filters out the wrong replies.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The daemon prints its greeting, answers Correct, and gives the password for bandit twenty-five, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

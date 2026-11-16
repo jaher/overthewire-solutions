@@ -1,0 +1,81 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level twenty-six.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The home directory holds a setuid helper called bandit twenty-seven do, owned by bandit twenty-seven.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit26 with ssh bandit26@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Same break-out as the last level: showtext, more, v, vi, shell, to get a real shell.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "I list the helper, and the permissions show the s bit, owned by bandit twenty-seven.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "text": "I run the helper with cat on bandit twenty-seven's password file.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It runs as bandit twenty-seven, and prints the password for bandit twenty-seven, and the level is solved.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
