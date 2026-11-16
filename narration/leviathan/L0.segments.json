@@ -1,0 +1,73 @@
+{
+ "segments": [
+  {
+   "text": "Leviathan, level zero.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is to find the password for leviathan one, hidden somewhere in leviathan zero's home directory.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as leviathan zero, on port 2223.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I list the hidden dot backup directory, and it holds a single file, bookmarks dot html, a hundred and thirty-three kilobyte export from a web browser.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 3
+    }
+   ]
+  },
+  {
+   "text": "I search the file for the word password, and one entry matches, with the password for leviathan one written right into its link text.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "text": "That entry gives the leviathan one password, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

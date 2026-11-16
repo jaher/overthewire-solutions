@@ -1,0 +1,96 @@
+{
+ "game": "leviathan",
+ "level": 0,
+ "audio": "narration/leviathan/L0.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 32.35,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.21,
+   "text": "Leviathan, level zero.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.21,
+   "end": 7.85,
+   "text": "The goal is to find the password for leviathan one, hidden somewhere in leviathan zero's home directory.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 7.85,
+   "end": 11.74,
+   "text": "I log in as leviathan zero, on port 2223.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 11.74,
+   "end": 21.1,
+   "text": "I list the hidden dot backup directory, and it holds a single file, bookmarks dot html, a hundred and thirty-three kilobyte export from a web browser.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 3
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 21.1,
+   "end": 28.46,
+   "text": "I search the file for the word password, and one entry matches, with the password for leviathan one written right into its link text.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 28.46,
+   "end": 32.35,
+   "text": "That entry gives the leviathan one password, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
