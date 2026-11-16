@@ -1,0 +1,85 @@
+{
+ "game": "natas",
+ "level": 22,
+ "audio": "narration/natas/L22.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 44.02,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.21,
+   "text": "Natas, level twenty-two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.21,
+   "end": 12.46,
+   "text": "The page itself shows nothing interesting, but the source reveals the whole story: if the request contains a GET parameter named revelio, the page prints the credentials for the next level.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 12.46,
+   "end": 15.62,
+   "text": "I fetch the source and pull out the two revelio blocks.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 15.62,
+   "end": 27.82,
+   "text": "The first block checks the admin session, but all it does when the check fails is send a redirect header: it never stops the page. The second block prints the credentials with no check at all, so the parameter alone is the key.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 27.82,
+   "end": 44.02,
+   "text": "I add revelio to the query string, and since curl does not follow the redirect, the page hands us the username and password for natas twenty-three, and the level is solved. The lesson is a missing authorization check: the presence of a client-controlled parameter is treated as proof of privilege.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
