@@ -1,0 +1,99 @@
+{
+ "game": "natas",
+ "level": 0,
+ "audio": "narration/natas/L0.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 44.28,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.11,
+   "text": "Natas, level zero.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.11,
+   "end": 11.52,
+   "text": "Natas is the web wargame: every level is a website protected by HTTP basic authentication, and the password for one level is the login for the next.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 11.52,
+   "end": 17.57,
+   "text": "At level zero we log in as natas zero with the password natas zero, which the game gives us.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 17.57,
+   "end": 22.92,
+   "text": "The page says the password for the next level is on this page, but you cannot see it in the rendered text.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 22.92,
+   "end": 29.71,
+   "text": "It is sitting in an HTML comment, the kind of note meant for humans reading the source, but still sent to every browser.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 29.71,
+   "end": 39.31,
+   "text": "So instead of looking at the page visually, we fetch the raw response with curl, authenticating as natas zero, and grep for the line mentioning natas one.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 39.31,
+   "end": 44.28,
+   "text": "The comment prints, and the password for natas one is right there, and the level is solved.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

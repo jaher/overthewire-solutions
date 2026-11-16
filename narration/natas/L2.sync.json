@@ -1,0 +1,107 @@
+{
+ "game": "natas",
+ "level": 2,
+ "audio": "narration/natas/L2.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 39.5,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.8,
+   "text": "Natas, level two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.8,
+   "end": 5.16,
+   "text": "The page shows almost nothing, just a one pixel image.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 5.16,
+   "end": 13.37,
+   "text": "I fetch the page with curl and grep for the image tag, and it points at files slash pixel dot png, which tells us there is a files directory.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 13.37,
+   "end": 21.58,
+   "text": "The web server has directory indexing turned on for that folder, so requesting the directory itself returns an Apache listing instead of a forbidden page.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 21.58,
+   "end": 25.82,
+   "text": "The listing shows the pixel image and a file called users dot txt.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 6
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 25.82,
+   "end": 31.7,
+   "text": "I fetch users dot txt and grep for natas three, and the line gives the password for the next level.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 31.7,
+   "end": 39.5,
+   "text": "The lesson is that unlinked paths can still be found, and open directory indexes expose whatever is sitting there, and the level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

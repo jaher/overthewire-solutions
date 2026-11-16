@@ -1,0 +1,81 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The page shows almost nothing, just a one pixel image.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I fetch the page with curl and grep for the image tag, and it points at files slash pixel dot png, which tells us there is a files directory.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "The web server has directory indexing turned on for that folder, so requesting the directory itself returns an Apache listing instead of a forbidden page.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The listing shows the pixel image and a file called users dot txt.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 6
+    }
+   ]
+  },
+  {
+   "text": "I fetch users dot txt and grep for natas three, and the line gives the password for the next level.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "The lesson is that unlinked paths can still be found, and open directory indexes expose whatever is sitting there, and the level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

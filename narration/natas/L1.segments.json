@@ -1,0 +1,64 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The page tells us the password for the next level is on this page, but right clicking has been blocked.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "That block is a small piece of JavaScript attached to the body element, and it only stops a browser's context menu.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "It does not change what the server sends, and the password is again in an HTML comment.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "So the trick from the previous level still works: fetch the page with curl and search the raw HTML for the natas two line.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The comment prints, and the password for natas two is right there, and the level is solved.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

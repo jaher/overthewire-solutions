@@ -1,0 +1,73 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level zero.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Natas is the web wargame: every level is a website protected by HTTP basic authentication, and the password for one level is the login for the next.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "At level zero we log in as natas zero with the password natas zero, which the game gives us.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The page says the password for the next level is on this page, but you cannot see it in the rendered text.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "It is sitting in an HTML comment, the kind of note meant for humans reading the source, but still sent to every browser.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "So instead of looking at the page visually, we fetch the raw response with curl, authenticating as natas zero, and grep for the line mentioning natas one.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The comment prints, and the password for natas one is right there, and the level is solved.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
