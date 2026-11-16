@@ -1,0 +1,103 @@
+{
+ "game": "bandit",
+ "level": 6,
+ "audio": "narration/bandit/L6.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 39.48,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.85,
+   "text": "Bandit, level six.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.85,
+   "end": 11.16,
+   "text": "The password for bandit seven is somewhere on the whole filesystem: a file owned by user bandit seven, in group bandit six, exactly thirty-three bytes.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 11.16,
+   "end": 19.75,
+   "text": "I log in as bandit6 with ssh bandit6@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 19.75,
+   "end": 27.48,
+   "text": "I run find from the root, filtering on user, group, and exact size in bytes, sending the flood of permission denied errors to dev null.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 27.48,
+   "end": 34.68,
+   "text": "Exactly one path matches: var lib dpkg info slash bandit seven dot password.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 34.68,
+   "end": 35.81,
+   "text": "I cat it.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 35.81,
+   "end": 39.48,
+   "text": "It prints the password for bandit seven, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

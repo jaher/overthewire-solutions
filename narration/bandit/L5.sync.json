@@ -1,0 +1,103 @@
+{
+ "game": "bandit",
+ "level": 5,
+ "audio": "narration/bandit/L5.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 39.05,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.99,
+   "text": "Bandit, level five.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.99,
+   "end": 9.07,
+   "text": "Somewhere under inhere is one file: a regular file, exactly one thousand and thirty-three bytes, and not executable.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 9.07,
+   "end": 18.02,
+   "text": "I log in as bandit5 with ssh bandit5@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 18.02,
+   "end": 27.38,
+   "text": "Find can express all three conditions in one pass, so I run find inhere, type f, size 1033 c, not executable.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 27.38,
+   "end": 33.82,
+   "text": "Exactly one path survives: inhere slash maybehere zero seven slash dot file two.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 33.82,
+   "end": 35.33,
+   "text": "I cat that file.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 35.33,
+   "end": 39.05,
+   "text": "It prints the password for bandit six, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

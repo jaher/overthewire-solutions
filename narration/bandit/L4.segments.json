@@ -1,0 +1,78 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level four.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The inhere directory holds ten files with similar dash-prefixed names, and exactly one of them is human-readable text.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit4 with ssh bandit4@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The file command inspects magic bytes instead of trusting names, so I run file on every file in inhere.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Seven come back as data, two as non-ISO extended ASCII text, and one, file zero seven, as ASCII text.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 9
+    }
+   ]
+  },
+  {
+   "text": "Because the name starts with a dash, I pass it with the directory prefix: cat inhere slash dash file zero seven.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It prints the password for bandit five, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,104 @@
+{
+ "game": "bandit",
+ "level": 4,
+ "audio": "narration/bandit/L4.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 44.38,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.75,
+   "text": "Bandit, level four.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.75,
+   "end": 8.52,
+   "text": "The inhere directory holds ten files with similar dash-prefixed names, and exactly one of them is human-readable text.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 8.52,
+   "end": 17.35,
+   "text": "I log in as bandit4 with ssh bandit4@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 17.35,
+   "end": 24.24,
+   "text": "The file command inspects magic bytes instead of trusting names, so I run file on every file in inhere.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 24.24,
+   "end": 33.24,
+   "text": "Seven come back as data, two as non-ISO extended ASCII text, and one, file zero seven, as ASCII text.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 9
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 33.24,
+   "end": 40.73,
+   "text": "Because the name starts with a dash, I pass it with the directory prefix: cat inhere slash dash file zero seven.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 40.73,
+   "end": 44.38,
+   "text": "It prints the password for bandit five, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

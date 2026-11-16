@@ -1,0 +1,77 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level five.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Somewhere under inhere is one file: a regular file, exactly one thousand and thirty-three bytes, and not executable.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit5 with ssh bandit5@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Find can express all three conditions in one pass, so I run find inhere, type f, size 1033 c, not executable.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Exactly one path survives: inhere slash maybehere zero seven slash dot file two.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "text": "I cat that file.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It prints the password for bandit six, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
