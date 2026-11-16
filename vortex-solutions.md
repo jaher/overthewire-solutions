@@ -1,4 +1,35 @@
 
+## Level 12 → vortex13 (BLOCKED 2026-11-16)
+- **No password obtained.**  The level is blocked on a thread self-drop that kills the L8-style race; the full analysis and the piece-verified exploit chain are in `tools/vx/l12/NOTES.md`.
+- **The program (reconstructed from objdump):** `/vortex/vortex12`, mode 4750, setuid vortex13, group vortex12, 15220 bytes, md5 `0c8384a61f74ffb2d493bd9a6c634ca6`, not stripped, `GNU_STACK RW` (no shellcode), partial RELRO (the GOT writable):
+  ```c
+  void fix_perms(unsigned uid, unsigned gid) {  /* 0x080491e6 */
+      syscall(170, uid, uid, uid);   /* setresgid(rgid,egid,sgid) = uid */
+      syscall(164, gid, gid, gid);   /* setresuid(ruid,euid,suid) = gid */
+  }
+  void *safecode(void *arg) {                   /* 0x08049235 — the THREAD */
+      unsigned i = 0;
+      geteuid(); getgid();
+      fix_perms(geteuid(), getgid());
+      for (;;) { printf("%d\n", i++); fflush(stdout); sleep(1); }
+  }
+  int unsafecode(char *src) {                   /* 0x08049294 */
+      char buf[1032];
+      strcpy(buf, src);              /* unbounded overflow */
+  }
+  int main(int argc, char **argv) {
+      pthread_t tid;
+      pthread_create(&tid, 0, safecode, 0);
+      getuid(); getgid();
+      fix_perms(getuid(), getgid()); /* drops MAIN to r=e=s=5012 */
+      unsafecode(argv[1]);           /* the overflow runs AFTER the drop */
+  }
+  ```
+- **Why the L8 race is dead here:** L8's safecode had no fix_perms, so the raw syscalls in main were per-thread and the other thread kept euid forever.  L12's safecode **calls fix_perms itself** — and fix_perms passes its first arg to setresgid and its second to setresuid, so the thread runs `setresgid(5013,5013,5013)` (EPERM, gid not held) then `setresuid(5012,5012,5012)` and **drops itself to 5012** before its loop starts.  A gdb thread dump confirms both threads end at `Uid: 5012 5012 5012 5012`; `/etc/vortex_pass/vortex13` is `400 vortex13:vortex13` — euid 5013 is required and nothing in the process holds it.
+- **The exploit chain (built and piece-verified live):** the overflow reaches the ret slot at buf+1036 with a NUL-free 1440-byte payload; gadgets byte-verified in the copied binary and /usr/lib32/libc.so.6 (base 0xf7d6d000 measured): `popal; cld; ret` @0x0804931d, `pop ebx; ret`, `inc [ebx-0x366fef3c]; ret` building small integers in the zero .data at 0x0804c028, `mov [eax], ecx; ret` write-what-where @libc+0x3caee, `mov eax,[eax]; ret` deref, `xchg eax,{ebx,ecx,edx}; ret`, `pop esp; ret`, `int 0x80`.  Planned chain: W1 = getgid@GOT ← geteuid@plt (the thread's getgid() then returns its euid, so fix_perms no-ops and the thread never drops), W2 = the thread's sleep-return slot (0xf7d6c33c) ← `pop esp; ret`, W3 = the sleep-arg slot ← a ROP chain in the payload; main sleeps forever and the thread pivots into open/read/write via int 0x80.  An isolated test patching getgid@GOT with 0xdeadbeef killed the thread at its next GOT call — the write-what-where works.
+- **The three blockers:** (1) W1 must land before the thread's `getgid@plt` ~1.5 µs after pthread_create; main's ROP runs ~10 µs later (two syscalls in fix_perms plus the strcpy) — the thread always wins, and CPU hogs (1–24 on the lab's 2 cores) either leave the thread ahead or starve it.  (2) The thread pushes its own return address into the W2 slot on **every** sleep call; whenever its first sleep call follows main's ROP the thread overwrites both W2 and W3 — only ~20 % of runs pivot, and the chain then runs at euid 5012 (EACCES on the pass file).  (3) mprotect is not imported, so the stack can't be made RWX for a shellcode stage, and every useful syscall value (open=5, O_RDONLY=0, read=3, write=4) contains NUL bytes strcpy cannot carry — six ROP variants (sleep-pivot, patch re-apply loop, sleep-yield loop, multi-candidate stack leaks, .data value builders, env-independent leaks) were built, run, and strace-instrumented; each hit one of the three blockers.
+- **Fallback per the standing rule:** no password obtained, nothing invented.  The chain to vortex13 continues if the block is lifted — the next binary is present (`-r-sr-x--- 1 vortex13 vortex12 /vortex/vortex12`).
+
 ## Level 11 → vortex12 (SOLVED 2026-11-16)
 - **Password for vortex12:** `YufVIb8Mo`, dumped by the shellcode from `/etc/vortex_pass/vortex12` and verified by logging in as vortex12 (`uid=5012`, `cat /etc/vortex_pass/vortex12` matches). Recording: `recordings/vortex/L11.cast`.
 - **The program (reconstructed from objdump):** `/vortex/vortex11`, mode 4550, setuid vortex12, 20660 bytes, md5 `c6b84d4cebbd082a3c852c83305443b2`, not stripped, **embeds its own phkmalloc** (the FreeBSD allocator — `malloc`/`malloc_bytes` compiled in; GOT shows `mmap/munmap/madvise/brk/sbrk`, no `malloc@GLIBC`), `GNU_STACK RWE` (executable stack, ASLR off):
