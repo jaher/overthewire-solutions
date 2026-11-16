@@ -3,7 +3,7 @@
  "level": 16,
  "audio": "narration/natas/L16.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 105.94,
+ "duration": 102.53,
  "segments": [
   {
    "id": 0,
@@ -98,7 +98,7 @@
   {
    "id": 6,
    "start": 50.52,
-   "end": 52.63,
+   "end": 52.68,
    "text": "I open vim and write the script:",
    "lines": [
     {
@@ -113,8 +113,8 @@
   },
   {
    "id": 7,
-   "start": 52.63,
-   "end": 62.3,
+   "start": 52.68,
+   "end": 61.8,
    "text": "The first chunk sets up the imports, the page URL, the basic auth header, the character set, and the start of empty, which tests a payload against the page.",
    "lines": [
     {
@@ -125,8 +125,8 @@
   },
   {
    "id": 8,
-   "start": 62.3,
-   "end": 74.95,
+   "start": 61.8,
+   "end": 74.21,
    "text": "The second chunk finishes empty: it posts the payload, reads the reply, and returns true when the block between the pre tags is empty. Then it starts the loop over the character positions, with a binary search over the character set.",
    "lines": [
     {
@@ -137,8 +137,8 @@
   },
   {
    "id": 9,
-   "start": 74.95,
-   "end": 93.86,
+   "start": 74.21,
+   "end": 92.81,
    "text": "The third chunk adds the binary search: it asks grep whether the next character falls in the first half of the character set, using a character class, which needs no quotes. If the reply is empty, the character is in the first half; otherwise it is in the second. Then it verifies the character with a direct grep, and appends it to the prefix.",
    "lines": [
     {
@@ -149,26 +149,10 @@
   },
   {
    "id": 10,
-   "start": 93.86,
-   "end": 98.18,
+   "start": 92.81,
+   "end": 97.18,
    "text": "The last chunk prints the growing prefix and stops when the whole password matches.",
    "lines": [
-    {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "id": 11,
-   "start": 98.18,
-   "end": 99.74,
-   "text": "Here is the last chunk.",
-   "lines": [
-    {
-     "step": 8,
-     "role": "text"
-    },
     {
      "step": 7,
      "role": "vim"
@@ -176,11 +160,15 @@
    ]
   },
   {
-   "id": 12,
-   "start": 99.74,
-   "end": 105.94,
+   "id": 11,
+   "start": 97.18,
+   "end": 102.53,
    "text": "I run the script, and it prints the password one character at a time, finishing with the full thirty-two characters.",
    "lines": [
+    {
+     "step": 8,
+     "role": "text"
+    },
     {
      "step": 8,
      "role": "out",
