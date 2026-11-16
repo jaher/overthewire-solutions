@@ -415,7 +415,11 @@ async function typeInto(prompt, cmd, my, nk){
    like vim, with the cursor moving and lines retyped in place when a
    snapshot changes an earlier line. A pass that only re-types content
    already shown (the repeated passes in Narnia L2/L8) is skipped, so the
-   file is typed once, not eight times. */
+   file is typed once, not eight times.
+   Each action is tagged with the absolute step index whose snapshot
+   produced it, so the player can gate each chunk of a session on its own
+   spoken segment: the narration describes a section as it is typed,
+   instead of the whole file typing under the first sentence. */
 const VIM_ROWS = 18;
 function vimFileOf(st){
   const m = /^vim\s+(.+)$/.exec((st.cmd || '').trim());
@@ -431,7 +435,7 @@ function parseVimScreen(out){
   }
   return lines;
 }
-function buildVimScript(run){
+function buildVimScript(run, firstStep){
   const actions = [];
   let buf = {};
   const snaps = run.map(s => parseVimScreen(s.out));
@@ -455,14 +459,14 @@ function buildVimScript(run){
         bufKeys.every(k => rebuilt[k] === buf[k]) &&
         Object.keys(rebuilt).length > bufKeys.length;
       if (superset){ i++; continue; }
-      if (bufKeys.length > 0){ actions.push({t:'clear'}); buf = {}; }
+      if (bufKeys.length > 0){ actions.push({t:'clear', s: firstStep + i}); buf = {}; }
       i++;
       continue;
     }
     const nums = keys.map(Number).sort((a, b) => a - b);
     for (const n of nums){
-      if (!(n in buf)) actions.push({t:'type', n, text: snap[n]});
-      else if (buf[n] !== snap[n]) actions.push({t:'edit', n, text: snap[n]});
+      if (!(n in buf)) actions.push({t:'type', n, text: snap[n], s: firstStep + i});
+      else if (buf[n] !== snap[n]) actions.push({t:'edit', n, text: snap[n], s: firstStep + i});
       buf[n] = snap[n];
     }
     i++;
@@ -476,10 +480,19 @@ async function playVimSession(user, file, run, my, firstStep){
   line('<span class="note">── typing ' + esc(file) + ' in vim ──</span>', 'note');
   await typeCmd(user, 'vim ' + file, my, firstStep === undefined ? undefined : {step: firstStep, role: 'vimcmd'});
   if (my !== runId) return;
-  const actions = buildVimScript(run);
+  const actions = buildVimScript(run, firstStep);
   const box = line('', '');
   box.className = 'vimscreen';
-  if (firstStep !== undefined) tagNarr(box, firstStep, 'vim');
+  if (firstStep !== undefined){
+    // Tag the box with every segment that anchors any chunk of this run,
+    // so it stays highlighted while each section is spoken and typed.
+    const segs = [];
+    for (let s = firstStep; s < firstStep + run.length; s++){
+      const ss = narrKeySegs.get(narrKey(s, 'vim'));
+      if (ss) for (const x of ss) if (segs.indexOf(x) < 0) segs.push(x);
+    }
+    if (segs.length) box.dataset.narrSeg = segs.join(' ');
+  }
   const rowsEl = document.createElement('div');
   const statusEl = document.createElement('div');
   statusEl.className = 'vimstatus';
@@ -533,8 +546,16 @@ async function playVimSession(user, file, run, my, firstStep){
   }
   render();
   await delay(320 * speed());
+  let lastGated = -1;
   for (const a of actions){
     if (my !== runId) return;
+    // Gate each chunk on its own spoken segment: the section is not typed
+    // until the narration reaches it. (Ungated when not narrating.)
+    if (a.s !== undefined && a.s !== lastGated){
+      await narrGate(a.s, 'vim', undefined, my);
+      if (my !== runId) return;
+      lastGated = a.s;
+    }
     if (a.t === 'clear'){
       for (const k of Object.keys(buf)) delete buf[k];
       topLine = 1; curLine = 1; curCol = 1; dirty = false;

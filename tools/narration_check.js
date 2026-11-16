@@ -247,13 +247,14 @@ function expectedChildren(L) {
     // The highlight is applied synchronously by the timeupdate handler to
     // the divs present NOW; divs the render creates afterwards catch up at
     // the next tick, so snapshot the expected highlight set here, before
-    // the sleep, and compare against it after.
+    // the sleep, and compare against it after. Read the player's own
+    // tagging off each div: the vim box carries the merged segment list
+    // of its whole run, so it highlights through every chunk.
     const active = activeSegAt(audio.currentTime);
     const wantNow = [];
     for (let i = 0; i < term.children.length; i++) {
-      const k = expected[i] && expected[i].key;
-      const segs = k && getNarrKeySegs().get(k);
-      if (segs && segs.indexOf(active) >= 0) wantNow.push(i);
+      const d = term.children[i];
+      if (d.dataset && d.dataset.narrSeg && d.dataset.narrSeg.split(' ').indexOf(String(active)) >= 0) wantNow.push(i);
     }
     const panelNow = panelActive();
     await sleep(STEP_SLEEP);
@@ -272,7 +273,9 @@ function expectedChildren(L) {
       }
     }
     // (c) highlighted divs == present divs tagged with the active segment
-    // (as snapshotted at the timeupdate, before the sleep)
+    // (as snapshotted at the timeupdate, before the sleep). Read the
+    // player's own tagging off each div: the vim box carries the merged
+    // segment list of its whole run, so it highlights through every chunk.
     const got = highlightedIdx();
     if (wantNow.sort().join(',') !== got.sort().join(',')) {
       hlBad.push(`t=${now.toFixed(2)} seg=${active} want=[${wantNow.join(',')}] got=[${got.join(',')}]`);

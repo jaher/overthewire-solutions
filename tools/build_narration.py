@@ -124,12 +124,21 @@ def validate(game, level, segments):
             elif role == "note":
                 if not ((st.get("cmd") or "").startswith("#") or st.get("note")):
                     errors.append(f"seg {i}: step {step} is neither a # comment nor a noted step")
-            elif role in ("vim", "vimcmd"):
+            elif role == "vimcmd":
+                # only one vim command line exists per run, on its first step
                 if step not in first_of:
                     errors.append(f"seg {i}: step {step} is not a vim step")
                 elif first_of[step] != step:
-                    errors.append(f"seg {i}: {role} must anchor the FIRST step of the vim run "
+                    errors.append(f"seg {i}: vimcmd must anchor the FIRST step of the vim run "
                                   f"(step {first_of[step]}, not {step})")
+                else:
+                    covered_cmds.add(step)
+            elif role == "vim":
+                # a vim session is gated per chunk: any step of the run may
+                # anchor its chunk (the player gates each chunk on its own
+                # spoken segment); the box is one div tagged with all of them
+                if step not in first_of:
+                    errors.append(f"seg {i}: step {step} is not a vim step")
                 else:
                     covered_cmds.add(step)
             elif role == "out":
