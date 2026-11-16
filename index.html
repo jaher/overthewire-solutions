@@ -44,6 +44,10 @@
   .lvl { color:var(--dim); font-size:13px; }
   .progress { height:6px; background:#0f1f0f; border-radius:3px; overflow:hidden; margin-top:6px; }
   .progress > div { height:100%; background:var(--green); width:0%; transition: width .3s; }
+  .term .narr-hl { outline:2px solid var(--green); outline-offset:1px; background:rgba(51,255,102,.10); }
+  #narrBar { display:none; align-items:center; gap:10px; margin:10px 0 0; }
+  #narrBar.on { display:flex; }
+  #narrSeek { flex:1; accent-color:var(--green); }
   a { color:#7dff9e; }
   footer { color:var(--dim); font-size:12px; margin-top:18px; }
 </style>
@@ -59,6 +63,7 @@
   <div class="bar">
     <button id="playBtn">⏸ Pause</button>
     <button id="restartBtn">⟲ Restart level</button>
+    <button id="narrBtn" style="display:none">🔊 Narrate</button>
     <label class="lvl">Speed
       <select id="speed">
         <option value="2">0.5×</option>
@@ -76,6 +81,7 @@
     <span class="lvl" id="status"></span>
   </div>
   <div class="progress"><div id="fill"></div></div>
+  <div id="narrBar"><span class="lvl" id="narrTime">0:00 / 0:00</span><input type="range" id="narrSeek" min="0" max="100" step="0.1" value="0" aria-label="Narration position"><span class="lvl" id="narrSeg"></span></div>
 
   <footer>Reconstructed from the actual solving session on DGX 5 (2026-10-20). Commands are the real ones used; long outputs are trimmed for the replay.</footer>
 </div>
@@ -186,9 +192,134 @@ loadManifest();
 let playing = true, timer = null, cur = 0, runId = 0;
 const speed = () => parseFloat(speedSel.value);
 function sleep(ms){ return new Promise(r => { const iv = setInterval(() => { if (playing) { clearInterval(iv); r(); } }, 60); setTimeout(() => {}, 0); }); }
-function delay(ms){ return new Promise(r => { let t = 0; const iv = setInterval(() => { if (playing) { t += 50; if (t >= ms) { clearInterval(iv); r(); } } }, 50); }); }
+function delay(ms){ if (narrFF) return Promise.resolve(); return new Promise(r => { let t = 0; const iv = setInterval(() => { if (playing) { t += 50; if (t >= ms) { clearInterval(iv); r(); } } }, 50); }); }
 function line(html, cls, colwrap){ const d = document.createElement('div'); if (cls) d.className = cls + (colwrap ? ' w100' : ''); d.innerHTML = html; term.appendChild(d); term.scrollTop = term.scrollHeight; return d; }
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+/* ---- Spoken narration, synced to the typed lines ----
+   A level with a sync map (narration/<game>/L<n>.sync.json) gets a Narrate
+   button. The audio is the clock: every rendered line waits for its
+   scheduled audio time before it is typed, so the spoken words and the
+   appearing text land together. The map keys lines by step + role
+   (goal/vim/vimcmd/cmd/out/pw); out lines take an inclusive index range.
+   A line's time is its segment's start plus its share of the segment, so
+   lines inside one spoken clause appear spread across that clause.
+   Seeking re-renders the level fast-forwarded up to the seek point. */
+const narrAudio = document.createElement('audio');
+narrAudio.preload = 'metadata';
+const narrBtn = document.getElementById('narrBtn');
+const narrBar = document.getElementById('narrBar');
+const narrSeek = document.getElementById('narrSeek');
+const narrTimeEl = document.getElementById('narrTime');
+const narrSegEl = document.getElementById('narrSeg');
+let narrMap = null, narrOn = false, narrFF = false;
+let narrGame = '', narrLevel = -1, narrLevelKey = '', narrLoadTok = 0;
+let narrLineTime = new Map(), narrKeySegs = new Map();
+function narrKey(step, role, idx){ return step + ':' + role + ':' + (idx === undefined ? '' : idx); }
+function buildNarrSchedule(map){
+  narrLineTime = new Map(); narrKeySegs = new Map();
+  map.segments.forEach((sg, si) => {
+    const refs = [];
+    for (const L of (sg.lines || [])){
+      if (L.role === 'out' && L.from !== undefined){
+        for (let i = L.from; i <= (L.to === undefined ? L.from : L.to); i++) refs.push(narrKey(L.step, 'out', i));
+      } else refs.push(narrKey(L.step, L.role));
+    }
+    refs.forEach((k, j) => {
+      if (!narrKeySegs.has(k)) narrKeySegs.set(k, []);
+      narrKeySegs.get(k).push(si);
+      if (!narrLineTime.has(k)){
+        const t = sg.start + (refs.length > 1 ? (j / refs.length) * (sg.end - sg.start) : 0);
+        narrLineTime.set(k, {t, seg: si});
+      }
+    });
+  });
+}
+function narrActive(){ return narrOn && narrMap && narrGame === gameKey && narrLevel === (curGame().levels[cur] || {}).lvl; }
+async function narrGate(step, role, idx, my){
+  if (!narrActive()) return;
+  const e = narrLineTime.get(narrKey(step, role, idx));
+  if (!e || e.t <= (narrAudio.currentTime || 0)) return;
+  narrFF = false;
+  while (narrAudio.paused || (narrAudio.currentTime || 0) < e.t){
+    if (my !== runId || !narrOn) return;
+    await new Promise(r => setTimeout(r, 60));
+  }
+}
+function tagNarr(d, step, role, idx){
+  if (!narrMap) return;
+  const segs = narrKeySegs.get(narrKey(step, role, idx));
+  if (segs) d.dataset.narrSeg = segs.join(' ');
+}
+async function loadNarration(game, lvl){
+  const key = game + ':' + lvl, tok = ++narrLoadTok;
+  narrLevelKey = key; narrMap = null;
+  narrOn = false; if (narrAudio.pause) narrAudio.pause();
+  narrBtn.style.display = 'none'; narrBar.classList.remove('on');
+  narrBtn.textContent = '🔊 Narrate';
+  try {
+    const r = await fetch('narration/' + game + '/L' + lvl + '.sync.json', {cache:'no-store'});
+    if (!r.ok || tok !== narrLoadTok) return;
+    narrMap = await r.json();
+    if (tok !== narrLoadTok) { narrMap = null; return; }
+    narrGame = game; narrLevel = lvl;
+    buildNarrSchedule(narrMap);
+    narrAudio.src = narrMap.audio;
+    narrBtn.style.display = '';
+    narrBar.classList.add('on');
+    setNarrTime();
+  } catch(e) {}
+}
+function fmtT(s){ if (!isFinite(s)) s = 0; s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+function setNarrTime(){
+  const d = narrAudio.duration, c = narrAudio.currentTime || 0;
+  narrTimeEl.textContent = fmtT(c) + ' / ' + fmtT(d);
+  if (isFinite(d) && d > 0){ narrSeek.max = d; if (document.activeElement !== narrSeek) narrSeek.value = c; }
+}
+function narrHighlight(){
+  if (!narrMap) return;
+  const t = narrAudio.currentTime || 0;
+  let active = -1;
+  narrMap.segments.forEach((sg, i) => { if (t >= sg.start) active = i; });
+  narrSegEl.textContent = active >= 0 ? narrMap.segments[active].text : '';
+  let first = null;
+  term.querySelectorAll('[data-narr-seg]').forEach(d => {
+    const on = active >= 0 && d.dataset.narrSeg.split(' ').indexOf(String(active)) >= 0;
+    d.classList.toggle('narr-hl', on);
+    if (on && !first) first = d;
+  });
+  if (first) first.scrollIntoView({block: 'nearest'});
+}
+function narrClearHL(){ term.querySelectorAll('[data-narr-seg]').forEach(d => d.classList.remove('narr-hl')); narrSegEl.textContent = ''; }
+narrAudio.addEventListener('timeupdate', () => { setNarrTime(); narrHighlight(); });
+narrAudio.addEventListener('seeked', narrHighlight);
+narrAudio.addEventListener('loadedmetadata', setNarrTime);
+narrAudio.addEventListener('ended', () => {
+  narrOn = false; narrFF = false;
+  narrBtn.textContent = '🔊 Narrate'; playBtn.textContent = '⏸ Pause';
+  narrClearHL();
+});
+narrBtn.onclick = async () => {
+  if (!narrMap) return;
+  if (narrOn && !narrAudio.paused){ narrAudio.pause(); narrBtn.textContent = '▶ Resume narration'; playBtn.textContent = '▶ Play'; return; }
+  if (narrOn && narrAudio.paused){ narrAudio.play().catch(() => {}); narrBtn.textContent = '⏸ Pause narration'; playBtn.textContent = '⏸ Pause'; return; }
+  narrOn = true; narrFF = false;
+  playing = true; playBtn.textContent = '⏸ Pause';
+  narrBtn.textContent = '⏸ Pause narration';
+  narrAudio.currentTime = 0;
+  playLevel(cur);
+  narrAudio.play().catch(() => {});
+};
+narrSeek.addEventListener('input', () => {
+  if (!narrMap) return;
+  narrAudio.currentTime = parseFloat(narrSeek.value);
+  narrHighlight();
+});
+narrSeek.addEventListener('change', () => {
+  if (!narrOn || !narrMap) return;
+  narrFF = true;
+  playLevel(cur);
+});
 
 // Every level is a list of steps: each step is one command and exactly the
 // output lines that command printed. Older levels still carry the legacy
@@ -214,20 +345,24 @@ function promptHost(user, cmd){
   return G.host || (gameKey + '.labs.overthewire.org');
 }
 
-async function typeCmd(user, cmd, my){
-  return typeInto(user + '@' + promptHost(user, cmd) + ':~$ ', cmd, my);
+async function typeCmd(user, cmd, my, nk){
+  return typeInto(user + '@' + promptHost(user, cmd) + ':~$ ', cmd, my, nk);
 }
 
 // A step whose command is the body of an editor session (or any text typed
 // into a program) is rendered as the text itself, one line at a time, under a
 // short label — not as a shell command.
-async function typeText(label, text, my){
-  line('<span class="note">── ' + esc(label) + ' ──</span>', 'note');
-  return typeInto('', text, my);
+async function typeText(label, text, my, nk){
+  const ld = line('<span class="note">── ' + esc(label) + ' ──</span>', 'note');
+  if (nk) tagNarr(ld, nk.step, nk.role, nk.idx);
+  return typeInto('', text, my, nk);
 }
 
-async function typeInto(prompt, cmd, my){
+async function typeInto(prompt, cmd, my, nk){
+  if (nk) await narrGate(nk.step, nk.role, nk.idx, my);
+  if (my !== runId) return;
   const d = line('<span class="prompt"></span><span class="cmd"></span><span class="cursor"></span>');
+  if (nk) tagNarr(d, nk.step, nk.role, nk.idx);
   d.querySelector('.prompt').textContent = prompt;
   const span = d.querySelector('.cmd');
   for (let i = 0; i < cmd.length; i++){
@@ -304,13 +439,16 @@ function buildVimScript(run){
   actions.push({t:'wq'});
   return actions;
 }
-async function playVimSession(user, file, run, my){
+async function playVimSession(user, file, run, my, firstStep){
+  if (firstStep !== undefined) await narrGate(firstStep, 'vim', undefined, my);
+  if (my !== runId) return;
   line('<span class="note">── typing ' + esc(file) + ' in vim ──</span>', 'note');
-  await typeCmd(user, 'vim ' + file, my);
+  await typeCmd(user, 'vim ' + file, my, firstStep === undefined ? undefined : {step: firstStep, role: 'vimcmd'});
   if (my !== runId) return;
   const actions = buildVimScript(run);
   const box = line('', '');
   box.className = 'vimscreen';
+  if (firstStep !== undefined) tagNarr(box, firstStep, 'vim');
   const rowsEl = document.createElement('div');
   const statusEl = document.createElement('div');
   statusEl.className = 'vimstatus';
@@ -417,6 +555,9 @@ async function playLevel(idx){
   const L = G.levels[idx]; if (!L) return;
   const my = ++runId;
   cur = idx;
+  if (gameKey + ':' + L.lvl !== narrLevelKey) loadNarration(gameKey, L.lvl);
+  const myNarr = narrOn && narrMap && narrGame === gameKey && narrLevel === L.lvl;
+  if (myNarr) narrFF = true;
   document.getElementById('nowPlaying').textContent = G.title.toUpperCase() + ' — LEVEL ' + L.lvl;
   document.title = G.title + ' Level ' + L.lvl + ' — OverTheWire solutions';
   term.innerHTML = '';
@@ -424,7 +565,9 @@ async function playLevel(idx){
   fill.style.width = (idx / (G.levels.length - 1) * 100) + '%';
   statusEl.textContent = G.title + ' — Level ' + L.lvl + ' / ' + G.levels[G.levels.length-1].lvl;
   line('', '');
-  line(G.title.toUpperCase() + ' LEVEL ' + L.lvl + ' — PROBLEM STATEMENT\n' + ((G.goals && G.goals[L.lvl]) || L.goal || ''), 'goal');
+  await narrGate(-1, 'goal', undefined, my);
+  const gd = line(G.title.toUpperCase() + ' LEVEL ' + L.lvl + ' — PROBLEM STATEMENT\n' + ((G.goals && G.goals[L.lvl]) || L.goal || ''), 'goal');
+  tagNarr(gd, -1, 'goal');
   const hostTag = L.user + '@' + (flatCmds(L).some(c => c.trim().startsWith('ssh ')) ? (G.host || 'bandit.labs.overthewire.org') : 'localhost');
   const desc = (G.goals && G.goals[L.lvl]) || L.goal || '';
   line('<span class="note">── ' + hostTag + ' ──</span>' + (desc ? '\n<span class="note">Goal: ' + esc(desc) + '</span>' : ''), 'note');
@@ -439,16 +582,25 @@ async function playLevel(idx){
       const st = L.steps[si];
       const vf = vimFileOf(st);
       if (vf){
+        const firstSi = si;
         const run = [];
         while (si < L.steps.length && vimFileOf(L.steps[si]) === vf){ run.push(L.steps[si]); si++; }
-        await playVimSession(L.user, vf, run, my);
+        await playVimSession(L.user, vf, run, my, firstSi);
         continue;
       }
-      if (st.text) await typeText(st.text, st.cmd, my);
-      else if (st.cmd.startsWith('#')) { line('<span class="note">' + esc(st.cmd) + '</span>', 'note'); await delay(420 * speed()); }
-      else await typeCmd(L.user, st.cmd, my);
-      for (const o of (st.out || [])) { if (my !== runId) return; line(esc(o), 'out', o.length > 100); await delay(160 * speed()); }
-      if (st.note) { line('<span class="note">' + esc(st.note) + '</span>', 'note'); await delay(260 * speed()); }
+      if (st.text) await typeText(st.text, st.cmd, my, {step: si, role: 'text'});
+      else if (st.cmd.startsWith('#')) { await narrGate(si, 'note', undefined, my); const nd = line('<span class="note">' + esc(st.cmd) + '</span>', 'note'); tagNarr(nd, si, 'note'); await delay(420 * speed()); }
+      else await typeCmd(L.user, st.cmd, my, {step: si, role: 'cmd'});
+      for (let oi = 0; oi < (st.out || []).length; oi++){
+        const o = st.out[oi];
+        if (my !== runId) return;
+        await narrGate(si, 'out', oi, my);
+        if (my !== runId) return;
+        const od = line(esc(o), 'out', o.length > 100);
+        tagNarr(od, si, 'out', oi);
+        await delay(160 * speed());
+      }
+      if (st.note) { await narrGate(si, 'note', undefined, my); const nd = line('<span class="note">' + esc(st.note) + '</span>', 'note'); tagNarr(nd, si, 'note'); await delay(260 * speed()); }
       si++;
     }
   } else {
@@ -461,15 +613,18 @@ async function playLevel(idx){
     }
     for (const o of (L.out || [])) { if (my !== runId) return; line(esc(o), 'out', o.length > 100); await delay(160 * speed()); }
   }
-  if (L.pw) { line('The password is <span class="pw">' + L.pw + '</span>', 'out'); }
+  if (L.pw) { await narrGate(-1, 'pw', undefined, my); const pd = line('The password is <span class="pw">' + L.pw + '</span>', 'out'); tagNarr(pd, -1, 'pw'); }
   if (L.note) { line('<span class="note">' + esc(L.note) + '</span>', 'note'); }
   line('');
   await delay(1400 * speed());
   if (my !== runId) return;
-  if (idx + 1 < curGame().levels.length && playing) playLevel(idx + 1);
-  else if (idx + 1 >= curGame().levels.length) { statusEl.textContent = curGame().title + ' complete — all levels'; }
+  if (!myNarr && idx + 1 < curGame().levels.length && playing) playLevel(idx + 1);
+  else if (!myNarr && idx + 1 >= curGame().levels.length) { statusEl.textContent = curGame().title + ' complete — all levels'; }
 }
-playBtn.onclick = () => { playing = !playing; playBtn.textContent = playing ? '⏸ Pause' : '▶ Play'; };
+playBtn.onclick = () => {
+  if (narrOn){ narrBtn.onclick(); return; }
+  playing = !playing; playBtn.textContent = playing ? '⏸ Pause' : '▶ Play';
+};
 document.getElementById('restartBtn').onclick = () => { playing = true; playBtn.textContent = '⏸ Pause'; playLevel(cur); };
 jump.onchange = () => { playing = true; playBtn.textContent = '⏸ Pause'; const ix = curGame().levels.findIndex(x => x.lvl === parseInt(jump.value, 10)); playLevel(ix < 0 ? 0 : ix); };
 playLevel(0);

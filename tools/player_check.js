@@ -9,7 +9,38 @@ function El(tag) {
   this.tag = tag; this.children = []; this.style = {}; this.className = '';
   this._text = ''; this._q = {}; this.parent = null;
   this.scrollTop = 0; this.scrollHeight = 0; this.value = ''; this.innerHTML = '';
+  this.dataset = {}; this._listeners = {};
+  // fake-audio state (the narration player uses document.createElement('audio'))
+  this.paused = true; this.currentTime = 0; this.duration = NaN; this.src = '';
 }
+El.prototype.addEventListener = function (type, fn) {
+  (this._listeners[type] = this._listeners[type] || []).push(fn);
+};
+El.prototype.fire = function (type) {
+  (this._listeners[type] || []).forEach(fn => fn());
+};
+El.prototype.play = function () { this.paused = false; return Promise.resolve(); };
+El.prototype.pause = function () { this.paused = true; };
+El.prototype.scrollIntoView = function () {};
+Object.defineProperty(El.prototype, 'classList', {
+  get() {
+    const el = this;
+    const has = (c) => el.className.split(/\s+/).includes(c);
+    return {
+      add(c) { if (!has(c)) el.className = (el.className + ' ' + c).trim(); },
+      remove(c) { el.className = el.className.split(/\s+/).filter(x => x && x !== c).join(' '); },
+      toggle(c, force) { const on = force === undefined ? !has(c) : force; if (on) this.add(c); else this.remove(c); return on; },
+      contains(c) { return has(c); },
+    };
+  },
+});
+El.prototype.querySelectorAll = function (sel) {
+  // only selector the page uses: [data-narr-seg]
+  const out = [];
+  const walk = (e) => { for (const c of e.children) { if (c.dataset && c.dataset.narrSeg) out.push(c); walk(c); } };
+  walk(this);
+  return out;
+};
 Object.defineProperty(El.prototype, 'innerHTML', {
   get() { return ''; },
   set(v) { this.children = []; this._text = String(v); },
@@ -45,7 +76,8 @@ global.setInterval = (fn, ms) => realSetInterval(fn, 1);
 
 const realFetch = (url) => {
   const p = path.join(ROOT, url.replace(/^\.?\//, ''));
-  return Promise.resolve({ json: async () => JSON.parse(fs.readFileSync(p, 'utf8')) });
+  if (!fs.existsSync(p)) return Promise.resolve({ ok: false, status: 404, json: async () => ({}) });
+  return Promise.resolve({ ok: true, status: 200, json: async () => JSON.parse(fs.readFileSync(p, 'utf8')) });
 };
 global.fetch = realFetch;
 
