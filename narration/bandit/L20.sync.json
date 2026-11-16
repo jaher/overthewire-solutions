@@ -1,0 +1,104 @@
+{
+ "game": "bandit",
+ "level": 20,
+ "audio": "narration/bandit/L20.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 44.06,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.8,
+   "text": "Bandit, level twenty.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.8,
+   "end": 13.63,
+   "text": "The home directory holds suconnect, a setuid binary owned by bandit twenty-one: it connects to a port on localhost, sends the current password, and if it matches, it sends back the next password.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 13.63,
+   "end": 22.34,
+   "text": "I log in as bandit20 with ssh bandit20@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 22.34,
+   "end": 31.66,
+   "text": "So I provide the listener it wants: netcat listening on port four thousand, feeding it bandit twenty's password, then sleeping three seconds to keep the connection open.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 31.66,
+   "end": 34.37,
+   "text": "The listener starts in the background as job one.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 34.37,
+   "end": 37.42,
+   "text": "Then I run suconnect against port four thousand.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 37.42,
+   "end": 44.06,
+   "text": "It reads the password, reports that it matches, and sends the password for bandit twenty-one, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,78 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level twenty.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The home directory holds suconnect, a setuid binary owned by bandit twenty-one: it connects to a port on localhost, sends the current password, and if it matches, it sends back the next password.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit20 with ssh bandit20@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "So I provide the listener it wants: netcat listening on port four thousand, feeding it bandit twenty's password, then sleeping three seconds to keep the connection open.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The listener starts in the background as job one.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "text": "Then I run suconnect against port four thousand.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It reads the password, reports that it matches, and sends the password for bandit twenty-one, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

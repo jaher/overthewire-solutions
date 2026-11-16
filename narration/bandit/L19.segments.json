@@ -1,0 +1,58 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level nineteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The home directory holds a binary called bandit twenty do, a setuid helper owned by bandit twenty: anything it runs, it runs as bandit twenty.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit19 with ssh bandit19@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The helper simply executes whatever command you give it, so I run it with cat on bandit twenty's password file.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The helper runs the command as bandit twenty, so it can read a file my account cannot, and the password for bandit twenty prints, and the level is solved.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

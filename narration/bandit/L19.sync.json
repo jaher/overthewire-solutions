@@ -1,0 +1,78 @@
+{
+ "game": "bandit",
+ "level": 19,
+ "audio": "narration/bandit/L19.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 34.25,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.92,
+   "text": "Bandit, level nineteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.92,
+   "end": 10.73,
+   "text": "The home directory holds a binary called bandit twenty do, a setuid helper owned by bandit twenty: anything it runs, it runs as bandit twenty.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 10.73,
+   "end": 20.26,
+   "text": "I log in as bandit19 with ssh bandit19@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 20.26,
+   "end": 25.97,
+   "text": "The helper simply executes whatever command you give it, so I run it with cat on bandit twenty's password file.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 25.97,
+   "end": 34.25,
+   "text": "The helper runs the command as bandit twenty, so it can read a file my account cannot, and the password for bandit twenty prints, and the level is solved.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

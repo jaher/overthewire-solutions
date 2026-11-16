@@ -1,0 +1,142 @@
+{
+ "game": "bandit",
+ "level": 21,
+ "audio": "narration/bandit/L21.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 63.48,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.16,
+   "text": "Bandit, level twenty-one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.16,
+   "end": 8.16,
+   "text": "The next password is delivered by a scheduled job: a cron job runs every minute as bandit twenty-two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 8.16,
+   "end": 17.52,
+   "text": "I log in as bandit21 with ssh bandit21@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 17.52,
+   "end": 22.68,
+   "text": "Cron definitions live in etc cron dot d, so I read the job for bandit twenty-two.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 22.68,
+   "end": 26.52,
+   "text": "It runs every minute as bandit twenty-two, and also at reboot.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 26.52,
+   "end": 28.39,
+   "text": "I read the script it runs.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 28.39,
+   "end": 33.5,
+   "text": "The script makes a file in temp readable, then copies bandit twenty-two's password into it.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 33.5,
+   "end": 57.98,
+   "text": "The note names the file: temp slash t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv, refreshed every minute.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 57.98,
+   "end": 59.47,
+   "text": "I cat that file.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 59.47,
+   "end": 63.48,
+   "text": "Out comes the password for bandit twenty-two, and the level is solved.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
