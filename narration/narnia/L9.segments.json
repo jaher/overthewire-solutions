@@ -1,0 +1,55 @@
+{
+ "segments": [
+  {
+   "text": "Narnia, level nine \u2014 the last one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "There is no exploit here: logging in as narnia nine just shows the completion file.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as narnia nine.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The home directory holds a file called CONGRATULATIONS, and it reads: you are l three three t, next please \u2014 with a note asking us not to post writeups or spoilers. The game is complete.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "The password for narnia nine is shown, and the game is complete.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
