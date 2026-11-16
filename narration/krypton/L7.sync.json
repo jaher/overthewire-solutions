@@ -1,0 +1,87 @@
+{
+ "game": "krypton",
+ "level": 7,
+ "audio": "narration/krypton/L7.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 24.96,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 3.24,
+   "text": "Krypton, level seven, the final level.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 3.24,
+   "end": 7.13,
+   "text": "There is no krypton eight account, so this level is just the end marker.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 7.13,
+   "end": 10.56,
+   "text": "I log in as krypton seven with the password from the last level,",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 10.56,
+   "end": 11.95,
+   "text": "and read the README.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 11.95,
+   "end": 14.04,
+   "text": "Congratulations on beating Krypton!",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 14.04,
+   "end": 24.96,
+   "text": "That completes the run, from Base64 and ROT thirteen, through Caesar and substitution ciphers, to Vigenere with unknown key length and finally a weak pseudo-random generator.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

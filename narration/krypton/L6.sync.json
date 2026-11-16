@@ -1,0 +1,155 @@
+{
+ "game": "krypton",
+ "level": 6,
+ "audio": "narration/krypton/L6.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 52.8,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.99,
+   "text": "Krypton, level six.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.99,
+   "end": 8.52,
+   "text": "Here the encryption mixes a secret key with a pseudo-random keystream, and the hint says the generator is weak.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 8.52,
+   "end": 10.61,
+   "text": "I log in as krypton six,",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 10.61,
+   "end": 13.9,
+   "text": "and read the second hint: eight bit LFSR.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 13.9,
+   "end": 24.62,
+   "text": "A feedback register like that is deterministic, so its output repeats, and a chosen plaintext can expose it. I make a working directory in temp, open it up, and link the key file into it.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 24.62,
+   "end": 33.31,
+   "text": "Then I write six hundred A's into a file: with A as the plaintext, each output byte is just the keystream offset, no plaintext mixed in.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 33.31,
+   "end": 35.28,
+   "text": "I run the encrypt program on it.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 35.28,
+   "end": 41.83,
+   "text": "Then I run the solver, which reads the keystream back, finds its period, and decrypts the target with the repeating offsets.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 41.83,
+   "end": 44.23,
+   "text": "The offsets repeat every thirty letters,",
+   "lines": [
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 44.23,
+   "end": 49.92,
+   "text": "and the target decrypts to LFSR IS NOT RANDOM, the password for krypton seven.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 49.92,
+   "end": 52.8,
+   "text": "An LFSR is not a random source.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

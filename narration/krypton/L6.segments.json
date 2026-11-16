@@ -1,0 +1,117 @@
+{
+ "segments": [
+  {
+   "text": "Krypton, level six.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Here the encryption mixes a secret key with a pseudo-random keystream, and the hint says the generator is weak.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as krypton six,",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "and read the second hint: eight bit LFSR.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "A feedback register like that is deterministic, so its output repeats, and a chosen plaintext can expose it. I make a working directory in temp, open it up, and link the key file into it.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Then I write six hundred A's into a file: with A as the plaintext, each output byte is just the keystream offset, no plaintext mixed in.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I run the encrypt program on it.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Then I run the solver, which reads the keystream back, finds its period, and decrypts the target with the repeating offsets.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The offsets repeat every thirty letters,",
+   "lines": [
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "and the target decrypts to LFSR IS NOT RANDOM, the password for krypton seven.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "An LFSR is not a random source.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
