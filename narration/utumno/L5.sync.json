@@ -3,12 +3,12 @@
  "level": 5,
  "audio": "narration/utumno/L5.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 130.2,
+ "duration": 174.62,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 2.11,
+   "end": 2.09,
    "text": "Utumno, level five.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 2.11,
-   "end": 4.27,
+   "start": 2.09,
+   "end": 4.32,
    "text": "I log in as utumno five.",
    "lines": [
     {
@@ -31,8 +31,8 @@
   },
   {
    "id": 2,
-   "start": 4.27,
-   "end": 14.59,
+   "start": 4.32,
+   "end": 15.07,
    "text": "This is the same shape as level two. The guard wants one argument and an empty argv zero, and then the program prints argv ten and passes it to a function called hihi.",
    "lines": [
     {
@@ -55,8 +55,8 @@
   },
   {
    "id": 3,
-   "start": 14.59,
-   "end": 20.42,
+   "start": 15.07,
+   "end": 21.6,
    "text": "With one argument, argv ten is again envp eight, the ninth environment variable.",
    "lines": [
     {
@@ -69,8 +69,8 @@
   },
   {
    "id": 4,
-   "start": 20.42,
-   "end": 35.5,
+   "start": 21.6,
+   "end": 35.23,
    "text": "The difference is inside hihi. It takes the string length. If the length is greater than nineteen it uses strncpy with a count of twenty, otherwise it uses strcpy. So a long string only puts twenty bytes into the twelve byte buffer.",
    "lines": [
     {
@@ -83,8 +83,8 @@
   },
   {
    "id": 5,
-   "start": 35.5,
-   "end": 49.78,
+   "start": 35.23,
+   "end": 49.39,
    "text": "The copy is twenty bytes into a twelve byte buffer, so the first twelve fill the buffer, the next four overwrite the saved frame pointer, and the next four the return address. The shellcode stays in the environment string, and the return address points at it.",
    "lines": [
     {
@@ -97,8 +97,8 @@
   },
   {
    "id": 6,
-   "start": 49.78,
-   "end": 53.42,
+   "start": 49.39,
+   "end": 52.82,
    "text": "The stack is executable and address randomisation is off.",
    "lines": [
     {
@@ -125,8 +125,8 @@
   },
   {
    "id": 7,
-   "start": 53.42,
-   "end": 55.66,
+   "start": 52.82,
+   "end": 55.06,
    "text": "I open vim and write the shellcode:",
    "lines": [
     {
@@ -141,8 +141,8 @@
   },
   {
    "id": 8,
-   "start": 55.66,
-   "end": 60.1,
+   "start": 55.06,
+   "end": 59.54,
    "text": "The header, the start label, and the marker comment, with eax zeroed.",
    "lines": [
     {
@@ -153,8 +153,8 @@
   },
   {
    "id": 9,
-   "start": 60.1,
-   "end": 66.65,
+   "start": 59.54,
+   "end": 66.79,
    "text": "The marker write: push a zero, push PWN exclamation, then write four bytes to standard output.",
    "lines": [
     {
@@ -165,8 +165,8 @@
   },
   {
    "id": 10,
-   "start": 66.65,
-   "end": 73.54,
+   "start": 66.79,
+   "end": 72.24,
    "text": "Then the user-id calls: geteuid, then setreuid with the id in both slots.",
    "lines": [
     {
@@ -177,8 +177,8 @@
   },
   {
    "id": 11,
-   "start": 73.54,
-   "end": 79.78,
+   "start": 72.24,
+   "end": 78.84,
    "text": "Then setuid, and the path begins: the password file path as dwords, null first.",
    "lines": [
     {
@@ -189,9 +189,9 @@
   },
   {
    "id": 12,
-   "start": 79.78,
-   "end": 82.54,
-   "text": "Then the rest of the path pushes, and the open call.",
+   "start": 78.84,
+   "end": 95.81,
+   "text": "Then the rest of the path pushes, and the open call. The remaining words of the password path are pushed in reverse so the full path sits on the stack, and the stack pointer becomes the path argument. The flags are cleared for a read-only open, five is loaded as the syscall number, and the interrupt makes the call.",
    "lines": [
     {
      "role": "vim",
@@ -201,9 +201,9 @@
   },
   {
    "id": 13,
-   "start": 82.54,
-   "end": 85.25,
-   "text": "Then read the password file into a stack buffer.",
+   "start": 95.81,
+   "end": 114.89,
+   "text": "Then read the password file into a stack buffer. The file descriptor from the open call is saved, and sixty-four bytes of stack are reserved for the buffer. The buffer address and the length are set up, three is loaded as the syscall number for the read, and the byte count that comes back is kept for the write that follows, with the output descriptor set to one.",
    "lines": [
     {
      "role": "vim",
@@ -213,9 +213,9 @@
   },
   {
    "id": 14,
-   "start": 85.25,
-   "end": 87.65,
-   "text": "Then write it to standard output and exit.",
+   "start": 114.89,
+   "end": 129.77,
+   "text": "Then write it to standard output and exit. The buffer address goes back into place, four is loaded as the syscall number, and the interrupt writes the bytes that were read. Then one is loaded as the syscall number, the exit code is cleared to zero, and the final interrupt exits.",
    "lines": [
     {
      "role": "vim",
@@ -225,8 +225,8 @@
   },
   {
    "id": 15,
-   "start": 87.65,
-   "end": 97.25,
+   "start": 129.77,
+   "end": 140.57,
    "text": "We assemble with nasm, inspect the encoding with objdump, extract with objcopy, check the bytes with xxd, and wc counts one hundred thirty one bytes.",
    "lines": [
     {
@@ -271,8 +271,8 @@
   },
   {
    "id": 16,
-   "start": 97.25,
-   "end": 106.18,
+   "start": 140.57,
+   "end": 149.28,
    "text": "The environment value is the prefix E zero eight equals, eight nops, four filler bytes, the return address, eight more nops, and the shellcode.",
    "lines": [
     {
@@ -289,8 +289,8 @@
   },
   {
    "id": 17,
-   "start": 106.18,
-   "end": 114.14,
+   "start": 149.28,
+   "end": 157.13,
    "text": "The first twelve bytes of the environment value fill the buffer, the next four overwrite the saved frame pointer, and the next four the return address.",
    "lines": [
     {
@@ -307,8 +307,8 @@
   },
   {
    "id": 18,
-   "start": 114.14,
-   "end": 124.15,
+   "start": 157.13,
+   "end": 167.98,
    "text": "The exploit builds the empty argv zero through libc dot execve and sweeps return addresses. It hits zero x f f f f d e f c.",
    "lines": [
     {
@@ -325,8 +325,8 @@
   },
   {
    "id": 19,
-   "start": 124.15,
-   "end": 130.2,
+   "start": 167.98,
+   "end": 174.62,
    "text": "The password is H h E X D I z q g nine.",
    "lines": [
     {
