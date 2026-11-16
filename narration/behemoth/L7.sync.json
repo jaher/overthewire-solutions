@@ -1,0 +1,307 @@
+{
+ "game": "behemoth",
+ "level": 7,
+ "audio": "narration/behemoth/L7.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 105.86,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 3.19,
+   "text": "Behemoth, level seven, the final level.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 3.19,
+   "end": 6.14,
+   "text": "We log in as behemoth seven and look at the binary.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 6.14,
+   "end": 13.94,
+   "text": "The disassembly shows the program copies our first argument into a stack buffer of five hundred twenty-four bytes, but first it runs a filter.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 3,
+     "to": 3
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 13.94,
+   "end": 23.71,
+   "text": "The filter walks the argument character by character and refuses anything that is not a letter or a space, and it stops after five hundred twelve characters, while the copy does not stop there.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 40,
+     "to": 40
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 52,
+     "to": 52
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 77,
+     "to": 77
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 83,
+     "to": 85
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 23.71,
+   "end": 30.38,
+   "text": "We inspect the protections: readelf shows the stack is marked executable, and address randomisation is off.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 30.38,
+   "end": 38.98,
+   "text": "We probe it: four letters pass, but a percent sign is refused with the message non-alpha chars found in string, possible shellcode.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 38.98,
+   "end": 50.54,
+   "text": "So we send five hundred twelve letters to satisfy the filter, and then we append the real payload: the saved frame pointer, the return address, and our shellcode, none of which the filter ever inspects.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 77,
+     "to": 77
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 50.54,
+   "end": 57.7,
+   "text": "The buffer sits five hundred twenty-four bytes below the saved frame pointer, so the return address is at offset five hundred twenty-eight.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 3,
+     "to": 3
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 57.7,
+   "end": 59.93,
+   "text": "Then we write the shellcode in vim.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vimcmd"
+    },
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 59.93,
+   "end": 70.92,
+   "text": "It prints a marker so our sweep can detect a successful jump, then raises the effective uid with geteuid and setreuid, and setuid so the privilege survives the exec.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "out",
+     "from": 3,
+     "to": 32
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 70.92,
+   "end": 77.57,
+   "text": "And finally execve on slash bin slash slash sh, with a double slash to keep the pushed string aligned.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "out",
+     "from": 33,
+     "to": 44
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 77.57,
+   "end": 84.84,
+   "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: seventy-eight bytes.",
+   "lines": [
+    {
+     "step": 15,
+     "role": "cmd"
+    },
+    {
+     "step": 15,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 16,
+     "role": "cmd"
+    },
+    {
+     "step": 17,
+     "role": "cmd"
+    },
+    {
+     "step": 17,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    },
+    {
+     "step": 18,
+     "role": "cmd"
+    },
+    {
+     "step": 18,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 84.84,
+   "end": 92.16,
+   "text": "Because the stack address depends on the environment, the exploit sweeps a range of return addresses and looks for the marker the shellcode prints.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "cmd"
+    },
+    {
+     "step": 19,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 92.16,
+   "end": 99.19,
+   "text": "It lands in the shellcode, we get a shell as behemoth eight, and it prints the final password, and the level is solved.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "out",
+     "from": 2,
+     "to": 4
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 99.19,
+   "end": 105.86,
+   "text": "Behemoth is complete: the lesson is that a filter and the operation it protects must cover exactly the same data.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "out",
+     "from": 4,
+     "to": 4
+    }
+   ]
+  }
+ ]
+}
