@@ -1,0 +1,70 @@
+{
+ "segments": [
+  {
+   "text": "Narnia, level zero.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The program reads up to twenty-four characters into a twenty-byte buffer with scanf, next to a long called val set to 0x41414141 \u2014 four bytes too many, and val sits right after the buffer.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as narnia zero.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I pipe twenty A bytes, then the four bytes ef, be, ad, de \u2014 0xdeadbeef in little-endian \u2014 and the program confirms the flip: correct val's value from 0x41414141 to 0xdeadbeef, and val prints as 0xdeadbeef.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "But the pipe carries only the payload line, so the shell the program spawns hits end of file at once and exits \u2014 the password read runs as narnia zero again, and fails with permission denied.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "The password shown comes from the level record: in the interactive session the recording shows, the shell stays up, id prints uid 14001, narnia one, and the password is verified by logging in as narnia one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
