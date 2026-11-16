@@ -1,0 +1,209 @@
+{
+ "segments": [
+  {
+   "text": "Vortex, level zero.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "This one never gives you a shell at all: it is a network service listening on port 5842 of vortex.labs.overthewire.org.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The official description says the service sends four unsigned integers in host byte order, you add them up and send the sum back, and the reply contains the username and password for vortex one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The machine is 32 bit x86, so host byte order means little endian.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write a small C client:",
+   "lines": [
+    {
+     "step": 0,
+     "role": "vimcmd"
+    },
+    {
+     "step": 0,
+     "role": "vim"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 16
+    }
+   ]
+  },
+  {
+   "text": "create a TCP socket,",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 17,
+     "to": 22
+    }
+   ]
+  },
+  {
+   "text": "resolve the host name,",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 23,
+     "to": 28
+    }
+   ]
+  },
+  {
+   "text": "connect to port 5842,",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 30,
+     "to": 33
+    }
+   ]
+  },
+  {
+   "text": "read sixteen bytes,",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 34,
+     "to": 40
+    }
+   ]
+  },
+  {
+   "text": "copy them into four unsigned integers, add them,",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 41,
+     "to": 45
+    }
+   ]
+  },
+  {
+   "text": "write the four byte sum back,",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 46,
+     "to": 50
+    }
+   ]
+  },
+  {
+   "text": "then read until the service closes and print the reply.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 51,
+     "to": 66
+    }
+   ]
+  },
+  {
+   "text": "The first bug I hit was using inet_pton on a host name, which only accepts a literal address, so I switched to gethostbyname;",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 23,
+     "to": 28
+    }
+   ]
+  },
+  {
+   "text": "the compiler also caught a missing netdb header.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 6,
+     "to": 6
+    }
+   ]
+  },
+  {
+   "text": "The reply arrives split across reads, and my input buffer was only sixteen bytes, so I read into a separate two hundred and fifty six byte buffer until the peer closes.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 12,
+     "to": 13
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 52,
+     "to": 60
+    }
+   ]
+  },
+  {
+   "text": "Then I compile with gcc, run it, and the service answers with the vortex one credentials.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "The service prints the vortex one username and password, and the level is solved.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "out",
+     "from": 2,
+     "to": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

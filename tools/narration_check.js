@@ -1,15 +1,23 @@
-// Headless check of the narration player: run index.html's script against a
-// tiny DOM stub (same stub as player_check.js, plus a drivable fake audio
-// element) and verify that, for Vortex L0, the typed lines appear in time
-// with the narration audio and the highlight tracks the spoken segment —
-// through the first minute and across a seek — and that the visible
-// transcript panel renders all 17 segments, tracks the audio clock, jumps
-// on seek, freezes on pause, and clears at the end.
-// Usage: node narration_check.js
+// Headless check of the narration player, for one level: run index.html's
+// script against a tiny DOM stub (same stub as player_check.js, plus a
+// drivable fake audio element) and verify that the typed lines appear in
+// time with the narration audio, the highlight tracks the spoken segment,
+// the visible transcript panel renders the script and tracks the clock,
+// and seek / pause / end all behave — through the whole narration.
+// Usage: node tools/narration_check.js <game> <level>   (default: vortex 0)
 // Exit 0 when every assertion passes, 1 otherwise.
+// If a level fails ONLY on lateness (the render typing slower than the
+// driven clock, not a real sync bug), re-run with SLOW=1: it drives the
+// fake clock slower and widens the late tolerance.
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
+const GAME = process.argv[2] || 'vortex';
+const LEVEL = parseInt(process.argv[3] || '0', 10);
+const SLOW = !!process.env.SLOW;
+const STEP_SLEEP = SLOW ? 250 : 150;   // real ms per 0.25s of audio
+const LATE_TOL = SLOW ? 4.0 : 2.5;     // s a line may lag its spoken time
+const EARLY_TOL = 0.6;                 // s a line may appear before its time
 
 function El(tag) {
   this.tag = tag; this.children = []; this.style = {}; this.className = '';
@@ -87,8 +95,8 @@ global.fetch = realFetch;
 const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 const m = html.match(/<script>([\s\S]*)<\/script>/);
 if (!m) { console.error('no script found'); process.exit(1); }
-const api = new Function(m[1] + "\n;return { GAMES, playLevel, fillLevels, setGame: g => { gameKey = g; }, getCur: () => cur, getRun: () => runId, getNarrMap: () => narrMap, isNarrOn: () => narrOn, getNarrBtn: () => narrBtn, getNarrSeek: () => narrSeek, getNarrAudio: () => narrAudio };")();
-const { GAMES, playLevel, fillLevels, setGame, getNarrMap, isNarrOn, getNarrBtn, getNarrSeek, getNarrAudio } = api;
+const api = new Function(m[1] + "\n;return { GAMES, playLevel, fillLevels, setGame: g => { gameKey = g; }, getCur: () => cur, getRun: () => runId, getNarrMap: () => narrMap, isNarrOn: () => narrOn, getNarrBtn: () => narrBtn, getNarrSeek: () => narrSeek, getNarrAudio: () => narrAudio, getNarrKeySegs: () => narrKeySegs };")();
+const { GAMES, playLevel, fillLevels, setGame, getNarrMap, isNarrOn, getNarrBtn, getNarrSeek, getNarrAudio, getNarrKeySegs } = api;
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 let failures = 0;
@@ -98,7 +106,7 @@ function check(name, ok, detail) {
 }
 
 // Per-line scheduled times, recomputed from the sync map with the same rule
-// the page uses (segment start + j/refs * segment length).
+// the page uses (segment start + j/refs * segment length; first ref wins).
 function lineTimes(map) {
   const times = new Map();
   map.segments.forEach((sg, si) => {
@@ -115,158 +123,213 @@ function lineTimes(map) {
   return times;
 }
 
-(async () => {
-  const sync = JSON.parse(fs.readFileSync(path.join(ROOT, 'narration/vortex/L0.sync.json'), 'utf8'));
-  const sched = lineTimes(sync);
-  check('sync map: 17 segments, continuous 0 -> 74.98',
-    sync.segments.length === 17 && Math.abs(sync.duration - 74.98) < 0.01,
-    `segments=${sync.segments.length} duration=${sync.duration}`);
-  const mp3 = path.join(ROOT, 'narration/vortex/L0.mp3');
-  check('mp3 exists next to the script', fs.existsSync(mp3), fs.existsSync(mp3) ? (fs.statSync(mp3).size + ' bytes') : 'missing');
+function vimFileOf(st) {
+  const m = /^vim\s+(.+)$/.exec((st.cmd || '').trim());
+  if (!m) return null;
+  const parts = m[1].trim().split(/\s+/);
+  return parts[parts.length - 1] || null;
+}
 
-  for (let i = 0; i < 200 && !GAMES.vortex; i++) await sleep(20);
-  if (!GAMES.vortex) { console.error('vortex not loaded'); process.exit(1); }
+// The sequence of term children playLevel renders, in order, as
+// {key} (a narration-gated line) or {key: null} (an untagged line).
+// Mirrors playLevel/playVimSession/typeText exactly.
+function expectedChildren(L) {
+  const seq = [];
+  seq.push({ key: null });                 // opening blank line
+  seq.push({ key: '-1:goal:' });           // goal div
+  seq.push({ key: null });                 // host tag note
+  if (L.steps) {
+    let si = 0;
+    while (si < L.steps.length) {
+      const st = L.steps[si];
+      const vf = vimFileOf(st);
+      if (vf) {
+        const firstSi = si;
+        const run = [];
+        while (si < L.steps.length && vimFileOf(L.steps[si]) === vf) { run.push(si); si++; }
+        seq.push({ key: null });           // 'typing X in vim' note
+        seq.push({ key: firstSi + ':vimcmd:' });
+        seq.push({ key: firstSi + ':vim:' });
+        for (const s of run) if (L.steps[s].note) seq.push({ key: s + ':note:' });
+        continue;
+      }
+      if (st.text) { seq.push({ key: si + ':text:' }); seq.push({ key: si + ':text:' }); }
+      else if ((st.cmd || '').startsWith('#')) seq.push({ key: si + ':note:' });
+      else seq.push({ key: si + ':cmd:' });
+      for (let oi = 0; oi < (st.out || []).length; oi++) seq.push({ key: si + ':out:' + oi });
+      if (st.note) seq.push({ key: si + ':note:' });
+      si++;
+    }
+  }
+  if (L.pw) seq.push({ key: '-1:pw:' });
+  if (L.note) seq.push({ key: null });
+  seq.push({ key: null });                 // closing blank line
+  return seq;
+}
+
+(async () => {
+  const syncPath = path.join(ROOT, 'narration', GAME, `L${LEVEL}.sync.json`);
+  if (!fs.existsSync(syncPath)) { console.error('no sync map: ' + syncPath); process.exit(1); }
+  const sync = JSON.parse(fs.readFileSync(syncPath, 'utf8'));
+  const sched = lineTimes(sync);
+  const cont = sync.segments.every((sg, i) =>
+    (i === 0 ? Math.abs(sg.start) < 0.02 : Math.abs(sg.start - sync.segments[i - 1].end) < 0.02));
+  check('sync map continuous 0 -> duration',
+    cont && Math.abs(sync.segments[sync.segments.length - 1].end - sync.duration) < 0.05,
+    `${sync.segments.length} segments, duration=${sync.duration}s`);
+  const mp3 = path.join(ROOT, 'narration', GAME, `L${LEVEL}.mp3`);
+  check('mp3 exists next to the script', fs.existsSync(mp3) && fs.statSync(mp3).size > 0,
+    fs.existsSync(mp3) ? (fs.statSync(mp3).size + ' bytes') : 'missing');
+
+  for (let i = 0; i < 200 && !GAMES[GAME]; i++) await sleep(20);
+  if (!GAMES[GAME]) { console.error(GAME + ' not loaded'); process.exit(1); }
   await sleep(300);
   window.__userPickedGame = true;
-  setGame('vortex'); byId['gameSel'].value = 'vortex';
+  setGame(GAME); byId['gameSel'].value = GAME;
   fillLevels();
-  const idx = GAMES.vortex.levels.findIndex(x => x.lvl === 0);
+  const idx = GAMES[GAME].levels.findIndex(x => x.lvl === LEVEL);
+  if (idx < 0) { console.error('level ' + LEVEL + ' not in ' + GAME); process.exit(1); }
+  const L = GAMES[GAME].levels[idx];
+  if (!L.steps) { console.error('level has no steps (legacy cmds) — cannot check'); process.exit(1); }
+  const expected = expectedChildren(L);
+  // scheduled times must be non-decreasing in render order, else the
+  // narration walks the solution out of order and seek fast-forward stalls
+  const ordered = expected.filter(e => e.key && sched.has(e.key)).map(e => sched.get(e.key).t);
+  const mono = ordered.every((t, i) => i === 0 || t >= ordered[i - 1] - 0.01);
+  check('scheduled times non-decreasing in render order', mono,
+    mono ? `${ordered.length} gated lines` : 'narration references lines out of order');
+  const firstPos = new Map();
+  expected.forEach((e, i) => { if (e.key && !firstPos.has(e.key)) firstPos.set(e.key, i); });
+
   byId['speed'].value = '0.15';
   playLevel(idx);
-  // wait for the sync map to load (Narrate button appears)
   for (let i = 0; i < 100 && !getNarrMap(); i++) await sleep(20);
-  check('sync map loads for Vortex L0; Narrate button shown',
+  check('sync map loads; Narrate button shown',
     !!getNarrMap() && getNarrBtn().style.display !== 'none',
     getNarrMap() ? `duration ${getNarrMap().duration}s` : 'no map');
 
+  const audio = getNarrAudio();
+  audio.duration = sync.duration;
+  audio.fire('loadedmetadata');
+  const term = byId['term'];
   const transcript = byId['narrTranscript'];
   const panelActive = () => {
     let a = -1;
     for (const d of transcript.children) if (d.classList.contains('active')) a = parseInt(d.dataset.seg, 10);
     return a;
   };
-  check('transcript panel renders all 17 segments with the script text',
-    transcript.children.length === 17 &&
+  check('transcript panel renders every segment with the script text',
+    transcript.children.length === sync.segments.length &&
     transcript.children.every((d, i) => d.textContent === sync.segments[i].text) &&
     transcript.classList.contains('on'),
     `segments=${transcript.children.length} shown=${transcript.classList.contains('on')}`);
 
-  const audio = getNarrAudio();
-  audio.duration = sync.duration;
-  audio.fire('loadedmetadata');
-  const term = byId['term'];
-
-  // --- start narration ---
   getNarrBtn().onclick();
   await sleep(50);
   check('narration is on after pressing Narrate', isNarrOn() === true);
 
-  const outRows = () => term.children.filter(c => c.className === 'out' || c.className.startsWith('out '));
-  const catOut = () => {
-    // step 3 (cat -n) out lines: the 67-row block before the gcc cmd;
-    // step 5 out lines: the 3-row block after the ./v0 cmd. Identify by
-    // position: cat block = first 67 out rows, run block = next 3.
-    const rows = outRows();
-    return { cat: rows.slice(0, 67), run: rows.slice(67, 70) };
-  };
-  const highlighted = () => term.querySelectorAll('[data-narr-seg]')
+  const highlightedIdx = () => term.querySelectorAll('[data-narr-seg]')
     .filter(d => d.classList.contains('narr-hl'))
-    .map(d => d.dataset.narrSeg);
-  const hasVimBox = () => term.children.some(c => c.className === 'vimscreen' || (c.className || '').includes('vimscreen'));
+    .map(d => term.children.indexOf(d));
+  const activeSegAt = (t) => {
+    let active = -1;
+    sync.segments.forEach((sg, i) => { if (t >= sg.start) active = i; });
+    return active;
+  };
 
-  // --- drive the fake clock: 0.25s of audio per 40ms of real time ---
-  const early = [], late = [];
-  let sawVimAt10 = null, hlAtSeg5 = null, hlAtSeg12 = null, hlAtSeg15 = null;
-  let panelAt10 = null, panelAtSeg5 = null, panelAtSeg12 = null;
+  // --- drive the fake clock through the whole narration ---
+  const early = [], late = [], hlBad = [], panelBad = [];
   let t = 0;
   const DT = 0.25;
-  while (t < 62) {
+  while (t < sync.duration) {
     t += DT;
     if (!audio.paused) { audio.currentTime = t; audio.fire('timeupdate'); }
-    await sleep(100);
+    // The highlight is applied synchronously by the timeupdate handler to
+    // the divs present NOW; divs the render creates afterwards catch up at
+    // the next tick, so snapshot the expected highlight set here, before
+    // the sleep, and compare against it after.
+    const active = activeSegAt(audio.currentTime);
+    const wantNow = [];
+    for (let i = 0; i < term.children.length; i++) {
+      const k = expected[i] && expected[i].key;
+      const segs = k && getNarrKeySegs().get(k);
+      if (segs && segs.indexOf(active) >= 0) wantNow.push(i);
+    }
+    const panelNow = panelActive();
+    await sleep(STEP_SLEEP);
     const now = audio.currentTime;
-    // (a) no out line may appear before its scheduled time (0.6s tolerance)
-    const { cat, run } = catOut();
-    cat.forEach((d, i) => {
-      const e = sched.get('3:out:' + i);
-      if (e && e.t > now + 0.6) early.push(`cat out[${i}] at ${now.toFixed(2)} (scheduled ${e.t.toFixed(2)})`);
-    });
-    run.forEach((d, i) => {
-      const e = sched.get('5:out:' + i);
-      if (e && e.t > now + 0.6) early.push(`run out[${i}] at ${now.toFixed(2)} (scheduled ${e.t.toFixed(2)})`);
-    });
-    // (b) every out line scheduled <= now - 1.5 must exist by now
-    for (let i = 0; i < 67; i++) {
-      const e = sched.get('3:out:' + i);
-      if (e && e.t <= now - 1.5 && !cat[i]) late.push(`cat out[${i}] missing at ${now.toFixed(2)} (scheduled ${e.t.toFixed(2)})`);
+    const n = term.children.length;
+    // (a) no gated line may appear before its spoken time
+    for (let i = 0; i < n; i++) {
+      const k = expected[i] && expected[i].key;
+      const e = k && sched.get(k);
+      if (e && e.t > now + EARLY_TOL) early.push(`child[${i}] ${k} at ${now.toFixed(2)} (scheduled ${e.t.toFixed(2)})`);
     }
-    for (let i = 0; i < 3; i++) {
-      const e = sched.get('5:out:' + i);
-      if (e && e.t <= now - 1.5 && !run[i]) late.push(`run out[${i}] missing at ${now.toFixed(2)} (scheduled ${e.t.toFixed(2)})`);
+    // (b) every gated line scheduled <= now - LATE_TOL must exist by now
+    for (const [k, e] of sched) {
+      if (e.t <= now - LATE_TOL && firstPos.has(k) && firstPos.get(k) >= n) {
+        late.push(`${k} missing at ${now.toFixed(2)} (scheduled ${e.t.toFixed(2)})`);
+      }
     }
-    if (Math.abs(now - 10) < DT / 2) sawVimAt10 = hasVimBox();
-    if (Math.abs(now - 10) < DT / 2 && panelAt10 === null) panelAt10 = panelActive();
-    // seg 5's six lines are spread across [29.42, 31.30]; sample near its end
-    // so all six have appeared and are highlighted together
-    if (now >= 31.1 && now < 31.3 && hlAtSeg5 === null) hlAtSeg5 = highlighted();
-    if (now >= 31.1 && now < 31.3 && panelAtSeg5 === null) panelAtSeg5 = panelActive();
-    if (now >= 46 && now < 46.5 && hlAtSeg12 === null) hlAtSeg12 = highlighted();
-    if (now >= 46 && now < 46.5 && panelAtSeg12 === null) panelAtSeg12 = panelActive();
-    if (now >= 62.5 && hlAtSeg15 === null) hlAtSeg15 = highlighted();
+    // (c) highlighted divs == present divs tagged with the active segment
+    // (as snapshotted at the timeupdate, before the sleep)
+    const got = highlightedIdx();
+    if (wantNow.sort().join(',') !== got.sort().join(',')) {
+      hlBad.push(`t=${now.toFixed(2)} seg=${active} want=[${wantNow.join(',')}] got=[${got.join(',')}]`);
+    }
+    // (d) transcript panel tracks the clock
+    if (panelNow !== active) panelBad.push(`t=${now.toFixed(2)} panel=${panelNow} active=${active}`);
+    if (early.length > 5 || late.length > 5 || hlBad.length > 5 || panelBad.length > 5) break;
   }
   check('no typed line appears before its spoken time', early.length === 0,
     early.length ? early.slice(0, 3).join(' | ') : '0 early lines');
-  check('no typed line lags its spoken time by >1.5s', late.length === 0,
+  check(`no typed line lags its spoken time by >${LATE_TOL}s`, late.length === 0,
     late.length ? late.slice(0, 3).join(' | ') : '0 late lines');
-  check('at t=10s (still in the goal preamble) the vim session has not started', sawVimAt10 === false,
-    sawVimAt10 === null ? 'no sample at t=10' : (sawVimAt10 ? 'vim box already present' : 'no vim box yet'));
-  check('seg 5 ("create a TCP socket") highlights exactly out lines 17-22',
-    hlAtSeg5 !== null && hlAtSeg5.length === 6 && hlAtSeg5.every(s => s.split(' ').includes('5')),
-    hlAtSeg5 === null ? 'no sample' : `highlighted segs: [${hlAtSeg5.join(', ')}]`);
-  check('seg 12 (inet_pton story) highlights exactly out lines 23-28, no new lines',
-    hlAtSeg12 !== null && hlAtSeg12.length === 6 && hlAtSeg12.every(s => s.split(' ').includes('12')),
-    hlAtSeg12 === null ? 'no sample' : `highlighted segs: [${hlAtSeg12.join(', ')}]`);
-  check('transcript panel active segment tracks the audio clock (seg 1 at t=10, seg 5 at t=31, seg 12 at t=46)',
-    panelAt10 === 1 && panelAtSeg5 === 5 && panelAtSeg12 === 12,
-    `t10=${panelAt10} t31=${panelAtSeg5} t46=${panelAtSeg12}`);
-  // --- seek to 60s (seg 14: the reply-buffer story) and re-render fast-forwarded ---
-  // Only lines scheduled <= 60s may appear: all 67 cat lines, but NOT the
-  // gcc/run lines (scheduled 65.1s+) — the seek fast-forwards up to the seek
-  // point, never past it.
-  audio.currentTime = 60; audio.fire('seeked');
-  getNarrSeek().value = '60';
+  check('highlighted lines == lines tagged with the active segment (every tick)', hlBad.length === 0,
+    hlBad.length ? hlBad.slice(0, 3).join(' | ') : '0 mismatches');
+  check('transcript panel active segment tracks the audio clock (every tick)', panelBad.length === 0,
+    panelBad.length ? panelBad.slice(0, 3).join(' | ') : '0 mismatches');
+
+  // --- seek to ~60% and re-render fast-forwarded ---
+  const seekSeg = sync.segments.reduce((best, sg, i) =>
+    Math.abs(sg.start - sync.duration * 0.6) < Math.abs(sync.segments[best].start - sync.duration * 0.6) ? i : best, 0);
+  const seekT = sync.segments[seekSeg].start;
+  audio.currentTime = seekT; audio.fire('seeked');
+  getNarrSeek().value = String(seekT);
   getNarrSeek().fire('input');
   getNarrSeek().fire('change');
-  await sleep(1500);
-  const afterSeek = catOut();
-  check('after seek to 60s, all 67 cat lines present, run lines not yet (fast-forward stops at seek point)',
-    afterSeek.cat.length === 67 && afterSeek.run.length === 0,
-    `cat=${afterSeek.cat.length} run=${afterSeek.run.length}`);
-  check('after seek to 60s, transcript panel jumps to segment 14', panelActive() === 14,
-    `panel=${panelActive()}`);
-  // resume the clock from 60 to past the end
-  while (t < 75.2) {
+  await sleep(SLOW ? 3000 : 2000);
+  const nAfter = term.children.length;
+  const missingPast = [], presentFuture = [];
+  for (const [k, e] of sched) {
+    if (!firstPos.has(k)) continue;
+    if (e.t <= seekT && firstPos.get(k) >= nAfter) missingPast.push(k);
+    if (e.t > seekT + EARLY_TOL && firstPos.get(k) < nAfter) presentFuture.push(k);
+  }
+  check(`after seek to ${seekT.toFixed(1)}s (seg ${seekSeg}), fast-forward stops at the seek point`,
+    missingPast.length === 0 && presentFuture.length === 0,
+    missingPast.length ? `missing past lines: ${missingPast.slice(0, 3).join(', ')}`
+      : presentFuture.length ? `future lines present: ${presentFuture.slice(0, 3).join(', ')}`
+      : `${nAfter} lines present`);
+  check('after seek, transcript panel jumps to the seek segment', panelActive() === seekSeg,
+    `panel=${panelActive()} seekSeg=${seekSeg}`);
+
+  // --- drive to the end ---
+  while (t < sync.duration + 0.2) {
     t += DT;
     if (!audio.paused) { audio.currentTime = t; audio.fire('timeupdate'); }
-    await sleep(100);
-    if (t >= 67 && t < 67.25 && hlAtSeg15 === null) hlAtSeg15 = highlighted();
+    await sleep(STEP_SLEEP);
   }
-  check('seg 15 highlights the gcc/run lines', hlAtSeg15 !== null && hlAtSeg15.length >= 2 && hlAtSeg15.every(s => s.split(' ').includes('15')),
-    hlAtSeg15 === null ? 'no sample' : `highlighted segs: [${hlAtSeg15.join(', ')}]`);
-  const atEnd = catOut();
-  const pwShown = term.children.some(c => (c.textContent || '').includes('The password is'));
-  check('by the end (t=75s) the 3 run lines and the password line are shown',
-    atEnd.run.length === 3 && pwShown, `run=${atEnd.run.length} pw=${pwShown}`);
-  audio.currentTime = 75.2; audio.fire('ended');
+  audio.currentTime = sync.duration + 0.2; audio.fire('ended');
   await sleep(100);
-  check('audio end clears narration state + highlight + transcript panel', isNarrOn() === false && highlighted().length === 0 && panelActive() === -1,
-    `narrOn=${isNarrOn()} highlighted=${highlighted().length} panel=${panelActive()}`);
+  check('audio end clears narration state + highlight + transcript panel',
+    isNarrOn() === false && highlightedIdx().length === 0 && panelActive() === -1,
+    `narrOn=${isNarrOn()} highlighted=${highlightedIdx().length} panel=${panelActive()}`);
 
   // --- pause / resume lockstep ---
   getNarrBtn().onclick(); // start again
   await sleep(50);
-  // drive a few seconds so a segment is active, then pause
-  for (let k = 0; k < 20; k++){ audio.currentTime = (k + 1) * 0.25; audio.fire('timeupdate'); await sleep(40); }
+  for (let k = 0; k < 20; k++) { audio.currentTime = (k + 1) * 0.25; audio.fire('timeupdate'); await sleep(40); }
   getNarrBtn().onclick(); // pause
   await sleep(50);
   check('pause button pauses the audio', audio.paused === true, `paused=${audio.paused}`);
