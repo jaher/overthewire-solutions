@@ -1,0 +1,239 @@
+{
+ "game": "natas",
+ "level": 28,
+ "audio": "narration/natas/L28.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 180.55,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.04,
+   "text": "Natas, level twenty-eight.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.04,
+   "end": 12.12,
+   "text": "The search form takes our query, encrypts it, and redirects to a search page that decrypts it and runs a database query. There is no source code this time, so we treat it as a black box.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 12.12,
+   "end": 61.44,
+   "text": "I start by probing the ciphertext. I post queries of zero to sixteen a's and print the ciphertext length each time.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 61.44,
+   "end": 68.93,
+   "text": "It is eighty bytes for up to twelve a's, and ninety-six from thirteen on. So the cipher works in sixteen-byte blocks.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "out",
+     "from": 1,
+     "to": 17
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 68.93,
+   "end": 74.33,
+   "text": "Then I post sixty-four capital A's. The ciphertext contains three identical blocks.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "out",
+     "from": 18,
+     "to": 19
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 74.33,
+   "end": 84.05,
+   "text": "The repeated block is f six three three e six b zero five f eight six. That is ECB, where every block is encrypted independently.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 84.05,
+   "end": 105.41,
+   "text": "The probe prints a label claiming a*8 and a*12 share block two, but the block lists it just printed say otherwise: a*8's block two is four five three e zero zero two zero six zero two f, while a*12 and a*13 both print c zero eight seven two d e e eight b c nine.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "out",
+     "from": 20,
+     "to": 23
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 105.41,
+   "end": 120.58,
+   "text": "So a*12 and a*13 are the pair that shares block two, which puts our input six bytes into block two \u2014 a thirty-eight-byte prefix \u2014 and ten filler characters fill the rest of the block, so a payload after them starts at block three.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 120.58,
+   "end": 123.46,
+   "text": "So I open vim and write the splice script:",
+   "lines": [
+    {
+     "step": 1,
+     "role": "vimcmd"
+    },
+    {
+     "step": 1,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 123.46,
+   "end": 129.65,
+   "text": "First the imports, the basic auth header, a handler that stops urllib from following redirects, and the opener.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 129.65,
+   "end": 136.78,
+   "text": "Then I write ct_for. It posts a query and reads the ciphertext out of the redirect Location header.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 136.78,
+   "end": 141.34,
+   "text": "Then I start get_ct. It fetches a search page for a raw ciphertext.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 141.34,
+   "end": 148.61,
+   "text": "Then the base blocks. It posts eight a's, splits the ciphertext into sixteen-byte blocks and prints them.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 148.61,
+   "end": 156.24,
+   "text": "Then it loops over the two payloads. Each is prefixed with ten b's. It fetches each payload's ciphertext and prints the payload.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 156.24,
+   "end": 165.19,
+   "text": "The last chunk prints each payload's blocks, splices the first three base blocks with the payload blocks from block three on, fetches the search page, and prints the result.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "start": 165.19,
+   "end": 166.75,
+   "text": "Here is the last chunk.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "text"
+    },
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "start": 166.75,
+   "end": 180.55,
+   "text": "I run the script. The first payload, UNION SELECT 1, comes back as a list item with 1, so the splice works. The second, UNION SELECT password FROM users, returns the password for natas29.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 6
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
