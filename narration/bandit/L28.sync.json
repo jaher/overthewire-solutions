@@ -1,0 +1,153 @@
+{
+ "game": "bandit",
+ "level": 28,
+ "audio": "narration/bandit/L28.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 46.94,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.04,
+   "text": "Bandit, level twenty-eight.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.04,
+   "end": 8.59,
+   "text": "This level is a lesson about git history: the current README has the password replaced with a row of x characters.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 8.59,
+   "end": 17.54,
+   "text": "I log in as bandit28 with ssh bandit28@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 17.54,
+   "end": 21.91,
+   "text": "The lab blocks the localhost ssh hop, so I clone from this client.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 21.91,
+   "end": 23.11,
+   "text": "I clone the repo.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 23.11,
+   "end": 26.3,
+   "text": "Git pulls nine objects and checks out the working tree.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 6
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 26.3,
+   "end": 29.62,
+   "text": "I open the README, and the password is redacted to x's.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 6
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 29.62,
+   "end": 36.26,
+   "text": "But git keeps every previous version: the log shows three commits, and the latest is titled fix info leak.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 36.26,
+   "end": 42.43,
+   "text": "The parent of the redaction still holds the real password, so I ask git to show that older version of the README.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 42.43,
+   "end": 46.94,
+   "text": "There it is: the password for bandit twenty-nine, and the level is solved.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 6
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

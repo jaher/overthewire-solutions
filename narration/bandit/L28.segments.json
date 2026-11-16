@@ -1,0 +1,118 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level twenty-eight.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "This level is a lesson about git history: the current README has the password replaced with a row of x characters.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit28 with ssh bandit28@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The lab blocks the localhost ssh hop, so I clone from this client.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "I clone the repo.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Git pulls nine objects and checks out the working tree.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 6
+    }
+   ]
+  },
+  {
+   "text": "I open the README, and the password is redacted to x's.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 6
+    }
+   ]
+  },
+  {
+   "text": "But git keeps every previous version: the log shows three commits, and the latest is titled fix info leak.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "The parent of the redaction still holds the real password, so I ask git to show that older version of the README.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "There it is: the password for bandit twenty-nine, and the level is solved.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 6
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

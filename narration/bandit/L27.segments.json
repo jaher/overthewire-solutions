@@ -1,0 +1,87 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level twenty-seven.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "This level gives us a git repository served over SSH, hosted under the account bandit twenty-seven git.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit27 with ssh bandit27@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The lab blocks the localhost ssh hop, so I clone from this client.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "I run git clone on the ssh URL for the repo.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Git pulls the objects and checks out the working tree.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 5
+    }
+   ]
+  },
+  {
+   "text": "I read the README in the repo.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It gives the password for bandit twenty-eight in plain text, and the level is solved.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
