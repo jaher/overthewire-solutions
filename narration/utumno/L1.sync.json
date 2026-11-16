@@ -1,0 +1,305 @@
+{
+ "game": "utumno",
+ "level": 1,
+ "audio": "narration/utumno/L1.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 140.21,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.99,
+   "text": "Utumno, level one.",
+   "lines": [
+    {
+     "role": "goal",
+     "step": -1
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.99,
+   "end": 3.91,
+   "text": "I log in as utumno one.",
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 0
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 3.91,
+   "end": 17.42,
+   "text": "The binary takes a directory argument, walks its entries, and for any entry whose name begins with s h underscore it calls a function that copies the name into a writable executable page and jumps into it. So the file name is the payload.",
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 1
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 1,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 17.42,
+   "end": 40.75,
+   "text": "We read the disassembly to confirm the flow. Main calls mmap with protection seven, which is read, write and execute, keeps the address in a global, opens the directory, compares the entry name with the three bytes s h underscore, and calls the runner with the name plus three. The runner copies the string into the mapped page and calls it. So execution starts at the fourth character of the file name.",
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 2
+    },
+    {
+     "from": 11,
+     "role": "out",
+     "step": 2,
+     "to": 19
+    },
+    {
+     "from": 25,
+     "role": "out",
+     "step": 2,
+     "to": 31
+    },
+    {
+     "from": 36,
+     "role": "out",
+     "step": 2,
+     "to": 50
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 40.75,
+   "end": 44.28,
+   "text": "The stack is executable and address randomisation is off.",
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 3
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 3,
+     "to": 0
+    },
+    {
+     "role": "cmd",
+     "step": 4
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 4,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 44.28,
+   "end": 58.37,
+   "text": "Two constraints follow. A file name cannot contain a slash, so the shellcode cannot push slash bin slash sh as the usual pair of immediate values. And the copy stops at a null byte, so the shellcode cannot contain a zero either.",
+   "lines": [
+    {
+     "from": 36,
+     "role": "out",
+     "step": 2,
+     "to": 44
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 58.37,
+   "end": 61.97,
+   "text": "I open vim and write the shellcode with those constraints in mind:",
+   "lines": [
+    {
+     "role": "vimcmd",
+     "step": 5
+    },
+    {
+     "role": "vim",
+     "step": 5
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 61.97,
+   "end": 66.17,
+   "text": "The header, and the user-id block begins with a zeroed eax.",
+   "lines": [
+    {
+     "role": "vim",
+     "step": 6
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 66.17,
+   "end": 77.09,
+   "text": "geteuid, then setreuid with the id in all three slots, then the start of setuid. Syscall numbers are loaded with mov al so no instruction contains a zero.",
+   "lines": [
+    {
+     "role": "vim",
+     "step": 7
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 77.09,
+   "end": 97.32,
+   "text": "setuid follows, so the shell keeps the effective id across execve: a plain setreuid would leave the saved id at utumno one and the shell would drop back. Then the path build begins: reserve eight bytes and store the first slash, made from a dot plus one. Slash is never stored as an immediate.",
+   "lines": [
+    {
+     "role": "vim",
+     "step": 8
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 97.32,
+   "end": 102.65,
+   "text": "Then b, i, n, and the second dot, each loaded into the low byte and stored.",
+   "lines": [
+    {
+     "role": "vim",
+     "step": 9
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 102.65,
+   "end": 106.44,
+   "text": "Then the second slash, s, h, and a zero for the terminator.",
+   "lines": [
+    {
+     "role": "vim",
+     "step": 10
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 106.44,
+   "end": 108.84,
+   "text": "Then the terminator and the execve call.",
+   "lines": [
+    {
+     "role": "vim",
+     "step": 11
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 108.84,
+   "end": 120.05,
+   "text": "We assemble with nasm, inspect the encoding with objdump, extract the text section with objcopy, and print the bytes with xxd. Wc counts eighty six bytes.",
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 12
+    },
+    {
+     "role": "cmd",
+     "step": 13
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 13,
+     "to": 5
+    },
+    {
+     "role": "cmd",
+     "step": 14
+    },
+    {
+     "role": "cmd",
+     "step": 15
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 15,
+     "to": 2
+    },
+    {
+     "role": "cmd",
+     "step": 16
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 16,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 120.05,
+   "end": 125.57,
+   "text": "A small python check prints the length, eighty six, and confirms no slash and no null.",
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 17
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 17,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "start": 125.57,
+   "end": 134.52,
+   "text": "Then the exploit creates the file: s h underscore followed by those eighty six bytes. Running the binary on that directory executes the shellcode.",
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 22
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 22,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "start": 134.52,
+   "end": 140.21,
+   "text": "The password for utumno two is W a S w u X N h v g.",
+   "lines": [
+    {
+     "role": "pw",
+     "step": -1
+    }
+   ]
+  }
+ ]
+}
