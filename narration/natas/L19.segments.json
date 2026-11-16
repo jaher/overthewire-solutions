@@ -68,19 +68,6 @@
    "text": "The second chunk sends each identifier as the session cookie, and when the reply says you are an admin, it prints the number and the credentials block, then stops.",
    "lines": [
     {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "text": "Here is the second chunk.",
-   "lines": [
-    {
-     "step": 4,
-     "role": "text"
-    },
-    {
      "step": 3,
      "role": "vim"
     }
@@ -89,6 +76,10 @@
   {
    "text": "I run it, and it finds number two hundred eighty-one, whose identifier is the hex of two eight one hyphen admin, and prints the password for natas twenty, and the level is solved.",
    "lines": [
+    {
+     "step": 4,
+     "role": "text"
+    },
     {
      "step": 4,
      "role": "out",
