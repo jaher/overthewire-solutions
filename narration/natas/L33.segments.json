@@ -156,21 +156,8 @@
    ]
   },
   {
-   "text": "The last chunk adds the file entry, the trailer with the sha one digest and the G B M B marker, writes the phar, and prints its size.",
+   "text": "The last chunk adds the file entry, the trailer with the sha one digest and the G B M B marker, writes the phar, and prints its size. It builds out from the stub, the manifest length, the manifest, and the single file byte.",
    "lines": [
-    {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "text": "Here is the last chunk.",
-   "lines": [
-    {
-     "step": 8,
-     "role": "text"
-    },
     {
      "step": 7,
      "role": "vim"
@@ -180,6 +167,10 @@
   {
    "text": "I run the builder. It writes the phar, two hundred seventy-four bytes, and prints the payload md five.",
    "lines": [
+    {
+     "step": 8,
+     "role": "text"
+    },
     {
      "step": 8,
      "role": "out",

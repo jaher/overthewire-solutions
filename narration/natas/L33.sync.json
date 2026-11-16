@@ -3,7 +3,7 @@
  "level": 33,
  "audio": "narration/natas/L33.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 180.12,
+ "duration": 184.32,
  "segments": [
   {
    "id": 0,
@@ -208,25 +208,9 @@
   {
    "id": 15,
    "start": 125.59,
-   "end": 133.44,
-   "text": "The last chunk adds the file entry, the trailer with the sha one digest and the G B M B marker, writes the phar, and prints its size.",
+   "end": 139.2,
+   "text": "The last chunk adds the file entry, the trailer with the sha one digest and the G B M B marker, writes the phar, and prints its size. It builds out from the stub, the manifest length, the manifest, and the single file byte.",
    "lines": [
-    {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "id": 16,
-   "start": 133.44,
-   "end": 135.0,
-   "text": "Here is the last chunk.",
-   "lines": [
-    {
-     "step": 8,
-     "role": "text"
-    },
     {
      "step": 7,
      "role": "vim"
@@ -234,11 +218,15 @@
    ]
   },
   {
-   "id": 17,
-   "start": 135.0,
-   "end": 141.36,
+   "id": 16,
+   "start": 139.2,
+   "end": 145.56,
    "text": "I run the builder. It writes the phar, two hundred seventy-four bytes, and prints the payload md five.",
    "lines": [
+    {
+     "step": 8,
+     "role": "text"
+    },
     {
      "step": 8,
      "role": "out",
@@ -248,9 +236,9 @@
    ]
   },
   {
-   "id": 18,
-   "start": 141.36,
-   "end": 155.16,
+   "id": 17,
+   "start": 145.56,
+   "end": 159.36,
    "text": "I upload both files, naming each with a path that climbs out of the upload directory to slash tmp. Both print failure, md five sum mismatch, from the original object's destructor \u2014 the stored signature does not match.",
    "lines": [
     {
@@ -266,9 +254,9 @@
    ]
   },
   {
-   "id": 19,
-   "start": 155.16,
-   "end": 172.8,
+   "id": 18,
+   "start": 159.36,
+   "end": 177.0,
    "text": "Now the trigger. I upload a dummy file but set the filename to phar colon slash slash slash tmp slash n33r dot phar. The md five check opens the phar stream, php deserializes our metadata, and the rebuilt executor's destructor runs our payload.",
    "lines": [
     {
@@ -284,9 +272,9 @@
    ]
   },
   {
-   "id": 20,
-   "start": 172.8,
-   "end": 180.12,
+   "id": 19,
+   "start": 177.0,
+   "end": 184.32,
    "text": "The page prints congratulations, running firmware update, and the natas thirty-four password. And natas is complete.",
    "lines": [
     {
