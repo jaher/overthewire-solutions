@@ -1,0 +1,419 @@
+{
+ "segments": [
+  {
+   "text": "Narnia, level two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Main copies argv one into a one hundred twenty-eight byte buffer with strcpy, and there is no length check.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as narnia two, change to slash tmp, and read the source.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The disassembly shows the buffer at ebp minus one hundred twenty-eight, so the saved frame pointer sits at offset one hundred twenty-eight and the return address at offset one hundred thirty-two.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 3,
+     "to": 3
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 18,
+     "to": 20
+    }
+   ]
+  },
+  {
+   "text": "Readelf shows the stack is readable, writable and executable, and address randomisation is zero, so a return into the stack will run.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "Before writing assembly, I prototype the payload logic in C.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vimcmd"
+    },
+    {
+     "step": 6,
+     "role": "vim"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 18
+    }
+   ]
+  },
+  {
+   "text": "It prints the marker PWN exclamation, reads the effective id, sets reuid with it twice, sets uid with it, then execs the shell.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "out",
+     "from": 8,
+     "to": 14
+    }
+   ]
+  },
+  {
+   "text": "I print the prototype with cat, compile it with gcc minus m thirty-two, and run it: it prints PWN exclamation and the effective id, so the syscall order is right.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "out",
+     "from": 0,
+     "to": 16
+    },
+    {
+     "step": 10,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "Then I write the shellcode in vim.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vimcmd"
+    },
+    {
+     "step": 11,
+     "role": "vim"
+    },
+    {
+     "step": 11,
+     "role": "out",
+     "from": 0,
+     "to": 18
+    }
+   ]
+  },
+  {
+   "text": "It starts with a write of the four byte marker PWN exclamation, so the address sweep can tell a hit from a crash.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "out",
+     "from": 3,
+     "to": 7
+    }
+   ]
+  },
+  {
+   "text": "Then geteuid, syscall two hundred one, and setreuid with that id twice, syscall seventy, so the effective id survives the exec.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "out",
+     "from": 7,
+     "to": 15
+    }
+   ]
+  },
+  {
+   "text": "Then setuid with the same id, syscall twenty-three, which sets the real, effective and saved ids, so the privilege survives the exec where a plain setreuid would not.",
+   "lines": [
+    {
+     "step": 15,
+     "role": "out",
+     "from": 8,
+     "to": 15
+    }
+   ]
+  },
+  {
+   "text": "Finally execve on slash bin slash sh, syscall eleven.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "out",
+     "from": 4,
+     "to": 15
+    }
+   ]
+  },
+  {
+   "text": "I print the finished assembly with cat.",
+   "lines": [
+    {
+     "step": 68,
+     "role": "cmd"
+    },
+    {
+     "step": 68,
+     "role": "out",
+     "from": 0,
+     "to": 44
+    },
+    {
+     "step": 69,
+     "role": "cmd"
+    },
+    {
+     "step": 70,
+     "role": "cmd"
+    },
+    {
+     "step": 70,
+     "role": "out",
+     "from": 0,
+     "to": 46
+    }
+   ]
+  },
+  {
+   "text": "I assemble it with nasm, format elf thirty-two, extract the text section with objcopy, and print the bytes with xxd.",
+   "lines": [
+    {
+     "step": 71,
+     "role": "cmd"
+    },
+    {
+     "step": 72,
+     "role": "cmd"
+    },
+    {
+     "step": 73,
+     "role": "cmd"
+    },
+    {
+     "step": 73,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "Before the bytes go into argv one, I prove they work on their own: a small C harness maps a page readable, writable and executable, copies the assembled bytes in, and calls them.",
+   "lines": [
+    {
+     "step": 74,
+     "role": "vimcmd"
+    },
+    {
+     "step": 74,
+     "role": "vim"
+    },
+    {
+     "step": 74,
+     "role": "out",
+     "from": 0,
+     "to": 18
+    }
+   ]
+  },
+  {
+   "text": "I print the harness with cat, compile it, and run it on the assembled bytes: it loads seventy-eight bytes, jumps in, and the shellcode prints PWN exclamation, so the code is proven before it goes into the overflow.",
+   "lines": [
+    {
+     "step": 80,
+     "role": "cmd"
+    },
+    {
+     "step": 80,
+     "role": "out",
+     "from": 0,
+     "to": 40
+    },
+    {
+     "step": 81,
+     "role": "cmd"
+    },
+    {
+     "step": 81,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "Then I write the exploit driver in vim.",
+   "lines": [
+    {
+     "step": 82,
+     "role": "vimcmd"
+    },
+    {
+     "step": 82,
+     "role": "vim"
+    },
+    {
+     "step": 82,
+     "role": "out",
+     "from": 0,
+     "to": 18
+    }
+   ]
+  },
+  {
+   "text": "It loads the shellcode from the assembler output, and checks it has no null byte and fits in one hundred twenty-eight bytes.",
+   "lines": [
+    {
+     "step": 83,
+     "role": "out",
+     "from": 2,
+     "to": 7
+    }
+   ]
+  },
+  {
+   "text": "The payload is fifty NOPs, then the seventy-eight byte shellcode, then four B bytes for the saved frame pointer, then the return address in little-endian.",
+   "lines": [
+    {
+     "step": 84,
+     "role": "out",
+     "from": 8,
+     "to": 10
+    }
+   ]
+  },
+  {
+   "text": "The probe runs the binary with a candidate address, writes echo PROBE OK to its standard input, and counts a hit only if PROBE OK comes back, because the program echoes the payload, which itself contains PWN exclamation, so grepping for the marker would report hits that never ran.",
+   "lines": [
+    {
+     "step": 85,
+     "role": "out",
+     "from": 4,
+     "to": 9
+    }
+   ]
+  },
+  {
+   "text": "The sweep runs from ffff d zero zero zero to ffff e eight zero zero, four bytes at a time, skipping any address whose little-endian bytes contain a null.",
+   "lines": [
+    {
+     "step": 86,
+     "role": "out",
+     "from": 3,
+     "to": 6
+    }
+   ]
+  },
+  {
+   "text": "I print the driver with cat, then run it.",
+   "lines": [
+    {
+     "step": 88,
+     "role": "cmd"
+    },
+    {
+     "step": 88,
+     "role": "out",
+     "from": 0,
+     "to": 33
+    },
+    {
+     "step": 89,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It hits at ffff d one e eight after one hundred twenty-three probes, runs the shell as narnia three, and the password prints.",
+   "lines": [
+    {
+     "step": 89,
+     "role": "out",
+     "from": 15,
+     "to": 15
+    },
+    {
+     "step": 89,
+     "role": "out",
+     "from": 21,
+     "to": 22
+    },
+    {
+     "step": 89,
+     "role": "out",
+     "from": 24,
+     "to": 24
+    }
+   ]
+  },
+  {
+   "text": "The shell runs as narnia three, and the level is solved.",
+   "lines": [
+    {
+     "step": 89,
+     "role": "out",
+     "from": 21,
+     "to": 22
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
