@@ -1,0 +1,398 @@
+{
+ "game": "vortex",
+ "level": 3,
+ "audio": "narration/vortex/L3.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 180.19,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.85,
+   "text": "Vortex, level three.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.85,
+   "end": 16.97,
+   "text": "The goal is the vortex4 password, from /vortex/vortex3: a setuid root binary that copies our argument into a 128 byte stack buffer, then writes the buffer's address through a pointer we control, and exits.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 16.97,
+   "end": 29.33,
+   "text": "The pointer only has to look like 0x0804-something, and the stack is executable \u2014 so if we point it at exit's own GOT slot, the exit call jumps straight into our shellcode on the stack.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 29.33,
+   "end": 31.49,
+   "text": "I log in as vortex3.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 31.49,
+   "end": 36.72,
+   "text": "I make /tmp/l3rec, move in, and clear any old files.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 36.72,
+   "end": 43.25,
+   "text": "I open vim and write the shellcode in assembly: it opens the password file, reads it, and writes it to standard output.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 43.25,
+   "end": 57.0,
+   "text": "First the path, built backwards on the stack: zero eax, push a zero to terminate the string, then push the pieces of /etc/vortex_pass/vortex4.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 57.0,
+   "end": 66.53,
+   "text": "Then the open call: the stack pointer becomes the path, ecx is zeroed, eax is 5, and int 0x80 opens the file.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 66.53,
+   "end": 78.41,
+   "text": "Then the read: the descriptor moves to ebx, eax is 3, ecx points at the stack, edx is 100 bytes, and int 0x80 reads the password onto the stack.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 78.41,
+   "end": 95.04,
+   "text": "Then the write: eax is 4, ebx is 1 for standard output, ecx still points at the stack, and int 0x80 prints it. Finally exit: eax is 1, ebx is zero, int 0x80.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 95.04,
+   "end": 98.47,
+   "text": "The file is 28 lines, 433 bytes.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 98.47,
+   "end": 101.04,
+   "text": "nasm assembles it to 69 bytes.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 101.04,
+   "end": 104.11,
+   "text": "The hex dump shows the shellcode as one line of hex.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 104.11,
+   "end": 113.42,
+   "text": "The count comes back zero, and the fallback prints NO-NUL-BYTES: the shellcode has no zero bytes, so it survives strcpy.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "cmd"
+    },
+    {
+     "step": 11,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 113.42,
+   "end": 118.78,
+   "text": "I open vim and write the driver: it reads a file and passes its whole contents as the binary's argument.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "start": 118.78,
+   "end": 126.89,
+   "text": "The includes, then main: a 4096 byte static buffer, and fopen of the file named on the command line.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "start": 126.89,
+   "end": 137.14,
+   "text": "It reads the file into the buffer, then builds the argument list \u2014 the binary's path, the buffer, and a null \u2014 and execs it, returning 51 if exec ever comes back.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 17,
+   "start": 137.14,
+   "end": 140.38,
+   "text": "The driver is 6 lines, 247 bytes.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "cmd"
+    },
+    {
+     "step": 16,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "start": 140.38,
+   "end": 143.5,
+   "text": "I compile it \u2014 no output means no errors.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 19,
+   "start": 143.5,
+   "end": 157.58,
+   "text": "Then I build the payload: the 69 byte shellcode, A filler to offset 128, four more As for the lp slot, and 52 90 04 08 in the lpp slot \u2014 136 bytes in all.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 20,
+   "start": 157.58,
+   "end": 160.42,
+   "text": "The payload file is 136 bytes.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "cmd"
+    },
+    {
+     "step": 19,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 21,
+   "start": 160.42,
+   "end": 163.85,
+   "text": "I run it, and the shellcode prints the vortex4 password.",
+   "lines": [
+    {
+     "step": 20,
+     "role": "cmd"
+    },
+    {
+     "step": 20,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 22,
+   "start": 163.85,
+   "end": 165.84,
+   "text": "I log out of vortex3.",
+   "lines": [
+    {
+     "step": 21,
+     "role": "cmd"
+    },
+    {
+     "step": 21,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 23,
+   "start": 165.84,
+   "end": 169.63,
+   "text": "Then I log in as vortex4 with the password the shellcode printed.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 24,
+   "start": 169.63,
+   "end": 175.03,
+   "text": "id confirms uid 5004, vortex4.",
+   "lines": [
+    {
+     "step": 23,
+     "role": "cmd"
+    },
+    {
+     "step": 23,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 25,
+   "start": 175.03,
+   "end": 179.23,
+   "text": "And the password file reads back the same password. The level is solved.",
+   "lines": [
+    {
+     "step": 24,
+     "role": "cmd"
+    },
+    {
+     "step": 24,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 26,
+   "start": 179.23,
+   "end": 180.19,
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": 25,
+     "role": "cmd"
+    },
+    {
+     "step": 25,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
