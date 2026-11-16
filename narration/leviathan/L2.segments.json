@@ -1,0 +1,121 @@
+{
+ "segments": [
+  {
+   "text": "Leviathan, level two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The setuid binary printfile, owned by leviathan three, prints a file we name, and the goal is to make it print leviathan three's password.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as leviathan two, on port 2223.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I run strings on printfile and grep for usage, cat, and cant, and the output shows the whole mechanism: a usage line, and a slash bin slash cat format string.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "I disassemble main, and the listing shows the order of operations: access checks the name we give it, then snprintf builds slash bin slash cat from that name, then the program switches to leviathan three and runs the command with system.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 36
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 54
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 62
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 67
+    }
+   ]
+  },
+  {
+   "text": "The check and the use disagree about the name: access sees one path, but the shell splits it on spaces. So I make a directory, link a to the leviathan three password file, and create a real readable file named a space b.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I run printfile on a space b, and the privileged cat prints the password through the symlink, then complains that b is no such file, which proves the argument was split.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "The password for leviathan three is printed, and the level is solved.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

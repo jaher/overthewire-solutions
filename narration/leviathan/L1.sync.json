@@ -1,0 +1,117 @@
+{
+ "game": "leviathan",
+ "level": 1,
+ "audio": "narration/leviathan/L1.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 51.89,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.87,
+   "text": "Leviathan, level one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.87,
+   "end": 9.67,
+   "text": "The home directory holds a setuid binary called check, owned by leviathan two, and the goal is to get leviathan two's password.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 9.67,
+   "end": 13.32,
+   "text": "I log in as leviathan one, on port 2223.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 13.32,
+   "end": 22.73,
+   "text": "I run strings on check, and the readable text gives the game away: the fragments secr and love, the password prompt, and a slash bin slash sh.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 17,
+     "to": 21
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 22.73,
+   "end": 38.14,
+   "text": "I trace the program with ltrace, feeding it the word sex, and the trace shows the whole flow: three getchar calls, a strcmp of sex against sex that returns zero, then setreuid and system slash bin slash sh.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 2,
+     "to": 5
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 8,
+     "to": 9
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 38.14,
+   "end": 46.18,
+   "text": "Then I run check again, piping in sex, then id, then a cat of the leviathan two password file, pausing a second between each line.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 46.18,
+   "end": 51.89,
+   "text": "The shell answers with the leviathan two identity, and the cat prints the password, so the level is solved.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

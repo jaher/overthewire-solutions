@@ -1,0 +1,91 @@
+{
+ "segments": [
+  {
+   "text": "Leviathan, level one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The home directory holds a setuid binary called check, owned by leviathan two, and the goal is to get leviathan two's password.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as leviathan one, on port 2223.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I run strings on check, and the readable text gives the game away: the fragments secr and love, the password prompt, and a slash bin slash sh.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 17,
+     "to": 21
+    }
+   ]
+  },
+  {
+   "text": "I trace the program with ltrace, feeding it the word sex, and the trace shows the whole flow: three getchar calls, a strcmp of sex against sex that returns zero, then setreuid and system slash bin slash sh.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 2,
+     "to": 5
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 8,
+     "to": 9
+    }
+   ]
+  },
+  {
+   "text": "Then I run check again, piping in sex, then id, then a cat of the leviathan two password file, pausing a second between each line.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The shell answers with the leviathan two identity, and the cat prints the password, so the level is solved.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
