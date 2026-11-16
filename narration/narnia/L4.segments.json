@@ -1,0 +1,286 @@
+{
+ "segments": [
+  {
+   "text": "Narnia, level four.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The source declares a two hundred fifty-six byte buffer, wipes every environment string first, then copies argv one into the buffer with strcpy. The wiped environment makes the stack layout the same on every run, so the overflow is deterministic.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as narnia four and read the source.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The buffer is two hundred fifty-six bytes; main first zeroes every environment string, then, if an argument was given, copies it into the buffer with strcpy.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 107,
+     "to": 113
+    }
+   ]
+  },
+  {
+   "text": "I disassemble main: it subtracts two hundred sixty from the stack pointer, so the buffer sits at ebp minus two hundred sixty, the saved frame pointer at offset two hundred sixty, and the return address at offset two hundred sixty-four.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 3,
+     "to": 3
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 38,
+     "to": 40
+    }
+   ]
+  },
+  {
+   "text": "Readelf shows the stack readable, writable and executable, and address randomisation is zero, so a return into the stack will run.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "In gdb I break at the strcpy call and print the layout. The buffer is at ffff d two a four and the return address slot at ffff d three a c, two hundred sixty-four bytes apart, as expected.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 5,
+     "to": 5
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 10,
+     "to": 11
+    }
+   ]
+  },
+  {
+   "text": "Then I write the shellcode in vim.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vimcmd"
+    },
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It starts with a write of the four byte marker PWN exclamation, so the address sweep can tell a hit from a crash.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The write call itself: one into ebx for standard output, four into edx for the length, syscall four, interrupt eighty hex.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then geteuid, syscall two hundred one, and setreuid with that id twice, syscall seventy, so the effective id survives the exec.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then setuid with the same id, syscall twenty-three, which sets the real, effective and saved ids, so the privilege survives the exec where a plain setreuid would not.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the execve setup: push a null, push slash slash s h and slash bin slash, point ebx at the path, and start the argument array.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The last lines finish it: push ebx, point ecx at the arguments, clear edx, load eleven as the syscall number, and interrupt eighty hex \u2014 execve on slash bin slash sh.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I assemble it with nasm, check the disassembly with objdump, extract the text section with objcopy, and print the bytes with xxd.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "cmd"
+    },
+    {
+     "step": 20,
+     "role": "cmd"
+    },
+    {
+     "step": 20,
+     "role": "out",
+     "from": 6,
+     "to": 8
+    },
+    {
+     "step": 21,
+     "role": "cmd"
+    },
+    {
+     "step": 22,
+     "role": "cmd"
+    },
+    {
+     "step": 22,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "Then I write the exploit driver in vim.",
+   "lines": [
+    {
+     "step": 23,
+     "role": "vimcmd"
+    },
+    {
+     "step": 23,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It loads the shellcode from the assembler output and prints its length in hex; the payload is a NOP sled filling the two hundred fifty-six byte buffer, the shellcode at its end, then four B bytes for the saved frame pointer, then the return address in little-endian.",
+   "lines": [
+    {
+     "step": 24,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The probe rejects any address whose little-endian bytes contain a null, then runs the binary with the payload, feeding it id and the password read as its standard input.",
+   "lines": [
+    {
+     "step": 25,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The probe counts a hit when uid equals appears in the output; the sweep runs from ffff d zero zero zero to ffff e eight zero zero, four bytes at a time, and stops at the first hit, printing where it landed.",
+   "lines": [
+    {
+     "step": 26,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "If nothing hits it gives up; otherwise it runs the binary once more at the hit address, feeding it id and the password read on separate lines, and prints whatever comes back.",
+   "lines": [
+    {
+     "step": 27,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I run the driver: it prints the seventy-eight byte shellcode, sweeps, lands in the NOP sled at 0xffffdc04, the shell comes up as narnia five, and the password prints.",
+   "lines": [
+    {
+     "step": 28,
+     "role": "cmd"
+    },
+    {
+     "step": 28,
+     "role": "out",
+     "from": 0,
+     "to": 4
+    }
+   ]
+  },
+  {
+   "text": "The shell runs as narnia five, and the level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

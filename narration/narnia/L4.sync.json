@@ -1,0 +1,357 @@
+{
+ "game": "narnia",
+ "level": 4,
+ "audio": "narration/narnia/L4.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 304.13,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.73,
+   "text": "Narnia, level four.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.73,
+   "end": 17.14,
+   "text": "The source declares a two hundred fifty-six byte buffer, wipes every environment string first, then copies argv one into the buffer with strcpy. The wiped environment makes the stack layout the same on every run, so the overflow is deterministic.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 17.14,
+   "end": 20.09,
+   "text": "I log in as narnia four and read the source.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 20.09,
+   "end": 29.16,
+   "text": "The buffer is two hundred fifty-six bytes; main first zeroes every environment string, then, if an argument was given, copies it into the buffer with strcpy.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 107,
+     "to": 113
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 29.16,
+   "end": 43.03,
+   "text": "I disassemble main: it subtracts two hundred sixty from the stack pointer, so the buffer sits at ebp minus two hundred sixty, the saved frame pointer at offset two hundred sixty, and the return address at offset two hundred sixty-four.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 3,
+     "to": 3
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 38,
+     "to": 40
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 43.03,
+   "end": 50.83,
+   "text": "Readelf shows the stack readable, writable and executable, and address randomisation is zero, so a return into the stack will run.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 50.83,
+   "end": 66.48,
+   "text": "In gdb I break at the strcpy call and print the layout. The buffer is at ffff d two a four and the return address slot at ffff d three a c, two hundred sixty-four bytes apart, as expected.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 5,
+     "to": 5
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 10,
+     "to": 11
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 66.48,
+   "end": 68.45,
+   "text": "Then I write the shellcode in vim.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vimcmd"
+    },
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 68.45,
+   "end": 75.34,
+   "text": "It starts with a write of the four byte marker PWN exclamation, so the address sweep can tell a hit from a crash.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 75.34,
+   "end": 86.06,
+   "text": "The write call itself: one into ebx for standard output, four into edx for the length, syscall four, interrupt eighty hex.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 86.06,
+   "end": 96.7,
+   "text": "Then geteuid, syscall two hundred one, and setreuid with that id twice, syscall seventy, so the effective id survives the exec.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 96.7,
+   "end": 108.05,
+   "text": "Then setuid with the same id, syscall twenty-three, which sets the real, effective and saved ids, so the privilege survives the exec where a plain setreuid would not.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 108.05,
+   "end": 118.25,
+   "text": "Then the execve setup: push a null, push slash slash s h and slash bin slash, point ebx at the path, and start the argument array.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 118.25,
+   "end": 180.48,
+   "text": "The last lines finish it: push ebx, point ecx at the arguments, clear edx, load eleven as the syscall number, and interrupt eighty hex \u2014 execve on slash bin slash sh.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 180.48,
+   "end": 188.95,
+   "text": "I assemble it with nasm, check the disassembly with objdump, extract the text section with objcopy, and print the bytes with xxd.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "cmd"
+    },
+    {
+     "step": 20,
+     "role": "cmd"
+    },
+    {
+     "step": 20,
+     "role": "out",
+     "from": 6,
+     "to": 8
+    },
+    {
+     "step": 21,
+     "role": "cmd"
+    },
+    {
+     "step": 22,
+     "role": "cmd"
+    },
+    {
+     "step": 22,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "start": 188.95,
+   "end": 191.47,
+   "text": "Then I write the exploit driver in vim.",
+   "lines": [
+    {
+     "step": 23,
+     "role": "vimcmd"
+    },
+    {
+     "step": 23,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "start": 191.47,
+   "end": 206.4,
+   "text": "It loads the shellcode from the assembler output and prints its length in hex; the payload is a NOP sled filling the two hundred fifty-six byte buffer, the shellcode at its end, then four B bytes for the saved frame pointer, then the return address in little-endian.",
+   "lines": [
+    {
+     "step": 24,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 17,
+   "start": 206.4,
+   "end": 215.88,
+   "text": "The probe rejects any address whose little-endian bytes contain a null, then runs the binary with the payload, feeding it id and the password read as its standard input.",
+   "lines": [
+    {
+     "step": 25,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "start": 215.88,
+   "end": 230.11,
+   "text": "The probe counts a hit when uid equals appears in the output; the sweep runs from ffff d zero zero zero to ffff e eight zero zero, four bytes at a time, and stops at the first hit, printing where it landed.",
+   "lines": [
+    {
+     "step": 26,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 19,
+   "start": 230.11,
+   "end": 239.54,
+   "text": "If nothing hits it gives up; otherwise it runs the binary once more at the hit address, feeding it id and the password read on separate lines, and prints whatever comes back.",
+   "lines": [
+    {
+     "step": 27,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 20,
+   "start": 239.54,
+   "end": 301.18,
+   "text": "I run the driver: it prints the seventy-eight byte shellcode, sweeps, lands in the NOP sled at 0xffffdc04, the shell comes up as narnia five, and the password prints.",
+   "lines": [
+    {
+     "step": 28,
+     "role": "cmd"
+    },
+    {
+     "step": 28,
+     "role": "out",
+     "from": 0,
+     "to": 4
+    }
+   ]
+  },
+  {
+   "id": 21,
+   "start": 301.18,
+   "end": 304.13,
+   "text": "The shell runs as narnia five, and the level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
