@@ -2,7 +2,9 @@
 // tiny DOM stub (same stub as player_check.js, plus a drivable fake audio
 // element) and verify that, for Vortex L0, the typed lines appear in time
 // with the narration audio and the highlight tracks the spoken segment —
-// through the first minute and across a seek.
+// through the first minute and across a seek — and that the visible
+// transcript panel renders all 17 segments, tracks the audio clock, jumps
+// on seek, freezes on pause, and clears at the end.
 // Usage: node narration_check.js
 // Exit 0 when every assertion passes, 1 otherwise.
 const fs = require('fs');
@@ -137,6 +139,18 @@ function lineTimes(map) {
     !!getNarrMap() && getNarrBtn().style.display !== 'none',
     getNarrMap() ? `duration ${getNarrMap().duration}s` : 'no map');
 
+  const transcript = byId['narrTranscript'];
+  const panelActive = () => {
+    let a = -1;
+    for (const d of transcript.children) if (d.classList.contains('active')) a = parseInt(d.dataset.seg, 10);
+    return a;
+  };
+  check('transcript panel renders all 17 segments with the script text',
+    transcript.children.length === 17 &&
+    transcript.children.every((d, i) => d.textContent === sync.segments[i].text) &&
+    transcript.classList.contains('on'),
+    `segments=${transcript.children.length} shown=${transcript.classList.contains('on')}`);
+
   const audio = getNarrAudio();
   audio.duration = sync.duration;
   audio.fire('loadedmetadata');
@@ -163,6 +177,7 @@ function lineTimes(map) {
   // --- drive the fake clock: 0.25s of audio per 40ms of real time ---
   const early = [], late = [];
   let sawVimAt10 = null, hlAtSeg5 = null, hlAtSeg12 = null, hlAtSeg15 = null;
+  let panelAt10 = null, panelAtSeg5 = null, panelAtSeg12 = null;
   let t = 0;
   const DT = 0.25;
   while (t < 62) {
@@ -190,10 +205,13 @@ function lineTimes(map) {
       if (e && e.t <= now - 1.5 && !run[i]) late.push(`run out[${i}] missing at ${now.toFixed(2)} (scheduled ${e.t.toFixed(2)})`);
     }
     if (Math.abs(now - 10) < DT / 2) sawVimAt10 = hasVimBox();
+    if (Math.abs(now - 10) < DT / 2 && panelAt10 === null) panelAt10 = panelActive();
     // seg 5's six lines are spread across [29.42, 31.30]; sample near its end
     // so all six have appeared and are highlighted together
     if (now >= 31.1 && now < 31.3 && hlAtSeg5 === null) hlAtSeg5 = highlighted();
+    if (now >= 31.1 && now < 31.3 && panelAtSeg5 === null) panelAtSeg5 = panelActive();
     if (now >= 46 && now < 46.5 && hlAtSeg12 === null) hlAtSeg12 = highlighted();
+    if (now >= 46 && now < 46.5 && panelAtSeg12 === null) panelAtSeg12 = panelActive();
     if (now >= 62.5 && hlAtSeg15 === null) hlAtSeg15 = highlighted();
   }
   check('no typed line appears before its spoken time', early.length === 0,
@@ -208,7 +226,9 @@ function lineTimes(map) {
   check('seg 12 (inet_pton story) highlights exactly out lines 23-28, no new lines',
     hlAtSeg12 !== null && hlAtSeg12.length === 6 && hlAtSeg12.every(s => s.split(' ').includes('12')),
     hlAtSeg12 === null ? 'no sample' : `highlighted segs: [${hlAtSeg12.join(', ')}]`);
-
+  check('transcript panel active segment tracks the audio clock (seg 1 at t=10, seg 5 at t=31, seg 12 at t=46)',
+    panelAt10 === 1 && panelAtSeg5 === 5 && panelAtSeg12 === 12,
+    `t10=${panelAt10} t31=${panelAtSeg5} t46=${panelAtSeg12}`);
   // --- seek to 60s (seg 14: the reply-buffer story) and re-render fast-forwarded ---
   // Only lines scheduled <= 60s may appear: all 67 cat lines, but NOT the
   // gcc/run lines (scheduled 65.1s+) — the seek fast-forwards up to the seek
@@ -222,6 +242,8 @@ function lineTimes(map) {
   check('after seek to 60s, all 67 cat lines present, run lines not yet (fast-forward stops at seek point)',
     afterSeek.cat.length === 67 && afterSeek.run.length === 0,
     `cat=${afterSeek.cat.length} run=${afterSeek.run.length}`);
+  check('after seek to 60s, transcript panel jumps to segment 14', panelActive() === 14,
+    `panel=${panelActive()}`);
   // resume the clock from 60 to past the end
   while (t < 75.2) {
     t += DT;
@@ -237,15 +259,21 @@ function lineTimes(map) {
     atEnd.run.length === 3 && pwShown, `run=${atEnd.run.length} pw=${pwShown}`);
   audio.currentTime = 75.2; audio.fire('ended');
   await sleep(100);
-  check('audio end clears narration state + highlight', isNarrOn() === false && highlighted().length === 0,
-    `narrOn=${isNarrOn()} highlighted=${highlighted().length}`);
+  check('audio end clears narration state + highlight + transcript panel', isNarrOn() === false && highlighted().length === 0 && panelActive() === -1,
+    `narrOn=${isNarrOn()} highlighted=${highlighted().length} panel=${panelActive()}`);
 
   // --- pause / resume lockstep ---
   getNarrBtn().onclick(); // start again
   await sleep(50);
+  // drive a few seconds so a segment is active, then pause
+  for (let k = 0; k < 20; k++){ audio.currentTime = (k + 1) * 0.25; audio.fire('timeupdate'); await sleep(40); }
   getNarrBtn().onclick(); // pause
   await sleep(50);
   check('pause button pauses the audio', audio.paused === true, `paused=${audio.paused}`);
+  const frozenAt = panelActive();
+  await sleep(300);
+  check('transcript highlight freezes while paused', panelActive() === frozenAt && frozenAt >= 0,
+    `panel=${panelActive()} was=${frozenAt}`);
   getNarrBtn().onclick(); // resume
   await sleep(50);
   check('resume button resumes the audio', audio.paused === false, `paused=${audio.paused}`);
