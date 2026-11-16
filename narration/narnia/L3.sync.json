@@ -1,0 +1,167 @@
+{
+ "game": "narnia",
+ "level": 3,
+ "audio": "narration/narnia/L3.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 92.52,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.99,
+   "text": "Narnia, level three.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.99,
+   "end": 12.98,
+   "text": "This one is not about the return address; it is a stack variable overflow \u2014 strcpy into a thirty-two byte input buffer spills into the sixteen byte output filename next to it.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 12.98,
+   "end": 15.86,
+   "text": "I log in as narnia three and read the source.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 15.86,
+   "end": 25.46,
+   "text": "The source declares ofile, sixteen bytes, set to slash dev slash null, ifile, thirty-two bytes, and a thirty-two byte copy buffer.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 108,
+     "to": 111
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 25.46,
+   "end": 37.03,
+   "text": "It copies argv one into ifile with strcpy, no length check, then opens ofile read-write and ifile read-only, and copies thirty-one bytes from the input to the output.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 119,
+     "to": 132
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 37.03,
+   "end": 52.7,
+   "text": "The trick is one argument that is both paths at once: I make a directory under slash tmp named with twenty-seven A letters, link out three inside it to the narnia four password file, and pre-create slash tmp slash out three as world-writable.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 52.7,
+   "end": 68.35,
+   "text": "The argument is slash tmp, the twenty-seven A's, slash tmp, slash out three \u2014 forty-one characters: the first thirty-two fill ifile, and the rest spills into ofile as slash tmp slash out three.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 68.35,
+   "end": 84.19,
+   "text": "I run the program on that path, and it reports it copied the contents to a safer place, slash tmp slash out three \u2014 because with no terminator at the boundary, ifile still reads as the full path to the link, while ofile reads as slash tmp slash out three.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 84.19,
+   "end": 88.51,
+   "text": "Reading slash tmp slash out three prints the narnia four password.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 88.51,
+   "end": 92.52,
+   "text": "The password for narnia four is shown, and the level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
