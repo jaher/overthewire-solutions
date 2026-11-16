@@ -3,7 +3,7 @@
  "level": 1,
  "audio": "narration/behemoth/L1.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 99.77,
+ "duration": 124.56,
  "segments": [
   {
    "id": 0,
@@ -20,7 +20,7 @@
   {
    "id": 1,
    "start": 1.92,
-   "end": 4.73,
+   "end": 5.21,
    "text": "We log in as behemoth one and look at the binary.",
    "lines": [
     {
@@ -35,8 +35,8 @@
   },
   {
    "id": 2,
-   "start": 4.73,
-   "end": 12.36,
+   "start": 5.21,
+   "end": 12.72,
    "text": "ls shows it is setuid to behemoth two, and file says it is a thirty-two bit Intel executable, not stripped.",
    "lines": [
     {
@@ -63,8 +63,8 @@
   },
   {
    "id": 3,
-   "start": 12.36,
-   "end": 20.04,
+   "start": 12.72,
+   "end": 20.59,
    "text": "We disassemble main with objdump: it loads the address of a buffer sixty-seven bytes below the frame pointer and calls gets on it.",
    "lines": [
     {
@@ -87,8 +87,8 @@
   },
   {
    "id": 4,
-   "start": 20.04,
-   "end": 30.77,
+   "start": 20.59,
+   "end": 30.84,
    "text": "gets reads until a newline with no bound, so this is a classic stack overflow: the saved frame pointer sits at offset sixty-seven and the return address at offset seventy-one.",
    "lines": [
     {
@@ -101,8 +101,8 @@
   },
   {
    "id": 5,
-   "start": 30.77,
-   "end": 37.08,
+   "start": 30.84,
+   "end": 37.27,
    "text": "We inspect the protections: readelf shows the stack is marked executable, and address randomisation is off.",
    "lines": [
     {
@@ -129,8 +129,8 @@
   },
   {
    "id": 6,
-   "start": 37.08,
-   "end": 44.47,
+   "start": 37.27,
+   "end": 44.16,
    "text": "That combination means we do not need a return-to-libc chain; we can simply place shellcode on the stack and jump to it.",
    "lines": [
     {
@@ -149,8 +149,8 @@
   },
   {
    "id": 7,
-   "start": 44.47,
-   "end": 46.44,
+   "start": 44.16,
+   "end": 46.13,
    "text": "Then we write the shellcode in vim.",
    "lines": [
     {
@@ -165,8 +165,8 @@
   },
   {
    "id": 8,
-   "start": 46.44,
-   "end": 51.53,
+   "start": 46.13,
+   "end": 51.24,
    "text": "First the header: thirty-two bit mode, the global entry point, and the start label.",
    "lines": [
     {
@@ -177,9 +177,9 @@
   },
   {
    "id": 9,
-   "start": 51.53,
-   "end": 54.84,
-   "text": "It writes a marker so our sweep can detect a successful jump.",
+   "start": 51.24,
+   "end": 59.83,
+   "text": "It writes a marker so our sweep can detect a successful jump. It pushes a zero and the marker bytes onto the stack, then points at them and calls write.",
    "lines": [
     {
      "role": "vim",
@@ -189,8 +189,8 @@
   },
   {
    "id": 10,
-   "start": 54.84,
-   "end": 59.83,
+   "start": 59.83,
+   "end": 64.63,
    "text": "Then it calls geteuid, setreuid with that id twice,",
    "lines": [
     {
@@ -201,9 +201,9 @@
   },
   {
    "id": 11,
-   "start": 59.83,
-   "end": 63.84,
-   "text": "and setuid with the same id so the privilege survives the exec.",
+   "start": 64.63,
+   "end": 74.54,
+   "text": "and setuid with the same id so the privilege survives the exec. It calls geteuid again, moves the id into place, and invokes setuid.",
    "lines": [
     {
      "role": "vim",
@@ -213,9 +213,9 @@
   },
   {
    "id": 12,
-   "start": 63.84,
-   "end": 68.23,
-   "text": "And finally execve on slash bin slash sh.",
+   "start": 74.54,
+   "end": 92.9,
+   "text": "And finally execve on slash bin slash sh. It pushes a zero, then slash slash s h, then slash b i n, points the first argument at the stack, builds the argument list from it, clears the environment pointer, loads eleven as the syscall number, and triggers the interrupt.",
    "lines": [
     {
      "role": "vim",
@@ -229,8 +229,8 @@
   },
   {
    "id": 13,
-   "start": 68.23,
-   "end": 75.6,
+   "start": 92.9,
+   "end": 100.22,
    "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: seventy-eight bytes.",
    "lines": [
     {
@@ -271,8 +271,8 @@
   },
   {
    "id": 14,
-   "start": 75.6,
-   "end": 82.56,
+   "start": 100.22,
+   "end": 107.3,
    "text": "The payload is seventy-one NOP bytes, then the candidate return address, then the shellcode, then a newline.",
    "lines": [
     {
@@ -289,8 +289,8 @@
   },
   {
    "id": 15,
-   "start": 82.56,
-   "end": 88.8,
+   "start": 107.3,
+   "end": 113.35,
    "text": "The exploit forks once per candidate address, feeds the payload on standard input, and watches for the marker.",
    "lines": [
     {
@@ -303,8 +303,8 @@
   },
   {
    "id": 16,
-   "start": 88.8,
-   "end": 95.57,
+   "start": 113.35,
+   "end": 120.07,
    "text": "When it finds the address that lands in the shellcode, it runs the binary again with that address and feeds the shell commands.",
    "lines": [
     {
@@ -317,8 +317,8 @@
   },
   {
    "id": 17,
-   "start": 95.57,
-   "end": 99.77,
+   "start": 120.07,
+   "end": 124.56,
    "text": "We get a shell as behemoth two and read the password, and the level is solved.",
    "lines": [
     {
