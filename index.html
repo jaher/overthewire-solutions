@@ -191,7 +191,7 @@ async function loadManifest(){
       } catch(e) {}
     }
     fillGames();
-    if (GAMES['narnia'] && !window.__userPickedGame) { gameKey = 'narnia'; gameSel.value = 'narnia'; fillLevels(); playLevel(0); }
+    if (GAMES['vortex'] && !window.__userPickedGame) { gameKey = 'vortex'; gameSel.value = 'vortex'; fillLevels(); playLevel(0); }
   } catch(e) {}
 }
 loadManifest();
@@ -336,6 +336,20 @@ function setNarrTime(){
   narrTimeEl.textContent = fmtT(c) + ' / ' + fmtT(d);
   if (isFinite(d) && d > 0){ narrSeek.max = d; if (document.activeElement !== narrSeek) narrSeek.value = c; }
 }
+/* Scroll a child into view inside its own panel only — never the window.
+   scrollIntoView() climbs every scrollable ancestor including the page, so
+   while narration played the window kept sliding down to the transcript and
+   the shell slid out of view. The shell is the focus; the transcript follows
+   along inside its own 220px box. */
+function scrollPanelTo(container, el){
+  /* The headless narration checker runs this script against a stub DOM
+     with no layout: without getBoundingClientRect there is nothing to
+     scroll, so skip it there. Real browsers always have it. */
+  if (typeof container.getBoundingClientRect !== 'function' || typeof el.getBoundingClientRect !== 'function') return;
+  const cr = container.getBoundingClientRect(), er = el.getBoundingClientRect();
+  if (er.top < cr.top) container.scrollTop += er.top - cr.top;
+  else if (er.bottom > cr.bottom) container.scrollTop += er.bottom - cr.bottom;
+}
 function narrHighlight(){
   if (!narrMap) return;
   const t = narrAudio.currentTime || 0;
@@ -348,14 +362,14 @@ function narrHighlight(){
     d.classList.toggle('narr-hl', on);
     if (on && !first) first = d;
   });
-  if (first) first.scrollIntoView({block: 'nearest'});
+  if (first) scrollPanelTo(term, first);
   let activeSeg = null;
   for (const d of narrTranscript.children){
     const on = active >= 0 && parseInt(d.dataset.seg, 10) === active;
     d.classList.toggle('active', on);
     if (on) activeSeg = d;
   }
-  if (activeSeg) activeSeg.scrollIntoView({block: 'nearest'});
+  if (activeSeg) scrollPanelTo(narrTranscript, activeSeg);
 }
 function narrClearHL(){ term.querySelectorAll('[data-narr-seg]').forEach(d => d.classList.remove('narr-hl')); narrSegEl.textContent = ''; for (const d of narrTranscript.children) d.classList.remove('active'); }
 narrAudio.addEventListener('timeupdate', () => { setNarrTime(); narrHighlight(); });

