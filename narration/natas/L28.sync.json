@@ -3,7 +3,7 @@
  "level": 28,
  "audio": "narration/natas/L28.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 180.55,
+ "duration": 187.99,
  "segments": [
   {
    "id": 0,
@@ -132,8 +132,8 @@
   {
    "id": 9,
    "start": 123.46,
-   "end": 129.65,
-   "text": "First the imports, the basic auth header, a handler that stops urllib from following redirects, and the opener.",
+   "end": 135.82,
+   "text": "First the imports, urllib dot request, urllib dot parse, base64, and urllib dot error, the basic auth header, a handler that stops urllib from following redirects, and the opener.",
    "lines": [
     {
      "step": 2,
@@ -143,9 +143,9 @@
   },
   {
    "id": 10,
-   "start": 129.65,
-   "end": 136.78,
-   "text": "Then I write ct_for. It posts a query and reads the ciphertext out of the redirect Location header.",
+   "start": 135.82,
+   "end": 145.78,
+   "text": "Then I write ct_for. It URL-encodes the query, posts it to the index page with a ten second timeout, and reads the ciphertext out of the redirect Location header.",
    "lines": [
     {
      "step": 3,
@@ -155,8 +155,8 @@
   },
   {
    "id": 11,
-   "start": 136.78,
-   "end": 141.34,
+   "start": 145.78,
+   "end": 150.34,
    "text": "Then I start get_ct. It fetches a search page for a raw ciphertext.",
    "lines": [
     {
@@ -167,8 +167,8 @@
   },
   {
    "id": 12,
-   "start": 141.34,
-   "end": 148.61,
+   "start": 150.34,
+   "end": 157.61,
    "text": "Then the base blocks. It posts eight a's, splits the ciphertext into sixteen-byte blocks and prints them.",
    "lines": [
     {
@@ -179,8 +179,8 @@
   },
   {
    "id": 13,
-   "start": 148.61,
-   "end": 156.24,
+   "start": 157.61,
+   "end": 165.24,
    "text": "Then it loops over the two payloads. Each is prefixed with ten b's. It fetches each payload's ciphertext and prints the payload.",
    "lines": [
     {
@@ -191,26 +191,10 @@
   },
   {
    "id": 14,
-   "start": 156.24,
-   "end": 165.19,
+   "start": 165.24,
+   "end": 174.19,
    "text": "The last chunk prints each payload's blocks, splices the first three base blocks with the payload blocks from block three on, fetches the search page, and prints the result.",
    "lines": [
-    {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "id": 15,
-   "start": 165.19,
-   "end": 166.75,
-   "text": "Here is the last chunk.",
-   "lines": [
-    {
-     "step": 6,
-     "role": "text"
-    },
     {
      "step": 5,
      "role": "vim"
@@ -218,11 +202,15 @@
    ]
   },
   {
-   "id": 16,
-   "start": 166.75,
-   "end": 180.55,
+   "id": 15,
+   "start": 174.19,
+   "end": 187.99,
    "text": "I run the script. The first payload, UNION SELECT 1, comes back as a list item with 1, so the splice works. The second, UNION SELECT password FROM users, returns the password for natas29.",
    "lines": [
+    {
+     "step": 6,
+     "role": "text"
+    },
     {
      "step": 6,
      "role": "out",

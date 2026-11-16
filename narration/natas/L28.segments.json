@@ -98,7 +98,7 @@
    ]
   },
   {
-   "text": "First the imports, the basic auth header, a handler that stops urllib from following redirects, and the opener.",
+   "text": "First the imports, urllib dot request, urllib dot parse, base64, and urllib dot error, the basic auth header, a handler that stops urllib from following redirects, and the opener.",
    "lines": [
     {
      "step": 2,
@@ -107,7 +107,7 @@
    ]
   },
   {
-   "text": "Then I write ct_for. It posts a query and reads the ciphertext out of the redirect Location header.",
+   "text": "Then I write ct_for. It URL-encodes the query, posts it to the index page with a ten second timeout, and reads the ciphertext out of the redirect Location header.",
    "lines": [
     {
      "step": 3,
@@ -146,19 +146,6 @@
    "text": "The last chunk prints each payload's blocks, splices the first three base blocks with the payload blocks from block three on, fetches the search page, and prints the result.",
    "lines": [
     {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "text": "Here is the last chunk.",
-   "lines": [
-    {
-     "step": 6,
-     "role": "text"
-    },
-    {
      "step": 5,
      "role": "vim"
     }
@@ -167,6 +154,10 @@
   {
    "text": "I run the script. The first payload, UNION SELECT 1, comes back as a list item with 1, so the splice works. The second, UNION SELECT password FROM users, returns the password for natas29.",
    "lines": [
+    {
+     "step": 6,
+     "role": "text"
+    },
     {
      "step": 6,
      "role": "out",
