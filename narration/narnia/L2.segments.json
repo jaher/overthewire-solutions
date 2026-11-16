@@ -95,7 +95,7 @@
    ]
   },
   {
-   "text": "The prototype starts with a comment and the headers, then main opens.",
+   "text": "The prototype starts with a comment laying out the whole plan \u2014 print the marker, become the setuid user, then exec the shell \u2014 plus the standard headers, and then main opens.",
    "lines": [
     {
      "step": 7,

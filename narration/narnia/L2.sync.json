@@ -3,7 +3,7 @@
  "level": 2,
  "audio": "narration/narnia/L2.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 260.86,
+ "duration": 302.16,
  "segments": [
   {
    "id": 0,
@@ -20,7 +20,7 @@
   {
    "id": 1,
    "start": 1.87,
-   "end": 8.47,
+   "end": 8.66,
    "text": "Main copies argv one into a one hundred twenty-eight byte buffer with strcpy, and there is no length check.",
    "lines": [
     {
@@ -31,8 +31,8 @@
   },
   {
    "id": 2,
-   "start": 8.47,
-   "end": 13.58,
+   "start": 8.66,
+   "end": 13.39,
    "text": "I log in as narnia two, change to slash tmp, and read the source.",
    "lines": [
     {
@@ -51,8 +51,8 @@
   },
   {
    "id": 3,
-   "start": 13.58,
-   "end": 24.26,
+   "start": 13.39,
+   "end": 24.02,
    "text": "The disassembly shows the buffer at ebp minus one hundred twenty-eight, so the saved frame pointer sits at offset one hundred twenty-eight and the return address at offset one hundred thirty-two.",
    "lines": [
     {
@@ -75,8 +75,8 @@
   },
   {
    "id": 4,
-   "start": 24.26,
-   "end": 32.38,
+   "start": 24.02,
+   "end": 32.06,
    "text": "Readelf shows the stack is readable, writable and executable, and address randomisation is zero, so a return into the stack will run.",
    "lines": [
     {
@@ -103,8 +103,8 @@
   },
   {
    "id": 5,
-   "start": 32.38,
-   "end": 35.81,
+   "start": 32.06,
+   "end": 35.86,
    "text": "Before writing assembly, I prototype the payload logic in C.",
    "lines": [
     {
@@ -119,9 +119,9 @@
   },
   {
    "id": 6,
-   "start": 35.81,
-   "end": 40.2,
-   "text": "The prototype starts with a comment and the headers, then main opens.",
+   "start": 35.86,
+   "end": 46.22,
+   "text": "The prototype starts with a comment laying out the whole plan \u2014 print the marker, become the setuid user, then exec the shell \u2014 plus the standard headers, and then main opens.",
    "lines": [
     {
      "step": 7,
@@ -131,8 +131,8 @@
   },
   {
    "id": 7,
-   "start": 40.2,
-   "end": 49.99,
+   "start": 46.22,
+   "end": 56.47,
    "text": "It prints the marker PWN exclamation, reads the effective id, sets reuid with it twice, sets uid with it, then execs the shell.",
    "lines": [
     {
@@ -143,8 +143,8 @@
   },
   {
    "id": 8,
-   "start": 49.99,
-   "end": 60.72,
+   "start": 56.47,
+   "end": 65.54,
    "text": "I compile it with gcc minus m thirty-two, and run it: it prints PWN exclamation and the effective id, so the syscall order is right.",
    "lines": [
     {
@@ -161,8 +161,8 @@
   },
   {
    "id": 9,
-   "start": 60.72,
-   "end": 62.64,
+   "start": 65.54,
+   "end": 67.39,
    "text": "Then I write the shellcode in vim.",
    "lines": [
     {
@@ -177,8 +177,8 @@
   },
   {
    "id": 10,
-   "start": 62.64,
-   "end": 69.53,
+   "start": 67.39,
+   "end": 74.28,
    "text": "It starts with a write of the four byte marker PWN exclamation, so the address sweep can tell a hit from a crash.",
    "lines": [
     {
@@ -189,8 +189,8 @@
   },
   {
    "id": 11,
-   "start": 69.53,
-   "end": 78.36,
+   "start": 74.28,
+   "end": 82.97,
    "text": "The write call itself: one into ebx for standard output, four into edx for the length, syscall four, interrupt eighty hex.",
    "lines": [
     {
@@ -201,8 +201,8 @@
   },
   {
    "id": 12,
-   "start": 78.36,
-   "end": 88.92,
+   "start": 82.97,
+   "end": 130.2,
    "text": "Then geteuid, syscall two hundred one, and setreuid with that id twice, syscall seventy, so the effective id survives the exec.",
    "lines": [
     {
@@ -213,8 +213,8 @@
   },
   {
    "id": 13,
-   "start": 88.92,
-   "end": 100.73,
+   "start": 130.2,
+   "end": 141.53,
    "text": "Then setuid with the same id, syscall twenty-three, which sets the real, effective and saved ids, so the privilege survives the exec where a plain setreuid would not.",
    "lines": [
     {
@@ -225,8 +225,8 @@
   },
   {
    "id": 14,
-   "start": 100.73,
-   "end": 109.8,
+   "start": 141.53,
+   "end": 151.3,
    "text": "Then the execve setup: push a null, push slash slash s h and slash bin slash, point ebx at the path, and start the argument array.",
    "lines": [
     {
@@ -237,8 +237,8 @@
   },
   {
    "id": 15,
-   "start": 109.8,
-   "end": 124.27,
+   "start": 151.3,
+   "end": 164.26,
    "text": "The last lines finish it: push ebx, point ecx at the arguments, clear edx, load eleven as the syscall number, and interrupt eighty hex \u2014 execve on slash bin slash sh.",
    "lines": [
     {
@@ -249,8 +249,8 @@
   },
   {
    "id": 16,
-   "start": 124.27,
-   "end": 132.24,
+   "start": 164.26,
+   "end": 172.1,
    "text": "I assemble it with nasm, format elf thirty-two, extract the text section with objcopy, and print the bytes with xxd.",
    "lines": [
     {
@@ -275,8 +275,8 @@
   },
   {
    "id": 17,
-   "start": 132.24,
-   "end": 136.2,
+   "start": 172.1,
+   "end": 176.14,
    "text": "Before the bytes go into argv one, I prove they work on their own.",
    "lines": [
     {
@@ -291,8 +291,8 @@
   },
   {
    "id": 18,
-   "start": 136.2,
-   "end": 142.87,
+   "start": 176.14,
+   "end": 183.17,
    "text": "A small C harness maps a page readable, writable and executable, copies the assembled bytes in, and calls them.",
    "lines": [
     {
@@ -303,8 +303,8 @@
   },
   {
    "id": 19,
-   "start": 142.87,
-   "end": 151.34,
+   "start": 183.17,
+   "end": 191.33,
    "text": "It starts with a comment and the headers: standard I/O, standard library, string, and sys/mman for the mapping call.",
    "lines": [
     {
@@ -315,8 +315,8 @@
   },
   {
    "id": 20,
-   "start": 151.34,
-   "end": 157.51,
+   "start": 191.33,
+   "end": 197.38,
    "text": "Main opens, declares the file pointer, the byte count and the buffer pointer, and checks it got a file name.",
    "lines": [
     {
@@ -327,8 +327,8 @@
   },
   {
    "id": 21,
-   "start": 157.51,
-   "end": 162.48,
+   "start": 197.38,
+   "end": 202.06,
    "text": "It opens the file, checks it, and measures its size with fseek and ftell.",
    "lines": [
     {
@@ -339,8 +339,8 @@
   },
   {
    "id": 22,
-   "start": 162.48,
-   "end": 172.99,
+   "start": 202.06,
+   "end": 212.57,
    "text": "Then the mapping: four thousand ninety-six bytes, readable, writable and executable, anonymous and private; it reads the file in and prints the loaded bytes in hex.",
    "lines": [
     {
@@ -351,8 +351,8 @@
   },
   {
    "id": 23,
-   "start": 172.99,
-   "end": 178.63,
+   "start": 212.57,
+   "end": 218.28,
    "text": "Finally it prints the jump address, calls the buffer as a function, and reports if the shellcode ever returns.",
    "lines": [
     {
@@ -363,8 +363,8 @@
   },
   {
    "id": 24,
-   "start": 178.63,
-   "end": 190.34,
+   "start": 218.28,
+   "end": 230.09,
    "text": "I compile it, and run it on the assembled bytes: it loads seventy-eight bytes, jumps in, and the shellcode prints PWN exclamation, so the code is proven before it goes into the overflow.",
    "lines": [
     {
@@ -381,8 +381,8 @@
   },
   {
    "id": 25,
-   "start": 190.34,
-   "end": 192.91,
+   "start": 230.09,
+   "end": 232.37,
    "text": "Then I write the exploit driver in vim.",
    "lines": [
     {
@@ -397,8 +397,8 @@
   },
   {
    "id": 26,
-   "start": 192.91,
-   "end": 199.44,
+   "start": 232.37,
+   "end": 239.09,
    "text": "It loads the shellcode from the assembler output, and checks it has no null byte and fits in one hundred twenty-eight bytes.",
    "lines": [
     {
@@ -409,8 +409,8 @@
   },
   {
    "id": 27,
-   "start": 199.44,
-   "end": 214.85,
+   "start": 239.09,
+   "end": 255.58,
    "text": "The payload is fifty NOPs, then the seventy-eight byte shellcode, then four B bytes for the saved frame pointer, then the return address in little-endian. The probe rejects any address whose little-endian bytes contain a null, then runs the binary with the payload.",
    "lines": [
     {
@@ -421,8 +421,8 @@
   },
   {
    "id": 28,
-   "start": 214.85,
-   "end": 239.74,
+   "start": 255.58,
+   "end": 281.26,
    "text": "The probe writes echo PROBE OK to the target's standard input, and counts a hit only if PROBE OK comes back, because the program echoes the payload, which itself contains PWN exclamation, so grepping for the marker would report hits that never ran. The sweep runs from ffff d zero zero zero to ffff e eight zero zero, four bytes at a time, and stops at the first hit.",
    "lines": [
     {
@@ -433,8 +433,8 @@
   },
   {
    "id": 29,
-   "start": 239.74,
-   "end": 248.5,
+   "start": 281.26,
+   "end": 290.02,
    "text": "If nothing hits it gives up; otherwise it runs the binary once more at the hit address, feeding it id and the password read, and prints whatever comes back.",
    "lines": [
     {
@@ -445,8 +445,8 @@
   },
   {
    "id": 30,
-   "start": 248.5,
-   "end": 249.74,
+   "start": 290.02,
+   "end": 291.41,
    "text": "I run the driver.",
    "lines": [
     {
@@ -457,8 +457,8 @@
   },
   {
    "id": 31,
-   "start": 249.74,
-   "end": 257.74,
+   "start": 291.41,
+   "end": 298.97,
    "text": "It hits at ffff d one e eight after one hundred twenty-three probes, runs the shell as narnia three, and the password prints.",
    "lines": [
     {
@@ -483,8 +483,8 @@
   },
   {
    "id": 32,
-   "start": 257.74,
-   "end": 260.86,
+   "start": 298.97,
+   "end": 302.16,
    "text": "The shell runs as narnia three, and the level is solved.",
    "lines": [
     {
