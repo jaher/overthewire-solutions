@@ -1,0 +1,105 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level nineteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The page says the session identifiers are no longer sequential, but the source tells us exactly how they are built. The function takes a random number between one and six hundred forty, appends a hyphen and the username, and then hex-encodes the whole string. So the admin session identifier is simply the hex encoding of some number followed by hyphen admin. Hex encoding does not add any real entropy; it is just a different representation.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I fetch the source and pull out the identifier format, a number, a hyphen, and the username.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "We brute-force the number: for each value from one to six hundred forty, we build the string, hex-encode it, and send it as the session cookie. Exactly one of them belongs to the admin session.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "So I open vim and write the brute force:",
+   "lines": [
+    {
+     "step": 1,
+     "role": "vimcmd"
+    },
+    {
+     "step": 1,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The first chunk sets up the imports, the page URL, the basic auth header, and the loop over numbers from one to six hundred forty, encoding each candidate as the hex of the number, a hyphen, and admin.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The second chunk sends each identifier as the session cookie, and when the reply says you are an admin, it prints the number and the credentials block, then stops.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Here is the second chunk.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "text"
+    },
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I run it, and it finds number two hundred eighty-one, whose identifier is the hex of two eight one hyphen admin, and prints the password for natas twenty, and the level is solved.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
