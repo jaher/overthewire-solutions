@@ -162,6 +162,7 @@ const LEVELS = [
   ["Vortex",5,"MD5 preimage crack: the level hashes getpass() input and compares to a fixed digest; brute force finds rlTf6; the spawned shell runs as vortex6"],
   ["Vortex",6,"reconstructed binary: restart(argv[0]) re-execs argv[0] with setreuid(v7,v7) before execlp; execve with argv[0]=/bin/sh gives a shell as vortex7"],
   ["Vortex",7,"CRC-gated strcpy: GF(2) linear CRC patch hits 0xe1ca95ee; epilogue ret pops from ecx-4; NOP sled into setreuid(5008,5008) shellcode dumping /etc/vortex_pass/vortex8"],
+  ["Vortex",8,"thread + privilege-drop race: overflow patches sleep@GOT and returns main into safecode's loop; the thread (keeps euid=vortex9) calls the hijacked sleep and dumps /etc/vortex_pass/vortex9"],
 ];
 
 const rows = document.getElementById('rows');

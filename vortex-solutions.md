@@ -1,4 +1,39 @@
 
+## Level 8 → vortex9 (SOLVED 2026-11-16)
+- **Password for vortex9:** `XdTW4yCeq`, read by the hijacked *thread* (euid=vortex9) from `/etc/vortex_pass/vortex9` and verified by logging in as vortex9 (`uid=5009`, `cat /etc/vortex_pass/vortex9` matches). Recording: `recordings/vortex/L8.cast`.
+- **The program (reconstructed from objdump, no published source — the level page says "Disassemble this dynamically linked executable"):** `/vortex/vortex8`, mode 4750, setuid vortex9, 15152 bytes, md5 `a2cae4e765bc58316b34dbe7f64af120`, not stripped:
+  ```c
+  void *safecode(void *arg) {          /* 0x80491d6 — the THREAD */
+      int i = 0;
+      for (;;) { printf("%d\n", i); fflush(stdout); sleep(1); }
+  }
+  int unsafecode(char *src) {          /* 0x8049217 — main thread */
+      char buf[1024];                  /* ebp-0x408 */
+      strcpy(buf, src);                /* unbounded overflow */
+  }
+  int main(int argc, char **argv) {
+      pthread_t tid;                   /* ebp-0x1c */
+      pthread_create(&tid, 0, safecode, 0);
+      syscall(170, getgid(), getgid(), getgid());  /* setresgid — no-op */
+      syscall(164, getuid(), getuid(), getuid());  /* setresuid — drops euid 5009→5008 */
+      unsafecode(argv[1]);             /* the overflow runs AFTER the drop */
+  }
+  ```
+  So the overflow gives code execution as plain vortex8, while `/etc/vortex_pass/vortex9` is `-r-------- vortex9:vortex9` — only euid=vortex9 can read it.
+- **The key measurement (a clean-run poller, then a geteuid()-in-the-thread shellcode):** the thread is created *before* the drops, and the raw `syscall()` calls in this glibc do **per-thread** credentials — the thread **keeps euid=vortex9** while main drops to 5008. Measured live two ways: a fork+exec poller that snapshots `/proc/<pid>/task/*/status` in a tight loop caught one task at `Uid: 5008 5009 5009 5009` while the other was all-5008 (the transient broadcast state), and a uid-printing shellcode executed *inside the hijacked thread* reported `geteuid()=5009` seconds later — the thread still runs as vortex9 for its whole life. (First gdb /proc snapshots showed both tasks at 5008 — gdb holds threads in signals and perturbs the setxid broadcast; the clean-run poller settles it.)
+- **The exploit chain:** 1100-byte argv[1] (raw bytes via a fread/execv driver, NUL-free):
+  1. `strcpy` copies all 1100 bytes into unsafecode's 1024-byte buffer — offset 1036 = unsafecode's saved eip.
+  2. Bytes 8..25: a GOT-patcher shellcode (`mov eax,&sc2; mov [0x804c00c],eax; push 0x80491e3; ret`) that overwrites **`sleep@GOT`** (0x804c00c, writable — outside the 0x804bf00–0x804c000 RELRO region) with the address of the password shellcode, then returns main into `safecode`'s loop head so the process never exits.
+  3. Bytes 48..112: the password shellcode (`open("/etc/vortex_pass/vortex9",0); read; write(1,…)`) — called by **the thread** via the hijacked `sleep@GOT` every loop iteration, with euid=5009.
+  4. Bytes 1032..1035: a readable address (0x0804a008) over unsafecode's saved ebp so the loop's `push -0xc(%ebp)` doesn't fault.
+- **The gotchas (each measured live):**
+  - The race window is thread-vs-broadcast: a naive poller shows the thread dragged to 5008 within ~20 µs in a gdb-attached run, but in a clean no-pty session the thread keeps 5009 for its whole life.
+  - **The session type matters (measured live):** over `ssh -T` (no pty) the thread keeps euid=5009 and the exploit works; over `ssh -tt` (pty) the setxid broadcast drags the thread to 5008 and the exploit fails. The recorded exploit run is therefore transported over `ssh -T` while the `-tt` session displays it — stated plainly in the cast as a comment.
+  - The stack buffer address drifts with the session's environment: measured 0xffffd310 (gdb exec-follow), 0xffffd998 (the working fork/exec shape). The solve script sweeps candidate addresses and detects the hit by a uid-signature shellcode that prints `getuid()/geteuid()` from inside the hijacked thread (looking for 5009) before running the password shellcode.
+  - My first password shellcode pushed the path chunk `9pss` instead of `tex9` — the open() returned ENOENT (fd −2, printed live by a debug shellcode) instead of EACCES; the fixed chunking is `push 0; push 'tex9'; push '/vor'; push 'pass'; push 'tex_'; push '/vor'; push '/etc'` = `/etc/vortex_pass/vortex9\0`.
+- **Files:** `tools/vx/l8/drv8.c` (raw-bytes argv driver: fread a file, execv `/vortex/vortex8`), `tools/vx/l8/solve8.py` (payload builder + sweep + uid-signature hit detection + password run).
+- **Recording:** `recordings/vortex/L8.cast` — local shell, ssh vortex8 (`-tt`), workdir `/tmp/l8rec-9319`, the binary's md5/safecode/unsafecode/main disassembly, `sleep@GOT` in the relocation table, `GNU_STACK RWE`, the pass file's mode, `drv8.c` and `solve8.py` typed in vim from empty buffers, `drv8` compiled, the sweep + uid hit + password run (its output appearing from the `ssh -T` transport, shown as a comment in the terminal), then login as vortex9 from the local shell (`uid=5009(vortex9)`, password file read).
+
 ## Level 7 → vortex8 (SOLVED 2026-11-16)
 - **Password for vortex8:** `X2cOOCYnT`, printed by the exploit shellcode from `/etc/vortex_pass/vortex8` and verified by logging in as vortex8 (`uid=5008`, `cat /etc/vortex_pass/vortex8` matches). Recording: `recordings/vortex/L7.cast`.
 - **The program (reconstructed from objdump, no published source — the level page says "Generic Binary Exploitation"):** `/vortex/vortex7`, mode 4750, setuid vortex8, 14956 bytes, md5 `c4f614fe053e5e2f3d4c34e0d34fd878`, not stripped:
