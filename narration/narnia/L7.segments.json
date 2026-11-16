@@ -1,0 +1,358 @@
+{
+ "segments": [
+  {
+   "text": "Narnia, level seven.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "A function pointer sits just below a one hundred twenty-eight byte buffer, and only a format string can reach it.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as narnia seven and read the source.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The function prints both addresses, then sets the pointer to the good function.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 29,
+     "to": 33
+    }
+   ]
+  },
+  {
+   "text": "It formats the argument into a one hundred twenty-eight byte buffer, then calls the pointer.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 39,
+     "to": 41
+    }
+   ]
+  },
+  {
+   "text": "The program prints both function addresses before the call, and the good one is lower than the hacked one.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 8,
+     "to": 11
+    }
+   ]
+  },
+  {
+   "text": "Gdb shows the pointer four bytes below the buffer, so an overflow cannot reach it.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 17,
+     "to": 18
+    }
+   ]
+  },
+  {
+   "text": "Then I write the driver in vim.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vimcmd"
+    },
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The header comment copies the vulnerable function.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The pointer sits below the buffer, and the format string is the only way to reach it.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The format argument reaches snprintf, and the function returns through the pointer.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The next chunk explains the varargs.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "With an empty environment the first vararg is the pointer value, and the format string itself sits at argument one hundred fifty-two.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "That index was measured live, and it holds on every run because the layout is fixed with an empty environment.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The two addresses go in the first eight bytes of the format string.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The upper half address comes first, then the pointer address itself.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Two half writes store the hacked address.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The high half goes first, since it is smaller than the low half.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The output buffer stops at one hundred twenty-eight bytes, but the percent n writes still fire with the full count, so the huge widths work.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The run helper opens a pipe and forks, and the child wires the pipe to its output.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The child runs the target with the given argument and an empty environment.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The parent closes its end of the pipe and reads with a deadline, collecting output until the time runs out or the pipe closes.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It closes the pipe, waits for the child, and returns the output and the status.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The build helper splits the hacked address into its low and high halves, and requires the high half to be smaller.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It packs the two addresses, then pads to the high half and writes it, then pads to the low half and writes it.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The driver first learns the hacked address with a short probe argument, and prints it.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The hacked address never changes, so any small argument will do for this probe.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The pointer address moves with the stack, so the driver probes with an argument the same length as the final payload.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It reads the pointer address from the program output and prints it.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The driver builds the format string with the probed address, prints it and its length of thirty five bytes, and checks the length matches the probe.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then it runs the target attached to the terminal, so the hacked function prints its message and runs the shell.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The driver is saved, and I quit vim.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I run the driver.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It prints the hacked address, the pointer address, and the thirty five byte format string.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "The program prints the good and hacked addresses, then calls the hacked function, and the shell runs as narnia eight.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "out",
+     "from": 3,
+     "to": 8
+    }
+   ]
+  },
+  {
+   "text": "The password prints, and the level is solved.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "out",
+     "from": 9,
+     "to": 9
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
