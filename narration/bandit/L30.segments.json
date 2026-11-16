@@ -1,0 +1,111 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level thirty.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The repository looks like a joke: the README says it is just an empty file, and there is nothing interesting in the working tree.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit30 with ssh bandit30@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The lab blocks the localhost ssh hop, so I clone from this client.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "I clone the repo.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Git pulls four objects.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 4
+    }
+   ]
+  },
+  {
+   "text": "I open the README: just an empty file, muahaha.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "text": "But git stores more than files and commits: tags are separate references, so I list them.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "There is a single tag named secret.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "text": "Showing that tag prints the password for bandit thirty-one, and the level is solved.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

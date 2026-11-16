@@ -1,0 +1,148 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level thirty-one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The README sets a challenge: push a file called key dot txt, containing the phrase May I come in, to the master branch.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit31 with ssh bandit31@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The lab blocks the localhost ssh hop, so I clone from this client.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "I clone the repo.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Git pulls four objects.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 5
+    }
+   ]
+  },
+  {
+   "text": "I read the README and the gitignore: the file must be key dot txt, with the content May I come in, on branch master, and the gitignore excludes all dot txt files.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 7
+    }
+   ]
+  },
+  {
+   "text": "I write the file with echo.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "A normal git add would quietly ignore it, so I use git add minus f, which overrides the ignore rule.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I commit the file.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The commit records one file changed, one insertion.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "Then I push to origin master.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The push sends the objects, and the remote hook validates the file, prints Well done, and gives the password for bandit thirty-two.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "out",
+     "from": 0,
+     "to": 13
+    }
+   ]
+  },
+  {
+   "text": "The hook declines the push, so git reports the push failed, but the remote output already gave the password for bandit thirty-two, and the level is solved.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "out",
+     "from": 14,
+     "to": 17
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

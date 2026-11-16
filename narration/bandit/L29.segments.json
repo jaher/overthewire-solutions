@@ -1,0 +1,118 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level twenty-nine.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Another git repository, and this time the master branch README says no passwords in production.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit29 with ssh bandit29@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The lab blocks the localhost ssh hop, so I clone from this client.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "I clone the repo.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Git pulls sixteen objects and checks out the working tree.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 6
+    }
+   ]
+  },
+  {
+   "text": "I open the README on master: no passwords in production, a dead end if you only look at the checked-out branch.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 6
+    }
+   ]
+  },
+  {
+   "text": "Listing all branches shows a remote dev branch, and a sploits dash dev branch, neither merged into master.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 4
+    }
+   ]
+  },
+  {
+   "text": "I ask git to show the README directly from the dev branch.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It contains the real password, for bandit thirty, and the level is solved.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 6
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

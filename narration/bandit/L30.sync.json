@@ -1,0 +1,146 @@
+{
+ "game": "bandit",
+ "level": 30,
+ "audio": "narration/bandit/L30.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 40.9,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.85,
+   "text": "Bandit, level thirty.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.85,
+   "end": 8.64,
+   "text": "The repository looks like a joke: the README says it is just an empty file, and there is nothing interesting in the working tree.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 8.64,
+   "end": 17.47,
+   "text": "I log in as bandit30 with ssh bandit30@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 17.47,
+   "end": 21.84,
+   "text": "The lab blocks the localhost ssh hop, so I clone from this client.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 21.84,
+   "end": 23.04,
+   "text": "I clone the repo.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 23.04,
+   "end": 24.84,
+   "text": "Git pulls four objects.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 4
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 24.84,
+   "end": 29.09,
+   "text": "I open the README: just an empty file, muahaha.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 29.09,
+   "end": 34.25,
+   "text": "But git stores more than files and commits: tags are separate references, so I list them.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 34.25,
+   "end": 36.58,
+   "text": "There is a single tag named secret.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 36.58,
+   "end": 40.9,
+   "text": "Showing that tag prints the password for bandit thirty-one, and the level is solved.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
