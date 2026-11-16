@@ -124,6 +124,8 @@ def validate(game, level, segments):
             elif role == "note":
                 if not ((st.get("cmd") or "").startswith("#") or st.get("note")):
                     errors.append(f"seg {i}: step {step} is neither a # comment nor a noted step")
+                else:
+                    covered_cmds.add(step)
             elif role == "vimcmd":
                 # only one vim command line exists per run, on its first step
                 if step not in first_of:
