@@ -1,0 +1,61 @@
+{
+ "segments": [
+  {
+   "text": "Leviathan, level seven, the final level.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "There is no leviathan eight, so the goal is simply to confirm the game is complete.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as leviathan seven with the password from the previous level, on port 2223.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I read the congratulations file in the home directory, and it says well done, you seem to have used a Unix system before, now try something more serious. It also asks players not to post writeups, solutions, or spoilers.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "That message is the end of the game, and Leviathan is complete.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
