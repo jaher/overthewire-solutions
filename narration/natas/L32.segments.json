@@ -1,0 +1,128 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level thirty-two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "This is the same CSV to HTML code as the previous level, but the page tells us we must prove we have code execution by running a binary that sits in the webroot.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I fetch the source and grep for the upload, the parameter, the loop, the split, and the code exec line. It is the same upload check and file parameter as before, plus the demand to run the binary.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 4
+    }
+   ]
+  },
+  {
+   "text": "The same ARGV injection applies: a plain field named file makes the program open the special handle ARGV, which reads the argument list that the CGI library fills from the query string.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "But there is a new wrinkle. The CGI library quotes each query word the way a shell would, so a command ending in a pipe arrives at Perl with a trailing backslash, and it is treated as a filename instead of a pipe.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The fix is to end the query with a space and a hash. The hash comments out the quote and backslash that the library appended, and the pipe stays a pipe. That is why the working query ends with space hash pipe.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "As before, I make a small CSV with two rows, a b and c d, to satisfy the upload check.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "I list the webroot by running slash bin slash ls, space hash pipe. The listing shows the getpassword binary among the webroot files.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 7
+    }
+   ]
+  },
+  {
+   "text": "I confirm with a long listing that getpassword is setuid root and executable by us.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "Then I run the binary itself, again ending the query with space hash pipe. It prints the password for natas33.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
