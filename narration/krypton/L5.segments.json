@@ -1,0 +1,373 @@
+{
+ "segments": [
+  {
+   "text": "Krypton, level five.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Another Vigenere cipher, but now the key length is unknown.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The first step is to find it, and frequency analysis can still break it.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as krypton five,",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "and read the README: one last polyalphabetic cipher, this time with the key length unknown.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "I need the three intercepted messages as files, so I open vim",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vimcmd"
+    },
+    {
+     "step": 2,
+     "role": "vim"
+    },
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "and write the first ciphertext into a file.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "one long line of five-letter groups.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The first file is seventeen hundred and seventy-seven bytes.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "text": "The second message gets the same treatment: I open vim",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vimcmd"
+    },
+    {
+     "step": 5,
+     "role": "vim"
+    },
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "and write its ciphertext into a second file.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "another long line of five-letter groups.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The second file is nineteen hundred and sixteen bytes.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "text": "And the third message the same way: I open vim",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vimcmd"
+    },
+    {
+     "step": 8,
+     "role": "vim"
+    },
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "and write its ciphertext into a third file.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "a third long line of five-letter groups.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The third file is twenty-one hundred and eleven bytes.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "text": "Then I read the target: BELOS Z, six letters.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "cmd"
+    },
+    {
+     "step": 11,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "text": "Now I write the solver. I open vim and type it in:",
+   "lines": [
+    {
+     "step": 12,
+     "role": "vimcmd"
+    },
+    {
+     "step": 12,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The imports: re for the letter filter, and Counter for the tallies.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The header comment states the idea: shift the text by k and line it up with itself, and when k is a multiple of the key length the same key letters meet, so the index of coincidence jumps to English level.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the English letter frequency table the scoring measures against.",
+   "lines": [
+    {
+     "step": 15,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It strips each file down to just its capital letters,",
+   "lines": [
+    {
+     "step": 16,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "then defines the index of coincidence: how uneven a letter distribution is.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Each column is then a Caesar cipher, broken the same way as last level: try all twenty-six shifts and keep the one that best matches English frequencies.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Decoding subtracts the key letter at each position, cycling with the key.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The main part loads the three files and prints each one's letter count and index of coincidence.",
+   "lines": [
+    {
+     "step": 20,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then it scans key lengths from two to twelve, averaging the column index across all three messages, takes the winner, recovers the key from the first file's columns, and prints the decoded target.",
+   "lines": [
+    {
+     "step": 21,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I run it.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Each file is around fifteen hundred letters with an index of coincidence near zero point zero four: flat, polyalphabetic, as expected.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "The vote peaks at nine, zero point zero six five nine, ahead of twelve and six, so the key is nine letters.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "out",
+     "from": 3
+    }
+   ]
+  },
+  {
+   "text": "The key is KEYLENGTH,",
+   "lines": [
+    {
+     "step": 22,
+     "role": "out",
+     "from": 4
+    }
+   ]
+  },
+  {
+   "text": "and the target decodes straight to RANDOM, the password for krypton six.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "out",
+     "from": 5
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "Three messages, one key length, one key: the index of coincidence found the length, and frequency analysis found the letters.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
