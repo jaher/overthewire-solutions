@@ -74,16 +74,7 @@
    ]
   },
   {
-   "text": "The last chunk registers the padded name and logs in with it, printing the replies.",
-   "lines": [
-    {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "text": "Here is the last chunk.",
+   "text": "The last chunk registers the padded name and logs in with it, printing the replies. It builds the two names first: reg is natas28 plus fifty-seven spaces plus an x, sixty-five characters, and login is natas28 plus fifty-seven spaces, sixty-four characters. Then it prints a label for each call and prints the stripped reply.",
    "lines": [
     {
      "step": 3,

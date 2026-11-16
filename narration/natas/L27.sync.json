@@ -3,12 +3,12 @@
  "level": 27,
  "audio": "narration/natas/L27.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 103.66,
+ "duration": 120.19,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 2.11,
+   "end": 2.35,
    "text": "Natas, level twenty-seven.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 2.11,
-   "end": 20.11,
+   "start": 2.35,
+   "end": 20.95,
    "text": "The page is a login form backed by a user table with sixty-four character username and password columns. Registration refuses names that differ from their trimmed form, and it stores only the first sixty-four characters. Login compares the whole string exactly, and then dumps the row whose username equals the trimmed input.",
    "lines": [
     {
@@ -31,8 +31,8 @@
   },
   {
    "id": 2,
-   "start": 20.11,
-   "end": 24.31,
+   "start": 20.95,
+   "end": 25.32,
    "text": "I fetch the source and pull out the registration, login, and dump queries.",
    "lines": [
     {
@@ -49,8 +49,8 @@
   },
   {
    "id": 3,
-   "start": 24.31,
-   "end": 60.55,
+   "start": 25.32,
+   "end": 61.2,
    "text": "Three quirks combine. First, if we register a name that is sixty-five characters long, ending in a non-space character, the trim check passes, but the insert cuts it to sixty-four characters. So we register the string natas28 followed by fifty-seven spaces and then an x. The stored username becomes natas28 followed by fifty-seven spaces, with our own empty password. Second, MySQL ignores trailing spaces when comparing strings, so the padded name matches that row and the login check passes. Third, the data dump trims the username before querying,",
    "lines": [
     {
@@ -61,8 +61,8 @@
   },
   {
    "id": 4,
-   "start": 60.55,
-   "end": 67.87,
+   "start": 61.2,
+   "end": 68.71,
    "text": "which turns our padded name back into natas28, selects the genuine natas28 row, and prints its real password.",
    "lines": [
     {
@@ -73,8 +73,8 @@
   },
   {
    "id": 5,
-   "start": 67.87,
-   "end": 71.3,
+   "start": 68.71,
+   "end": 71.83,
    "text": "So I open vim and write the register and login script:",
    "lines": [
     {
@@ -89,8 +89,8 @@
   },
   {
    "id": 6,
-   "start": 71.3,
-   "end": 80.54,
+   "start": 71.83,
+   "end": 81.19,
    "text": "The first chunk sets up the imports, the basic auth header, the page URL, and the post helper, which sends a username and password and returns the content of the page.",
    "lines": [
     {
@@ -101,21 +101,9 @@
   },
   {
    "id": 7,
-   "start": 80.54,
-   "end": 85.34,
-   "text": "The last chunk registers the padded name and logs in with it, printing the replies.",
-   "lines": [
-    {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "id": 8,
-   "start": 85.34,
-   "end": 86.78,
-   "text": "Here is the last chunk.",
+   "start": 81.19,
+   "end": 103.08,
+   "text": "The last chunk registers the padded name and logs in with it, printing the replies. It builds the two names first: reg is natas28 plus fifty-seven spaces plus an x, sixty-five characters, and login is natas28 plus fifty-seven spaces, sixty-four characters. Then it prints a label for each call and prints the stripped reply.",
    "lines": [
     {
      "step": 3,
@@ -124,9 +112,9 @@
    ]
   },
   {
-   "id": 9,
-   "start": 86.78,
-   "end": 103.66,
+   "id": 8,
+   "start": 103.08,
+   "end": 120.19,
    "text": "I run it, and the registration creates our padded user, the login succeeds, and the dump prints the genuine natas28 password, and the level is solved. The lesson is that different layers trim, truncate and compare strings in different ways, and mixing those behaviours creates identity confusion.",
    "lines": [
     {
