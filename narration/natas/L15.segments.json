@@ -1,0 +1,106 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level fifteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "This level is a login form backed by a database, and the source shows the username is concatenated straight into the query, but the page never tells us the password, it only tells us whether a user exists.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I fetch the source and pull out the query, which takes the username straight from the request.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "I first confirm the injection works by appending a condition to the username: a double quote, then and password like percent, and the page replies that the user exists, which proves I can test predicates about the password.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write a script. The first chunk sets up the request helper: it posts a username to the page and returns true when the reply says the user exists.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "text"
+    },
+    {
+     "step": 3,
+     "role": "text"
+    }
+   ]
+  },
+  {
+   "text": "The second chunk adds the loop: for each of the thirty-two character positions, it binary searches the character code, asking the database whether the code at that position is greater than a midpoint, and the exists or does not exist reply gives a single bit.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "text"
+    }
+   ]
+  },
+  {
+   "text": "The third chunk finishes the loop: it stops when a position has no character, appends each recovered character, and prints the growing password as it goes.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "text"
+    },
+    {
+     "step": 6,
+     "role": "text"
+    }
+   ]
+  },
+  {
+   "text": "I run the script, and it prints the password one character at a time, finishing with the full thirty-two characters.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "text"
+    },
+    {
+     "step": 8,
+     "role": "out",
+     "from": 0,
+     "to": 32
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

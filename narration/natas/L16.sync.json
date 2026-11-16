@@ -1,0 +1,157 @@
+{
+ "game": "natas",
+ "level": 16,
+ "audio": "narration/natas/L16.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 77.88,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.04,
+   "text": "Natas, level sixteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.04,
+   "end": 10.63,
+   "text": "This is the same search box as before, but the filter is stricter: it blocks semicolons, pipes, ampersands, backticks, and both kinds of quotes.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 10.63,
+   "end": 15.0,
+   "text": "I fetch the source and pull out the filter, a preg match against those characters.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 15.0,
+   "end": 33.72,
+   "text": "But the user input is placed inside double quotes in the command, and double quotes do not stop command substitution, so I can still inject a dollar sign followed by parentheses, which the shell evaluates. I test it with a grep on the natas seventeen password file for a matching prefix, and the response is thirteen bytes: empty.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 33.72,
+   "end": 43.39,
+   "text": "Then I test a non-matching prefix, and the response is four hundred sixty thousand bytes: the whole dictionary dumped, because the outer grep ran with an empty pattern.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 43.39,
+   "end": 56.18,
+   "text": "That gives a clear yes or no signal, so I open vim and write a script. The first chunk sets up the request helper, which posts a payload and returns true when the reply block is empty, and starts the loop over the character positions.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "text"
+    },
+    {
+     "step": 4,
+     "role": "text"
+    },
+    {
+     "step": 5,
+     "role": "text"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 56.18,
+   "end": 65.54,
+   "text": "The next chunk adds the binary search: it asks grep whether the next character falls in the first half of the character set, using a character class, which needs no quotes.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "text"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 65.54,
+   "end": 71.71,
+   "text": "The last chunk verifies each character, prints the growing prefix, and stops when the whole password matches.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "text"
+    },
+    {
+     "step": 8,
+     "role": "text"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 71.71,
+   "end": 77.88,
+   "text": "I run the script, and it prints the password one character at a time, finishing with the full thirty-two characters.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "text"
+    },
+    {
+     "step": 10,
+     "role": "out",
+     "from": 0,
+     "to": 32
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
