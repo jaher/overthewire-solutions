@@ -1,0 +1,109 @@
+{
+ "game": "leviathan",
+ "level": 5,
+ "audio": "narration/leviathan/L5.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 52.34,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.35,
+   "text": "Leviathan, level five.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.35,
+   "end": 12.62,
+   "text": "The setuid binary leviathan five, owned by leviathan six, reads a fixed file and prints it, then deletes it, and the goal is to make it read leviathan six's password.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 12.62,
+   "end": 16.39,
+   "text": "I log in as leviathan five, on port 2223.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 16.39,
+   "end": 32.23,
+   "text": "I run strings on leviathan five and grep for tmp, fopen, and unlink, and the output names the fixed path, slash tmp slash file dot log, the fopen and unlink calls that work on it, and the error it prints when the file is missing.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 3
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 32.23,
+   "end": 40.94,
+   "text": "Since slash tmp is world writable and the path is fixed, I link slash tmp slash file dot log to the leviathan six password file.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 40.94,
+   "end": 48.67,
+   "text": "I run leviathan five, and it follows the link with its own privileges and prints the leviathan six password, then unlinks the link.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 48.67,
+   "end": 52.34,
+   "text": "The leviathan six password is printed, and the level is solved.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

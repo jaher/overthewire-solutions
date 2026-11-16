@@ -1,0 +1,68 @@
+{
+ "segments": [
+  {
+   "text": "Leviathan, level six.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The setuid binary leviathan six takes a four-digit code, and if the code is right it spawns a shell as leviathan seven.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as leviathan six, on port 2223.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Instead of trying all ten thousand codes, I disassemble leviathan six and grep for zero x one b d three, and the one matching line stores that constant as the code to compare against.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "text": "Zero x one b d three is seven thousand, one hundred and twenty-three in decimal, so I run leviathan six with seven one two three, piping in a cat of the leviathan seven password file.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The shell runs the cat and prints the leviathan seven password, so the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

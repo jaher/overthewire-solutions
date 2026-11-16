@@ -1,0 +1,83 @@
+{
+ "segments": [
+  {
+   "text": "Leviathan, level five.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The setuid binary leviathan five, owned by leviathan six, reads a fixed file and prints it, then deletes it, and the goal is to make it read leviathan six's password.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as leviathan five, on port 2223.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I run strings on leviathan five and grep for tmp, fopen, and unlink, and the output names the fixed path, slash tmp slash file dot log, the fopen and unlink calls that work on it, and the error it prints when the file is missing.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 3
+    }
+   ]
+  },
+  {
+   "text": "Since slash tmp is world writable and the path is fixed, I link slash tmp slash file dot log to the leviathan six password file.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I run leviathan five, and it follows the link with its own privileges and prints the leviathan six password, then unlinks the link.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "text": "The leviathan six password is printed, and the level is solved.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
