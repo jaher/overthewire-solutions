@@ -107,19 +107,6 @@
    "text": "The last chunk prints each recovered character as it goes, and prints the final password at the end.",
    "lines": [
     {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "text": "Here is the last chunk.",
-   "lines": [
-    {
-     "step": 8,
-     "role": "text"
-    },
-    {
      "step": 7,
      "role": "vim"
     }
@@ -128,6 +115,10 @@
   {
    "text": "I run the script, and it prints the password one character at a time, finishing with all thirty-two characters.",
    "lines": [
+    {
+     "step": 8,
+     "role": "text"
+    },
     {
      "step": 8,
      "role": "out",
