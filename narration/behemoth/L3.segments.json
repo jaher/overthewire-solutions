@@ -140,60 +140,87 @@
    ]
   },
   {
-   "text": "It prints a marker so our sweep can detect a successful jump, then raises the effective uid with geteuid and setreuid, and setuid so the privilege survives the exec.",
    "lines": [
     {
-     "step": 14,
-     "role": "out",
-     "from": 3,
-     "to": 32
+     "role": "vim",
+     "step": 8
     }
-   ]
+   ],
+   "text": "First the header: thirty-two bit mode, the global entry point, and the start label."
   },
   {
-   "text": "And finally execve on slash bin slash sh.",
    "lines": [
     {
-     "step": 14,
-     "role": "out",
-     "from": 33,
-     "to": 44
+     "role": "vim",
+     "step": 9
     }
-   ]
+   ],
+   "text": "It prints a marker so our sweep can detect a successful jump,"
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 10
+    }
+   ],
+   "text": "then raises the effective uid with geteuid and setreuid,"
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 11
+    }
+   ],
+   "text": "and setuid so the privilege survives the exec."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 12
+    },
+    {
+     "role": "vim",
+     "step": 13
+    }
+   ],
+   "text": "And finally execve on slash bin slash sh."
   },
   {
    "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: seventy-eight bytes.",
    "lines": [
     {
-     "step": 15,
+     "step": 14,
      "role": "cmd"
     },
     {
-     "step": 15,
+     "step": 14,
      "role": "out",
      "from": 0,
      "to": 0
+    },
+    {
+     "step": 15,
+     "role": "cmd"
     },
     {
      "step": 16,
      "role": "cmd"
     },
     {
-     "step": 17,
-     "role": "cmd"
-    },
-    {
-     "step": 17,
+     "step": 16,
      "role": "out",
      "from": 0,
      "to": 2
     },
     {
-     "step": 18,
+     "step": 17,
      "role": "cmd"
     },
     {
-     "step": 18,
+     "step": 17,
      "role": "out",
      "from": 0,
      "to": 0
@@ -204,11 +231,11 @@
    "text": "We run the exploit: it leaks the address of the argument vector, derives the buffer address, and verifies the guess with a marker string.",
    "lines": [
     {
-     "step": 19,
+     "step": 18,
      "role": "cmd"
     },
     {
-     "step": 19,
+     "step": 18,
      "role": "out",
      "from": 1,
      "to": 2
@@ -219,7 +246,7 @@
    "text": "The return slot sits two hundred four bytes into the buffer, and the format string writes the shellcode address there in two halves, with arguments forty one and forty two.",
    "lines": [
     {
-     "step": 19,
+     "step": 18,
      "role": "out",
      "from": 3,
      "to": 4
@@ -230,7 +257,7 @@
    "text": "The exploit prints the marker and a shell as behemoth four, and the password, and the level is solved.",
    "lines": [
     {
-     "step": 19,
+     "step": 18,
      "role": "out",
      "from": 10,
      "to": 11

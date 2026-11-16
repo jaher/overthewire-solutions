@@ -3,12 +3,12 @@
  "level": 3,
  "audio": "narration/behemoth/L3.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 104.38,
+ "duration": 108.12,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 1.97,
+   "end": 1.87,
    "text": "Behemoth, level three.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 1.97,
-   "end": 4.92,
+   "start": 1.87,
+   "end": 4.7,
    "text": "We log in as behemoth three and look at the binary.",
    "lines": [
     {
@@ -35,8 +35,8 @@
   },
   {
    "id": 2,
-   "start": 4.92,
-   "end": 13.49,
+   "start": 4.7,
+   "end": 13.03,
    "text": "We disassemble main with objdump: it reads up to two hundred bytes with fgets, then passes the buffer straight to printf as the format string.",
    "lines": [
     {
@@ -59,8 +59,8 @@
   },
   {
    "id": 3,
-   "start": 13.49,
-   "end": 24.46,
+   "start": 13.03,
+   "end": 23.3,
    "text": "That is a format string vulnerability: anything we type is interpreted as a format directive, so percent n and percent h n let us write a value to an address we supply.",
    "lines": [
     {
@@ -73,8 +73,8 @@
   },
   {
    "id": 4,
-   "start": 24.46,
-   "end": 34.3,
+   "start": 23.3,
+   "end": 33.26,
    "text": "We check the relocations with objdump: printf, fgets and puts are imported, but we do not need the GOT; we target the saved return address.",
    "lines": [
     {
@@ -91,8 +91,8 @@
   },
   {
    "id": 5,
-   "start": 34.3,
-   "end": 40.25,
+   "start": 33.26,
+   "end": 39.14,
    "text": "We inspect the protections: readelf shows the stack is executable, and address randomisation is off.",
    "lines": [
     {
@@ -119,8 +119,8 @@
   },
   {
    "id": 6,
-   "start": 40.25,
-   "end": 48.24,
+   "start": 39.14,
+   "end": 47.23,
    "text": "We probe it by piping a format string in, and the program prints stack words back at us, confirming our input is interpreted as a format string.",
    "lines": [
     {
@@ -137,8 +137,8 @@
   },
   {
    "id": 7,
-   "start": 48.24,
-   "end": 56.88,
+   "start": 47.23,
+   "end": 55.94,
    "text": "The buffer sits two hundred bytes below the frame pointer, so the saved frame pointer is at offset two hundred and the return address at offset two hundred four.",
    "lines": [
     {
@@ -157,8 +157,8 @@
   },
   {
    "id": 8,
-   "start": 56.88,
-   "end": 58.92,
+   "start": 55.94,
+   "end": 57.98,
    "text": "Then we write the shellcode in vim.",
    "lines": [
     {
@@ -173,68 +173,104 @@
   },
   {
    "id": 9,
-   "start": 58.92,
-   "end": 69.96,
-   "text": "It prints a marker so our sweep can detect a successful jump, then raises the effective uid with geteuid and setreuid, and setuid so the privilege survives the exec.",
+   "start": 57.98,
+   "end": 62.78,
+   "text": "First the header: thirty-two bit mode, the global entry point, and the start label.",
    "lines": [
     {
-     "step": 14,
-     "role": "out",
-     "from": 3,
-     "to": 32
+     "role": "vim",
+     "step": 8
     }
    ]
   },
   {
    "id": 10,
-   "start": 69.96,
-   "end": 74.04,
-   "text": "And finally execve on slash bin slash sh.",
+   "start": 62.78,
+   "end": 66.14,
+   "text": "It prints a marker so our sweep can detect a successful jump,",
    "lines": [
     {
-     "step": 14,
-     "role": "out",
-     "from": 33,
-     "to": 44
+     "role": "vim",
+     "step": 9
     }
    ]
   },
   {
    "id": 11,
-   "start": 74.04,
-   "end": 81.31,
+   "start": 66.14,
+   "end": 71.23,
+   "text": "then raises the effective uid with geteuid and setreuid,",
+   "lines": [
+    {
+     "role": "vim",
+     "step": 10
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 71.23,
+   "end": 74.42,
+   "text": "and setuid so the privilege survives the exec.",
+   "lines": [
+    {
+     "role": "vim",
+     "step": 11
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 74.42,
+   "end": 78.19,
+   "text": "And finally execve on slash bin slash sh.",
+   "lines": [
+    {
+     "role": "vim",
+     "step": 12
+    },
+    {
+     "role": "vim",
+     "step": 13
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 78.19,
+   "end": 85.46,
    "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: seventy-eight bytes.",
    "lines": [
     {
-     "step": 15,
+     "step": 14,
      "role": "cmd"
     },
     {
-     "step": 15,
+     "step": 14,
      "role": "out",
      "from": 0,
      "to": 0
+    },
+    {
+     "step": 15,
+     "role": "cmd"
     },
     {
      "step": 16,
      "role": "cmd"
     },
     {
-     "step": 17,
-     "role": "cmd"
-    },
-    {
-     "step": 17,
+     "step": 16,
      "role": "out",
      "from": 0,
      "to": 2
     },
     {
-     "step": 18,
+     "step": 17,
      "role": "cmd"
     },
     {
-     "step": 18,
+     "step": 17,
      "role": "out",
      "from": 0,
      "to": 0
@@ -242,17 +278,17 @@
    ]
   },
   {
-   "id": 12,
-   "start": 81.31,
-   "end": 88.94,
+   "id": 15,
+   "start": 85.46,
+   "end": 93.26,
    "text": "We run the exploit: it leaks the address of the argument vector, derives the buffer address, and verifies the guess with a marker string.",
    "lines": [
     {
-     "step": 19,
+     "step": 18,
      "role": "cmd"
     },
     {
-     "step": 19,
+     "step": 18,
      "role": "out",
      "from": 1,
      "to": 2
@@ -260,13 +296,13 @@
    ]
   },
   {
-   "id": 13,
-   "start": 88.94,
-   "end": 98.3,
+   "id": 16,
+   "start": 93.26,
+   "end": 102.07,
    "text": "The return slot sits two hundred four bytes into the buffer, and the format string writes the shellcode address there in two halves, with arguments forty one and forty two.",
    "lines": [
     {
-     "step": 19,
+     "step": 18,
      "role": "out",
      "from": 3,
      "to": 4
@@ -274,13 +310,13 @@
    ]
   },
   {
-   "id": 14,
-   "start": 98.3,
-   "end": 104.38,
+   "id": 17,
+   "start": 102.07,
+   "end": 108.12,
    "text": "The exploit prints the marker and a shell as behemoth four, and the password, and the level is solved.",
    "lines": [
     {
-     "step": 19,
+     "step": 18,
      "role": "out",
      "from": 10,
      "to": 11
