@@ -83,19 +83,6 @@
    "text": "The third chunk finishes the loop: it stops when a position has no character, appends each recovered character, and prints the growing password as it goes.",
    "lines": [
     {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "text": "Here is the third chunk.",
-   "lines": [
-    {
-     "step": 6,
-     "role": "text"
-    },
-    {
      "step": 5,
      "role": "vim"
     }
@@ -104,6 +91,10 @@
   {
    "text": "I run the script, and it prints the password one character at a time, finishing with the full thirty-two characters.",
    "lines": [
+    {
+     "step": 6,
+     "role": "text"
+    },
     {
      "step": 6,
      "role": "out",
