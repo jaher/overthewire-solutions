@@ -3,12 +3,12 @@
  "level": 3,
  "audio": "narration/utumno/L3.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 145.18,
+ "duration": 184.39,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 2.16,
+   "end": 2.04,
    "text": "Utumno, level three.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 2.16,
-   "end": 4.2,
+   "start": 2.04,
+   "end": 4.08,
    "text": "I log in as utumno three.",
    "lines": [
     {
@@ -31,8 +31,8 @@
   },
   {
    "id": 2,
-   "start": 4.2,
-   "end": 6.12,
+   "start": 4.08,
+   "end": 6.05,
    "text": "The disassembly is a short loop.",
    "lines": [
     {
@@ -43,8 +43,8 @@
   },
   {
    "id": 3,
-   "start": 6.12,
-   "end": 20.95,
+   "start": 6.05,
+   "end": 19.25,
    "text": "For each iteration it stores the current value into the table at index k, exclusive ors it with three times k, reads a new value from getchar, and then writes that value to table at index equal to the signed char of the exclusive or result.",
    "lines": [
     {
@@ -57,8 +57,8 @@
   },
   {
    "id": 4,
-   "start": 20.95,
-   "end": 26.04,
+   "start": 19.25,
+   "end": 23.88,
    "text": "Then it reads another value, stops at end of file or after twenty four iterations.",
    "lines": [
     {
@@ -71,8 +71,8 @@
   },
   {
    "id": 5,
-   "start": 26.04,
-   "end": 38.04,
+   "start": 23.88,
+   "end": 35.57,
    "text": "The first iteration is special, because the value starts at zero, so the selector byte is zero, and each iteration consumes exactly two input bytes. Getting that off by one wrong shifts the whole payload.",
    "lines": [
     {
@@ -85,8 +85,8 @@
   },
   {
    "id": 6,
-   "start": 38.04,
-   "end": 46.15,
+   "start": 35.57,
+   "end": 43.3,
    "text": "The index is a signed char used as an offset, so it reaches from table minus one hundred twenty eight to table plus one hundred twenty seven.",
    "lines": [
     {
@@ -99,8 +99,8 @@
   },
   {
    "id": 7,
-   "start": 46.15,
-   "end": 52.27,
+   "start": 43.3,
+   "end": 49.06,
    "text": "That covers the saved return address at table plus thirty six, and also argv zero at table plus forty.",
    "lines": [
     {
@@ -113,8 +113,8 @@
   },
   {
    "id": 8,
-   "start": 52.27,
-   "end": 66.55,
+   "start": 49.06,
+   "end": 63.53,
    "text": "The disassembly gives the arithmetic: the table is at ebp minus zero x two zero, so the saved return address at ebp plus four is index thirty six, and argv zero at ebp plus eight is index forty.",
    "lines": [
     {
@@ -127,8 +127,8 @@
   },
   {
    "id": 9,
-   "start": 66.55,
-   "end": 78.79,
+   "start": 63.53,
+   "end": 75.48,
    "text": "The stack is executable and address randomisation is off, so we can put the shellcode in argv zero, which is a string we control, and overwrite the return address with its address. Only four writes are needed.",
    "lines": [
     {
@@ -155,8 +155,8 @@
   },
   {
    "id": 10,
-   "start": 78.79,
-   "end": 81.02,
+   "start": 75.48,
+   "end": 77.71,
    "text": "I open vim and write the shellcode:",
    "lines": [
     {
@@ -171,8 +171,8 @@
   },
   {
    "id": 11,
-   "start": 81.02,
-   "end": 85.3,
+   "start": 77.71,
+   "end": 82.2,
    "text": "The header, the start label, and the marker comment, with eax zeroed.",
    "lines": [
     {
@@ -183,8 +183,8 @@
   },
   {
    "id": 12,
-   "start": 85.3,
-   "end": 92.57,
+   "start": 82.2,
+   "end": 89.45,
    "text": "The marker write: push a zero, push PWN exclamation, then write four bytes to standard output.",
    "lines": [
     {
@@ -195,8 +195,8 @@
   },
   {
    "id": 13,
-   "start": 92.57,
-   "end": 99.12,
+   "start": 89.45,
+   "end": 94.9,
    "text": "Then the user-id calls: geteuid, then setreuid with the id in both slots.",
    "lines": [
     {
@@ -207,8 +207,8 @@
   },
   {
    "id": 14,
-   "start": 99.12,
-   "end": 104.88,
+   "start": 94.9,
+   "end": 101.5,
    "text": "Then setuid, and the path begins: the password file path as dwords, null first.",
    "lines": [
     {
@@ -219,9 +219,9 @@
   },
   {
    "id": 15,
-   "start": 104.88,
-   "end": 107.93,
-   "text": "Then the rest of the path pushes, and the open call.",
+   "start": 101.5,
+   "end": 118.46,
+   "text": "Then the rest of the path pushes, and the open call. The remaining words of the password path are pushed in reverse so the full path sits on the stack, and the stack pointer becomes the path argument. The flags are cleared for a read-only open, five is loaded as the syscall number, and the interrupt makes the call.",
    "lines": [
     {
      "role": "vim",
@@ -231,9 +231,9 @@
   },
   {
    "id": 16,
-   "start": 107.93,
-   "end": 110.81,
-   "text": "Then read the password file into a stack buffer.",
+   "start": 118.46,
+   "end": 137.54,
+   "text": "Then read the password file into a stack buffer. The file descriptor from the open call is saved, and sixty-four bytes of stack are reserved for the buffer. The buffer address and the length are set up, three is loaded as the syscall number for the read, and the byte count that comes back is kept for the write that follows, with the output descriptor set to one.",
    "lines": [
     {
      "role": "vim",
@@ -243,9 +243,9 @@
   },
   {
    "id": 17,
-   "start": 110.81,
-   "end": 113.21,
-   "text": "Then write it to standard output and exit.",
+   "start": 137.54,
+   "end": 152.42,
+   "text": "Then write it to standard output and exit. The buffer address goes back into place, four is loaded as the syscall number, and the interrupt writes the bytes that were read. Then one is loaded as the syscall number, the exit code is cleared to zero, and the final interrupt exits.",
    "lines": [
     {
      "role": "vim",
@@ -255,8 +255,8 @@
   },
   {
    "id": 18,
-   "start": 113.21,
-   "end": 124.9,
+   "start": 152.42,
+   "end": 163.75,
    "text": "We assemble with nasm, inspect the encoding with objdump, extract the text section with objcopy, check the bytes with xxd, and wc counts one hundred thirty one bytes.",
    "lines": [
     {
@@ -301,8 +301,8 @@
   },
   {
    "id": 19,
-   "start": 124.9,
-   "end": 133.54,
+   "start": 163.75,
+   "end": 171.98,
    "text": "The exploit builds the ten byte input from the formula, with the selector byte equal to the index exclusive or three k, and the value byte as the target.",
    "lines": [
     {
@@ -313,8 +313,8 @@
   },
   {
    "id": 20,
-   "start": 133.54,
-   "end": 145.18,
+   "start": 171.98,
+   "end": 184.39,
    "text": "The sweep over return addresses hits f f f f d f six four, which is inside argv zero, and the shellcode prints the password zero six n x two C S seven r S.",
    "lines": [
     {
