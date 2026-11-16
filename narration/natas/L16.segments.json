@@ -64,41 +64,73 @@
    ]
   },
   {
-   "text": "That gives a clear yes or no signal, so I open vim and write a script. The first chunk sets up the request helper, which posts a payload and returns true when the reply block is empty, and starts the loop over the character positions.",
+   "text": "That gives a clear yes or no signal: an empty reply means the grep matched, a full dictionary dump means it did not.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the script:",
    "lines": [
     {
      "step": 3,
-     "role": "text"
+     "role": "vimcmd"
     },
     {
-     "step": 4,
-     "role": "text"
-    },
-    {
-     "step": 5,
-     "role": "text"
+     "step": 3,
+     "role": "vim"
     }
    ]
   },
   {
-   "text": "The next chunk adds the binary search: it asks grep whether the next character falls in the first half of the character set, using a character class, which needs no quotes.",
+   "text": "The first chunk sets up the imports, the page URL, the basic auth header, the character set, and the start of empty, which tests a payload against the page.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The second chunk finishes empty: it posts the payload, reads the reply, and returns true when the block between the pre tags is empty. Then it starts the loop over the character positions, with a binary search over the character set.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The third chunk adds the binary search: it asks grep whether the next character falls in the first half of the character set, using a character class, which needs no quotes. If the reply is empty, the character is in the first half; otherwise it is in the second. Then it verifies the character with a direct grep, and appends it to the prefix.",
    "lines": [
     {
      "step": 6,
-     "role": "text"
+     "role": "vim"
     }
    ]
   },
   {
-   "text": "The last chunk verifies each character, prints the growing prefix, and stops when the whole password matches.",
+   "text": "The last chunk prints the growing prefix and stops when the whole password matches.",
    "lines": [
     {
-     "step": 7,
-     "role": "text"
-    },
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Here is the last chunk.",
+   "lines": [
     {
      "step": 8,
      "role": "text"
+    },
+    {
+     "step": 7,
+     "role": "vim"
     }
    ]
   },
@@ -106,11 +138,7 @@
    "text": "I run the script, and it prints the password one character at a time, finishing with the full thirty-two characters.",
    "lines": [
     {
-     "step": 10,
-     "role": "text"
-    },
-    {
-     "step": 10,
+     "step": 8,
      "role": "out",
      "from": 0,
      "to": 32
