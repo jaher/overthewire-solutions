@@ -1,0 +1,88 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level sixteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The credentials for bandit seventeen are served by one port between thirty-one thousand and thirty-two thousand on localhost, and I have to find which one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit16 with ssh bandit16@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I scan the whole range with nmap.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Five ports are open: thirty-one thousand forty-six, thirty-one thousand five hundred eighteen, thirty-one thousand six hundred ninety-one, thirty-one thousand seven hundred ninety, and thirty-one thousand nine hundred sixty.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 12
+    }
+   ]
+  },
+  {
+   "text": "Most ports just echo back what you send, but thirty-one thousand seven hundred ninety speaks SSL, and returns a key for bandit seventeen.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "I send the current password, read from its file, to that port with openssl s client, discarding standard error so only the answer shows.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The daemon answers Correct, and prints a private key for bandit seventeen, from BEGIN to END, and the level is solved.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 38
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

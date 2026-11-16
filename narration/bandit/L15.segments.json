@@ -1,0 +1,78 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level fifteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Same idea as the last level, but the service on localhost port thirty thousand and one expects a TLS connection.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit15 with ssh bandit15@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Plain netcat will not work, because the daemon waits for a TLS handshake before it reads anything, so I use openssl s client, which performs the handshake.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I pipe the current password into openssl s client, connecting to localhost port thirty thousand and one, with the quiet flag.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "OpenSSL prints certificate chatter about a self-signed certificate, then the daemon answers Correct.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 7
+    }
+   ]
+  },
+  {
+   "text": "The next line is the password for bandit sixteen, and the level is solved.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 8
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,108 @@
+{
+ "game": "bandit",
+ "level": 14,
+ "audio": "narration/bandit/L14.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 43.44,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.97,
+   "text": "Bandit, level fourteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.97,
+   "end": 9.58,
+   "text": "A daemon listens on localhost port thirty thousand: send it the current password, and it replies with the password for bandit fifteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 9.58,
+   "end": 19.1,
+   "text": "I log in as bandit14 with ssh bandit14@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 19.1,
+   "end": 26.11,
+   "text": "First I read the current password from its file, slash etc slash bandit underscore pass slash bandit14.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 26.11,
+   "end": 30.5,
+   "text": "Then I feed that password to the daemon with netcat, using a here-string.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 30.5,
+   "end": 37.75,
+   "text": "Minus q two tells netcat to close two seconds after standard input ends, so the exchange finishes cleanly instead of hanging.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 37.75,
+   "end": 43.44,
+   "text": "The daemon answers Correct, followed by the password for bandit fifteen, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
