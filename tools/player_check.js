@@ -81,6 +81,15 @@ const realFetch = (url) => {
 };
 global.fetch = realFetch;
 
+// The player narrates by default when a sync map exists; player_check
+// verifies the plain render order, so it runs as a visitor who turned
+// narration off (otherwise the render gates on an audio clock this
+// harness never advances and stalls at the first line).
+global.localStorage = {
+  getItem: (k) => (k === 'otw-narration' ? 'off' : null),
+  setItem: () => {}, removeItem: () => {},
+};
+
 const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 const m = html.match(/<script>([\s\S]*)<\/script>/);
 if (!m) { console.error('no script found'); process.exit(1); }

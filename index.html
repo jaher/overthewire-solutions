@@ -204,14 +204,20 @@ function line(html, cls, colwrap){ const d = document.createElement('div'); if (
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
 /* ---- Spoken narration, synced to the typed lines ----
-   A level with a sync map (narration/<game>/L<n>.sync.json) gets a Narrate
-   button. The audio is the clock: every rendered line waits for its
-   scheduled audio time before it is typed, so the spoken words and the
-   appearing text land together. The map keys lines by step + role
-   (goal/vim/vimcmd/cmd/out/pw); out lines take an inclusive index range.
-   A line's time is its segment's start plus its share of the segment, so
-   lines inside one spoken clause appear spread across that clause.
-   Seeking re-renders the level fast-forwarded up to the seek point. */
+   A level with a sync map (narration/<game>/L<n>.sync.json) is narrated
+   BY DEFAULT: when playback starts, the audio starts with it and every
+   rendered line waits for its scheduled audio time before it is typed,
+   so the spoken words and the appearing text land together. The Narrate
+   button is the toggle to turn narration off; that choice is persisted
+   (localStorage 'otw-narration' = 'off') and stays off until the visitor
+   turns it back on. Browsers block audible autoplay before a user
+   gesture, so the audio is attempted on load and (re)started on the
+   first interaction whenever playback is running but the audio is
+   paused. The map keys lines by step + role (goal/vim/vimcmd/cmd/out/pw);
+   out lines take an inclusive index range. A line's time is its segment's
+   start plus its share of the segment, so lines inside one spoken clause
+   appear spread across that clause. Seeking re-renders the level
+   fast-forwarded up to the seek point. */
 const narrAudio = document.createElement('audio');
 narrAudio.preload = 'metadata';
 const narrBtn = document.getElementById('narrBtn');
@@ -220,6 +226,32 @@ const narrSeek = document.getElementById('narrSeek');
 const narrTimeEl = document.getElementById('narrTime');
 const narrSegEl = document.getElementById('narrSeg');
 const narrTranscript = document.getElementById('narrTranscript');
+const NARR_PREF_KEY = 'otw-narration';
+function narrPrefOff(){
+  try { return typeof localStorage !== 'undefined' && localStorage.getItem(NARR_PREF_KEY) === 'off'; }
+  catch(e){ return false; }
+}
+function setNarrPref(off){
+  try {
+    if (typeof localStorage === 'undefined') return;
+    if (off) localStorage.setItem(NARR_PREF_KEY, 'off'); else localStorage.removeItem(NARR_PREF_KEY);
+  } catch(e){}
+}
+function setNarrBtnText(){ narrBtn.textContent = narrOn ? '🔇 Turn narration off' : '🔊 Narrate'; }
+function tryStartNarrAudio(){
+  if (!narrOn || !narrMap) return;
+  try { const p = narrAudio.play(); if (p && p.catch) p.catch(() => {}); } catch(e){}
+}
+// Autoplay is blocked before a user gesture: whenever playback is running
+// but the audio is paused (an autoplay-blocked start, or a level that began
+// narrated by auto-advance), the next interaction starts it. Deliberate
+// pauses are respected: Play sets playing=false, and the toggle sets
+// narrOn=false, and both keep this listener quiet.
+if (document.addEventListener) {
+  const narrKick = () => { if (narrOn && narrMap && playing && narrAudio.paused) tryStartNarrAudio(); };
+  document.addEventListener('pointerdown', narrKick);
+  document.addEventListener('keydown', narrKick);
+}
 let narrMap = null, narrOn = false, narrFF = false;
 let narrGame = '', narrLevel = -1, narrLevelKey = '', narrLoadTok = 0;
 let narrLineTime = new Map(), narrKeySegs = new Map();
@@ -279,12 +311,12 @@ async function loadNarration(game, lvl){
   narrOn = false; if (narrAudio.pause) narrAudio.pause();
   narrBtn.style.display = 'none'; narrBar.classList.remove('on');
   narrTranscript.innerHTML = ''; narrTranscript.classList.remove('on');
-  narrBtn.textContent = '🔊 Narrate';
+  setNarrBtnText();
   try {
     const r = await fetch('narration/' + game + '/L' + lvl + '.sync.json', {cache:'no-store'});
-    if (!r.ok || tok !== narrLoadTok) return;
+    if (!r.ok || tok !== narrLoadTok) return false;
     narrMap = await r.json();
-    if (tok !== narrLoadTok) { narrMap = null; return; }
+    if (tok !== narrLoadTok) { narrMap = null; return false; }
     narrGame = game; narrLevel = lvl;
     buildNarrSchedule(narrMap);
     narrAudio.src = narrMap.audio;
@@ -292,7 +324,11 @@ async function loadNarration(game, lvl){
     narrBar.classList.add('on');
     buildNarrTranscript(narrMap); narrTranscript.classList.add('on');
     setNarrTime();
-  } catch(e) {}
+    // Narrated by default unless the visitor turned narration off.
+    narrOn = !narrPrefOff();
+    setNarrBtnText();
+    return true;
+  } catch(e) { return false; }
 }
 function fmtT(s){ if (!isFinite(s)) s = 0; s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
 function setNarrTime(){
@@ -327,19 +363,28 @@ narrAudio.addEventListener('seeked', narrHighlight);
 narrAudio.addEventListener('loadedmetadata', setNarrTime);
 narrAudio.addEventListener('ended', () => {
   narrOn = false; narrFF = false;
-  narrBtn.textContent = '🔊 Narrate'; playBtn.textContent = '⏸ Pause';
+  setNarrBtnText(); playBtn.textContent = '⏸ Pause';
   narrClearHL();
 });
 narrBtn.onclick = async () => {
   if (!narrMap) return;
-  if (narrOn && !narrAudio.paused){ narrAudio.pause(); narrBtn.textContent = '▶ Resume narration'; playBtn.textContent = '▶ Play'; return; }
-  if (narrOn && narrAudio.paused){ narrAudio.play().catch(() => {}); narrBtn.textContent = '⏸ Pause narration'; playBtn.textContent = '⏸ Pause'; return; }
+  if (narrOn){
+    // Turn narration off (persisted): the audio pauses and the render
+    // continues ungated — narrGate returns as soon as narrOn is false.
+    narrOn = false; narrFF = false;
+    setNarrPref(true);
+    narrAudio.pause();
+    setNarrBtnText();
+    return;
+  }
+  // Turn narration back on (persisted): restart the level gated from the top.
   narrOn = true; narrFF = false;
+  setNarrPref(false);
   playing = true; playBtn.textContent = '⏸ Pause';
-  narrBtn.textContent = '⏸ Pause narration';
+  setNarrBtnText();
   narrAudio.currentTime = 0;
   playLevel(cur);
-  narrAudio.play().catch(() => {});
+  tryStartNarrAudio();
 };
 narrSeek.addEventListener('input', () => {
   if (!narrMap) return;
@@ -630,9 +675,10 @@ async function playLevel(idx){
   const L = G.levels[idx]; if (!L) return;
   const my = ++runId;
   cur = idx;
-  if (gameKey + ':' + L.lvl !== narrLevelKey) loadNarration(gameKey, L.lvl);
+  if (gameKey + ':' + L.lvl !== narrLevelKey) await loadNarration(gameKey, L.lvl);
   const myNarr = narrOn && narrMap && narrGame === gameKey && narrLevel === L.lvl;
   if (myNarr) narrFF = true;
+  if (myNarr) tryStartNarrAudio();
   document.getElementById('nowPlaying').textContent = G.title.toUpperCase() + ' — LEVEL ' + L.lvl;
   document.title = G.title + ' Level ' + L.lvl + ' — OverTheWire solutions';
   term.innerHTML = '';
@@ -697,10 +743,14 @@ async function playLevel(idx){
   else if (!myNarr && idx + 1 >= curGame().levels.length) { statusEl.textContent = curGame().title + ' complete — all levels'; }
 }
 playBtn.onclick = () => {
-  if (narrOn){ narrBtn.onclick(); return; }
   playing = !playing; playBtn.textContent = playing ? '⏸ Pause' : '▶ Play';
+  // When narrating, Play pauses/resumes the audio too: the gates stall
+  // while the audio is paused, so typing and speech stay in lockstep.
+  if (narrOn && narrMap){
+    if (playing) tryStartNarrAudio(); else narrAudio.pause();
+  }
 };
-document.getElementById('restartBtn').onclick = () => { playing = true; playBtn.textContent = '⏸ Pause'; playLevel(cur); };
+document.getElementById('restartBtn').onclick = () => { playing = true; playBtn.textContent = '⏸ Pause'; if (narrOn && narrMap) narrAudio.currentTime = 0; playLevel(cur); };
 jump.onchange = () => { playing = true; playBtn.textContent = '⏸ Pause'; const ix = curGame().levels.findIndex(x => x.lvl === parseInt(jump.value, 10)); playLevel(ix < 0 ? 0 : ix); };
 playLevel(0);
 </script>

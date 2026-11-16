@@ -95,8 +95,8 @@ global.fetch = realFetch;
 const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 const m = html.match(/<script>([\s\S]*)<\/script>/);
 if (!m) { console.error('no script found'); process.exit(1); }
-const api = new Function(m[1] + "\n;return { GAMES, playLevel, fillLevels, setGame: g => { gameKey = g; }, getCur: () => cur, getRun: () => runId, getNarrMap: () => narrMap, isNarrOn: () => narrOn, getNarrBtn: () => narrBtn, getNarrSeek: () => narrSeek, getNarrAudio: () => narrAudio, getNarrKeySegs: () => narrKeySegs };")();
-const { GAMES, playLevel, fillLevels, setGame, getNarrMap, isNarrOn, getNarrBtn, getNarrSeek, getNarrAudio, getNarrKeySegs } = api;
+const api = new Function(m[1] + "\n;return { GAMES, playLevel, fillLevels, setGame: g => { gameKey = g; }, getCur: () => cur, getRun: () => runId, getNarrMap: () => narrMap, isNarrOn: () => narrOn, getNarrBtn: () => narrBtn, getNarrSeek: () => narrSeek, getNarrAudio: () => narrAudio, getNarrKeySegs: () => narrKeySegs, getPlayBtn: () => playBtn };")();
+const { GAMES, playLevel, fillLevels, setGame, getNarrMap, isNarrOn, getNarrBtn, getNarrSeek, getNarrAudio, getNarrKeySegs, getPlayBtn } = api;
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 let failures = 0;
@@ -230,9 +230,10 @@ function expectedChildren(L) {
     transcript.classList.contains('on'),
     `segments=${transcript.children.length} shown=${transcript.classList.contains('on')}`);
 
-  getNarrBtn().onclick();
-  await sleep(50);
-  check('narration is on after pressing Narrate', isNarrOn() === true);
+  // Narration is on by default once the map loads — no Narrate click
+  // needed to start it (playLevel already started the audio).
+  check('narration is on by default after the map loads', isNarrOn() === true && audio.paused === false,
+    `narrOn=${isNarrOn()} paused=${audio.paused}`);
 
   const highlightedIdx = () => term.querySelectorAll('[data-narr-seg]')
     .filter(d => d.classList.contains('narr-hl'))
@@ -335,18 +336,29 @@ function expectedChildren(L) {
     isNarrOn() === false && highlightedIdx().length === 0 && panelActive() === -1,
     `narrOn=${isNarrOn()} highlighted=${highlightedIdx().length} panel=${panelActive()}`);
 
-  // --- pause / resume lockstep ---
-  getNarrBtn().onclick(); // start again
+  // --- narration toggle (Narrate button) ---
+  getNarrBtn().onclick(); // start again after the audio ended
   await sleep(50);
+  check('narrate toggle starts narration again', isNarrOn() === true && audio.paused === false,
+    `narrOn=${isNarrOn()} paused=${audio.paused}`);
   for (let k = 0; k < 20; k++) { audio.currentTime = (k + 1) * 0.25; audio.fire('timeupdate'); await sleep(40); }
-  getNarrBtn().onclick(); // pause
+  getNarrBtn().onclick(); // turn off
+  await sleep(50);
+  check('narrate toggle turns narration off', isNarrOn() === false && audio.paused === true,
+    `narrOn=${isNarrOn()} paused=${audio.paused}`);
+  getNarrBtn().onclick(); // turn back on (restarts from the top)
+  await sleep(50);
+  check('narrate toggle turns narration back on', isNarrOn() === true && audio.paused === false,
+    `narrOn=${isNarrOn()} paused=${audio.paused}`);
+  // --- pause / resume lockstep (Play button) ---
+  getPlayBtn().onclick(); // pause
   await sleep(50);
   check('pause button pauses the audio', audio.paused === true, `paused=${audio.paused}`);
   const frozenAt = panelActive();
   await sleep(300);
   check('transcript highlight freezes while paused', panelActive() === frozenAt && frozenAt >= 0,
     `panel=${panelActive()} was=${frozenAt}`);
-  getNarrBtn().onclick(); // resume
+  getPlayBtn().onclick(); // resume
   await sleep(50);
   check('resume button resumes the audio', audio.paused === false, `paused=${audio.paused}`);
   audio.pause();
