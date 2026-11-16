@@ -1,0 +1,137 @@
+{
+ "game": "natas",
+ "level": 20,
+ "audio": "narration/natas/L20.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 79.56,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.33,
+   "text": "Natas, level twenty.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.33,
+   "end": 21.7,
+   "text": "This level uses a custom session save handler instead of the default PHP serialization. The write handler stores each session variable as a line containing the key, a space, and the value. The read handler rebuilds the session by splitting every line on the first space. The page lets us change a name, which is stored as a session variable.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 21.7,
+   "end": 26.14,
+   "text": "I fetch the source and pull out the two handler functions, my read and my write.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 26.14,
+   "end": 44.5,
+   "text": "The flaw is that the value is written verbatim, without escaping newlines. So if we submit a name that contains a newline followed by the text admin space one, the session file ends up with a second line reading admin one. On our next request, the read handler parses that line as the session variable admin with the value one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 44.5,
+   "end": 47.09,
+   "text": "So I open vim and write the injection:",
+   "lines": [
+    {
+     "step": 1,
+     "role": "vimcmd"
+    },
+    {
+     "step": 1,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 47.09,
+   "end": 55.37,
+   "text": "The first chunk sets up the imports, the basic auth header, the page URL, and a cookie jar with an opener that keeps the session cookie across requests.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 55.37,
+   "end": 63.84,
+   "text": "The second chunk posts the name with the embedded newline, then requests the page again with the same session, and prints whether we are an admin and the credentials block.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 63.84,
+   "end": 65.33,
+   "text": "Here is the second chunk.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "text"
+    },
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 65.33,
+   "end": 79.56,
+   "text": "I run it, and the reply says we are an admin, and it prints the password for natas twenty-one, and the level is solved. The lesson is that custom serialization must escape the characters it uses as separators, or a value can smuggle in new keys.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

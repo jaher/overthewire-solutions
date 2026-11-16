@@ -1,0 +1,105 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level twenty.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "This level uses a custom session save handler instead of the default PHP serialization. The write handler stores each session variable as a line containing the key, a space, and the value. The read handler rebuilds the session by splitting every line on the first space. The page lets us change a name, which is stored as a session variable.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I fetch the source and pull out the two handler functions, my read and my write.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "The flaw is that the value is written verbatim, without escaping newlines. So if we submit a name that contains a newline followed by the text admin space one, the session file ends up with a second line reading admin one. On our next request, the read handler parses that line as the session variable admin with the value one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "So I open vim and write the injection:",
+   "lines": [
+    {
+     "step": 1,
+     "role": "vimcmd"
+    },
+    {
+     "step": 1,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The first chunk sets up the imports, the basic auth header, the page URL, and a cookie jar with an opener that keeps the session cookie across requests.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The second chunk posts the name with the embedded newline, then requests the page again with the same session, and prints whether we are an admin and the credentials block.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Here is the second chunk.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "text"
+    },
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I run it, and the reply says we are an admin, and it prints the password for natas twenty-one, and the level is solved. The lesson is that custom serialization must escape the characters it uses as separators, or a value can smuggle in new keys.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
