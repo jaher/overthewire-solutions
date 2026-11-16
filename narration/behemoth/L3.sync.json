@@ -3,12 +3,12 @@
  "level": 3,
  "audio": "narration/behemoth/L3.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 108.12,
+ "duration": 133.03,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 1.87,
+   "end": 1.92,
    "text": "Behemoth, level three.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 1.87,
-   "end": 4.7,
+   "start": 1.92,
+   "end": 4.87,
    "text": "We log in as behemoth three and look at the binary.",
    "lines": [
     {
@@ -35,8 +35,8 @@
   },
   {
    "id": 2,
-   "start": 4.7,
-   "end": 13.03,
+   "start": 4.87,
+   "end": 13.2,
    "text": "We disassemble main with objdump: it reads up to two hundred bytes with fgets, then passes the buffer straight to printf as the format string.",
    "lines": [
     {
@@ -59,8 +59,8 @@
   },
   {
    "id": 3,
-   "start": 13.03,
-   "end": 23.3,
+   "start": 13.2,
+   "end": 23.57,
    "text": "That is a format string vulnerability: anything we type is interpreted as a format directive, so percent n and percent h n let us write a value to an address we supply.",
    "lines": [
     {
@@ -73,8 +73,8 @@
   },
   {
    "id": 4,
-   "start": 23.3,
-   "end": 33.26,
+   "start": 23.57,
+   "end": 33.46,
    "text": "We check the relocations with objdump: printf, fgets and puts are imported, but we do not need the GOT; we target the saved return address.",
    "lines": [
     {
@@ -91,8 +91,8 @@
   },
   {
    "id": 5,
-   "start": 33.26,
-   "end": 39.14,
+   "start": 33.46,
+   "end": 39.77,
    "text": "We inspect the protections: readelf shows the stack is executable, and address randomisation is off.",
    "lines": [
     {
@@ -119,8 +119,8 @@
   },
   {
    "id": 6,
-   "start": 39.14,
-   "end": 47.23,
+   "start": 39.77,
+   "end": 47.76,
    "text": "We probe it by piping a format string in, and the program prints stack words back at us, confirming our input is interpreted as a format string.",
    "lines": [
     {
@@ -137,8 +137,8 @@
   },
   {
    "id": 7,
-   "start": 47.23,
-   "end": 55.94,
+   "start": 47.76,
+   "end": 56.21,
    "text": "The buffer sits two hundred bytes below the frame pointer, so the saved frame pointer is at offset two hundred and the return address at offset two hundred four.",
    "lines": [
     {
@@ -157,8 +157,8 @@
   },
   {
    "id": 8,
-   "start": 55.94,
-   "end": 57.98,
+   "start": 56.21,
+   "end": 58.18,
    "text": "Then we write the shellcode in vim.",
    "lines": [
     {
@@ -173,8 +173,8 @@
   },
   {
    "id": 9,
-   "start": 57.98,
-   "end": 62.78,
+   "start": 58.18,
+   "end": 63.29,
    "text": "First the header: thirty-two bit mode, the global entry point, and the start label.",
    "lines": [
     {
@@ -185,9 +185,9 @@
   },
   {
    "id": 10,
-   "start": 62.78,
-   "end": 66.14,
-   "text": "It prints a marker so our sweep can detect a successful jump,",
+   "start": 63.29,
+   "end": 71.62,
+   "text": "It prints a marker so our sweep can detect a successful jump, pushing a zero and the marker bytes onto the stack, then pointing at them and calling write,",
    "lines": [
     {
      "role": "vim",
@@ -197,8 +197,8 @@
   },
   {
    "id": 11,
-   "start": 66.14,
-   "end": 71.23,
+   "start": 71.62,
+   "end": 76.73,
    "text": "then raises the effective uid with geteuid and setreuid,",
    "lines": [
     {
@@ -209,9 +209,9 @@
   },
   {
    "id": 12,
-   "start": 71.23,
-   "end": 74.42,
-   "text": "and setuid so the privilege survives the exec.",
+   "start": 76.73,
+   "end": 85.25,
+   "text": "and setuid so the privilege survives the exec. It calls geteuid again, moves the id into place, and invokes setuid.",
    "lines": [
     {
      "role": "vim",
@@ -221,9 +221,9 @@
   },
   {
    "id": 13,
-   "start": 74.42,
-   "end": 78.19,
-   "text": "And finally execve on slash bin slash sh.",
+   "start": 85.25,
+   "end": 103.61,
+   "text": "And finally execve on slash bin slash sh. It pushes a zero, then slash slash s h, then slash b i n, points the first argument at the stack, builds the argument list from it, clears the environment pointer, loads eleven as the syscall number, and triggers the interrupt.",
    "lines": [
     {
      "role": "vim",
@@ -237,8 +237,8 @@
   },
   {
    "id": 14,
-   "start": 78.19,
-   "end": 85.46,
+   "start": 103.61,
+   "end": 110.93,
    "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: seventy-eight bytes.",
    "lines": [
     {
@@ -279,8 +279,8 @@
   },
   {
    "id": 15,
-   "start": 85.46,
-   "end": 93.26,
+   "start": 110.93,
+   "end": 118.32,
    "text": "We run the exploit: it leaks the address of the argument vector, derives the buffer address, and verifies the guess with a marker string.",
    "lines": [
     {
@@ -297,8 +297,8 @@
   },
   {
    "id": 16,
-   "start": 93.26,
-   "end": 102.07,
+   "start": 118.32,
+   "end": 127.03,
    "text": "The return slot sits two hundred four bytes into the buffer, and the format string writes the shellcode address there in two halves, with arguments forty one and forty two.",
    "lines": [
     {
@@ -311,8 +311,8 @@
   },
   {
    "id": 17,
-   "start": 102.07,
-   "end": 108.12,
+   "start": 127.03,
+   "end": 133.03,
    "text": "The exploit prints the marker and a shell as behemoth four, and the password, and the level is solved.",
    "lines": [
     {

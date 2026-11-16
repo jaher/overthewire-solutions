@@ -155,7 +155,7 @@
      "step": 9
     }
    ],
-   "text": "It prints a marker so our sweep can detect a successful jump,"
+   "text": "It prints a marker so our sweep can detect a successful jump, pushing a zero and the marker bytes onto the stack, then pointing at them and calling write,"
   },
   {
    "lines": [
@@ -173,7 +173,7 @@
      "step": 11
     }
    ],
-   "text": "and setuid so the privilege survives the exec."
+   "text": "and setuid so the privilege survives the exec. It calls geteuid again, moves the id into place, and invokes setuid."
   },
   {
    "lines": [
@@ -186,7 +186,7 @@
      "step": 13
     }
    ],
-   "text": "And finally execve on slash bin slash sh."
+   "text": "And finally execve on slash bin slash sh. It pushes a zero, then slash slash s h, then slash b i n, points the first argument at the stack, builds the argument list from it, clears the environment pointer, loads eleven as the syscall number, and triggers the interrupt."
   },
   {
    "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: seventy-eight bytes.",
