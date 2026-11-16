@@ -3,12 +3,12 @@
  "level": 11,
  "audio": "narration/natas/L11.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 52.13,
+ "duration": 62.52,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 2.11,
+   "end": 2.09,
    "text": "Natas, level eleven.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 2.11,
-   "end": 8.11,
+   "start": 2.09,
+   "end": 8.52,
    "text": "The site stores your background colour in a cookie, base64 encoded and XOR encrypted with a secret key.",
    "lines": [
     {
@@ -31,8 +31,8 @@
   },
   {
    "id": 2,
-   "start": 8.11,
-   "end": 12.96,
+   "start": 8.52,
+   "end": 13.32,
    "text": "I fetch the page headers and pull out the cookie, a base64 blob named data.",
    "lines": [
     {
@@ -49,48 +49,68 @@
   },
   {
    "id": 3,
-   "start": 12.96,
-   "end": 28.87,
-   "text": "I open vim and write the script. The first chunk imports the helpers, pastes in the cookie, decodes it, and XORs it with the known default plaintext, a JSON object with show password set to no and a white background, which recovers the repeating key, only four bytes long.",
+   "start": 13.32,
+   "end": 26.57,
+   "text": "The encryption is XOR with a repeating key, and the default plaintext is known: a JSON object with show password set to no and a white background. XORing the ciphertext against it recovers the key.",
    "lines": [
     {
-     "step": 1,
-     "role": "text"
-    },
-    {
-     "step": 2,
-     "role": "text"
+     "step": -1,
+     "role": "goal"
     }
    ]
   },
   {
    "id": 4,
-   "start": 28.87,
-   "end": 39.79,
-   "text": "The second chunk prints the recovered key, builds a new JSON object with show password set to yes, encrypts it with the recovered key, and base64 encodes it into the forged cookie.",
+   "start": 26.57,
+   "end": 28.73,
+   "text": "I open vim and write the script:",
    "lines": [
     {
-     "step": 3,
-     "role": "text"
+     "step": 1,
+     "role": "vimcmd"
     },
     {
-     "step": 4,
-     "role": "text"
+     "step": 1,
+     "role": "vim"
     }
    ]
   },
   {
    "id": 5,
-   "start": 39.79,
-   "end": 43.56,
+   "start": 28.73,
+   "end": 39.29,
+   "text": "First chunk: the imports, the cookie pasted in, the base64 decode, and the XOR with the known plaintext, which recovers the repeating key, only four bytes long.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 39.29,
+   "end": 50.76,
+   "text": "Second chunk: print the recovered key, build a new JSON object with show password set to yes, encrypt it with the recovered key, and base64 encode it into the forged cookie.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 50.76,
+   "end": 54.29,
    "text": "I run it, and it prints the recovered key and the forged cookie.",
    "lines": [
     {
-     "step": 6,
+     "step": 4,
      "role": "cmd"
     },
     {
-     "step": 6,
+     "step": 4,
      "role": "out",
      "from": 0,
      "to": 1
@@ -98,17 +118,17 @@
    ]
   },
   {
-   "id": 6,
-   "start": 43.56,
-   "end": 52.13,
+   "id": 8,
+   "start": 54.29,
+   "end": 62.52,
    "text": "I send the forged cookie back, and the server decrypts it, sees the flag set, and prints the password for natas twelve, and the level is solved.",
    "lines": [
     {
-     "step": 7,
+     "step": 5,
      "role": "cmd"
     },
     {
-     "step": 7,
+     "step": 5,
      "role": "out",
      "from": 0,
      "to": 0

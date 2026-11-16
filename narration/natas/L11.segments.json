@@ -34,28 +34,42 @@
    ]
   },
   {
-   "text": "I open vim and write the script. The first chunk imports the helpers, pastes in the cookie, decodes it, and XORs it with the known default plaintext, a JSON object with show password set to no and a white background, which recovers the repeating key, only four bytes long.",
+   "text": "The encryption is XOR with a repeating key, and the default plaintext is known: a JSON object with show password set to no and a white background. XORing the ciphertext against it recovers the key.",
    "lines": [
     {
-     "step": 1,
-     "role": "text"
-    },
-    {
-     "step": 2,
-     "role": "text"
+     "step": -1,
+     "role": "goal"
     }
    ]
   },
   {
-   "text": "The second chunk prints the recovered key, builds a new JSON object with show password set to yes, encrypts it with the recovered key, and base64 encodes it into the forged cookie.",
+   "text": "I open vim and write the script:",
+   "lines": [
+    {
+     "step": 1,
+     "role": "vimcmd"
+    },
+    {
+     "step": 1,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "First chunk: the imports, the cookie pasted in, the base64 decode, and the XOR with the known plaintext, which recovers the repeating key, only four bytes long.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Second chunk: print the recovered key, build a new JSON object with show password set to yes, encrypt it with the recovered key, and base64 encode it into the forged cookie.",
    "lines": [
     {
      "step": 3,
-     "role": "text"
-    },
-    {
-     "step": 4,
-     "role": "text"
+     "role": "vim"
     }
    ]
   },
@@ -63,11 +77,11 @@
    "text": "I run it, and it prints the recovered key and the forged cookie.",
    "lines": [
     {
-     "step": 6,
+     "step": 4,
      "role": "cmd"
     },
     {
-     "step": 6,
+     "step": 4,
      "role": "out",
      "from": 0,
      "to": 1
@@ -78,11 +92,11 @@
    "text": "I send the forged cookie back, and the server decrypts it, sees the flag set, and prints the password for natas twelve, and the level is solved.",
    "lines": [
     {
-     "step": 7,
+     "step": 5,
      "role": "cmd"
     },
     {
-     "step": 7,
+     "step": 5,
      "role": "out",
      "from": 0,
      "to": 0
