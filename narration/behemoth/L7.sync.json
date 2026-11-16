@@ -3,12 +3,12 @@
  "level": 7,
  "audio": "narration/behemoth/L7.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 110.47,
+ "duration": 136.46,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 3.17,
+   "end": 3.0,
    "text": "Behemoth, level seven, the final level.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 3.17,
-   "end": 6.1,
+   "start": 3.0,
+   "end": 5.83,
    "text": "We log in as behemoth seven and look at the binary.",
    "lines": [
     {
@@ -35,8 +35,8 @@
   },
   {
    "id": 2,
-   "start": 6.1,
-   "end": 13.7,
+   "start": 5.83,
+   "end": 13.44,
    "text": "The disassembly shows the program copies our first argument into a stack buffer of five hundred twenty-four bytes, but first it runs a filter.",
    "lines": [
     {
@@ -53,8 +53,8 @@
   },
   {
    "id": 3,
-   "start": 13.7,
-   "end": 23.59,
+   "start": 13.44,
+   "end": 23.04,
    "text": "The filter walks the argument character by character and refuses anything that is not a letter or a space, and it stops after five hundred twelve characters, while the copy does not stop there.",
    "lines": [
     {
@@ -85,8 +85,8 @@
   },
   {
    "id": 4,
-   "start": 23.59,
-   "end": 30.0,
+   "start": 23.04,
+   "end": 29.47,
    "text": "We inspect the protections: readelf shows the stack is marked executable, and address randomisation is off.",
    "lines": [
     {
@@ -113,8 +113,8 @@
   },
   {
    "id": 5,
-   "start": 30.0,
-   "end": 37.92,
+   "start": 29.47,
+   "end": 37.7,
    "text": "We probe it: four letters pass, but a percent sign is refused with the message non-alpha chars found in string, possible shellcode.",
    "lines": [
     {
@@ -141,7 +141,7 @@
   },
   {
    "id": 6,
-   "start": 37.92,
+   "start": 37.7,
    "end": 49.27,
    "text": "So we send five hundred twelve letters to satisfy the filter, and then we append the real payload: the saved frame pointer, the return address, and our shellcode, none of which the filter ever inspects.",
    "lines": [
@@ -156,7 +156,7 @@
   {
    "id": 7,
    "start": 49.27,
-   "end": 57.07,
+   "end": 57.26,
    "text": "The buffer sits five hundred twenty-four bytes below the saved frame pointer, so the return address is at offset five hundred twenty-eight.",
    "lines": [
     {
@@ -169,8 +169,8 @@
   },
   {
    "id": 8,
-   "start": 57.07,
-   "end": 59.3,
+   "start": 57.26,
+   "end": 59.23,
    "text": "Then we write the shellcode in vim.",
    "lines": [
     {
@@ -185,8 +185,8 @@
   },
   {
    "id": 9,
-   "start": 59.3,
-   "end": 64.54,
+   "start": 59.23,
+   "end": 64.34,
    "text": "First the header: thirty-two bit mode, the global entry point, and the start label.",
    "lines": [
     {
@@ -197,9 +197,9 @@
   },
   {
    "id": 10,
-   "start": 64.54,
-   "end": 67.9,
-   "text": "It prints a marker so our sweep can detect a successful jump,",
+   "start": 64.34,
+   "end": 72.67,
+   "text": "It prints a marker so our sweep can detect a successful jump, pushing a zero and the marker bytes onto the stack, then pointing at them and calling write,",
    "lines": [
     {
      "role": "vim",
@@ -209,8 +209,8 @@
   },
   {
    "id": 11,
-   "start": 67.9,
-   "end": 73.25,
+   "start": 72.67,
+   "end": 77.78,
    "text": "then raises the effective uid with geteuid and setreuid,",
    "lines": [
     {
@@ -221,9 +221,9 @@
   },
   {
    "id": 12,
-   "start": 73.25,
-   "end": 76.49,
-   "text": "and setuid so the privilege survives the exec.",
+   "start": 77.78,
+   "end": 86.3,
+   "text": "and setuid so the privilege survives the exec. It calls geteuid again, moves the id into place, and invokes setuid.",
    "lines": [
     {
      "role": "vim",
@@ -233,9 +233,9 @@
   },
   {
    "id": 13,
-   "start": 76.49,
-   "end": 82.78,
-   "text": "And finally execve on slash bin slash slash sh, with a double slash to keep the pushed string aligned.",
+   "start": 86.3,
+   "end": 108.19,
+   "text": "And finally execve on slash bin slash slash sh, with a double slash to keep the pushed string aligned. It pushes a zero, then slash slash s h, then slash b i n, points the first argument at the stack, builds the argument list from it, clears the environment pointer, loads eleven as the syscall number, and triggers the interrupt.",
    "lines": [
     {
      "role": "vim",
@@ -249,8 +249,8 @@
   },
   {
    "id": 14,
-   "start": 82.78,
-   "end": 89.93,
+   "start": 108.19,
+   "end": 115.51,
    "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: seventy-eight bytes.",
    "lines": [
     {
@@ -291,8 +291,8 @@
   },
   {
    "id": 15,
-   "start": 89.93,
-   "end": 97.3,
+   "start": 115.51,
+   "end": 123.19,
    "text": "Because the stack address depends on the environment, the exploit sweeps a range of return addresses and looks for the marker the shellcode prints.",
    "lines": [
     {
@@ -309,8 +309,8 @@
   },
   {
    "id": 16,
-   "start": 97.3,
-   "end": 103.7,
+   "start": 123.19,
+   "end": 129.74,
    "text": "It lands in the shellcode, we get a shell as behemoth eight, and it prints the final password, and the level is solved.",
    "lines": [
     {
@@ -327,8 +327,8 @@
   },
   {
    "id": 17,
-   "start": 103.7,
-   "end": 110.47,
+   "start": 129.74,
+   "end": 136.46,
    "text": "Behemoth is complete: the lesson is that a filter and the operation it protects must cover exactly the same data.",
    "lines": [
     {
