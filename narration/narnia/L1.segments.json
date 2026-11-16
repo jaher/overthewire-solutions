@@ -1,0 +1,202 @@
+{
+ "segments": [
+  {
+   "text": "Narnia, level one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The program takes the environment variable EGG, casts it to a function pointer, and calls it, so whatever bytes we put in EGG run as machine code.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as narnia one and read the source.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The main function checks that EGG is set, prints trying to execute EGG, and calls it.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 18,
+     "to": 28
+    }
+   ]
+  },
+  {
+   "text": "I print the main function again with sed.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 13
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write a Python driver.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vimcmd"
+    },
+    {
+     "step": 3,
+     "role": "vim"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 18
+    }
+   ]
+  },
+  {
+   "text": "The shellcode is written out as raw bytes: it builds the path to the shell on the stack and calls execve, syscall eleven.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 17
+    }
+   ]
+  },
+  {
+   "text": "Every byte is chosen to avoid a null, because the environment cannot carry one.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 17
+    }
+   ]
+  },
+  {
+   "text": "The driver builds the payload as two hundred NOPs, then the shellcode, then four more NOPs, then a candidate address in little-endian.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "out",
+     "from": 9,
+     "to": 11
+    }
+   ]
+  },
+  {
+   "text": "It sweeps that address from ffff d zero zero zero up to ffff e zero zero zero, four bytes at a time, skipping any payload that contains a null byte, and skipping any run that times out.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "out",
+     "from": 8,
+     "to": 17
+    }
+   ]
+  },
+  {
+   "text": "For each candidate it sets EGG through the environment, decoding the bytes as latin one so the high bytes survive Python's text encoding.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "out",
+     "from": 11,
+     "to": 12
+    }
+   ]
+  },
+  {
+   "text": "It reads the shell commands from standard input, and when the output contains uid equals, it prints the output and stops.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "out",
+     "from": 12,
+     "to": 13
+    },
+    {
+     "step": 8,
+     "role": "out",
+     "from": 9,
+     "to": 13
+    }
+   ]
+  },
+  {
+   "text": "I print the finished driver with cat, to check it.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "cmd"
+    },
+    {
+     "step": 16,
+     "role": "out",
+     "from": 0,
+     "to": 40
+    }
+   ]
+  },
+  {
+   "text": "I run the driver, piping in id and the password read.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The program prints trying to execute EGG, the shell comes up as narnia two, and the password file prints the next password.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "The shell runs as narnia two, and the level is solved.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "out",
+     "from": 1,
+     "to": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
