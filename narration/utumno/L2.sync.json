@@ -3,12 +3,12 @@
  "level": 2,
  "audio": "narration/utumno/L2.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 141.1,
+ "duration": 151.27,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 2.09,
+   "end": 1.97,
    "text": "Utumno, level two.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 2.09,
-   "end": 4.13,
+   "start": 1.97,
+   "end": 4.01,
    "text": "I log in as utumno two.",
    "lines": [
     {
@@ -31,8 +31,8 @@
   },
   {
    "id": 2,
-   "start": 4.13,
-   "end": 10.56,
+   "start": 4.01,
+   "end": 10.42,
    "text": "Running it with no arguments, and again with four As, both print Aw dot dot and exit one.",
    "lines": [
     {
@@ -59,8 +59,8 @@
   },
   {
    "id": 3,
-   "start": 10.56,
-   "end": 12.41,
+   "start": 10.42,
+   "end": 12.14,
    "text": "The disassembly shows why.",
    "lines": [
     {
@@ -71,8 +71,8 @@
   },
   {
    "id": 4,
-   "start": 12.41,
-   "end": 21.48,
+   "start": 12.14,
+   "end": 21.43,
    "text": "The guard wants exactly one argument, and that argument must be the empty string: argc equal to one, and the first byte of argv zero is zero.",
    "lines": [
     {
@@ -85,8 +85,8 @@
   },
   {
    "id": 5,
-   "start": 21.48,
-   "end": 23.59,
+   "start": 21.43,
+   "end": 23.76,
    "text": "The second quirk is the copy source.",
    "lines": [
     {
@@ -99,8 +99,8 @@
   },
   {
    "id": 6,
-   "start": 23.59,
-   "end": 31.82,
+   "start": 23.76,
+   "end": 31.99,
    "text": "The program does strcpy into a twelve byte buffer, but the source is argv ten, ten pointers past the start of argv.",
    "lines": [
     {
@@ -113,8 +113,8 @@
   },
   {
    "id": 7,
-   "start": 31.82,
-   "end": 48.19,
+   "start": 31.99,
+   "end": 47.64,
    "text": "With one argument, argv ten is past the null terminator, inside the environment array. The kernel puts envp immediately after argv on the initial stack, so argv ten is envp eight, the value of the ninth environment variable.",
    "lines": [
     {
@@ -127,8 +127,8 @@
   },
   {
    "id": 8,
-   "start": 48.19,
-   "end": 56.78,
+   "start": 47.64,
+   "end": 56.09,
    "text": "That gives us a full string to copy. Twelve bytes fill the buffer, the next four overwrite the saved frame pointer, and the next four the return address.",
    "lines": [
     {
@@ -141,8 +141,8 @@
   },
   {
    "id": 9,
-   "start": 56.78,
-   "end": 60.26,
+   "start": 56.09,
+   "end": 59.52,
    "text": "The stack is executable and address randomisation is off.",
    "lines": [
     {
@@ -169,8 +169,8 @@
   },
   {
    "id": 10,
-   "start": 60.26,
-   "end": 62.54,
+   "start": 59.52,
+   "end": 61.75,
    "text": "I open vim and write the shellcode:",
    "lines": [
     {
@@ -185,8 +185,8 @@
   },
   {
    "id": 11,
-   "start": 62.54,
-   "end": 68.06,
+   "start": 61.75,
+   "end": 66.24,
    "text": "The header, the start label, and the marker comment, with eax zeroed.",
    "lines": [
     {
@@ -197,8 +197,8 @@
   },
   {
    "id": 12,
-   "start": 68.06,
-   "end": 74.86,
+   "start": 66.24,
+   "end": 73.49,
    "text": "The marker write: push a zero, push PWN exclamation, then write four bytes to standard output.",
    "lines": [
     {
@@ -209,8 +209,8 @@
   },
   {
    "id": 13,
-   "start": 74.86,
-   "end": 81.62,
+   "start": 73.49,
+   "end": 78.94,
    "text": "Then the user-id calls: geteuid, then setreuid with the id in both slots.",
    "lines": [
     {
@@ -221,8 +221,8 @@
   },
   {
    "id": 14,
-   "start": 81.62,
-   "end": 87.91,
+   "start": 78.94,
+   "end": 85.1,
    "text": "Then setuid, and the start of the execve: a zeroed eax pushed as the terminator.",
    "lines": [
     {
@@ -233,9 +233,9 @@
   },
   {
    "id": 15,
-   "start": 87.91,
-   "end": 90.74,
-   "text": "Then the execve of slash bin slash sh.",
+   "start": 85.1,
+   "end": 101.26,
+   "text": "Then the execve of slash bin slash sh. The last two path words are pushed so the string sits on the stack, the stack pointer becomes the path argument, and the argument array is built from a zero and that pointer. Eleven is loaded as the syscall number and the interrupt makes the call.",
    "lines": [
     {
      "role": "vim",
@@ -245,8 +245,8 @@
   },
   {
    "id": 16,
-   "start": 90.74,
-   "end": 101.98,
+   "start": 101.26,
+   "end": 111.65,
    "text": "We assemble with nasm, inspect the encoding with objdump, extract the text section with objcopy, check the bytes with xxd, and wc counts seventy eight bytes.",
    "lines": [
     {
@@ -291,8 +291,8 @@
   },
   {
    "id": 17,
-   "start": 101.98,
-   "end": 115.01,
+   "start": 111.65,
+   "end": 124.06,
    "text": "Python refuses to build an empty argv zero: the execve call says the first element cannot be empty, so we call libc dot execve directly through ctypes, with a pointer array we build ourselves.",
    "lines": [
     {
@@ -303,8 +303,8 @@
   },
   {
    "id": 18,
-   "start": 115.01,
-   "end": 123.89,
+   "start": 124.06,
+   "end": 132.98,
    "text": "The environment value is the prefix E zero eight equals, then eight nops, then four filler bytes, then the return address, then the shellcode.",
    "lines": [
     {
@@ -321,8 +321,8 @@
   },
   {
    "id": 19,
-   "start": 123.89,
-   "end": 132.94,
+   "start": 132.98,
+   "end": 142.03,
    "text": "The exploit forks once per candidate address and looks for the marker in the child output. The sweep hits at f f f f d c d zero.",
    "lines": [
     {
@@ -339,8 +339,8 @@
   },
   {
    "id": 20,
-   "start": 132.94,
-   "end": 141.1,
+   "start": 142.03,
+   "end": 151.27,
    "text": "Re-running that address with the commands piped in gives a shell as utumno three and the password y i T c a Z b p J nine.",
    "lines": [
     {
