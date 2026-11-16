@@ -2498,34 +2498,6 @@
      ]
     },
     {
-     "cmd": "cat -n /tmp/b6.asm",
-     "out": [
-      "     1\tBITS 32",
-      "     2\tglobal _start",
-      "     3\t_start:",
-      "     4\t    ; write(1, \"HelloKitty\\n\", 10): the reader compares what the",
-      "     5\t    ; program produced with this string",
-      "     6\t    xor eax, eax",
-      "     7\t    push eax",
-      "     8\t    push 0x7974",
-      "     9\t    push 0x74694b6f",
-      "    10\t    push 0x6c6c6548",
-      "    11\t    mov ecx, esp",
-      "    12\t    xor ebx, ebx",
-      "    13\t    inc ebx",
-      "    14\t    xor edx, edx",
-      "    15\t    mov dl, 10",
-      "    16\t    xor eax, eax",
-      "    17\t    mov al, 4",
-      "    18\t    int 0x80",
-      "    19\t    ; exit(0)",
-      "    20\t    xor eax, eax",
-      "    21\t    mov al, 1",
-      "    22\t    xor ebx, ebx",
-      "    23\t    int 0x80"
-     ]
-    },
-    {
      "cmd": "nasm -f elf32 /tmp/b6.asm -o /tmp/b6.o",
      "out": [
       "(b6.asm assembles cleanly; the .o is not needed further here)"

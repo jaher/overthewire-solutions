@@ -110,60 +110,69 @@
    ]
   },
   {
-   "text": "It must print exactly ten bytes, HelloKitty, the string the program checks our output against.",
    "lines": [
     {
-     "step": 10,
-     "role": "out",
-     "from": 3,
-     "to": 4
+     "role": "vim",
+     "step": 6
     }
-   ]
+   ],
+   "text": "First the header: thirty-two bit mode, the global entry point, and the start label. It must print exactly ten bytes, HelloKitty, the string the program checks our output against."
   },
   {
-   "text": "It pushes the string onto the stack in three pieces, because ten bytes do not fit in one immediate, sets up a write to file descriptor one, and exits.",
    "lines": [
     {
-     "step": 10,
-     "role": "out",
-     "from": 5,
-     "to": 22
+     "role": "vim",
+     "step": 7
     }
-   ]
+   ],
+   "text": "It pushes the string onto the stack in three pieces, because ten bytes do not fit in one immediate,"
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 8
+    },
+    {
+     "role": "vim",
+     "step": 9
+    }
+   ],
+   "text": "sets up a write to file descriptor one, and exits."
   },
   {
    "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: forty-one bytes, with no zero x zero b byte in them.",
    "lines": [
     {
-     "step": 11,
+     "step": 10,
      "role": "cmd"
     },
     {
-     "step": 11,
+     "step": 10,
      "role": "out",
      "from": 0,
      "to": 0
+    },
+    {
+     "step": 11,
+     "role": "cmd"
     },
     {
      "step": 12,
      "role": "cmd"
     },
     {
-     "step": 13,
-     "role": "cmd"
-    },
-    {
-     "step": 13,
+     "step": 12,
      "role": "out",
      "from": 0,
      "to": 1
     },
     {
-     "step": 14,
+     "step": 13,
      "role": "cmd"
     },
     {
-     "step": 14,
+     "step": 13,
      "role": "out",
      "from": 0,
      "to": 0
@@ -174,11 +183,11 @@
    "text": "Then we run the exploit: it writes the bytes to shellcode dot txt in a directory we own and runs behemoth six on a raw terminal.",
    "lines": [
     {
-     "step": 15,
+     "step": 14,
      "role": "cmd"
     },
     {
-     "step": 15,
+     "step": 14,
      "role": "out",
      "from": 0,
      "to": 1
@@ -189,7 +198,7 @@
    "text": "The program answers Correct, we get a shell as behemoth seven, and it prints the password, and the level is solved.",
    "lines": [
     {
-     "step": 15,
+     "step": 14,
      "role": "out",
      "from": 3,
      "to": 5
