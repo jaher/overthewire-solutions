@@ -1,0 +1,271 @@
+{
+ "segments": [
+  {
+   "text": "Utumno, level two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as utumno two.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Running it with no arguments, and again with four As, both print Aw dot dot and exit one.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "The disassembly shows why.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The guard wants exactly one argument, and that argument must be the empty string: argc equal to one, and the first byte of argv zero is zero.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 4,
+     "to": 12
+    }
+   ]
+  },
+  {
+   "text": "The second quirk is the copy source.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 18,
+     "to": 20
+    }
+   ]
+  },
+  {
+   "text": "The program does strcpy into a twelve byte buffer, but the source is argv ten, which is ten pointers past the start of argv.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 21,
+     "to": 25
+    }
+   ]
+  },
+  {
+   "text": "With one argument, argv ten is past the null terminator, inside the environment array. The kernel puts envp immediately after argv on the initial stack, so argv ten is envp eight, the value of the ninth environment variable.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 18,
+     "to": 20
+    }
+   ]
+  },
+  {
+   "text": "That gives us a full string to copy. Twelve bytes fill the buffer, the next four overwrite the saved frame pointer, and the next four the return address.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 22,
+     "to": 25
+    }
+   ]
+  },
+  {
+   "text": "The stack is executable and address randomisation is off.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "We write the shellcode in vim:",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vimcmd"
+    },
+    {
+     "step": 6,
+     "role": "vim"
+    },
+    {
+     "step": 13,
+     "role": "cmd"
+    },
+    {
+     "step": 13,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "a marker write, then geteuid, setreuid and setuid, then execve slash bin slash sh, all null free because the payload is a C string.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "out",
+     "from": 3,
+     "to": 43
+    }
+   ]
+  },
+  {
+   "text": "We assemble with nasm, inspect the encoding with objdump, extract the text section with objcopy, check the bytes with xxd, and wc counts seventy eight bytes.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "cmd"
+    },
+    {
+     "step": 14,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 15,
+     "role": "cmd"
+    },
+    {
+     "step": 16,
+     "role": "cmd"
+    },
+    {
+     "step": 17,
+     "role": "cmd"
+    },
+    {
+     "step": 17,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    },
+    {
+     "step": 18,
+     "role": "cmd"
+    },
+    {
+     "step": 18,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 19,
+     "role": "cmd"
+    },
+    {
+     "step": 20,
+     "role": "cmd"
+    },
+    {
+     "step": 21,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Python refuses to build an empty argv zero: the execve call says the first element cannot be empty, so we call libc dot execve directly through ctypes, with a pointer array we build ourselves.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The environment value is the prefix E zero eight equals, then eight nops, then four filler bytes, then the return address, then the shellcode.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "The exploit forks once per candidate address and looks for the marker in the child output. The sweep hits at f f f f d c d zero.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "out",
+     "from": 1,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "Re-running that address with the commands piped in gives a shell as utumno three and the password y i T c a Z b p J nine. We verify.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "out",
+     "from": 3,
+     "to": 4
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
