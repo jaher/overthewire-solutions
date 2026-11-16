@@ -3,12 +3,12 @@
  "level": 1,
  "audio": "narration/narnia/L1.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 88.18,
+ "duration": 98.69,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 1.85,
+   "end": 1.92,
    "text": "Narnia, level one.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 1.85,
-   "end": 10.85,
+   "start": 1.92,
+   "end": 10.51,
    "text": "The program takes the environment variable EGG, casts it to a function pointer, and calls it, so whatever bytes we put in EGG run as machine code.",
    "lines": [
     {
@@ -31,8 +31,8 @@
   },
   {
    "id": 2,
-   "start": 10.85,
-   "end": 13.61,
+   "start": 10.51,
+   "end": 13.39,
    "text": "I log in as narnia one and read the source.",
    "lines": [
     {
@@ -47,8 +47,8 @@
   },
   {
    "id": 3,
-   "start": 13.61,
-   "end": 18.89,
+   "start": 13.39,
+   "end": 19.15,
    "text": "The main function checks that EGG is set, prints trying to execute EGG, and calls it.",
    "lines": [
     {
@@ -61,8 +61,8 @@
   },
   {
    "id": 4,
-   "start": 18.89,
-   "end": 21.34,
+   "start": 19.15,
+   "end": 21.55,
    "text": "I print the main function again with sed.",
    "lines": [
     {
@@ -79,8 +79,8 @@
   },
   {
    "id": 5,
-   "start": 21.34,
-   "end": 23.81,
+   "start": 21.55,
+   "end": 24.0,
    "text": "I open vim and write a Python driver.",
    "lines": [
     {
@@ -90,143 +90,89 @@
     {
      "step": 3,
      "role": "vim"
-    },
-    {
-     "step": 3,
-     "role": "out",
-     "from": 0,
-     "to": 18
     }
    ]
   },
   {
    "id": 6,
-   "start": 23.81,
-   "end": 31.54,
-   "text": "The shellcode is written out as raw bytes: it builds the path to the shell on the stack and calls execve, syscall eleven.",
+   "start": 24.0,
+   "end": 32.76,
+   "text": "The driver starts with the imports, then the shellcode opens: push a zero, then push slash slash s h, the first half of the shell path.",
    "lines": [
     {
      "step": 4,
-     "role": "out",
-     "from": 0,
-     "to": 17
+     "role": "vim"
     }
    ]
   },
   {
    "id": 7,
-   "start": 31.54,
-   "end": 35.98,
-   "text": "Every byte is chosen to avoid a null, because the environment cannot carry one.",
+   "start": 32.76,
+   "end": 46.37,
+   "text": "The rest of the shellcode pushes slash bin, sets ebx to the stack, builds the argument array, and calls execve, syscall eleven \u2014 every byte chosen to avoid a null, because the environment cannot carry one.",
    "lines": [
     {
      "step": 5,
-     "role": "out",
-     "from": 0,
-     "to": 17
+     "role": "vim"
     }
    ]
   },
   {
    "id": 8,
-   "start": 35.98,
-   "end": 44.26,
-   "text": "The driver builds the payload as two hundred NOPs, then the shellcode, then four more NOPs, then a candidate address in little-endian.",
+   "start": 46.37,
+   "end": 65.21,
+   "text": "Then the payload builder: two hundred NOPs, the shellcode, four more NOPs, and the candidate address in little-endian; main reads the shell commands from standard input and sweeps the address from ffff d zero zero zero up to ffff e zero zero zero, four bytes at a time.",
    "lines": [
     {
      "step": 6,
-     "role": "out",
-     "from": 9,
-     "to": 11
+     "role": "vim"
     }
    ]
   },
   {
    "id": 9,
-   "start": 44.26,
-   "end": 56.81,
-   "text": "It sweeps that address from ffff d zero zero zero up to ffff e zero zero zero, four bytes at a time, skipping any payload that contains a null byte, and skipping any run that times out.",
+   "start": 65.21,
+   "end": 76.49,
+   "text": "For each candidate it skips any payload containing a null byte, sets EGG through the environment, decoding the bytes as latin one so the high bytes survive, and runs the target with a five second timeout.",
    "lines": [
     {
      "step": 7,
-     "role": "out",
-     "from": 8,
-     "to": 17
+     "role": "vim"
     }
    ]
   },
   {
    "id": 10,
-   "start": 56.81,
-   "end": 64.3,
-   "text": "For each candidate it sets EGG through the environment, decoding the bytes as latin one so the high bytes survive Python's text encoding.",
+   "start": 76.49,
+   "end": 83.86,
+   "text": "A run that times out is skipped; when the output contains uid equals, it prints the output and the hit address, and stops.",
    "lines": [
     {
-     "step": 7,
-     "role": "out",
-     "from": 11,
-     "to": 12
+     "step": 8,
+     "role": "vim"
     }
    ]
   },
   {
    "id": 11,
-   "start": 64.3,
-   "end": 71.06,
-   "text": "It reads the shell commands from standard input, and when the output contains uid equals, it prints the output and stops.",
+   "start": 83.86,
+   "end": 87.46,
+   "text": "I run the driver, piping in id and the password read.",
    "lines": [
     {
-     "step": 6,
-     "role": "out",
-     "from": 12,
-     "to": 13
-    },
-    {
-     "step": 8,
-     "role": "out",
-     "from": 9,
-     "to": 13
+     "step": 16,
+     "role": "cmd"
     }
    ]
   },
   {
    "id": 12,
-   "start": 71.06,
-   "end": 73.75,
-   "text": "I print the finished driver with cat, to check it.",
-   "lines": [
-    {
-     "step": 16,
-     "role": "cmd"
-    },
-    {
-     "step": 16,
-     "role": "out",
-     "from": 0,
-     "to": 40
-    }
-   ]
-  },
-  {
-   "id": 13,
-   "start": 73.75,
-   "end": 77.18,
-   "text": "I run the driver, piping in id and the password read.",
-   "lines": [
-    {
-     "step": 17,
-     "role": "cmd"
-    }
-   ]
-  },
-  {
-   "id": 14,
-   "start": 77.18,
-   "end": 84.98,
+   "start": 87.46,
+   "end": 95.33,
    "text": "The program prints trying to execute EGG, the shell comes up as narnia two, and the password file prints the next password.",
    "lines": [
     {
-     "step": 17,
+     "step": 16,
      "role": "out",
      "from": 0,
      "to": 2
@@ -234,13 +180,13 @@
    ]
   },
   {
-   "id": 15,
-   "start": 84.98,
-   "end": 88.18,
+   "id": 13,
+   "start": 95.33,
+   "end": 98.69,
    "text": "The shell runs as narnia two, and the level is solved.",
    "lines": [
     {
-     "step": 17,
+     "step": 16,
      "role": "out",
      "from": 1,
      "to": 2
