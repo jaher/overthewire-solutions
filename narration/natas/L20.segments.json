@@ -56,7 +56,7 @@
    ]
   },
   {
-   "text": "The first chunk sets up the imports, the basic auth header, the page URL, and a cookie jar with an opener that keeps the session cookie across requests.",
+   "text": "The first chunk sets up the imports, the basic auth header, the page URL, and a cookie jar with an opener that keeps the session cookie across requests. It builds the cookie jar first, then the opener with a cookie processor around it.",
    "lines": [
     {
      "step": 2,
@@ -65,21 +65,8 @@
    ]
   },
   {
-   "text": "The second chunk posts the name with the embedded newline, then requests the page again with the same session, and prints whether we are an admin and the credentials block.",
+   "text": "The second chunk posts the name with the embedded newline, then requests the page again with the same session, and prints whether we are an admin and the credentials block. The name is x, newline, admin space one, and the print falls back to the first two hundred characters when there is no credentials block.",
    "lines": [
-    {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "text": "Here is the second chunk.",
-   "lines": [
-    {
-     "step": 4,
-     "role": "text"
-    },
     {
      "step": 3,
      "role": "vim"
@@ -89,6 +76,10 @@
   {
    "text": "I run it, and the reply says we are an admin, and it prints the password for natas twenty-one, and the level is solved. The lesson is that custom serialization must escape the characters it uses as separators, or a value can smuggle in new keys.",
    "lines": [
+    {
+     "step": 4,
+     "role": "text"
+    },
     {
      "step": 4,
      "role": "out",

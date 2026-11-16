@@ -3,12 +3,12 @@
  "level": 20,
  "audio": "narration/natas/L20.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 79.56,
+ "duration": 91.61,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 2.33,
+   "end": 2.04,
    "text": "Natas, level twenty.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 2.33,
-   "end": 21.7,
+   "start": 2.04,
+   "end": 21.24,
    "text": "This level uses a custom session save handler instead of the default PHP serialization. The write handler stores each session variable as a line containing the key, a space, and the value. The read handler rebuilds the session by splitting every line on the first space. The page lets us change a name, which is stored as a session variable.",
    "lines": [
     {
@@ -31,8 +31,8 @@
   },
   {
    "id": 2,
-   "start": 21.7,
-   "end": 26.14,
+   "start": 21.24,
+   "end": 25.73,
    "text": "I fetch the source and pull out the two handler functions, my read and my write.",
    "lines": [
     {
@@ -49,8 +49,8 @@
   },
   {
    "id": 3,
-   "start": 26.14,
-   "end": 44.5,
+   "start": 25.73,
+   "end": 44.81,
    "text": "The flaw is that the value is written verbatim, without escaping newlines. So if we submit a name that contains a newline followed by the text admin space one, the session file ends up with a second line reading admin one. On our next request, the read handler parses that line as the session variable admin with the value one.",
    "lines": [
     {
@@ -61,8 +61,8 @@
   },
   {
    "id": 4,
-   "start": 44.5,
-   "end": 47.09,
+   "start": 44.81,
+   "end": 47.38,
    "text": "So I open vim and write the injection:",
    "lines": [
     {
@@ -77,9 +77,9 @@
   },
   {
    "id": 5,
-   "start": 47.09,
-   "end": 55.37,
-   "text": "The first chunk sets up the imports, the basic auth header, the page URL, and a cookie jar with an opener that keeps the session cookie across requests.",
+   "start": 47.38,
+   "end": 60.17,
+   "text": "The first chunk sets up the imports, the basic auth header, the page URL, and a cookie jar with an opener that keeps the session cookie across requests. It builds the cookie jar first, then the opener with a cookie processor around it.",
    "lines": [
     {
      "step": 2,
@@ -89,26 +89,10 @@
   },
   {
    "id": 6,
-   "start": 55.37,
-   "end": 63.84,
-   "text": "The second chunk posts the name with the embedded newline, then requests the page again with the same session, and prints whether we are an admin and the credentials block.",
+   "start": 60.17,
+   "end": 77.04,
+   "text": "The second chunk posts the name with the embedded newline, then requests the page again with the same session, and prints whether we are an admin and the credentials block. The name is x, newline, admin space one, and the print falls back to the first two hundred characters when there is no credentials block.",
    "lines": [
-    {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "id": 7,
-   "start": 63.84,
-   "end": 65.33,
-   "text": "Here is the second chunk.",
-   "lines": [
-    {
-     "step": 4,
-     "role": "text"
-    },
     {
      "step": 3,
      "role": "vim"
@@ -116,11 +100,15 @@
    ]
   },
   {
-   "id": 8,
-   "start": 65.33,
-   "end": 79.56,
+   "id": 7,
+   "start": 77.04,
+   "end": 91.61,
    "text": "I run it, and the reply says we are an admin, and it prints the password for natas twenty-one, and the level is solved. The lesson is that custom serialization must escape the characters it uses as separators, or a value can smuggle in new keys.",
    "lines": [
+    {
+     "step": 4,
+     "role": "text"
+    },
     {
      "step": 4,
      "role": "out",
