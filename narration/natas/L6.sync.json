@@ -1,0 +1,91 @@
+{
+ "game": "natas",
+ "level": 6,
+ "audio": "narration/natas/L6.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 32.52,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.28,
+   "text": "Natas, level six.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.28,
+   "end": 7.15,
+   "text": "This level has a form that asks for a secret, and it offers to show its own source code.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 7.15,
+   "end": 15.24,
+   "text": "Reading the source, I see it compares our submitted secret against a variable loaded from a file called includes slash secret dot inc.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 15.24,
+   "end": 25.68,
+   "text": "The crucial detail is that this include file lives under the web root, and the server serves it as plain text if we request it directly, so I fetch it, and it contains the secret in plain sight.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 25.68,
+   "end": 32.52,
+   "text": "I submit that value through the form, and the page grants access and prints the password for natas seven, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

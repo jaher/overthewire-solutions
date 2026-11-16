@@ -1,0 +1,61 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level seven.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The page has links that pass a page parameter to index dot php, and a hint comment says the password for natas eight is in a specific file under etc.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I fetch the page and grep for the hint, and it names the file: slash etc slash natas webpass slash natas eight.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "I pass the full path of the password file as the page parameter, and the application includes whatever file it names, with no validation, and no directory traversal sequences are needed.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It reads the file and prints its contents into the page, giving us the password for natas eight, and the level is solved.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
