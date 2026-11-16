@@ -1,0 +1,78 @@
+{
+ "game": "bandit",
+ "level": 7,
+ "audio": "narration/bandit/L7.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 30.77,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.8,
+   "text": "Bandit, level seven.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.8,
+   "end": 7.37,
+   "text": "The password for bandit eight is in data dot txt, on the line with the word millionth.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 7.37,
+   "end": 15.65,
+   "text": "I log in as bandit7 with ssh bandit7@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 15.65,
+   "end": 23.93,
+   "text": "The file holds many lines, each pairing a word with a value separated by a tab, so I run grep millionth on data dot txt.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 23.93,
+   "end": 30.77,
+   "text": "Grep prints the single matching line, and the value after the tab is the password for bandit eight, and the level is solved.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
