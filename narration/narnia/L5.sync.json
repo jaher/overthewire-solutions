@@ -1,0 +1,407 @@
+{
+ "game": "narnia",
+ "level": 5,
+ "audio": "narration/narnia/L5.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 124.42,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.09,
+   "text": "Narnia, level five.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.09,
+   "end": 10.61,
+   "text": "The program passes its first argument straight into snprintf as the format string, and the task is to change i from one to five hundred.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 10.61,
+   "end": 13.32,
+   "text": "I log in as narnia five and read the source.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 13.32,
+   "end": 20.23,
+   "text": "The source declares i as one and a sixty four byte buffer, then calls snprintf with argv one as the format.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 22,
+     "to": 23
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 25,
+     "to": 25
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 20.23,
+   "end": 24.55,
+   "text": "If i reaches five hundred the program prints GOOD and runs a shell.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 27,
+     "to": 32
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 24.55,
+   "end": 28.15,
+   "text": "Otherwise it falls through and prints the buffer and the value of i.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 35,
+     "to": 37
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 28.15,
+   "end": 31.39,
+   "text": "Gdb shows i sixty four bytes above the buffer.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 10,
+     "to": 11
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 31.39,
+   "end": 36.26,
+   "text": "The stack dump shows the buffer address sitting where the format string can reach it as a vararg.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 13,
+     "to": 13
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 36.26,
+   "end": 38.02,
+   "text": "Then I write the driver in vim.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vimcmd"
+    },
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 38.02,
+   "end": 40.06,
+   "text": "The header comment records the plan.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 40.06,
+   "end": 45.65,
+   "text": "The first argument is the format string, and i sits exactly sixty four bytes past the buffer.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 45.65,
+   "end": 54.0,
+   "text": "Fifty six filler bytes plus the four byte address put that address at vararg fifteen, where a percent n writes the printed count into i.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 54.0,
+   "end": 55.87,
+   "text": "The next chunk notes the probe.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 55.87,
+   "end": 60.48,
+   "text": "The address of i moves with the stack, so the driver first learns it with a probe argument.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 60.48,
+   "end": 63.6,
+   "text": "The count must reach exactly five hundred before the write.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "start": 63.6,
+   "end": 68.83,
+   "text": "Fifty six plus four is sixty, so a width of four hundred forty pads the count to five hundred.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "start": 68.83,
+   "end": 71.06,
+   "text": "The probe opens a pipe and forks.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 17,
+   "start": 71.06,
+   "end": 75.46,
+   "text": "The child wires the pipe to its output and runs the target with an empty environment.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "start": 75.46,
+   "end": 78.38,
+   "text": "The probe argument is sixty eight A characters.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 19,
+   "start": 78.38,
+   "end": 83.9,
+   "text": "The parent reads the pipe, waits for the child, and searches the output for the printed address of i.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 20,
+   "start": 83.9,
+   "end": 86.5,
+   "text": "If the address is missing the driver stops.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 21,
+   "start": 86.5,
+   "end": 89.33,
+   "text": "Otherwise it prints the address the probe found.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 22,
+   "start": 89.33,
+   "end": 97.01,
+   "text": "The real format string is fifty six A characters, then the address, then a width of four hundred forty and a write at vararg fifteen.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 23,
+   "start": 97.01,
+   "end": 98.74,
+   "text": "It is seventy bytes long.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 24,
+   "start": 98.74,
+   "end": 105.46,
+   "text": "The driver prints the format string and its length, then runs the target attached to the terminal, so the shell comes up in the open.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 25,
+   "start": 105.46,
+   "end": 107.81,
+   "text": "The driver is saved, and I quit vim.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 26,
+   "start": 107.81,
+   "end": 108.94,
+   "text": "I run the driver.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 27,
+   "start": 108.94,
+   "end": 113.78,
+   "text": "The probe prints the address of i, then the format string and its length of seventy.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "id": 28,
+   "start": 113.78,
+   "end": 118.94,
+   "text": "The program prints GOOD, the shell runs as narnia six, and the password prints.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "out",
+     "from": 3,
+     "to": 5
+    }
+   ]
+  },
+  {
+   "id": 29,
+   "start": 118.94,
+   "end": 124.42,
+   "text": "After the shell exits the program falls through to its hint, printing the buffer and i at five hundred.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "out",
+     "from": 6,
+     "to": 8
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
