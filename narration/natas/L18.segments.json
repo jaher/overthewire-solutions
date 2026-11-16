@@ -1,0 +1,105 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level eighteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The page asks us to log in as admin, but the source shows that the direct admin login is disabled. What it does instead is create a session identifier using a random number between one and six hundred forty, and it stores an admin flag in the session. The credentials are printed only when that flag equals one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I fetch the source and pull out the maximum session id, six hundred forty.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "The flaw is that the session identifier space is tiny and guessable: exactly one of those identifiers belongs to a pre-existing admin session, and the server loads that session when it sees the cookie.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "So I open vim and write the brute force:",
+   "lines": [
+    {
+     "step": 1,
+     "role": "vimcmd"
+    },
+    {
+     "step": 1,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The first chunk sets up the imports, the page URL, the basic auth header, and the loop over session ids from one to six hundred forty, starting the request with the session cookie.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The second chunk fetches each session, and when the reply says you are an admin, it prints the session id and the credentials block, then stops.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Here is the second chunk.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "text"
+    },
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I run it, and it finds session one hundred nineteen, an admin session, and prints the password for natas nineteen, and the level is solved.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
