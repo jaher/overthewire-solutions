@@ -1,0 +1,177 @@
+{
+ "segments": [
+  {
+   "text": "Behemoth, level two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "We log in as behemoth two and look at the binary.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "We run strings and grep for touch, cat and sleep: the program builds a touch command and a cat command, and it sleeps.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "We disassemble main with objdump: it calls getpid and formats a touch command with the process id, then checks the file with lstat and removes it.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 12,
+     "to": 12
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 22,
+     "to": 22
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 28,
+     "to": 28
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 35,
+     "to": 35
+    }
+   ]
+  },
+  {
+   "text": "Then it raises its effective uid to behemoth three with setreuid and runs the touch command.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 43,
+     "to": 43
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 48,
+     "to": 48
+    }
+   ]
+  },
+  {
+   "text": "Then it sleeps for two thousand seconds, builds a cat command for the same file, raises its uid again, and runs that.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 51,
+     "to": 52
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 58,
+     "to": 58
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 67,
+     "to": 67
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 72,
+     "to": 72
+    }
+   ]
+  },
+  {
+   "text": "That is the opening: if we start the program in a directory we own, we can wait for the numeric file to appear, delete it, and replace it with a symbolic link to the behemoth three password file.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The exploit starts the program in its own work directory, waits for the file named forty-five to appear, and replaces it with the link.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 3
+    }
+   ]
+  },
+  {
+   "text": "The wait is the hard part: two thousand seconds is about thirty-three minutes, and the lab drops idle sessions, so the exploit prints a heartbeat every thirty seconds to keep the session alive.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 4,
+     "to": 70
+    }
+   ]
+  },
+  {
+   "text": "At the end, the password appears.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 71,
+     "to": 72
+    }
+   ]
+  },
+  {
+   "text": "The lesson is that a program that later operates on a file whose name it created earlier, in a directory the attacker controls, gives the attacker a window to swap that file, and the level is solved.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 71,
+     "to": 71
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
