@@ -68,19 +68,6 @@
    "text": "The second chunk fetches each session, and when the reply says you are an admin, it prints the session id and the credentials block, then stops.",
    "lines": [
     {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "text": "Here is the second chunk.",
-   "lines": [
-    {
-     "step": 4,
-     "role": "text"
-    },
-    {
      "step": 3,
      "role": "vim"
     }
@@ -89,6 +76,10 @@
   {
    "text": "I run it, and it finds session one hundred nineteen, an admin session, and prints the password for natas nineteen, and the level is solved.",
    "lines": [
+    {
+     "step": 4,
+     "role": "text"
+    },
     {
      "step": 4,
      "role": "out",
