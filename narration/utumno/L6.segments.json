@@ -1,0 +1,335 @@
+{
+ "segments": [
+  {
+   "lines": [
+    {
+     "role": "goal",
+     "step": -1
+    }
+   ],
+   "text": "Utumno, level six."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 0
+    }
+   ],
+   "text": "I log in as utumno six."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 1
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 1,
+     "to": 0
+    },
+    {
+     "role": "cmd",
+     "step": 2
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 2,
+     "to": 1
+    }
+   ],
+   "text": "Running it with no arguments prints Missing args. With one, deadbeef, hello, it prints the table entry and the description."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 3
+    },
+    {
+     "from": 11,
+     "role": "out",
+     "step": 3,
+     "to": 14
+    },
+    {
+     "from": 23,
+     "role": "out",
+     "step": 3,
+     "to": 31
+    },
+    {
+     "from": 32,
+     "role": "out",
+     "step": 3,
+     "to": 40
+    },
+    {
+     "from": 41,
+     "role": "out",
+     "step": 3,
+     "to": 42
+    }
+   ],
+   "text": "The program takes three arguments: a decimal position, a hexadecimal value, and a description. It allocates thirty two bytes, parses the value as hexadecimal and the position as decimal, and checks the position."
+  },
+  {
+   "lines": [
+    {
+     "from": 48,
+     "role": "out",
+     "step": 3,
+     "to": 50
+    },
+    {
+     "from": 51,
+     "role": "out",
+     "step": 3,
+     "to": 57
+    },
+    {
+     "from": 59,
+     "role": "out",
+     "step": 3,
+     "to": 66
+    }
+   ],
+   "text": "If the check passes, it writes the value into a table at that index, copies the description into the allocated buffer with strcpy, and prints the entry and the description."
+  },
+  {
+   "lines": [
+    {
+     "from": 41,
+     "role": "out",
+     "step": 3,
+     "to": 42
+    }
+   ],
+   "text": "The check is a signed comparison: if the position as a signed integer is greater than ten, it exits. But the index is then used as a full thirty two bit value."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 4
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 4,
+     "to": 0
+    },
+    {
+     "from": 41,
+     "role": "out",
+     "step": 3,
+     "to": 42
+    }
+   ],
+   "text": "Passing four billion two hundred ninety four million nine hundred sixty seven thousand two hundred ninety five is minus one as a signed integer, so it passes the check, and the write goes to table minus one. Running it that way segfaults."
+  },
+  {
+   "lines": [
+    {
+     "from": 14,
+     "role": "out",
+     "step": 3,
+     "to": 14
+    },
+    {
+     "from": 48,
+     "role": "out",
+     "step": 3,
+     "to": 57
+    }
+   ],
+   "text": "The table write lands at ebp plus the index times four minus zero x three zero, so index minus one lands at ebp minus zero x three four. That slot is the saved copy of the malloc pointer, which is exactly the destination that strcpy uses. So the value we supply becomes the address that the description is copied to."
+  },
+  {
+   "lines": [
+    {
+     "from": 48,
+     "role": "out",
+     "step": 3,
+     "to": 57
+    }
+   ],
+   "text": "That is an arbitrary write of a string to an address we choose, with a value we also choose."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 5
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 5,
+     "to": 0
+    },
+    {
+     "role": "cmd",
+     "step": 6
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 6,
+     "to": 0
+    }
+   ],
+   "text": "The stack is executable and address randomisation is off."
+  },
+  {
+   "lines": [
+    {
+     "role": "vimcmd",
+     "step": 7
+    },
+    {
+     "role": "vim",
+     "step": 7
+    }
+   ],
+   "text": "I open vim and write the shellcode:"
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 8
+    }
+   ],
+   "text": "The header, the start label, and the marker comment, with eax zeroed."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 9
+    }
+   ],
+   "text": "The marker write: push a zero, push PWN exclamation, then write four bytes to standard output."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 10
+    }
+   ],
+   "text": "Then the user-id calls: geteuid, then setreuid with the id in both slots."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 11
+    }
+   ],
+   "text": "Then setuid, and the path begins: the password file path as dwords, null first."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 12
+    }
+   ],
+   "text": "Then the rest of the path pushes, and the open call."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 13
+    }
+   ],
+   "text": "Then read the password file into a stack buffer."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 14
+    }
+   ],
+   "text": "Then write it to standard output and exit."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 15
+    },
+    {
+     "role": "cmd",
+     "step": 16
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 16,
+     "to": 5
+    },
+    {
+     "role": "cmd",
+     "step": 17
+    },
+    {
+     "role": "cmd",
+     "step": 18
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 18,
+     "to": 4
+    },
+    {
+     "role": "cmd",
+     "step": 19
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 19,
+     "to": 0
+    }
+   ],
+   "text": "We assemble with nasm, inspect the encoding with objdump, extract with objcopy, check the bytes with xxd, and wc counts one hundred thirty one bytes."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 23
+    }
+   ],
+   "text": "The exploit points the destination at the saved return address, and makes the description start with a pointer to the code that follows it. So strcpy writes the pointer over the return slot and the shellcode immediately after, and the leave and ret jump straight into the code, with no separate stack pivot."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 23
+    },
+    {
+     "from": 1,
+     "role": "out",
+     "step": 23,
+     "to": 1
+    },
+    {
+     "role": "pw",
+     "step": -1
+    }
+   ],
+   "text": "The password is V seven U one Z v Q C b P."
+  }
+ ]
+}
