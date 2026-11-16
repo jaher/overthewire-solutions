@@ -3,12 +3,12 @@
  "level": 13,
  "audio": "narration/natas/L13.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 51.67,
+ "duration": 50.78,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 2.16,
+   "end": 2.04,
    "text": "Natas, level thirteen.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 2.16,
-   "end": 10.39,
+   "start": 2.04,
+   "end": 9.84,
    "text": "Same upload task, but this time the handler validates the upload using a function that checks the file's magic bytes to decide whether it is an image.",
    "lines": [
     {
@@ -31,8 +31,8 @@
   },
   {
    "id": 2,
-   "start": 10.39,
-   "end": 15.0,
+   "start": 9.84,
+   "end": 14.69,
    "text": "I fetch the source and pull out the check: exif image type on the uploaded file.",
    "lines": [
     {
@@ -49,40 +49,60 @@
   },
   {
    "id": 3,
-   "start": 15.0,
-   "end": 25.08,
-   "text": "That check only looks at the beginning of the file, not the whole thing, and it does not look at the extension, so I open vim and write a polyglot: the six byte GIF header first.",
+   "start": 14.69,
+   "end": 20.02,
+   "text": "That check only looks at the beginning of the file, not the whole thing, and it does not look at the extension.",
    "lines": [
     {
-     "step": 1,
-     "role": "text"
-    },
-    {
-     "step": 2,
-     "role": "text"
-    },
-    {
-     "step": 3,
-     "role": "text"
+     "step": -1,
+     "role": "goal"
     }
    ]
   },
   {
    "id": 4,
-   "start": 25.08,
-   "end": 34.63,
+   "start": 20.02,
+   "end": 22.7,
+   "text": "So I open vim and write a polyglot:",
+   "lines": [
+    {
+     "step": 1,
+     "role": "vimcmd"
+    },
+    {
+     "step": 1,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 22.7,
+   "end": 25.06,
+   "text": "The six byte GIF header first.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 25.06,
+   "end": 34.3,
    "text": "Then I append the PHP code that reads the natas fourteen password file, and I check the file: the first line is the GIF header, the second is the PHP code.",
    "lines": [
     {
-     "step": 5,
+     "step": 3,
      "role": "cmd"
     },
     {
-     "step": 6,
+     "step": 4,
      "role": "cmd"
     },
     {
-     "step": 6,
+     "step": 4,
      "role": "out",
      "from": 0,
      "to": 1
@@ -90,17 +110,17 @@
    ]
   },
   {
-   "id": 5,
-   "start": 34.63,
-   "end": 42.02,
+   "id": 7,
+   "start": 34.3,
+   "end": 41.18,
    "text": "I upload it with the filename field set to shell dot php, and the server stores it with a random prefix and returns the path.",
    "lines": [
     {
-     "step": 7,
+     "step": 5,
      "role": "cmd"
     },
     {
-     "step": 7,
+     "step": 5,
      "role": "out",
      "from": 0,
      "to": 0
@@ -108,17 +128,17 @@
    ]
   },
   {
-   "id": 6,
-   "start": 42.02,
-   "end": 51.67,
+   "id": 8,
+   "start": 41.18,
+   "end": 50.78,
    "text": "I request that path, the file passes the image check, the server runs the PHP, and it prints the password for natas fourteen, and the level is solved.",
    "lines": [
     {
-     "step": 8,
+     "step": 6,
      "role": "cmd"
     },
     {
-     "step": 8,
+     "step": 6,
      "role": "out",
      "from": 0,
      "to": 0

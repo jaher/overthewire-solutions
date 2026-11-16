@@ -34,19 +34,33 @@
    ]
   },
   {
-   "text": "That check only looks at the beginning of the file, not the whole thing, and it does not look at the extension, so I open vim and write a polyglot: the six byte GIF header first.",
+   "text": "That check only looks at the beginning of the file, not the whole thing, and it does not look at the extension.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "So I open vim and write a polyglot:",
    "lines": [
     {
      "step": 1,
-     "role": "text"
+     "role": "vimcmd"
     },
+    {
+     "step": 1,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The six byte GIF header first.",
+   "lines": [
     {
      "step": 2,
-     "role": "text"
-    },
-    {
-     "step": 3,
-     "role": "text"
+     "role": "vim"
     }
    ]
   },
@@ -54,15 +68,15 @@
    "text": "Then I append the PHP code that reads the natas fourteen password file, and I check the file: the first line is the GIF header, the second is the PHP code.",
    "lines": [
     {
-     "step": 5,
+     "step": 3,
      "role": "cmd"
     },
     {
-     "step": 6,
+     "step": 4,
      "role": "cmd"
     },
     {
-     "step": 6,
+     "step": 4,
      "role": "out",
      "from": 0,
      "to": 1
@@ -73,11 +87,11 @@
    "text": "I upload it with the filename field set to shell dot php, and the server stores it with a random prefix and returns the path.",
    "lines": [
     {
-     "step": 7,
+     "step": 5,
      "role": "cmd"
     },
     {
-     "step": 7,
+     "step": 5,
      "role": "out",
      "from": 0,
      "to": 0
@@ -88,11 +102,11 @@
    "text": "I request that path, the file passes the image check, the server runs the PHP, and it prints the password for natas fourteen, and the level is solved.",
    "lines": [
     {
-     "step": 8,
+     "step": 6,
      "role": "cmd"
     },
     {
-     "step": 8,
+     "step": 6,
      "role": "out",
      "from": 0,
      "to": 0
