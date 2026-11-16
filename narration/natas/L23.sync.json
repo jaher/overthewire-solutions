@@ -1,0 +1,113 @@
+{
+ "game": "natas",
+ "level": 23,
+ "audio": "narration/natas/L23.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 57.72,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.11,
+   "text": "Natas, level twenty-three.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.11,
+   "end": 15.84,
+   "text": "The page takes a password from the query string and prints the credentials only if two conditions hold at once. First, the string must contain the word iloveyou, checked with strstr. Second, that same string must compare greater than ten.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 15.84,
+   "end": 18.05,
+   "text": "I fetch the source and pull out the check.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 18.05,
+   "end": 37.97,
+   "text": "PHP compares a string with a number loosely: it converts the string to a number by reading the leading numeric part and ignoring everything after it. So we put the digits first. The string one zero one one one followed by iloveyou contains the word, and it converts to ten thousand one hundred eleven, which is greater than ten.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 37.97,
+   "end": 43.08,
+   "text": "I try the three candidates in a loop. The word alone converts to zero and fails.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 43.08,
+   "end": 46.85,
+   "text": "The digits first succeed and print the password for natas twenty-four.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 3,
+     "to": 5
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 46.85,
+   "end": 57.72,
+   "text": "The word first has no leading digits, converts to zero, and fails. The lesson is type juggling: craft a value so that the string check and the numeric check each see what they need.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 6,
+     "to": 8
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
