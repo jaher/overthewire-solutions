@@ -1,0 +1,64 @@
+{
+ "segments": [
+  {
+   "text": "Krypton, level zero.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Krypton is the cryptography wargame, and it starts gently: the level page itself hands us the first credential, a string it says encodes the password in Base64.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Base64 is not encryption, it is just an encoding that turns bytes into a safe alphabet, so decoding the string gives back the original bytes.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I echo the string and pipe it through base64 minus d,",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "and out comes KRYPTON IS GREAT, the password for krypton one.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "There is no cryptanalysis yet; this level just shows that encoded is not the same as secret.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

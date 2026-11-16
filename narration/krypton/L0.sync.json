@@ -1,0 +1,87 @@
+{
+ "game": "krypton",
+ "level": 0,
+ "audio": "narration/krypton/L0.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 34.85,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.09,
+   "text": "Krypton, level zero.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.09,
+   "end": 12.7,
+   "text": "Krypton is the cryptography wargame, and it starts gently: the level page itself hands us the first credential, a string it says encodes the password in Base64.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 12.7,
+   "end": 21.26,
+   "text": "Base64 is not encryption, it is just an encoding that turns bytes into a safe alphabet, so decoding the string gives back the original bytes.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 21.26,
+   "end": 24.94,
+   "text": "I echo the string and pipe it through base64 minus d,",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 24.94,
+   "end": 29.45,
+   "text": "and out comes KRYPTON IS GREAT, the password for krypton one.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 29.45,
+   "end": 34.85,
+   "text": "There is no cryptanalysis yet; this level just shows that encoded is not the same as secret.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
