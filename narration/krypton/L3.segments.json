@@ -1,0 +1,119 @@
+{
+ "segments": [
+  {
+   "text": "Krypton, level three.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "This is a simple substitution cipher, and unlike the last level we cannot query the encryption at all.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "But we have three intercepted English messages, all encrypted with the same key, plus the target.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as krypton three,",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "and collect all four files into one working file.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The README notes the weakness: one simple key reused across messages, and this time the cipher mechanism is not available to us.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 5,
+     "to": 9
+    }
+   ]
+  },
+  {
+   "text": "It also states the two facts that make this breakable: the plaintexts are English, and they all share one key.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 18,
+     "to": 19
+    }
+   ]
+  },
+  {
+   "text": "I run the solver, which counts the letter frequencies across the whole corpus, then hill-climbs a substitution mapping, swapping two letters at a time and keeping the swap when the decrypted text looks more like English.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The frequencies come out S thirteen percent, Q nine point six, J eight point five, U seven point three, B seven point zero: the shape of English, with E, T, A, O and I hiding under other names.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "The target decrypts to WELL DONE THE LEVEL FOUR PASSWORD IS BRUTE, and the password is BRUTE.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "The same key also decrypts the intercepted messages, which is the cross-check that the key is right.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

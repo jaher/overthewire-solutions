@@ -1,0 +1,157 @@
+{
+ "game": "krypton",
+ "level": 3,
+ "audio": "narration/krypton/L3.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 71.14,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.97,
+   "text": "Krypton, level three.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.97,
+   "end": 7.97,
+   "text": "This is a simple substitution cipher, and unlike the last level we cannot query the encryption at all.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 7.97,
+   "end": 13.3,
+   "text": "But we have three intercepted English messages, all encrypted with the same key, plus the target.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 13.3,
+   "end": 15.38,
+   "text": "I log in as krypton three,",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 15.38,
+   "end": 18.5,
+   "text": "and collect all four files into one working file.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 18.5,
+   "end": 26.14,
+   "text": "The README notes the weakness: one simple key reused across messages, and this time the cipher mechanism is not available to us.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 5,
+     "to": 9
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 26.14,
+   "end": 32.33,
+   "text": "It also states the two facts that make this breakable: the plaintexts are English, and they all share one key.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 18,
+     "to": 19
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 32.33,
+   "end": 43.9,
+   "text": "I run the solver, which counts the letter frequencies across the whole corpus, then hill-climbs a substitution mapping, swapping two letters at a time and keeping the swap when the decrypted text looks more like English.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 43.9,
+   "end": 59.14,
+   "text": "The frequencies come out S thirteen percent, Q nine point six, J eight point five, U seven point three, B seven point zero: the shape of English, with E, T, A, O and I hiding under other names.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 59.14,
+   "end": 65.86,
+   "text": "The target decrypts to WELL DONE THE LEVEL FOUR PASSWORD IS BRUTE, and the password is BRUTE.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 65.86,
+   "end": 71.14,
+   "text": "The same key also decrypts the intercepted messages, which is the cross-check that the key is right.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
