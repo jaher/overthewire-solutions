@@ -3,12 +3,12 @@
  "level": 7,
  "audio": "narration/utumno/L7.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 170.35,
+ "duration": 214.97,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 3.12,
+   "end": 3.29,
    "text": "Utumno, level seven, the final level.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 3.12,
-   "end": 5.21,
+   "start": 3.29,
+   "end": 5.38,
    "text": "I log in as utumno seven.",
    "lines": [
     {
@@ -31,8 +31,8 @@
   },
   {
    "id": 2,
-   "start": 5.21,
-   "end": 11.45,
+   "start": 5.38,
+   "end": 11.5,
    "text": "Running it with no arguments prints nothing, and with four As it prints lol ulrich and fuck hector.",
    "lines": [
     {
@@ -53,8 +53,8 @@
   },
   {
    "id": 3,
-   "start": 11.45,
-   "end": 30.22,
+   "start": 11.5,
+   "end": 30.5,
    "text": "The vulnerable function declares a buffer of zero x one hundred twenty bytes. It stores the address of the buffer plus zero x eighty in a global, calls setjmp on that address, copies the argument into the buffer with strcpy, and then calls the jump helper with twenty three, which longjmps back to the saved context.",
    "lines": [
     {
@@ -71,8 +71,8 @@
   },
   {
    "id": 4,
-   "start": 30.22,
-   "end": 49.7,
+   "start": 30.5,
+   "end": 50.62,
    "text": "The jump buffer lives inside the buffer, so the copy overwrites the saved context. In this glibc the layout is ebx, esi, edi, ebp, esp and eip at offsets zero, four, eight, twelve, sixteen and twenty.",
    "lines": [
     {
@@ -85,8 +85,8 @@
   },
   {
    "id": 5,
-   "start": 49.7,
-   "end": 86.02,
+   "start": 50.62,
+   "end": 87.74,
    "text": "The trick is the payload length. The jump buffer starts at buffer plus one hundred twenty eight, so the saved frame pointer sits at buffer plus one hundred forty, and the saved stack pointer at buffer plus one hundred forty four. If we send one hundred forty one bytes, strcpy writes its terminating null at buffer one hundred forty one, which is the second byte of the saved frame pointer, and longjmp restores a corrupted frame. With one hundred forty four bytes the terminator lands at buffer one hundred forty four, which is only the low byte of the saved stack pointer, and the leave that follows resets the stack pointer from the restored frame pointer anyway.",
    "lines": [
     {
@@ -99,8 +99,8 @@
   },
   {
    "id": 6,
-   "start": 86.02,
-   "end": 100.46,
+   "start": 87.74,
+   "end": 102.14,
    "text": "The saved ebp at buffer one hundred forty is ours, so longjmp restores it to the buffer address, and then the function's leave and ret read buffer zero as the new frame pointer and buffer four as the return address. Both are ours.",
    "lines": [
     {
@@ -113,8 +113,8 @@
   },
   {
    "id": 7,
-   "start": 100.46,
-   "end": 104.18,
+   "start": 102.14,
+   "end": 105.58,
    "text": "The stack is executable and address randomisation is off.",
    "lines": [
     {
@@ -141,8 +141,8 @@
   },
   {
    "id": 8,
-   "start": 104.18,
-   "end": 106.39,
+   "start": 105.58,
+   "end": 107.81,
    "text": "I open vim and write the shellcode:",
    "lines": [
     {
@@ -157,8 +157,8 @@
   },
   {
    "id": 9,
-   "start": 106.39,
-   "end": 110.88,
+   "start": 107.81,
+   "end": 112.3,
    "text": "The header, the start label, and the marker comment, with eax zeroed.",
    "lines": [
     {
@@ -169,8 +169,8 @@
   },
   {
    "id": 10,
-   "start": 110.88,
-   "end": 118.37,
+   "start": 112.3,
+   "end": 119.54,
    "text": "The marker write: push a zero, push PWN exclamation, then write four bytes to standard output.",
    "lines": [
     {
@@ -181,8 +181,8 @@
   },
   {
    "id": 11,
-   "start": 118.37,
-   "end": 125.02,
+   "start": 119.54,
+   "end": 124.99,
    "text": "Then the user-id calls: geteuid, then setreuid with the id in both slots.",
    "lines": [
     {
@@ -193,8 +193,8 @@
   },
   {
    "id": 12,
-   "start": 125.02,
-   "end": 130.73,
+   "start": 124.99,
+   "end": 131.59,
    "text": "Then setuid, and the path begins: the password file path as dwords, null first.",
    "lines": [
     {
@@ -205,9 +205,9 @@
   },
   {
    "id": 13,
-   "start": 130.73,
-   "end": 133.68,
-   "text": "Then the rest of the path pushes, and the open call.",
+   "start": 131.59,
+   "end": 148.56,
+   "text": "Then the rest of the path pushes, and the open call. The remaining words of the password path are pushed in reverse so the full path sits on the stack, and the stack pointer becomes the path argument. The flags are cleared for a read-only open, five is loaded as the syscall number, and the interrupt makes the call.",
    "lines": [
     {
      "role": "vim",
@@ -217,9 +217,9 @@
   },
   {
    "id": 14,
-   "start": 133.68,
-   "end": 136.37,
-   "text": "Then read the password file into a stack buffer.",
+   "start": 148.56,
+   "end": 167.64,
+   "text": "Then read the password file into a stack buffer. The file descriptor from the open call is saved, and sixty-four bytes of stack are reserved for the buffer. The buffer address and the length are set up, three is loaded as the syscall number for the read, and the byte count that comes back is kept for the write that follows, with the output descriptor set to one.",
    "lines": [
     {
      "role": "vim",
@@ -229,9 +229,9 @@
   },
   {
    "id": 15,
-   "start": 136.37,
-   "end": 138.94,
-   "text": "Then write it to standard output and exit.",
+   "start": 167.64,
+   "end": 182.52,
+   "text": "Then write it to standard output and exit. The buffer address goes back into place, four is loaded as the syscall number, and the interrupt writes the bytes that were read. Then one is loaded as the syscall number, the exit code is cleared to zero, and the final interrupt exits.",
    "lines": [
     {
      "role": "vim",
@@ -241,8 +241,8 @@
   },
   {
    "id": 16,
-   "start": 138.94,
-   "end": 149.18,
+   "start": 182.52,
+   "end": 193.32,
    "text": "We assemble with nasm, inspect the encoding with objdump, extract with objcopy, check the bytes with xxd, and wc counts one hundred thirty one bytes.",
    "lines": [
     {
@@ -287,8 +287,8 @@
   },
   {
    "id": 17,
-   "start": 149.18,
-   "end": 161.83,
+   "start": 193.32,
+   "end": 205.97,
    "text": "The exploit fills one hundred forty four bytes: the fake frame pointer at zero, the return address at four pointing eight bytes into the buffer, the shellcode at eight, and the frame pointer the jump restores at one hundred forty.",
    "lines": [
     {
@@ -299,8 +299,8 @@
   },
   {
    "id": 18,
-   "start": 161.83,
-   "end": 170.35,
+   "start": 205.97,
+   "end": 214.97,
    "text": "It runs the target with that payload and the shellcode prints the password, two b v I T u q z N four. Utumno is complete.",
    "lines": [
     {
