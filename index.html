@@ -429,6 +429,13 @@ async function typeCmd(user, cmd, my, nk){
 // into a program) is rendered as the text itself, one line at a time, under a
 // short label — not as a shell command.
 async function typeText(label, text, my, nk){
+  // Gate BEFORE creating the label div: typeInto gates first and only
+  // then creates its line, but this label was created up front, so a
+  // text step reached before its spoken time rendered early (a text step
+  // right after a vim run, whose label appeared while the run was still
+  // typing). Waiting here makes the label appear at its spoken time.
+  if (nk) await narrGate(nk.step, nk.role, nk.idx, my);
+  if (my !== runId) return;
   const ld = line('<span class="note">── ' + esc(label) + ' ──</span>', 'note');
   if (nk) tagNarr(ld, nk.step, nk.role, nk.idx);
   return typeInto('', text, my, nk);
