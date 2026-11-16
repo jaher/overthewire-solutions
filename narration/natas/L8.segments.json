@@ -34,19 +34,33 @@
    ]
   },
   {
-   "text": "The encoder does three things: base64 encode, reverse the string, and hex encode, so I open vim and write a one-liner that undoes them in reverse order: hex decode first, then reverse the characters, then base64 decode.",
+   "text": "The encoder does three things: base64 encode, reverse the string, and hex encode.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the one-liner:",
    "lines": [
     {
      "step": 1,
-     "role": "text"
+     "role": "vimcmd"
     },
+    {
+     "step": 1,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Hex decode first, then reverse the characters, then base64 decode.",
+   "lines": [
     {
      "step": 2,
-     "role": "text"
-    },
-    {
-     "step": 3,
-     "role": "text"
+     "role": "vim"
     }
    ]
   },
@@ -54,11 +68,11 @@
    "text": "I run it with python three, and it prints the original secret.",
    "lines": [
     {
-     "step": 5,
+     "step": 3,
      "role": "cmd"
     },
     {
-     "step": 5,
+     "step": 3,
      "role": "out",
      "from": 0,
      "to": 0
@@ -69,11 +83,11 @@
    "text": "I submit that secret through the form, the comparison passes, and the page prints the password for natas nine, and the level is solved. This level teaches the difference between obfuscation and hashing: reversible transformations protect nothing.",
    "lines": [
     {
-     "step": 6,
+     "step": 4,
      "role": "cmd"
     },
     {
-     "step": 6,
+     "step": 4,
      "role": "out",
      "from": 0,
      "to": 0
