@@ -1,0 +1,621 @@
+{
+ "segments": [
+  {
+   "text": "Narnia, level eight.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "A copy loop with no length check runs past a twenty byte buffer, straight over the saved frame pointer and the return address.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as narnia eight and read the source.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The function copies its argument byte by byte into a twenty byte buffer, with no length check, then prints the buffer.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 29,
+     "to": 31
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 33,
+     "to": 33
+    }
+   ]
+  },
+  {
+   "text": "Main passes the first argument straight into that function.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 36,
+     "to": 39
+    }
+   ]
+  },
+  {
+   "text": "Gdb shows the buffer twenty four bytes below the frame pointer, and the source pointer four bytes below it.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 10,
+     "to": 12
+    }
+   ]
+  },
+  {
+   "text": "Then I write the shellcode in vim.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vimcmd"
+    },
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The shellcode starts by writing a four byte marker, so the address sweep can tell a hit from a crash.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It pushes the marker bytes and points the output register at them.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "One goes into the output register for standard output, four into the length register, and four is the write call number.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The interrupt runs the call, printing the marker.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Next the code reads its effective id with syscall two hundred one.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It calls setreuid with that id twice, syscall seventy, so the effective id survives the exec.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then it reads the id again and calls setuid, syscall twenty-three, which sets the real, effective and saved ids.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "A plain setreuid would leave the saved id behind, so this step keeps the privilege over the exec.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The last part builds the shell path.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It pushes a null, then the two halves of slash bin slash sh.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It points the path register at the string and starts the argument array.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The final lines point the argument register at the array, clear the environment register, and load eleven, the execve call number.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The interrupt runs execve on slash bin slash sh.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The shellcode is saved, and I quit vim.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I assemble it with nasm, format elf thirty-two, and check the disassembly.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "cmd"
+    },
+    {
+     "step": 12,
+     "role": "cmd"
+    },
+    {
+     "step": 12,
+     "role": "out",
+     "from": 5,
+     "to": 6
+    }
+   ]
+  },
+  {
+   "text": "I extract the text section with objcopy and print the bytes with xxd.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "cmd"
+    },
+    {
+     "step": 14,
+     "role": "cmd"
+    },
+    {
+     "step": 14,
+     "role": "out",
+     "from": 3,
+     "to": 3
+    }
+   ]
+  },
+  {
+   "text": "The shellcode is seventy eight bytes.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "cmd"
+    },
+    {
+     "step": 14,
+     "role": "cmd"
+    },
+    {
+     "step": 14,
+     "role": "out",
+     "from": 3,
+     "to": 3
+    }
+   ]
+  },
+  {
+   "text": "Then I write the exploit driver in vim.",
+   "lines": [
+    {
+     "step": 15,
+     "role": "vimcmd"
+    },
+    {
+     "step": 15,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The header comment copies the vulnerable function.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The copy loop has no length check, so it runs past the twenty byte buffer.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The loop copies its argument into the buffer byte by byte, then prints it.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Gdb puts the buffer twenty four bytes below the frame pointer, with the source pointer, the saved frame pointer and the return address above it.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The copy reaches the return address at offset twenty eight.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The trap is at offset twenty.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The loop overwrites its own source pointer there, so it dies early unless the pointer stays valid.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Making those four bytes equal the address of the argument itself keeps the pointer valid, so the loop runs to the return address.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The address is fixed with an empty environment, so a fault oracle can find it.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The sweep puts an invalid return address in place and watches for a crash with printed output.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The candidate that crashes is the argv address.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The layout comment maps the argument.",
+   "lines": [
+    {
+     "step": 20,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Twenty NOPs, the argv address, four B bytes, the return address, then a NOP sled and the shellcode.",
+   "lines": [
+    {
+     "step": 20,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The return address points thirty two bytes into the argument, into the NOP sled.",
+   "lines": [
+    {
+     "step": 20,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The driver loads the shellcode from the assembler output, prints it, and checks it has no null byte.",
+   "lines": [
+    {
+     "step": 21,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It keeps a fallback address from discovery, in case the sweep finds nothing.",
+   "lines": [
+    {
+     "step": 21,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The payload builder lays out the argument.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Twenty NOPs, the argv address, four B bytes, the return address, then one hundred NOPs and the shellcode.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The builder takes an argv address and a return address and returns the full argument.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The run helper opens a pipe and forks.",
+   "lines": [
+    {
+     "step": 23,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The child reads its input from null and wires the pipe to its output.",
+   "lines": [
+    {
+     "step": 23,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The child runs the target with the given argument and an empty environment.",
+   "lines": [
+    {
+     "step": 23,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The parent closes its end of the pipe and reads for three tenths of a second, collecting output.",
+   "lines": [
+    {
+     "step": 24,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It closes the pipe, waits for the child, and returns the output and the status.",
+   "lines": [
+    {
+     "step": 24,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The driver announces the sweep, then tries candidates from the bottom of the stack range upward, four bytes at a time.",
+   "lines": [
+    {
+     "step": 25,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It skips any candidate whose bytes contain a null, and counts a hit only on a fault with printed output.",
+   "lines": [
+    {
+     "step": 25,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Each try runs the target with the candidate address and an invalid return address.",
+   "lines": [
+    {
+     "step": 26,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "If nothing hits, the driver falls back to the address from discovery, then prints the address it found.",
+   "lines": [
+    {
+     "step": 26,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The return address is the argv address plus thirty two, into the NOP sled.",
+   "lines": [
+    {
+     "step": 27,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The driver runs the payload once and checks for the marker.",
+   "lines": [
+    {
+     "step": 27,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "If the marker is missing it falls back to the discovery address, prints the return address, and runs the target attached to the terminal.",
+   "lines": [
+    {
+     "step": 27,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The driver is saved, and I quit vim.",
+   "lines": [
+    {
+     "step": 28,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I run the driver.",
+   "lines": [
+    {
+     "step": 29,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "It prints the seventy eight byte shellcode, then sweeps for the argv address.",
+   "lines": [
+    {
+     "step": 29,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "The sweep finds the argv address, and the return address lands thirty two bytes past it.",
+   "lines": [
+    {
+     "step": 29,
+     "role": "out",
+     "from": 2,
+     "to": 3
+    }
+   ]
+  },
+  {
+   "text": "The program prints the buffer and the marker, the shell runs as narnia nine, and the password prints.",
+   "lines": [
+    {
+     "step": 29,
+     "role": "out",
+     "from": 4,
+     "to": 6
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
