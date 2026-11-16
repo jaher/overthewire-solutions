@@ -165,6 +165,7 @@ const LEVELS = [
   ["Vortex",8,"thread + privilege-drop race: overflow patches sleep@GOT and returns main into safecode's loop; the thread (keeps euid=vortex9) calls the hijacked sleep and dumps /etc/vortex_pass/vortex9"],
   ["Vortex",9,"the BlackBox: no level binary exists (/vortex/vortex9 missing, vortex10 unreachable by group); the password arrives by mail in /var/mail/vortex9"],
   ["Vortex",10,"srand-seed echo: reverse the srand seed from the printed 20-value rand() window with a libc-based C cracker; echo it as 4 raw bytes to get setresuid+sh -i"],
+  ["Vortex",11,"phkmalloc heap overflow -> exit@GOT: 2048-byte strcpy overflows into the next page's header; corrupt next makes malloc(0x10) return exit@GOT; strncpy writes 15 bytes; exit(0) jumps into the EGG sled -> 73-byte int 0x80 shellcode reading /etc/vortex_pass/vortex12"],
 ];
 
 const rows = document.getElementById('rows');

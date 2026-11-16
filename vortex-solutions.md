@@ -1,4 +1,25 @@
 
+## Level 11 → vortex12 (SOLVED 2026-11-16)
+- **Password for vortex12:** `YufVIb8Mo`, dumped by the shellcode from `/etc/vortex_pass/vortex12` and verified by logging in as vortex12 (`uid=5012`, `cat /etc/vortex_pass/vortex12` matches). Recording: `recordings/vortex/L11.cast`.
+- **The program (reconstructed from objdump):** `/vortex/vortex11`, mode 4550, setuid vortex12, 20660 bytes, md5 `c6b84d4cebbd082a3c852c83305443b2`, not stripped, **embeds its own phkmalloc** (the FreeBSD allocator — `malloc`/`malloc_bytes` compiled in; GOT shows `mmap/munmap/madvise/brk/sbrk`, no `malloc@GLIBC`), `GNU_STACK RWE` (executable stack, ASLR off):
+  ```c
+  int main(int argc, char **argv) {
+      if (argc <= 2) exit(0);
+      char *a = malloc(0x800);
+      char *b = malloc(0x10);
+      char *c = malloc(0x800);
+      strcpy(c, argv[1]);            /* UNBOUNDED heap overflow */
+      char *d = malloc(0x10);
+      strncpy(d, argv[2], 0xf);      /* the write primitive */
+      exit(0);
+  }
+  ```
+  Heap layout (gdb-verified): `a=0x804f000`, `b=0x8050030`, `c=0x804f800`, `d=0x8050040`; the second page's phkmalloc **page header** (`prev/next/info/bits/bitmap`) sits at `0x8050000`.
+- **The exploit: overflow c's 2048 bytes into the next page header.**  `argv[1] = 'A'*2048 + prev(0x11111111) + next(0x0804cfdc) + info byte(0x11)` — the copy then **stops at the NUL** after the info byte, so the header's `bits`/`bitmap` stay pristine (a junked `bits` would make malloc_junk's `memset(0xd0)` wipe the read-only RELRO page and crash).  The corrupt `next` makes `malloc(0x10)` walk a fake chunk whose bit_index shift returns `chunk->base + 64 = 0x804d01c` = **exit@GOT**; `strncpy(d, argv[2], 0xf)` then writes 15 bytes there, and main's final `call exit@plt` jumps into the EGG env var: a 1500-byte NOP sled + shellcode.
+- **The shellcode (73 bytes, NUL-free, int 0x80):** builds `/etc/vortex_pass/vortex1` on the stack with 7 push-immediates, patches byte 24 `'1'→'2'` (`mov byte [ebx+24], 0x32`), then `open/read/write/exit` via `int 0x80` — the level is setuid **vortex12**, so the 400-mode pass file is readable by euid with no setreuid first.  Two lessons: `push 0x31786574` puts `"tex1"` in memory (an early draft pushed the bytes backwards and built `vor1tex2` → ENOENT); and the first "syscall filter" evidence was a **64-bit harness artifact** — `seccomptest`/`wt.c` were compiled with plain `gcc` (64-bit) and `memcpy(o+7, &path, 4)` copied only the low 4 bytes of an 8-byte pointer, so `int 0x80 open → -14 (EFAULT)` was literally "bad address", not interception.  A `gcc -m32` probe on the lab showed open/read/write all succeed (getpid had already returned 12 — int 0x80 worked all along).
+- **Pinning the EGG address (no gdb sweep):** with ASLR off, the kernel places env strings identically for any execve with the same total argv+envp byte lengths; a helper `h11.c` (`printf("%p", getenv("EGG"))`, invoked with the same two argv strings) reports the exact address the level will see (`0xffffd7d7` live).  Target = `EGG + 1024` mid-sled; argv[2] cannot contain NULs, so a 0 low byte would shift the target by 1.
+- **Files:** `tools/vx/l11/` (`build11.py` payload builder, `h11.c` address pin, `solve11.sh` end-to-end driver, `NOTES.md`).
+
 ## Level 10 → vortex11 (SOLVED 2026-11-16)
 - **Password for vortex11:** `xb4DVZ2av`, read from `/etc/vortex_pass/vortex11` in the shell the level spawns and verified by logging in as vortex11 (`uid=5011`, `cat /etc/vortex_pass/vortex11` matches). Recording: `recordings/vortex/L10.cast`.
 - **The program (reconstructed from objdump):** `/vortex/vortex10`, mode 4550, setuid vortex11, 15352 bytes, md5 `49dcf2fee434ab1eb8f0b5bdc4104729`, not stripped, `GNU_STACK RW` (no shellcode possible), full RELRO-ish GOT (but not needed):
