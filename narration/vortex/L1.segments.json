@@ -181,47 +181,20 @@
    ]
   },
   {
-   "text": "The driver imports subprocess, sys, and time, and the header comment records the trick: two hundred sixty one backslashes walk the cursor from buf plus 0x100 down to 0xffffdc04, eight bytes above the saved frame pointer, and 0xca bytes give the branch its top byte.",
+   "text": "The driver imports subprocess, sys, and time, and the header comment records the trick: two hundred sixty one backslashes walk the cursor from buf plus 0x100 down to eight bytes above the saved frame pointer, and 0xca bytes give the branch its top byte.",
    "lines": [
-    {
-     "step": 5,
-     "role": "vim"
-    },
     {
      "step": 6,
-     "role": "out",
-     "from": 0,
-     "to": 4
+     "role": "vim"
     }
    ]
   },
   {
-   "text": "The comment finishes the story: 0xca cannot be typed, so it is passed raw on a pipe, the getchar hook only filters keyboard input, and stdin stays open so the shell is interactive.",
+   "text": "The comment finishes the story: 0xca cannot be typed, so it is passed raw on a pipe, the getchar hook only filters keyboard input, and stdin stays open so the shell is interactive. The driver takes the backslash count from the command line, default two hundred sixty one, builds the payload, spawns the program with a pipe, and writes it.",
    "lines": [
     {
-     "step": 5,
-     "role": "vim"
-    },
-    {
      "step": 7,
-     "role": "out",
-     "from": 5,
-     "to": 8
-    }
-   ]
-  },
-  {
-   "text": "The driver takes the backslash count from the command line, default two hundred sixty one, builds the payload, spawns the program with a pipe, and writes it.",
-   "lines": [
-    {
-     "step": 5,
      "role": "vim"
-    },
-    {
-     "step": 7,
-     "role": "out",
-     "from": 9,
-     "to": 14
     }
    ]
   },
@@ -229,14 +202,8 @@
    "text": "It flushes, waits half a second, and feeds the shell id, cat of the vortex2 password file, and exit, then closes stdin and prints the return code.",
    "lines": [
     {
-     "step": 5,
-     "role": "vim"
-    },
-    {
      "step": 8,
-     "role": "out",
-     "from": 15,
-     "to": 24
+     "role": "vim"
     }
    ]
   },
@@ -244,14 +211,8 @@
    "text": "Finally it reads the output and checks whether the vortex2 password is in it.",
    "lines": [
     {
-     "step": 5,
-     "role": "vim"
-    },
-    {
      "step": 9,
-     "role": "out",
-     "from": 24,
-     "to": 27
+     "role": "vim"
     }
    ]
   },
@@ -266,6 +227,10 @@
      "step": 11,
      "role": "out",
      "from": 0
+    },
+    {
+     "step": 11,
+     "role": "note"
     }
    ]
   },
