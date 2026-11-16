@@ -1,0 +1,62 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level eighteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The password is in a readme file, but logging in interactively logs you out at once.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit18 with ssh bandit18@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The login shell exits at once: the startup script terminates the session before you can type a command, so run the command over ssh instead.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "I run cat on the readme over ssh, without ever starting the interactive shell that would kill the connection.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The readme gives the password for bandit nineteen, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

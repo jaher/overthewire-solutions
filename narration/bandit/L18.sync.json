@@ -1,0 +1,85 @@
+{
+ "game": "bandit",
+ "level": 18,
+ "audio": "narration/bandit/L18.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 33.91,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.99,
+   "text": "Bandit, level eighteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.99,
+   "end": 6.86,
+   "text": "The password is in a readme file, but logging in interactively logs you out at once.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 6.86,
+   "end": 15.94,
+   "text": "I log in as bandit18 with ssh bandit18@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 15.94,
+   "end": 24.14,
+   "text": "The login shell exits at once: the startup script terminates the session before you can type a command, so run the command over ssh instead.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 24.14,
+   "end": 29.95,
+   "text": "I run cat on the readme over ssh, without ever starting the interactive shell that would kill the connection.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 29.95,
+   "end": 33.91,
+   "text": "The readme gives the password for bandit nineteen, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

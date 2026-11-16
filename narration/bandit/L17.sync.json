@@ -1,0 +1,92 @@
+{
+ "game": "bandit",
+ "level": 17,
+ "audio": "narration/bandit/L17.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 38.76,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.97,
+   "text": "Bandit, level seventeen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.97,
+   "end": 10.68,
+   "text": "Two files sit in the home directory, passwords dot old and passwords dot new, and the password for bandit eighteen is the single line that changed.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 10.68,
+   "end": 20.09,
+   "text": "I log in as bandit17 with ssh bandit17@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 20.09,
+   "end": 26.16,
+   "text": "Diff compares two files line by line and prints only the differences, so I run diff on the two files.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 26.16,
+   "end": 34.25,
+   "text": "There is exactly one hunk: line forty-two changed, the old value marked with a less-than sign, the new value with a greater-than sign.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 34.25,
+   "end": 38.76,
+   "text": "The new side is the password for bandit eighteen, and the level is solved.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

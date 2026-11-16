@@ -1,0 +1,69 @@
+{
+ "segments": [
+  {
+   "text": "Bandit, level seventeen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Two files sit in the home directory, passwords dot old and passwords dot new, and the password for bandit eighteen is the single line that changed.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as bandit17 with ssh bandit17@bandit.labs.overthewire.org -p 2220.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Diff compares two files line by line and prints only the differences, so I run diff on the two files.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "There is exactly one hunk: line forty-two changed, the old value marked with a less-than sign, the new value with a greater-than sign.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "The new side is the password for bandit eighteen, and the level is solved.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
