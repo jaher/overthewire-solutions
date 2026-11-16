@@ -1,4 +1,12 @@
 
+## Level 9 → vortex10 (SOLVED 2026-11-16)
+- **Password for vortex10:** `95KsP1i3K`, read from `/var/mail/vortex9` and verified by logging in as vortex10 (`uid=5010`, `cat /etc/vortex_pass/vortex10` matches). Recording: `recordings/vortex/L9.cast`.
+- **This level is the BlackBox.** The official page (overthewire.org vortex9.html) is titled "BlackBox" and says only *"There is no information available for this level. Login to vortex.labs.overthewire.org and check it out."* — no hints, no source.
+- **The level-9 binary is missing.** Every other level N has `/vortex/vortexN` (mode 4550, owner vortex(N+1), group vortexN — the current level's user runs it by gid). Level 9's binary does not exist: `stat /vortex/vortex9` → `No such file or directory`; the listing jumps from `vortex8` (4550 vortex9:vortex8) straight to `vortex10` (4550 vortex11:vortex10).
+- **The next binary is unreachable from vortex9 (measured live).** `/vortex/vortex10` is `4550 vortex11:vortex10`: only euid=vortex11 or gid=vortex10 can read/execute it. vortex9 has gid 5009 only, `setgid(5010)` is refused (EPERM), `/etc/security/group.conf` has no active pam_group rules, the sshd PAM chain contains no pam_group, and the `vortex10` group has no members to inherit from. `/etc/vortex_pass/vortex10` is `400 vortex10:vortex10`. So there is no route to run the level-10 binary from vortex9 at all — and none is needed.
+- **The solution: the password arrives by mail.** `/var/mail/vortex9` (mode 640, owned by vortex9) contains the 9-char password in plain text: `95KsP1i3K`.
+- **Recording:** `recordings/vortex/L9.cast` — local shell, ssh vortex9, workdir `/tmp/l9rec-10419`, the missing-binary stat, the next binary's mode and the group dead-ends, the mail file found and read, then login as vortex10 from the local shell (`uid=5010(vortex10)`, password file read).
+
 ## Level 8 → vortex9 (SOLVED 2026-11-16)
 - **Password for vortex9:** `XdTW4yCeq`, read by the hijacked *thread* (euid=vortex9) from `/etc/vortex_pass/vortex9` and verified by logging in as vortex9 (`uid=5009`, `cat /etc/vortex_pass/vortex9` matches). Recording: `recordings/vortex/L8.cast`.
 - **The program (reconstructed from objdump, no published source — the level page says "Disassemble this dynamically linked executable"):** `/vortex/vortex8`, mode 4750, setuid vortex9, 15152 bytes, md5 `a2cae4e765bc58316b34dbe7f64af120`, not stripped:
