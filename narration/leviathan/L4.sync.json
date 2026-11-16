@@ -1,0 +1,96 @@
+{
+ "game": "leviathan",
+ "level": 4,
+ "audio": "narration/leviathan/L4.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 40.08,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.09,
+   "text": "Leviathan, level four.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.09,
+   "end": 10.25,
+   "text": "A setuid binary hides in the dot trash directory, owned by leviathan five, and the goal is to run it to get leviathan five's password.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 10.25,
+   "end": 14.33,
+   "text": "I log in as leviathan four, on port 2223.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 14.33,
+   "end": 19.92,
+   "text": "I list dot trash, and it holds a single file, bin, setuid to leviathan five.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 3
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 19.92,
+   "end": 31.85,
+   "text": "I run dot trash slash bin, and it prints eleven eight-bit binary numbers, one per character of the password, ending with the newline group, zero zero zero zero one zero one zero.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 31.85,
+   "end": 40.08,
+   "text": "Each eight-bit group is one ASCII character, so reading them off in order reconstructs the leviathan five password, and the level is solved.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

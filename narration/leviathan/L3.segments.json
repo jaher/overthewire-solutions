@@ -1,0 +1,119 @@
+{
+ "segments": [
+  {
+   "text": "Leviathan, level three.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The setuid binary level three, owned by leviathan four, asks for a password, and the goal is to supply it and get a shell as leviathan four.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as leviathan three, on port 2223.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I run strings on level three and grep for s n l p and bin slash sh, and the output shows a fragment, s n l p, and a slash bin slash sh.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "I disassemble do stuff, and the listing builds the expected string from three pieces: s n l p, r i n t, and t f newline, which spells s n l printf. Then fgets reads a line, strcmp compares it, and on a match the program switches user and runs a shell.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 8
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 10
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 12
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 20
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 27
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 33
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 41
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 45
+    }
+   ]
+  },
+  {
+   "text": "I pipe the word s n l printf into level three, with id and a cat of the leviathan four password file after it, pausing a second between each.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The program prints you've got shell, the shell reports the leviathan four identity, and the cat prints the password, so the level is solved.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
