@@ -1,0 +1,245 @@
+{
+ "segments": [
+  {
+   "text": "Behemoth, level three.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "We log in as behemoth three and look at the binary.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "We disassemble main with objdump: it reads up to two hundred bytes with fgets, then passes the buffer straight to printf as the format string.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 9,
+     "to": 12
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 17,
+     "to": 19
+    }
+   ]
+  },
+  {
+   "text": "That is a format string vulnerability: anything we type is interpreted as a format directive, so percent n and percent h n let us write a value to an address we supply.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 19,
+     "to": 19
+    }
+   ]
+  },
+  {
+   "text": "We check the relocations with objdump: printf, fgets and puts are imported, but we do not need the GOT; we target the saved return address.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 7,
+     "to": 9
+    }
+   ]
+  },
+  {
+   "text": "We inspect the protections: readelf shows the stack is executable, and address randomisation is off.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "We probe it by piping a format string in, and the program prints stack words back at us, confirming our input is interpreted as a format string.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "The buffer sits two hundred bytes below the frame pointer, so the saved frame pointer is at offset two hundred and the return address at offset two hundred four.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "out",
+     "from": 10,
+     "to": 10
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 17,
+     "to": 17
+    }
+   ]
+  },
+  {
+   "text": "Then we write the shellcode in vim.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vimcmd"
+    },
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It prints a marker so our sweep can detect a successful jump, then raises the effective uid with geteuid and setreuid, and setuid so the privilege survives the exec.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "out",
+     "from": 3,
+     "to": 32
+    }
+   ]
+  },
+  {
+   "text": "And finally execve on slash bin slash sh.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "out",
+     "from": 33,
+     "to": 44
+    }
+   ]
+  },
+  {
+   "text": "We assemble it with nasm, extract the raw bytes with objcopy, and print them with xxd: seventy-eight bytes.",
+   "lines": [
+    {
+     "step": 15,
+     "role": "cmd"
+    },
+    {
+     "step": 15,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 16,
+     "role": "cmd"
+    },
+    {
+     "step": 17,
+     "role": "cmd"
+    },
+    {
+     "step": 17,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    },
+    {
+     "step": 18,
+     "role": "cmd"
+    },
+    {
+     "step": 18,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "We run the exploit: it leaks the address of the argument vector, derives the buffer address, and verifies the guess with a marker string.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "cmd"
+    },
+    {
+     "step": 19,
+     "role": "out",
+     "from": 1,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "The return slot sits two hundred four bytes into the buffer, and the format string writes the shellcode address there in two halves, with arguments forty one and forty two.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "out",
+     "from": 3,
+     "to": 4
+    }
+   ]
+  },
+  {
+   "text": "The exploit prints the marker and a shell as behemoth four, and the password, and the level is solved.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "out",
+     "from": 10,
+     "to": 11
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
