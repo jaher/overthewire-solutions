@@ -64,24 +64,33 @@
    ]
   },
   {
-   "text": "I open vim and write a script. The first chunk sets up a timer that posts a payload with curl and measures how long the reply takes.",
+   "text": "I open vim and write the script:",
    "lines": [
     {
      "step": 3,
-     "role": "text"
+     "role": "vimcmd"
     },
     {
-     "step": 4,
-     "role": "text"
+     "step": 3,
+     "role": "vim"
     }
    ]
   },
   {
-   "text": "The second chunk adds the condition test: it wraps the test in a scalar subquery, so a true answer costs one five second sleep instead of one per matched row, and treats anything over two and a half seconds as true.",
+   "text": "The first chunk sets up the imports, the page URL, the credentials, and the start of timed, which measures how long a request takes.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The second chunk adds the condition test: it runs the request with curl and returns the elapsed time, then wraps the test in a scalar subquery, so a true answer costs one five second sleep instead of one per matched row, and treats anything over two and a half seconds as true.",
    "lines": [
     {
      "step": 5,
-     "role": "text"
+     "role": "vim"
     }
    ]
   },
@@ -90,7 +99,7 @@
    "lines": [
     {
      "step": 6,
-     "role": "text"
+     "role": "vim"
     }
    ]
   },
@@ -98,12 +107,21 @@
    "text": "The last chunk prints each recovered character as it goes, and prints the final password at the end.",
    "lines": [
     {
-     "step": 7,
-     "role": "text"
-    },
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Here is the last chunk.",
+   "lines": [
     {
      "step": 8,
      "role": "text"
+    },
+    {
+     "step": 7,
+     "role": "vim"
     }
    ]
   },
@@ -111,11 +129,7 @@
    "text": "I run the script, and it prints the password one character at a time, finishing with all thirty-two characters.",
    "lines": [
     {
-     "step": 10,
-     "role": "text"
-    },
-    {
-     "step": 10,
+     "step": 8,
      "role": "out",
      "from": 0,
      "to": 32

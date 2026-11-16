@@ -3,12 +3,12 @@
  "level": 17,
  "audio": "narration/natas/L17.mp3",
  "voice": "avocado_v2:MAI_03",
- "duration": 73.13,
+ "duration": 80.38,
  "segments": [
   {
    "id": 0,
    "start": 0.0,
-   "end": 2.16,
+   "end": 2.11,
    "text": "Natas, level seventeen.",
    "lines": [
     {
@@ -19,8 +19,8 @@
   },
   {
    "id": 1,
-   "start": 2.16,
-   "end": 11.95,
+   "start": 2.11,
+   "end": 11.9,
    "text": "The source shows the same username query as before, but the page is now completely silent: it prints no message whether the user exists or not, so the only signal is timing.",
    "lines": [
     {
@@ -31,8 +31,8 @@
   },
   {
    "id": 2,
-   "start": 11.95,
-   "end": 14.35,
+   "start": 11.9,
+   "end": 14.18,
    "text": "I fetch the source and pull out the query.",
    "lines": [
     {
@@ -49,8 +49,8 @@
   },
   {
    "id": 3,
-   "start": 14.35,
-   "end": 26.66,
+   "start": 14.18,
+   "end": 26.47,
    "text": "I test the oracle: a true condition with a five second sleep takes about twenty seconds, because the query matches several rows and the sleep runs once per row, while a false condition returns in under half a second.",
    "lines": [
     {
@@ -67,8 +67,8 @@
   },
   {
    "id": 4,
-   "start": 26.66,
-   "end": 33.74,
+   "start": 26.47,
+   "end": 33.36,
    "text": "I test the length the same way: a password of thirty-two characters takes about twenty seconds, so the length is thirty-two.",
    "lines": [
     {
@@ -85,72 +85,92 @@
   },
   {
    "id": 5,
-   "start": 33.74,
-   "end": 40.9,
-   "text": "I open vim and write a script. The first chunk sets up a timer that posts a payload with curl and measures how long the reply takes.",
+   "start": 33.36,
+   "end": 35.47,
+   "text": "I open vim and write the script:",
    "lines": [
     {
      "step": 3,
-     "role": "text"
+     "role": "vimcmd"
     },
     {
-     "step": 4,
-     "role": "text"
+     "step": 3,
+     "role": "vim"
     }
    ]
   },
   {
    "id": 6,
-   "start": 40.9,
-   "end": 52.73,
-   "text": "The second chunk adds the condition test: it wraps the test in a scalar subquery, so a true answer costs one five second sleep instead of one per matched row, and treats anything over two and a half seconds as true.",
+   "start": 35.47,
+   "end": 42.67,
+   "text": "The first chunk sets up the imports, the page URL, the credentials, and the start of timed, which measures how long a request takes.",
    "lines": [
     {
-     "step": 5,
-     "role": "text"
+     "step": 4,
+     "role": "vim"
     }
    ]
   },
   {
    "id": 7,
-   "start": 52.73,
-   "end": 61.9,
-   "text": "The third chunk adds the loop: for each of the thirty-two positions, it binary searches the character code, asking whether the code is greater than or equal to a midpoint.",
+   "start": 42.67,
+   "end": 57.91,
+   "text": "The second chunk adds the condition test: it runs the request with curl and returns the elapsed time, then wraps the test in a scalar subquery, so a true answer costs one five second sleep instead of one per matched row, and treats anything over two and a half seconds as true.",
    "lines": [
     {
-     "step": 6,
-     "role": "text"
+     "step": 5,
+     "role": "vim"
     }
    ]
   },
   {
    "id": 8,
-   "start": 61.9,
-   "end": 67.13,
-   "text": "The last chunk prints each recovered character as it goes, and prints the final password at the end.",
+   "start": 57.91,
+   "end": 67.46,
+   "text": "The third chunk adds the loop: for each of the thirty-two positions, it binary searches the character code, asking whether the code is greater than or equal to a midpoint.",
    "lines": [
     {
-     "step": 7,
-     "role": "text"
-    },
-    {
-     "step": 8,
-     "role": "text"
+     "step": 6,
+     "role": "vim"
     }
    ]
   },
   {
    "id": 9,
-   "start": 67.13,
-   "end": 73.13,
-   "text": "I run the script, and it prints the password one character at a time, finishing with all thirty-two characters.",
+   "start": 67.46,
+   "end": 72.79,
+   "text": "The last chunk prints each recovered character as it goes, and prints the final password at the end.",
    "lines": [
     {
-     "step": 10,
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 72.79,
+   "end": 74.3,
+   "text": "Here is the last chunk.",
+   "lines": [
+    {
+     "step": 8,
      "role": "text"
     },
     {
-     "step": 10,
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 74.3,
+   "end": 80.38,
+   "text": "I run the script, and it prints the password one character at a time, finishing with all thirty-two characters.",
+   "lines": [
+    {
+     "step": 8,
      "role": "out",
      "from": 0,
      "to": 32
