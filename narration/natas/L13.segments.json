@@ -1,0 +1,107 @@
+{
+ "segments": [
+  {
+   "text": "Natas, level thirteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Same upload task, but this time the handler validates the upload using a function that checks the file's magic bytes to decide whether it is an image.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I fetch the source and pull out the check: exif image type on the uploaded file.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "That check only looks at the beginning of the file, not the whole thing, and it does not look at the extension, so I open vim and write a polyglot: the six byte GIF header first.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "text"
+    },
+    {
+     "step": 2,
+     "role": "text"
+    },
+    {
+     "step": 3,
+     "role": "text"
+    }
+   ]
+  },
+  {
+   "text": "Then I append the PHP code that reads the natas fourteen password file, and I check the file: the first line is the GIF header, the second is the PHP code.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "I upload it with the filename field set to shell dot php, and the server stores it with a random prefix and returns the path.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "I request that path, the file passes the image check, the server runs the PHP, and it prints the password for natas fourteen, and the level is solved.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,109 @@
+{
+ "game": "natas",
+ "level": 12,
+ "audio": "narration/natas/L12.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 41.35,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.16,
+   "text": "Natas, level twelve.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.16,
+   "end": 6.53,
+   "text": "The task is to upload a JPEG under one kilobyte and get the next password.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 6.53,
+   "end": 13.78,
+   "text": "Reading the source shows the upload handler takes the file extension from a hidden form field that the client controls, called filename.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 13.78,
+   "end": 25.46,
+   "text": "So even though I am uploading a PHP script, I set that field to shell dot php, and first I write the script to a local file: it reads the natas thirteen password file and prints it.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 25.46,
+   "end": 34.27,
+   "text": "I upload it with the filename field set to shell dot php, and the server stores it in the upload directory with a random prefix and returns the path.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 34.27,
+   "end": 41.35,
+   "text": "I request that path, the server runs my code, and it prints the password for natas thirteen, and the level is solved.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
