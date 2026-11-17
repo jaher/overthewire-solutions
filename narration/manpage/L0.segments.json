@@ -77,39 +77,45 @@
    "lines": [
     {
      "step": 5,
-     "role": "out",
-     "from": 0
+     "role": "cmd",
+     "from": 0,
+     "to": 0
     }
    ]
   },
   {
    "text": "id confirms uid seventeen thousand one, manpage one.",
-   "lines": []
-  },
-  {
-   "text": "And the password file reads back the manpage1 password.",
    "lines": [
     {
-     "step": 5,
-     "role": "cmd"
-    },
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "And the password file reads back Mu eight G v M u d H b.",
+   "lines": [
     {
-     "step": 5,
-     "role": "out",
-     "from": 0
+     "step": -1,
+     "role": "goal"
     }
    ]
   },
   {
    "text": "The level is solved.",
-   "lines": []
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
   },
   {
    "text": "I log out.",
    "lines": [
     {
      "step": -1,
-     "role": "pw"
+     "role": "goal"
     }
    ]
   }
