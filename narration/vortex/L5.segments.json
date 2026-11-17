@@ -64,7 +64,7 @@
    ]
   },
   {
-   "text": "Then the worker: the short lengths loop, then the five-character space, this first letter plus four more, and hashlib's md5 of each candidate against the target.",
+   "text": "Then the worker: for this first letter it checks the short lengths first.",
    "lines": [
     {
      "step": 4,
@@ -73,7 +73,25 @@
    ]
   },
   {
-   "text": "Then the pool: twenty processes, the first hit printed as FOUND, and the pool terminated.",
+   "text": "Lengths one to four, every combination from the alphanumeric set.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the five-character space: this first letter plus four more, each hashed with MD5 against the target.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the pool: twenty processes, the first hit printed as FOUND, and the pool terminated. The pool maps the worker over every first letter, and stops at the first hit.",
    "lines": [
     {
      "step": 5,
@@ -87,6 +105,11 @@
     {
      "step": 7,
      "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -96,6 +119,11 @@
     {
      "step": 9,
      "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -105,6 +133,12 @@
     {
      "step": 16,
      "role": "cmd"
+    },
+    {
+     "step": 16,
+     "role": "out",
+     "from": 0,
+     "to": 1
     }
    ]
   },
@@ -113,7 +147,7 @@
    "lines": [
     {
      "step": 16,
-     "role": "cmd",
+     "role": "out",
      "from": 2,
      "to": 2
     }
@@ -125,15 +159,25 @@
     {
      "step": 17,
      "role": "cmd"
+    },
+    {
+     "step": 17,
+     "role": "out",
+     "from": 0
     }
    ]
   },
   {
-   "text": "And the password file reads back o five k capital B capital P z capital S capital F capital M.",
+   "text": "And the password file reads back the vortex6 password.",
    "lines": [
     {
      "step": 18,
      "role": "cmd"
+    },
+    {
+     "step": 18,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -152,6 +196,15 @@
     {
      "step": 24,
      "role": "cmd"
+    },
+    {
+     "step": 24,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
     }
    ]
   }

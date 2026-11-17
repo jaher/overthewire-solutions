@@ -60,6 +60,12 @@
     {
      "step": 6,
      "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 1
     }
    ]
   },
@@ -69,6 +75,12 @@
     {
      "step": 7,
      "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "out",
+     "from": 0,
+     "to": 54
     }
    ]
   },
@@ -78,6 +90,12 @@
     {
      "step": 8,
      "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "out",
+     "from": 0,
+     "to": 2
     }
    ]
   },
@@ -131,9 +149,8 @@
    "lines": [
     {
      "step": 17,
-     "role": "cmd",
-     "from": 0,
-     "to": 0
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -161,6 +178,11 @@
     {
      "step": 21,
      "role": "cmd"
+    },
+    {
+     "step": 21,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -170,15 +192,26 @@
     {
      "step": 22,
      "role": "cmd"
+    },
+    {
+     "step": 22,
+     "role": "out",
+     "from": 0
     }
    ]
   },
   {
-   "text": "The run fires the level with the craft and the aim: the shellcode prints the password, Y capital u f capital V capital I b eight capital M o, and the exit code is zero.",
+   "text": "The run fires the level with the craft and the aim: the shellcode prints the password, and the exit code is zero.",
    "lines": [
     {
      "step": 24,
      "role": "cmd"
+    },
+    {
+     "step": 24,
+     "role": "out",
+     "from": 0,
+     "to": 1
     }
    ]
   },
@@ -206,6 +239,11 @@
     {
      "step": 28,
      "role": "cmd"
+    },
+    {
+     "step": 28,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -215,6 +253,11 @@
     {
      "step": 29,
      "role": "cmd"
+    },
+    {
+     "step": 29,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -224,17 +267,17 @@
     {
      "step": 30,
      "role": "cmd"
+    },
+    {
+     "step": 30,
+     "role": "out",
+     "from": 0
     }
    ]
   },
   {
    "text": "The level is solved.",
-   "lines": [
-    {
-     "step": -1,
-     "role": "pw"
-    }
-   ]
+   "lines": []
   },
   {
    "text": "I log out.",
@@ -242,6 +285,15 @@
     {
      "step": 31,
      "role": "cmd"
+    },
+    {
+     "step": 31,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
     }
    ]
   }

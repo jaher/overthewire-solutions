@@ -60,6 +60,12 @@
     {
      "step": 5,
      "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 42
     }
    ]
   },
@@ -69,6 +75,12 @@
     {
      "step": 6,
      "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 28
     }
    ]
   },
@@ -78,6 +90,12 @@
     {
      "step": 7,
      "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "out",
+     "from": 0,
+     "to": 56
     }
    ]
   },
@@ -87,6 +105,11 @@
     {
      "step": 8,
      "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -159,6 +182,11 @@
     {
      "step": 22,
      "role": "cmd"
+    },
+    {
+     "step": 22,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -173,25 +201,11 @@
   },
   {
    "text": "The sweep prints candidate addresses one by one, and the hit lands at ffff d nine eight eight: the uid signature reads nine thousand nine, the thread keeps its privilege.",
-   "lines": [
-    {
-     "step": 24,
-     "role": "cmd",
-     "from": 0,
-     "to": 3
-    }
-   ]
+   "lines": []
   },
   {
-   "text": "Then the password shellcode runs through the same address, and the output ends with the password, X capital d capital T capital W four y capital C e q.",
-   "lines": [
-    {
-     "step": 24,
-     "role": "cmd",
-     "from": 4,
-     "to": 4
-    }
-   ]
+   "text": "Then the password shellcode runs through the same address, and the output ends with the password.",
+   "lines": []
   },
   {
    "text": "I log in as vortex9 with that password.",
@@ -208,6 +222,11 @@
     {
      "step": 26,
      "role": "cmd"
+    },
+    {
+     "step": 26,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -217,17 +236,17 @@
     {
      "step": 27,
      "role": "cmd"
+    },
+    {
+     "step": 27,
+     "role": "out",
+     "from": 0
     }
    ]
   },
   {
    "text": "The level is solved.",
-   "lines": [
-    {
-     "step": -1,
-     "role": "pw"
-    }
-   ]
+   "lines": []
   },
   {
    "text": "I log out.",
@@ -235,6 +254,15 @@
     {
      "step": 28,
      "role": "cmd"
+    },
+    {
+     "step": 28,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
     }
    ]
   }

@@ -60,6 +60,11 @@
     {
      "step": 4,
      "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -69,6 +74,12 @@
     {
      "step": 6,
      "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 28
     }
    ]
   },
@@ -77,7 +88,7 @@
    "lines": [
     {
      "step": 6,
-     "role": "cmd",
+     "role": "out",
      "from": 0,
      "to": 5
     }
@@ -89,6 +100,12 @@
     {
      "step": 8,
      "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "out",
+     "from": 0,
+     "to": 1
     }
    ]
   },
@@ -121,12 +138,7 @@
   },
   {
    "text": "The file is 56 lines, 1446 bytes.",
-   "lines": [
-    {
-     "step": 25,
-     "role": "cmd"
-    }
-   ]
+   "lines": []
   },
   {
    "text": "I run it, and it prints the patch, four bytes, and the check confirms the patched message hashes to the target exactly.",
@@ -134,6 +146,12 @@
     {
      "step": 16,
      "role": "cmd"
+    },
+    {
+     "step": 16,
+     "role": "out",
+     "from": 0,
+     "to": 1
     }
    ]
   },
@@ -170,6 +188,11 @@
     {
      "step": 25,
      "role": "cmd"
+    },
+    {
+     "step": 25,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -201,11 +224,16 @@
    ]
   },
   {
-   "text": "The level's shellcode reads /etc/vortex_pass/vortex8 and prints X two c capital O capital O capital C capital Y n capital T.",
+   "text": "The level's shellcode reads /etc/vortex_pass/vortex8 and prints the vortex8 password.",
    "lines": [
     {
      "step": 32,
      "role": "cmd"
+    },
+    {
+     "step": 32,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -233,6 +261,11 @@
     {
      "step": 36,
      "role": "cmd"
+    },
+    {
+     "step": 36,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -242,17 +275,17 @@
     {
      "step": 37,
      "role": "cmd"
+    },
+    {
+     "step": 37,
+     "role": "out",
+     "from": 0
     }
    ]
   },
   {
    "text": "The level is solved.",
-   "lines": [
-    {
-     "step": -1,
-     "role": "pw"
-    }
-   ]
+   "lines": []
   },
   {
    "text": "I log out.",
@@ -260,6 +293,15 @@
     {
      "step": 38,
      "role": "cmd"
+    },
+    {
+     "step": 38,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
     }
    ]
   }

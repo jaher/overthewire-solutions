@@ -31,8 +31,8 @@
    "text": "The solve is the same shellcode, with the signal disarmed: the exploit parent blocks SIGTERM before launching the binary, the mask is inherited, and the raise never delivers.",
    "lines": [
     {
-     "step": 2,
-     "role": "cmd"
+     "step": 1,
+     "role": "note"
     }
    ]
   },
@@ -40,8 +40,8 @@
    "text": "Then the overflow runs to setresuid seventeen thousand two and execve /bin/sh.",
    "lines": [
     {
-     "step": 1,
-     "role": "note"
+     "step": 2,
+     "role": "cmd"
     }
    ]
   },
@@ -55,29 +55,24 @@
    ]
   },
   {
-   "text": "The shell comes up as manpage two, and the password file reads back m two u P l t j q C J.",
+   "text": "The shell comes up as manpage two, and the password file reads back the manpage2 password.",
    "lines": [
     {
-     "step": -1,
-     "role": "pw"
+     "step": 3,
+     "role": "note"
     }
    ]
   },
   {
    "text": "The level is solved.",
-   "lines": [
-    {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
+   "lines": []
   },
   {
    "text": "I log out.",
    "lines": [
     {
      "step": -1,
-     "role": "goal"
+     "role": "pw"
     }
    ]
   }

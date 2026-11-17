@@ -31,8 +31,8 @@
    "text": "Strcmp stops at the first NUL, so the comparison matches when the random file itself starts with a NUL.",
    "lines": [
     {
-     "step": 2,
-     "role": "cmd"
+     "step": 1,
+     "role": "note"
     }
    ]
   },
@@ -40,8 +40,8 @@
    "text": "I log in as manpage three, read the source, write the loop in python: reset, then submit a NUL-first line, again and again.",
    "lines": [
     {
-     "step": 1,
-     "role": "note"
+     "step": 2,
+     "role": "cmd"
     }
    ]
   },
@@ -64,29 +64,25 @@
    ]
   },
   {
-   "text": "The file reads back eight O nine six C W Q P a N.",
+   "text": "The file reads back the manpage4 password.",
    "lines": [
     {
-     "step": -1,
-     "role": "pw"
+     "step": 4,
+     "role": "out",
+     "from": 0
     }
    ]
   },
   {
    "text": "The level is solved.",
-   "lines": [
-    {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
+   "lines": []
   },
   {
    "text": "I log out.",
    "lines": [
     {
      "step": -1,
-     "role": "goal"
+     "role": "pw"
     }
    ]
   }

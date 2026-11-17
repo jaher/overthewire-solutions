@@ -51,6 +51,12 @@
     {
      "step": 4,
      "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 1
     }
    ]
   },
@@ -60,6 +66,12 @@
     {
      "step": 5,
      "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 89
     }
    ]
   },
@@ -69,6 +81,12 @@
     {
      "step": 6,
      "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 5
     }
    ]
   },
@@ -132,6 +150,11 @@
     {
      "step": 21,
      "role": "cmd"
+    },
+    {
+     "step": 21,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -145,13 +168,12 @@
    ]
   },
   {
-   "text": "The response prints uid five thousand eleven, vortex11, and the password, x b four capital D capital V capital Z two a v.",
+   "text": "The response prints uid five thousand eleven, vortex11, and the password.",
    "lines": [
     {
      "step": 22,
-     "role": "cmd",
-     "from": 0,
-     "to": 0
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -179,6 +201,11 @@
     {
      "step": 25,
      "role": "cmd"
+    },
+    {
+     "step": 25,
+     "role": "out",
+     "from": 0
     }
    ]
   },
@@ -188,17 +215,17 @@
     {
      "step": 26,
      "role": "cmd"
+    },
+    {
+     "step": 26,
+     "role": "out",
+     "from": 0
     }
    ]
   },
   {
    "text": "The level is solved.",
-   "lines": [
-    {
-     "step": -1,
-     "role": "pw"
-    }
-   ]
+   "lines": []
   },
   {
    "text": "I log out.",
@@ -206,6 +233,15 @@
     {
      "step": 27,
      "role": "cmd"
+    },
+    {
+     "step": 27,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
     }
    ]
   }
