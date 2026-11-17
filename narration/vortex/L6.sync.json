@@ -1,0 +1,379 @@
+{
+ "game": "vortex",
+ "level": 6,
+ "audio": "narration/vortex/L6.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 161.74,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.04,
+   "text": "Vortex, level six.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.04,
+   "end": 11.76,
+   "text": "The goal is the vortex7 password, from /vortex/vortex6: a setuid vortex7 binary with no published source.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 11.76,
+   "end": 16.37,
+   "text": "The binary copies itself so I can read it, and I measure it with md5.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 16.37,
+   "end": 26.28,
+   "text": "The first question is what the program does when run plain, and it hangs: a detached run under timeout produces a zero-byte output file, so the process never returns.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 26.28,
+   "end": 41.21,
+   "text": "The disassembly shows why: restart takes the argument, drops privileges with setreuid, and re-execs it, and main passes argv zero, not argv one, so running the binary re-execs itself forever, an infinite exec loop.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 41.21,
+   "end": 50.98,
+   "text": "The same restart is the way out: point argv zero at /bin/sh instead, and the setuid binary drops us into a shell as vortex7.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 50.98,
+   "end": 59.33,
+   "text": "The stack is not executable, and there is a format-string hole in printf argv three, but with the stack read-only the restart is the whole exploit.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 59.33,
+   "end": 61.61,
+   "text": "I log in as vortex6.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 61.61,
+   "end": 65.33,
+   "text": "I make /tmp/l6rec and move in.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 65.33,
+   "end": 75.0,
+   "text": "The hang test first: a detached run under timeout three, then four seconds, and the output file reads zero bytes, the infinite exec loop confirmed.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 75.0,
+   "end": 78.0,
+   "text": "I copy the binary and read it with md5.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 78.0,
+   "end": 85.37,
+   "text": "objdump shows restart: setreuid of the effective id twice, then execlp of the argument.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0,
+     "to": 22
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 85.37,
+   "end": 93.94,
+   "text": "objdump shows main: the argv zero test, the restart call, printf of argv three, and an exit with the status of the level number.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0,
+     "to": 26
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 93.94,
+   "end": 98.98,
+   "text": "readelf shows GNU_STACK read-write only, no shellcode.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 98.98,
+   "end": 102.46,
+   "text": "And the password file is ten bytes, mode four hundred.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "start": 102.46,
+   "end": 108.65,
+   "text": "I open vim and write the runner: it execs the binary with argv zero pointed at /bin/sh.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "start": 108.65,
+   "end": 117.72,
+   "text": "First the payload lists: /bin/sh as the program name, and a short PATH and TERM as the environment, both null-terminated.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 17,
+   "start": 117.72,
+   "end": 123.79,
+   "text": "Then the library handle, the two C arrays for the argument and environment lists, and the exec call.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "start": 123.79,
+   "end": 127.1,
+   "text": "The file is 12 lines, 440 bytes.",
+   "lines": [
+    {
+     "step": 15,
+     "role": "cmd"
+    },
+    {
+     "step": 15,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 19,
+   "start": 127.1,
+   "end": 145.82,
+   "text": "The run pipes id and a read of the password file into the runner: execve of /vortex/vortex6 with argv zero of /bin/sh, the setuid binary drops us into a shell as vortex7, and the piped commands run inside it.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "cmd"
+    },
+    {
+     "step": 17,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "id": 20,
+   "start": 145.82,
+   "end": 147.82,
+   "text": "I log out of vortex6.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 21,
+   "start": 147.82,
+   "end": 151.54,
+   "text": "Then I log in as vortex7 with the password the shell read.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 22,
+   "start": 151.54,
+   "end": 156.22,
+   "text": "id confirms uid five thousand seven, vortex7.",
+   "lines": [
+    {
+     "step": 20,
+     "role": "cmd"
+    },
+    {
+     "step": 20,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 23,
+   "start": 156.22,
+   "end": 159.22,
+   "text": "And the password file reads back the same password.",
+   "lines": [
+    {
+     "step": 21,
+     "role": "cmd"
+    },
+    {
+     "step": 21,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 24,
+   "start": 159.22,
+   "end": 160.66,
+   "text": "The level is solved.",
+   "lines": []
+  },
+  {
+   "id": 25,
+   "start": 160.66,
+   "end": 161.74,
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "cmd"
+    },
+    {
+     "step": 22,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
