@@ -1,0 +1,125 @@
+{
+ "game": "manpage",
+ "level": 3,
+ "audio": "narration/manpage/L3.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 53.23,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.75,
+   "text": "Manpage, level three.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.75,
+   "end": 16.99,
+   "text": "The goal is the manpage4 password, from /manpage/manpage3: the program compares a stdin line against 256 random bytes read from a password file, and a separate reset binary rewrites that file.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 16.99,
+   "end": 22.22,
+   "text": "The solve is a loop: reset the file, then guess a line that starts with a NUL byte.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 22.22,
+   "end": 28.75,
+   "text": "Strcmp stops at the first NUL, so the comparison matches when the random file itself starts with a NUL.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 28.75,
+   "end": 37.27,
+   "text": "I log in as manpage three, read the source, write the loop in python: reset, then submit a NUL-first line, again and again.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 37.27,
+   "end": 44.88,
+   "text": "When the file's first byte is NUL the comparison passes, the program says wow, you should play the lottery, and spawns a shell.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 44.88,
+   "end": 47.88,
+   "text": "I feed the shell the password command after a delay.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 47.88,
+   "end": 50.83,
+   "text": "The file reads back the manpage4 password.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 50.83,
+   "end": 52.27,
+   "text": "The level is solved.",
+   "lines": []
+  },
+  {
+   "id": 9,
+   "start": 52.27,
+   "end": 53.23,
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
