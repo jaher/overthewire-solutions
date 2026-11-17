@@ -208,7 +208,7 @@
 - **Earlier notes' open routes are all closed by this:** the GOT-slot candidates in `tools/vx/l3/NOTES.md` were only `0x804b1xx` entries that `exit` faults on or never consults; the slot that works is the *caller's own immediate*, which `exit@plt` dereferences on the next instruction. The notes' finalizer test (fini array) and the exit-reached probe are superseded by the RWE-stack observation.
 - **Recording:** `recordings/vortex/L3.cast` — local shell, ssh vortex3, `sc.asm` and `drv.c` typed in vim from empty buffers (`[New] 28L, 433B` / `[New] 6L, 247B`), `cat -n` of both, nasm (69 bytes), xxd hexdump + NUL check, `drv` payload build (136 bytes), `./drv pay` printing `TlI5kxGd1`, then login as vortex4 (`uid=5004`, password file read).
 
-## Level 2 → vortex3 (SOLVED — password read, verification pending)
+## Level 2 → vortex3 (SOLVED 2026-11-06 — password verified 2026-11-17)
 - **Where it comes from:** `0xbadc0ded.org` challenge #02. The shipped source is a tar wrapper:
   ```c
   int main(int argc, char **argv) {

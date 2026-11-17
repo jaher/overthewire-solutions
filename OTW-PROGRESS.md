@@ -78,6 +78,7 @@ Narnia | L5 | format string: snprintf dest overlaps varargs; 56 filler + &i + %4
 Narnia | L6 | overflow b1[8] into function pointer fp (b1+8==fp); point fp at libc system; "sh;#AAAA"+addr comments out the address bytes | recordings/narnia/L6.cast
 Narnia | L7 | format string writes hackedfunction into ptrf via %152$hn/%153$hn (arg index found by sweep) | recordings/narnia/L7.cast
 Narnia | L8 | bok[20] copy-loop overflow: loop overwrites its own blah pointer; argv[20..23]=argv addr keeps it valid; ret into argv sled; final level (CONGRATULATIONS) | recordings/narnia/L8.cast
+- Narnia | L9 | final level: narnia9 (password = L8's za689KedXW) reads ~/CONGRATULATIONS ("you are l33t! next plz..."); live-verified 2026-11-17 (login + CONGRATULATIONS read); transcript games/narnia.json L9 (2-step session) | (no recording)
 Behemoth | L0 | memfrob (XOR 42) obfuscated secret read from movl immediates -> "eatmyshorts" | recordings/behemoth/L0.cast
 Behemoth | L1 | gets() overflow into buf[67]; RWE stack + ASLR off -> stack shellcode (nasm), swept ret 0xffffde20 | recordings/behemoth/L1.cast
 Natas | L17 | time-based blind SQLi: scalar-subquery IF(cond,SLEEP(5)) for one sleep per query; binary search ORD(SUBSTR(password,pos,1)); len 32 | recordings/natas/L17.cast
