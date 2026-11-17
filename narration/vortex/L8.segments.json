@@ -1,0 +1,242 @@
+{
+ "segments": [
+  {
+   "text": "Vortex, level eight.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the vortex9 password, from /vortex/vortex8: a setuid vortex9 binary that creates a thread running a safe print-and-sleep loop, then drops privileges with two raw syscalls and overflows a stack buffer with our argument.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The drop is per-thread, so the other thread keeps the effective id, vortex9.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The overflow is unbounded, the GOT is writable, and the thread loops forever calling sleep, so patching sleep's GOT entry with shellcode address and returning main into the safe loop makes the privileged thread call our shellcode and read the password file.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as vortex8.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I make a working directory, move in, and copy the binary.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "objdump shows safecode: the thread, a loop of printf, fflush, and sleep.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "objdump shows unsafecode: a one-thousand-twenty-four-byte stack buffer and an unbounded strcpy.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "objdump shows main: the thread creation, then the two raw syscalls, setresgid and setresuid, dropping the effective id, then the overflow, after the drop.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "objdump reads the GOT, and readelf shows GNU_STACK read-write-execute and the GOT outside RELRO, writable.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the driver: a small C loader that reads the payload file and execs the level with it as the argument.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "text": "The file is 6 lines, 244 bytes.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the solver: it patches sleep's GOT and returns main into the safe loop.",
+   "lines": [
+    {
+     "step": 15,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "text": "First the two shellcodes: a uid signature that prints the thread's effective id, and the password shellcode that builds the path backwards on the stack and reads the file through int eighty.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the builder: the total payload of eleven hundred bytes, the GOT offset at ten thirty-six, and the second-stage address at the return.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the trial: it forks the level, reads the output, and reports whether the process stayed alive.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the sweep: candidate addresses, eight bytes apart, and the uid signature hit marks the buffer.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The file is 80 lines, 2091 bytes.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The exploit run is transported over a non-terminal session, because a terminal drags the thread to the dropped id and kills the race.",
+   "lines": [
+    {
+     "step": 24,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The sweep prints candidate addresses one by one, and the hit lands at ffff d nine eight eight: the uid signature reads nine thousand nine, the thread keeps its privilege.",
+   "lines": [
+    {
+     "step": 24,
+     "role": "cmd",
+     "from": 0,
+     "to": 3
+    }
+   ]
+  },
+  {
+   "text": "Then the password shellcode runs through the same address, and the output ends with the password, X capital d capital T capital W four y capital C e q.",
+   "lines": [
+    {
+     "step": 24,
+     "role": "cmd",
+     "from": 4,
+     "to": 4
+    }
+   ]
+  },
+  {
+   "text": "I log in as vortex9 with that password.",
+   "lines": [
+    {
+     "step": 25,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "id confirms uid five thousand nine, vortex9.",
+   "lines": [
+    {
+     "step": 26,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "And the password file reads back the same password.",
+   "lines": [
+    {
+     "step": 27,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": 28,
+     "role": "cmd"
+    }
+   ]
+  }
+ ]
+}

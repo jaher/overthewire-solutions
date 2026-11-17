@@ -1,0 +1,94 @@
+{
+ "segments": [
+  {
+   "text": "Manpage, level three.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the manpage4 password, from /manpage/manpage3: the program compares a stdin line against 256 random bytes read from a password file, and a separate reset binary rewrites that file.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The solve is a loop: reset the file, then guess a line that starts with a NUL byte.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Strcmp stops at the first NUL, so the comparison matches when the random file itself starts with a NUL.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I log in as manpage three, read the source, write the loop in python: reset, then submit a NUL-first line, again and again.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "When the file's first byte is NUL the comparison passes, the program says wow, you should play the lottery, and spawns a shell.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "I feed the shell the password command after a delay.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The file reads back eight O nine six C W Q P a N.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  }
+ ]
+}

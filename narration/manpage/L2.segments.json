@@ -1,0 +1,76 @@
+{
+ "segments": [
+  {
+   "text": "Manpage, level two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the manpage3 password, from /manpage/manpage2: a getpass-style check against a file, then setuid getuid and an execl where argv zero is the executable and argv one is a marker byte.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The trick is that the binary launches whatever argv zero names.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I log in as manpage two, read the source, and launch the level with the executable set to /manpage/manpage2 but argv zero set to /bin/sh, with the marker byte as argv one.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I plant a script file first: after one wrong guess the binary execs /bin/sh with the marker, which is my script.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "The script seeks fd three back to zero and reads it, dumping the password: A eight C L K p six I D p.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  }
+ ]
+}

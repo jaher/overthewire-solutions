@@ -1,0 +1,249 @@
+{
+ "segments": [
+  {
+   "text": "Vortex, level eleven.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the vortex12 password, from /vortex/vortex11: a setuid vortex12 binary that embeds its own phkmalloc, the FreeBSD allocator compiled into the binary, and overflows a heap chunk with the first argument, then mallocs and writes fifteen bytes of the second argument through strncpy.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The heap is page-based with a header at each page start, and the overflow reaches the next page's header, so a fake header aims the following malloc at an address of our choosing: the chunk base plus the bit shift lands exactly on exit's GOT entry, and strncpy writes fifteen bytes there, so exit jumps into our shellcode.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The stack is executable and the address space is not randomized.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I log in as vortex11.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I make a working directory in /tmp and move in.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The listing shows the binary, file confirms a setuid thirty-two-bit executable, and md5 identifies it.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "readelf shows GNU_STACK read-write-execute, the stack takes shellcode, and partial RELRO.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "objdump shows main: three mallocs, an unbounded strcpy of the first argument, another malloc, and strncpy of fifteen bytes of the second argument.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The GOT shows exit's slot, and the GOT table has the allocator's mmap, munmap, and madvise but no malloc from libc, the embedded phkmalloc.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the builder: it assembles the craft payload and the egg sled.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "First the shellcode, seventy-three bytes with no zero bytes: the path built backwards on the stack with seven pushes, then a byte patch turning vortex one into vortex twelve in place, then open, read, write, and exit through int eighty, and the binary is setuid vortex12 so the pass file is readable with no privilege calls.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the craft: two thousand forty-eight filler bytes reaching the next page header, a junk prev, the next pointer into a fake chunk, and one info byte, and the copy stops at the zero byte so the rest of the header stays pristine.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the egg: a fifteen-hundred-byte NOP sled so the exact shellcode address needs no precision.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The file is 59 lines, 2271 bytes.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "cmd",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "I run it, and it prints craft two thousand fifty-seven, egg fifteen seventy-three.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The helper that pins the egg address is written through a heredoc: it prints the environment variable's address, compiled thirty-two-bit, and because the address space is not randomized, an exec with the same argument and environment lengths puts the egg at the same place, so the helper reads the exact address the level will see.",
+   "lines": [
+    {
+     "step": 20,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I export the egg and measure it: the egg sits at ffff d seven d seven.",
+   "lines": [
+    {
+     "step": 21,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The target is the middle of the sled, egg plus one thousand twenty-four, and its bytes go into the second argument, with the low byte nonzero so no zero byte truncates the copy.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The run fires the level with the craft and the aim: the shellcode prints the password, Y capital u f capital V capital I b eight capital M o, and the exit code is zero.",
+   "lines": [
+    {
+     "step": 24,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I clear the environment and log out.",
+   "lines": [
+    {
+     "step": 25,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Then I log in as vortex12 with that password.",
+   "lines": [
+    {
+     "step": 27,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "id confirms uid five thousand twelve, vortex12.",
+   "lines": [
+    {
+     "step": 28,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "And the password file reads back the same password.",
+   "lines": [
+    {
+     "step": 29,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The listing shows the next binary, setuid vortex13, and the chain continues.",
+   "lines": [
+    {
+     "step": 30,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": 31,
+     "role": "cmd"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,148 @@
+{
+ "segments": [
+  {
+   "text": "Vortex, level nine.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "This is the BlackBox: the official page has no information, no hints, no source.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the vortex10 password.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as vortex9.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I make a working directory and move in.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The listing of /vortex shows the setup, and the level binary is missing: every other level N has /vortex/vortexN owned by the next user, but level nine's binary does not exist, and stat says no such file or directory.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The next binary, /vortex/vortex10, is owned by vortex11 with group vortex10, and running it is refused, permission denied, so it is unreachable from vortex9.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The group check explains why: the vortex10 group has no members, and setgid is refused, so there is no route to the level-ten binary at all.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The password arrives by mail instead.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "find locates /var/mail/vortex9, the listing shows it ten bytes, mode six forty, owned by vortex9, and the read prints the password in plain text: nine five capital K s capital P one i three capital K.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I log out of vortex9.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Then I log in as vortex10 with that password.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "id confirms uid five thousand ten, vortex10.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "And the password file reads back the same password.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": 15,
+     "role": "cmd"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,267 @@
+{
+ "segments": [
+  {
+   "text": "Vortex, level seven.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the vortex8 password, from /vortex/vortex7: a setuid vortex8 binary that computes crc32 of the first argument and only overflows when it equals a fixed value.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The gate is the CRC, and CRC32 is linear over GF two on the message, so any payload can be patched to any target CRC by solving a thirty-two variable linear system over four free bytes.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The copy is unbounded, the stack is executable, and main's epilogue pops its return address from ecx minus four, where ecx comes from payload bytes sixty-two through sixty-five, so the return address is read from bytes seventy-four through seventy-seven and lands in our NOP sled.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as vortex7.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I make a working directory, move in, and copy the binary.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The probe first: the level prints the CRC of any wrong argument, test gives f nine three b a one one zero, and the patched probe shows the target digest check at the compare.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "objdump shows main: the crc32 call, the compare against e one c a nine five e e, and the strcpy into a stack buffer.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The epilogue loads ecx from the buffer and pops the return address from ecx minus four.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd",
+     "from": 0,
+     "to": 5
+    }
+   ]
+  },
+  {
+   "text": "readelf shows GNU_STACK read-write-execute, the stack takes shellcode.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the CRC patcher: it solves the linear system.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "text": "First the crc table and the crc function, byte by byte through the table.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the solver: thirty-two deltas, one per bit, row-reduced into a basis, and the four patch bytes combined from the target and the message.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The file is 56 lines, 1446 bytes.",
+   "lines": [
+    {
+     "step": 25,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I run it, and it prints the patch, four bytes, and the check confirms the patched message hashes to the target exactly.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the exploit: it assembles the payload.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "text": "First the shellcode, eighty-one bytes: the path built backwards on the stack, then open, read, write, and exit through int eighty, dropping to vortex8's id is unnecessary because the binary is setuid vortex8 already.",
+   "lines": [
+    {
+     "step": 20,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the buffer address measured in gdb, ffff d two one two, the return address at buffer plus one sixty, and the sled sized to absorb the drift, one hundred eighty-seven bytes.",
+   "lines": [
+    {
+     "step": 21,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The file is 34 lines, 898 bytes.",
+   "lines": [
+    {
+     "step": 25,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the driver: a small C loader that reads the payload file and execs the level with it as the argument.",
+   "lines": [
+    {
+     "step": 26,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "text": "The file is 6 lines, 244 bytes.",
+   "lines": [
+    {
+     "step": 30,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I run the exploit with the buffer address piped in from gdb, and the driver loads the payload.",
+   "lines": [
+    {
+     "step": 31,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level's shellcode reads /etc/vortex_pass/vortex8 and prints X two c capital O capital O capital C capital Y n capital T.",
+   "lines": [
+    {
+     "step": 32,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I log out of vortex7.",
+   "lines": [
+    {
+     "step": 34,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Then I log in as vortex8 with that password.",
+   "lines": [
+    {
+     "step": 35,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "id confirms uid five thousand eight, vortex8.",
+   "lines": [
+    {
+     "step": 36,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "And the password file reads back the same password.",
+   "lines": [
+    {
+     "step": 37,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": 38,
+     "role": "cmd"
+    }
+   ]
+  }
+ ]
+}

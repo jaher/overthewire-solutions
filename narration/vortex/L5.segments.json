@@ -1,0 +1,159 @@
+{
+ "segments": [
+  {
+   "text": "Vortex, level five.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the vortex6 password, from /vortex/vortex5: a setuid vortex6 binary that hashes the getpass input with glibc's MD5 and compares sixteen bytes against a fixed digest, and gives up a shell when they match.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The gate is the exact password, and the target hash is the MD5 of the password itself, so the solve is a preimage crack.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as vortex5.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I make /tmp/l5rec, move in, and clear any old files.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the cracker: it forks twenty workers over the alphanumeric space, each checking one first letter, for lengths one through five, hashing each candidate and comparing to the target digest.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "text": "First the imports and the target: the digest read as bytes from hex, one five five f b nine five d, and the alphabet, letters plus digits.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the worker: the short lengths loop, then the five-character space, this first letter plus four more, and hashlib's md5 of each candidate against the target.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the pool: twenty processes, the first hit printed as FOUND, and the pool terminated.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The file is 29 lines, 924 bytes.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I log out of the shell.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Then I run the level directly, /vortex/vortex5, and type the cracked password, five characters, at the getpass prompt.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level says you got the right password, congrats, and spawns a shell.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "cmd",
+     "from": 2,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "id confirms uid five thousand six, vortex6.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "And the password file reads back o five k capital B capital P z capital S capital F capital M.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": 24,
+     "role": "cmd"
+    }
+   ]
+  }
+ ]
+}

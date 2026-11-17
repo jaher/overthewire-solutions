@@ -1,0 +1,132 @@
+{
+ "segments": [
+  {
+   "text": "Manpage, level four.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the manpage5 password, from /manpage/manpage4: a patched Wumpus game where log winner sprintf's the time plus a first name and a last name that are uninitialised on some paths.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The solve is a fixed seed and a stack overflow.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I log in as manpage four.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I read the diff to see the patch.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "I pick seed one two three four five, which replicates the host libc rand: the layout is player at room eighteen, wumpus at thirteen, pits at two and sixteen, bats at five and three.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "I shoot the wumpus, and the ROOM number line persists in getnum's stack buffer, overlapping the name buffers.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "That makes the sprintf print into a buffer I control: a NOP sled, then a setresuid shellcode for seventeen thousand five, and the return address into the sled.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "AHA, you got the wumpus.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "id confirms uid seventeen thousand five, manpage five.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "And the password file reads back v two l t d i z Z f m.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Manpage is complete.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  }
+ ]
+}

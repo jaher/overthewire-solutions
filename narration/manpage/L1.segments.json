@@ -1,0 +1,85 @@
+{
+ "segments": [
+  {
+   "text": "Manpage, level one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the manpage2 password, from /manpage/manpage1: the same strcpy overflow into a 256-byte buffer, but this time a length check fires.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "If the copy reaches 255 bytes the program raises SIGTERM after the copy, killing the process before the return.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The solve is the same shellcode, with the signal disarmed: the exploit parent blocks SIGTERM before launching the binary, the mask is inherited, and the raise never delivers.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Then the overflow runs to setresuid seventeen thousand two and execve /bin/sh.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "text": "I log in as manpage one, read the source, block the signal in the parent, and run the exploit script.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The shell comes up as manpage two, and the password file reads back m two u P l t j q C J.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  }
+ ]
+}
