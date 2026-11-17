@@ -22,8 +22,8 @@
    "text": "The binary copies itself so I can read it, and I measure it with md5.",
    "lines": [
     {
-     "step": -1,
-     "role": "goal"
+     "step": 4,
+     "role": "cmd"
     }
    ]
   },
@@ -31,8 +31,8 @@
    "text": "The first question is what the program does when run plain, and it hangs: a detached run under timeout produces a zero-byte output file, so the process never returns.",
    "lines": [
     {
-     "step": -1,
-     "role": "goal"
+     "step": 3,
+     "role": "cmd"
     }
    ]
   },
@@ -40,8 +40,8 @@
    "text": "The disassembly shows why: restart takes the argument, drops privileges with setreuid, and re-execs it, and main passes argv zero, not argv one, so running the binary re-execs itself forever, an infinite exec loop.",
    "lines": [
     {
-     "step": -1,
-     "role": "goal"
+     "step": 5,
+     "role": "cmd"
     }
    ]
   },
@@ -58,8 +58,8 @@
    "text": "The stack is not executable, and there is a format-string hole in printf argv three, but with the stack read-only the restart is the whole exploit.",
    "lines": [
     {
-     "step": -1,
-     "role": "goal"
+     "step": 8,
+     "role": "cmd"
     }
    ]
   },
@@ -87,11 +87,6 @@
     {
      "step": 3,
      "role": "cmd"
-    },
-    {
-     "step": 3,
-     "role": "out",
-     "from": 0
     }
    ]
   },
@@ -101,11 +96,6 @@
     {
      "step": 4,
      "role": "cmd"
-    },
-    {
-     "step": 4,
-     "role": "out",
-     "from": 0
     }
    ]
   },
@@ -115,12 +105,6 @@
     {
      "step": 5,
      "role": "cmd"
-    },
-    {
-     "step": 5,
-     "role": "out",
-     "from": 0,
-     "to": 22
     }
    ]
   },
@@ -130,12 +114,6 @@
     {
      "step": 6,
      "role": "cmd"
-    },
-    {
-     "step": 6,
-     "role": "out",
-     "from": 0,
-     "to": 26
     }
    ]
   },
@@ -145,12 +123,6 @@
     {
      "step": 8,
      "role": "cmd"
-    },
-    {
-     "step": 8,
-     "role": "out",
-     "from": 0,
-     "to": 1
     }
    ]
   },
@@ -160,11 +132,6 @@
     {
      "step": 9,
      "role": "cmd"
-    },
-    {
-     "step": 9,
-     "role": "out",
-     "from": 0
     }
    ]
   },
@@ -201,11 +168,6 @@
     {
      "step": 15,
      "role": "cmd"
-    },
-    {
-     "step": 15,
-     "role": "out",
-     "from": 0
     }
    ]
   },
@@ -215,12 +177,6 @@
     {
      "step": 17,
      "role": "cmd"
-    },
-    {
-     "step": 17,
-     "role": "out",
-     "from": 0,
-     "to": 1
     }
    ]
   },
@@ -248,11 +204,6 @@
     {
      "step": 20,
      "role": "cmd"
-    },
-    {
-     "step": 20,
-     "role": "out",
-     "from": 0
     }
    ]
   },
@@ -262,17 +213,17 @@
     {
      "step": 21,
      "role": "cmd"
-    },
-    {
-     "step": 21,
-     "role": "out",
-     "from": 0
     }
    ]
   },
   {
    "text": "The level is solved.",
-   "lines": []
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
   },
   {
    "text": "I log out.",
@@ -280,15 +231,6 @@
     {
      "step": 22,
      "role": "cmd"
-    },
-    {
-     "step": 22,
-     "role": "out",
-     "from": 0
-    },
-    {
-     "step": -1,
-     "role": "pw"
     }
    ]
   }
