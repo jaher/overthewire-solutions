@@ -1,0 +1,161 @@
+{
+ "game": "manpage",
+ "level": 0,
+ "audio": "narration/manpage/L0.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 74.88,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.85,
+   "text": "Manpage, level zero.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.85,
+   "end": 16.85,
+   "text": "The goal is the manpage1 password, from /manpage/manpage0: a setuid manpage1 binary that calls setuid getuid, then strcpy's argv one into a 256-byte stack buffer.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 16.85,
+   "end": 29.98,
+   "text": "The setuid getuid call drops the effective uid to manpage zero, but the saved set-user-id still holds manpage one, so a setresuid of seventeen thousand one regains the privilege.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 29.98,
+   "end": 32.93,
+   "text": "The solve is a stack overflow with a shellcode.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 32.93,
+   "end": 35.26,
+   "text": "I log in as manpage zero.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 35.26,
+   "end": 40.42,
+   "text": "I read the source, cat /manpage/manpage0.c.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 40.42,
+   "end": 49.13,
+   "text": "I find the buffer on the stack with gdb: the EIP offset is 260, ASLR is off, and the stack is executable.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 49.13,
+   "end": 63.24,
+   "text": "I write the payload in python: a NOP sled, then a shellcode that calls setresuid seventeen thousand one three times and execve's /bin/sh, and the return address pointing back into the buffer.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 63.24,
+   "end": 64.56,
+   "text": "I run the exploit.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 64.56,
+   "end": 68.88,
+   "text": "id confirms uid seventeen thousand one, manpage one.",
+   "lines": []
+  },
+  {
+   "id": 10,
+   "start": 68.88,
+   "end": 72.53,
+   "text": "And the password file reads back the manpage1 password.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 72.53,
+   "end": 73.97,
+   "text": "The level is solved.",
+   "lines": []
+  },
+  {
+   "id": 12,
+   "start": 73.97,
+   "end": 74.88,
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
