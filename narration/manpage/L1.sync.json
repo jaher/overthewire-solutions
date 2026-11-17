@@ -1,0 +1,112 @@
+{
+ "game": "manpage",
+ "level": 1,
+ "audio": "narration/manpage/L1.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 50.74,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 1.73,
+   "text": "Manpage, level one.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 1.73,
+   "end": 13.18,
+   "text": "The goal is the manpage2 password, from /manpage/manpage1: the same strcpy overflow into a 256-byte buffer, but this time a length check fires.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 13.18,
+   "end": 20.45,
+   "text": "If the copy reaches 255 bytes the program raises SIGTERM after the copy, killing the process before the return.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 20.45,
+   "end": 30.34,
+   "text": "The solve is the same shellcode, with the signal disarmed: the exploit parent blocks SIGTERM before launching the binary, the mask is inherited, and the raise never delivers.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 30.34,
+   "end": 36.74,
+   "text": "Then the overflow runs to setresuid seventeen thousand two and execve /bin/sh.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 36.74,
+   "end": 43.06,
+   "text": "I log in as manpage one, read the source, block the signal in the parent, and run the exploit script.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 43.06,
+   "end": 48.38,
+   "text": "The shell comes up as manpage two, and the password file reads back the manpage2 password.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "note"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 48.38,
+   "end": 49.82,
+   "text": "The level is solved.",
+   "lines": []
+  },
+  {
+   "id": 8,
+   "start": 49.82,
+   "end": 50.74,
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
