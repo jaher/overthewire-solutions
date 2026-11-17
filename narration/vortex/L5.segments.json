@@ -128,6 +128,50 @@
    ]
   },
   {
+   "text": "Back on my own shell, I make a local directory and write the cracker there. It is the same twenty-worker search, written out again to run locally. The heredoc writes the whole file in one go: imports, target, worker, and pool.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "cmd"
+    },
+    {
+     "step": 11,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The local copy is 29 lines, the run finds the five-character password, the hash checks out, and I log back in to run it.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "cmd"
+    },
+    {
+     "step": 13,
+     "role": "cmd"
+    },
+    {
+     "step": 13,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": 14,
+     "role": "cmd"
+    },
+    {
+     "step": 14,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": 15,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
    "text": "Then I run the level directly, /vortex/vortex5, and type the cracked password, five characters, at the getpass prompt.",
    "lines": [
     {
