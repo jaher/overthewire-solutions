@@ -141,7 +141,7 @@
    ]
   },
   {
-   "text": "First the two shellcodes: a uid signature that prints the thread's effective id, and the password shellcode that builds the path backwards on the stack and reads the file through int eighty.",
+   "text": "First the imports: os, time, select, sys, and re, for the fork, the pipe, and the read loop.",
    "lines": [
     {
      "step": 16,
@@ -150,7 +150,7 @@
    ]
   },
   {
-   "text": "Then the builder: the total payload of eleven hundred bytes, the GOT offset at ten thirty-six, and the second-stage address at the return.",
+   "text": "First the two shellcodes: a uid signature that prints the thread's effective id, and the password shellcode that builds the path backwards on the stack and reads the file through int eighty.",
    "lines": [
     {
      "step": 17,
@@ -159,7 +159,7 @@
    ]
   },
   {
-   "text": "Then the trial: it forks the level, reads the output, and reports whether the process stayed alive.",
+   "text": "Then the builder: the total payload of eleven hundred bytes, the GOT offset at ten thirty-six, and the second-stage address at the return. It writes the first stage at offset eight, the second stage at offset forty-eight, and checks the payload has no NUL byte before writing the file.",
    "lines": [
     {
      "step": 18,
@@ -168,10 +168,19 @@
    ]
   },
   {
-   "text": "Then the sweep: candidate addresses, eight bytes apart, and the uid signature hit marks the buffer.",
+   "text": "Then the trial: it forks the level, reads the output, and reports whether the process stayed alive. The child runs the driver on the payload file, the parent reads the pipe with a short select timeout, and kills the child if it is still alive after the wait. The trial returns the output and the exit status.",
    "lines": [
     {
      "step": 19,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then the sweep: candidate addresses, eight bytes apart, and the uid signature hit marks the buffer. Each candidate runs the trial with the uid shellcode, and the first hit reruns the trial with the password shellcode and prints the password.",
+   "lines": [
+    {
+     "step": 20,
      "role": "vim"
     }
    ]
