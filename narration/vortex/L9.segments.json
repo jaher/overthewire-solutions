@@ -78,25 +78,15 @@
     {
      "step": 8,
      "role": "cmd"
-    },
-    {
-     "step": 8,
-     "role": "out",
-     "from": 0
     }
    ]
   },
   {
-   "text": "find locates /var/mail/vortex9, the listing shows it ten bytes, mode six forty, owned by vortex9, and the read prints the password in plain text.",
+   "text": "find locates /var/mail/vortex9, the listing shows it ten bytes, mode six forty, owned by vortex9, and the read prints the password in plain text: nine five capital K s capital P one i three capital K.",
    "lines": [
     {
      "step": 10,
      "role": "cmd"
-    },
-    {
-     "step": 10,
-     "role": "out",
-     "from": 0
     }
    ]
   },
@@ -124,11 +114,6 @@
     {
      "step": 13,
      "role": "cmd"
-    },
-    {
-     "step": 13,
-     "role": "out",
-     "from": 0
     }
    ]
   },
@@ -138,17 +123,17 @@
     {
      "step": 14,
      "role": "cmd"
-    },
-    {
-     "step": 14,
-     "role": "out",
-     "from": 0
     }
    ]
   },
   {
    "text": "The level is solved.",
-   "lines": []
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
   },
   {
    "text": "I log out.",
@@ -156,15 +141,6 @@
     {
      "step": 15,
      "role": "cmd"
-    },
-    {
-     "step": 15,
-     "role": "out",
-     "from": 0
-    },
-    {
-     "step": -1,
-     "role": "pw"
     }
    ]
   }
