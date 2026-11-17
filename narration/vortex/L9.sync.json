@@ -1,0 +1,225 @@
+{
+ "game": "vortex",
+ "level": 9,
+ "audio": "narration/vortex/L9.mp3",
+ "voice": "avocado_v2:MAI_03",
+ "duration": 80.35,
+ "segments": [
+  {
+   "id": 0,
+   "start": 0.0,
+   "end": 2.35,
+   "text": "Vortex, level nine.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "start": 2.35,
+   "end": 8.04,
+   "text": "This is the BlackBox: the official page has no information, no hints, no source.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "start": 8.04,
+   "end": 10.73,
+   "text": "The goal is the vortex10 password.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "start": 10.73,
+   "end": 12.84,
+   "text": "I log in as vortex9.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "start": 12.84,
+   "end": 14.95,
+   "text": "I make a working directory and move in.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "start": 14.95,
+   "end": 30.43,
+   "text": "The listing of /vortex shows the setup, and the level binary is missing: every other level N has /vortex/vortexN owned by the next user, but level nine's binary does not exist, and stat says no such file or directory.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "start": 30.43,
+   "end": 43.34,
+   "text": "The next binary, /vortex/vortex10, is owned by vortex11 with group vortex10, and running it is refused, permission denied, so it is unreachable from vortex9.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "start": 43.34,
+   "end": 51.79,
+   "text": "The group check explains why: the vortex10 group has no members, and setgid is refused, so there is no route to the level-ten binary at all.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "start": 51.79,
+   "end": 54.14,
+   "text": "The password arrives by mail instead.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "start": 54.14,
+   "end": 65.23,
+   "text": "find locates /var/mail/vortex9, the listing shows it ten bytes, mode six forty, owned by vortex9, and the read prints the password in plain text.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "start": 65.23,
+   "end": 67.1,
+   "text": "I log out of vortex9.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "start": 67.1,
+   "end": 70.34,
+   "text": "Then I log in as vortex10 with that password.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "start": 70.34,
+   "end": 74.83,
+   "text": "id confirms uid five thousand ten, vortex10.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "cmd"
+    },
+    {
+     "step": 13,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "start": 74.83,
+   "end": 77.83,
+   "text": "And the password file reads back the same password.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "cmd"
+    },
+    {
+     "step": 14,
+     "role": "out",
+     "from": 0
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "start": 77.83,
+   "end": 79.27,
+   "text": "The level is solved.",
+   "lines": []
+  },
+  {
+   "id": 15,
+   "start": 79.27,
+   "end": 80.35,
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": 15,
+     "role": "cmd"
+    },
+    {
+     "step": 15,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
