@@ -10,7 +10,7 @@
    ]
   },
   {
-   "text": "The goal is the manpage5 password, from /manpage/manpage4: a patched Wumpus game where log winner sprintf's the time plus a first name and a last name that are uninitialised on some paths.",
+   "text": "The goal is the manpage5 password, from /manpage/manpage4: a patched Wumpus game where the winner log prints the time, a first name, and a last name that are uninitialised on some paths.",
    "lines": [
     {
      "step": -1,
@@ -64,7 +64,7 @@
    ]
   },
   {
-   "text": "That makes the sprintf print into a buffer I control: a NOP sled, then a setresuid shellcode for seventeen thousand five, and the return address into the sled.",
+   "text": "That makes the print go into a buffer I control: a NOP sled, then a setresuid shellcode for seventeen thousand five, and the return address into the sled.",
    "lines": [
     {
      "step": 5,
