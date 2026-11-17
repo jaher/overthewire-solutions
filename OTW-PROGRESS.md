@@ -68,7 +68,7 @@ Krypton | L4 | Vigenere keylen 6: per-column chi-squared -> SERXRL, then ROT13 |
 Krypton | L5 | Vigenere unknown keylen: IC->9, per-column chi-squared->XRLYRATGU, then ROT13 | recordings/krypton/L5.cast
 Krypton | L6 | chosen-plaintext recovers periodic LFSR keystream (period 30) | recordings/krypton/L6.cast
 Krypton | L7 | final level: README confirms game complete | recordings/krypton/L7.cast
-Manpage | L0 | BLOCKED: no account reachable — manpage.labs.overthewire.org:2224 refuses password auth for manpage0 and manpage1 ('Permission denied (publickey,password)'), so the levels cannot be replayed live from this host. Earlier attempts also found the setuid bit not honoured (euid stays manpage0 at main entry), so the level appears bit-rotted upstream. | (no recording)
+- Manpage | L0 | BLOCKED row stale (2026-11-17): manpage0/maze0 logins WORK again (uid=17000/15000 live). The recorded solves stand: L0-L4 in games/manpage.json with passwords verified by logging in as manpage1..manpage5 (all five accept the recorded passwords, live 2026-11-17). No casts yet - the transcript is the per-game json. | (no recording)
 Narnia | L0 | overwrite val via 24-byte scanf into 20-byte buf | recordings/narnia/L0.cast
 Narnia | L1 | EGG env var shellcode (setreuid euid + execve), bytes env | recordings/narnia/L1.cast
 Narnia | L2 | strcpy overflow: NOP sled + shellcode, swept return address | recordings/narnia/L2.cast
