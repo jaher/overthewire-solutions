@@ -59,3 +59,24 @@ credentials after main's fix_perms, so the regain route is dead.
 
 Outcome: fresh attempt dead-ends with evidence.  Not solved; the standing
 blocked note stays.
+
+## gdb control attempt (2026-11-17)
+
+Verbatim finding: gdb CONTROLS the setuid binary (PTRACE_TRACEME pre-exec works).
+But the decisive measurement is /proc:
+
+- b *0x080490d0 (real _start) + shell grep Uid /proc/<pid>/status:
+  Uid:	5012	5012	5012	5012  -- BEFORE any program code runs
+- safecode's geteuid() (b *0x08049248, thread): eax=0x1394 = 5012
+- the binary is -r-sr-s--- (4550) owner vortex13 group vortex12
+
+The lab does not honour setuid on exec here (same as the L2 note "the setuid bit not
+honoured (euid stays manpage0 at main entry)"). The premise of L12 - a drop from
+5013 to 5012 - does not exist in this lab: the process is always 5012, and
+/etc/vortex_pass/vortex13 (mode 400, owner vortex13) is unreadable from every path.
+
+Both fix_perms calls were also skipped under gdb (main's at 0x080492f4 -> 0x080492f9,
+the thread's at 0x08049258 -> 0x0804925d, main held at unsafecode 0x08049308):
+euid was still 5012. There is no 5013 state to reach.
+
+L12 is blocked by the lab, not by the race. Not solved.
