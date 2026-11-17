@@ -77,8 +77,9 @@
    "lines": [
     {
      "step": 4,
-     "role": "out",
-     "from": 0
+     "role": "cmd",
+     "from": 0,
+     "to": 0
     }
    ]
   },
@@ -87,31 +88,38 @@
    "lines": [
     {
      "step": 4,
-     "role": "out",
-     "from": 1
+     "role": "cmd",
+     "from": 0,
+     "to": 0
     }
    ]
   },
   {
-   "text": "One hundred and thirty two winning runs out of fifteen thousand print the maze1 password.",
+   "text": "One hundred and thirty two winning runs out of fifteen thousand print Sp five V m L G F C zero.",
    "lines": [
     {
      "step": 4,
-     "role": "out",
-     "from": 1
+     "role": "cmd",
+     "from": 1,
+     "to": 1
     }
    ]
   },
   {
    "text": "The level is solved.",
-   "lines": []
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
   },
   {
    "text": "I log out.",
    "lines": [
     {
      "step": -1,
-     "role": "pw"
+     "role": "goal"
     }
    ]
   }
