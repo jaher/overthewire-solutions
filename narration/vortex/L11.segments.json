@@ -85,7 +85,7 @@
    ]
   },
   {
-   "text": "objdump shows main: three mallocs, an unbounded strcpy of the first argument, another malloc, and strncpy of fifteen bytes of the second argument.",
+   "text": "objdump shows main: three mallocs, an unbounded strcpy of the first argument, another malloc, and a bounded copy of fifteen bytes of the second argument.",
    "lines": [
     {
      "step": 8,
@@ -110,6 +110,24 @@
   },
   {
    "text": "I open vim and write the builder: it assembles the craft payload and the egg sled.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The header maps the heap first: four mallocs, and the first argument lands in the third chunk, spanning two thousand forty-eight bytes to the next page header.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The overflow plan follows: two thousand forty-eight filler bytes reach the header, then nine craft bytes overwrite it, so the next small malloc lands on a fake chunk at the exit slot.",
    "lines": [
     {
      "step": 11,
