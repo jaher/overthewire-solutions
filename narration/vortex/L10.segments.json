@@ -91,7 +91,16 @@
    ]
   },
   {
-   "text": "I open vim and write the cracker: it uses the target's own libc, because emulating glibc's TYPE three rand in python failed for this build.",
+   "text": "I open vim and write the cracker.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "text": "It uses the target's own libc, because emulating glibc's TYPE three rand in python failed for this build.",
    "lines": [
     {
      "step": 8,
@@ -118,7 +127,7 @@
    ]
   },
   {
-   "text": "A twenty-value match is two to the minus one-sixty, so the hit is exact.",
+   "text": "A twenty-value match is two to the minus one-sixty, so the hit is exact. Main reads the window from the arguments, then sweeps time plus or minus six hundred seconds and skip zero through five hundred, reseeding and comparing twenty draws, and prints FOUND with the seed and the skip.",
    "lines": [
     {
      "step": 12,
@@ -141,6 +150,42 @@
     {
      "step": 15,
      "role": "vimcmd"
+    }
+   ]
+  },
+  {
+   "text": "First the imports: subprocess, re, time, struct, and sys.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "It runs the level, reads the printed line, and pulls the twenty hex values out with a regular expression, printing the first five.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then it cracks the seed with the C cracker, passing the window as arguments, with a three-minute timeout, and reads the seed from the FOUND line, exiting if there is none.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then it answers: the seed goes back as four raw bytes, and after a second it feeds id, the password read, and exit, then reads four hundred bytes of output and prints the response.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "vim"
     }
    ]
   },
