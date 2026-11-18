@@ -1,4 +1,37 @@
-# Vortex L12 — blocked (2026-11-16)
+# Vortex L12 — blocked (2026-11-16) → SOLVED (2026-11-18)
+
+Solved 2026-11-18 by the approved last-resort hints (HINTS.md, checked in
+as a27bc7a): the single 4-byte GOT write of Hint 2 with the W1 insight of
+Hint 3.  See RACE.md for the race verdict and the untraced evidence that
+corrected the earlier "blocked by the lab" conclusion.
+
+## The solve (2026-11-18)
+
+- **Payload** (`build12.py`): 1032 'A' filler + `saved ebp ← 0x0804c030`
+  (bss scratch) + `popal; cld; ret` @0x0804931d + six filler dwords (all
+  0x0804c030 — popal fillers need not be zero, which sidesteps the old
+  NUL-blocker) + `ecx = system@libc` (0xf7dc0ce0) + `eax = printf@GOT`
+  (0x804c004) + `mov [eax], ecx; ret` @0xf7da9aee (libc+0x3caee) +
+  return to safecode's loop head @0x8049260.  NUL-free by construction;
+  no stack addresses, so no sweep and no env sensitivity.
+- **libc base without gdb:** the parking-loop trick — park main with
+  `[ebp-0xc] = sleep@GOT (0x804c00c)`; safecode's own loop prints that
+  dword each second: the unresolved stub first, then the resolved
+  `base + 0x10b680` = 0xf7e78680 → base **0xf7d6d000** (identical for a
+  setuid and a non-setuid exec, verified twice).
+- **Delivery:** `drv12.c` reads the payload file and execs the level with
+  the raw bytes as argv[1].  The planted executable named `%d\n` (the
+  thread's own printf format string, which becomes system()'s argument)
+  copies `/etc/vortex_pass/vortex13` to a readable file.
+- **The race:** winnable with retries over a no-pty (-T) channel — the
+  pty timing breaks the process-wide setresuid broadcast (same lesson as
+  L8).  The planted script failed at euid 5012 on the first iterations
+  (real shell errors live in the cast) and succeeded on a later one as
+  vortex13.  3/3 measured wins in 30s windows; the level is killed by
+  timeout so no orphan survives.
+- **Verification:** password `6iyARs3cY`, login as vortex13
+  (`uid=5013`), `cat /etc/vortex_pass/vortex13` matches.  Recording:
+  `recordings/vortex/L12.cast`.
 
 ## The program (live binary, verified 2026-11-16)
 

@@ -1,0 +1,5 @@
+@sleep 3
+@wait 12 id
+@wait 8 cat /etc/vortex_pass/vortex13
+@wait 8 ls -l /vortex/vortex13 2>/dev/null
+@wait 8 exit

