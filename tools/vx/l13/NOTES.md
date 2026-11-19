@@ -237,3 +237,80 @@ path, every pre-main route audited, no helper-exec route, no emulator),
 and a pre-5.18-kernel VM is infeasible (no kvm, no qemu-system, no
 outbound network).  The level stays blocked pending a kernel change on
 the lab host.
+
+## Fifth attempt (2026-11-19): external process control with ptrace
+
+### Step 1 — static/dynamic finding
+
+`/vortex/vortex13` is **DYNAMIC** (`NEEDED libc.so.6`, Type EXEC): a
+loader-init window exists between exec and main's argc gate (ld.so maps
+libc, then main).  A static binary would give almost none.
+
+### Step 2 — empirical permission test (cheap, decisive)
+
+`ptrace13.c` (fork; the child sets `PR_SET_DUMPABLE(0)` and loops; the
+parent PTRACE_ATTACHes; then the control with dumpable=1):
+
+- attach to dumpable=0 (same uid): **rc=-1 errno=Operation not permitted**
+- attach to dumpable=1 (same uid): rc=0 errno=Success
+
+**The dumpable rule blocks external ptrace control without CAP_SYS_PTRACE
+- even by the same uid.**  A setuid vortex14 process (dumpable=0 from the
+moment of exec, since ruid != fsuid) cannot be PTRACE_ATTACHed by
+vortex13.  ptrace_scope = 1 (yama): the pure parent-attach shape
+SUCCEEDS for a dumpable=1 child (rc=0), so the block is precisely the
+dumpable flag, not the parent relationship.
+
+Control datum (the L12 precedent): the parked setuid vortex12 process
+(r=e=s=5012 after fix_perms) CAN be attached by its direct parent -
+**the kernel re-evaluates dumpable on setresuid: ruid == fsuid ->
+dumpable 1** (empirically: rc=0).  The L13 level has NO drop: its
+process keeps ruid=5013 != fsuid=5014, so dumpable stays 0 from exec -
+the attach fails EPERM at any moment.
+
+### Step 3 — the attach race, measured (decisive)
+
+`race13.c` (20 spawns with argv={NULL}, a tight attach loop per spawn):
+spawns=20 **attached=20** exits=0 eperm=0.  The 20/20 attaches are the
+PRE-exec fork window (the child is still the wrapper image, uid match
+5013==5013) - they don't help: after the detach the level execs and the
+gate exits(1).
+
+`race13b.c` (the decisive shape: the child sleeps 2s PRE-exec so the
+parent's attach cannot land pre-exec, then execs; the parent attaches
+after the exec): **post-exec attach: rc=-1 errno=Operation not
+permitted.**
+
+The spawned setuid vortex14 level (fsuid 5014, dumpable=2 - the
+Ubuntu-default suid_dumpable sysctl) cannot be PTRACE_ATTACHed by
+vortex13 (fsuid 5013, no CAP_SYS_PTRACE): the uid rule blocks it.
+dumpable=2 (suid-safe) does NOT block ptrace itself - only the uid rule
+does.
+
+Resolution of the earlier "dumpable=0 blocks" datum: the ptrace13 test
+used PR_SET_DUMPABLE(0) (dumpable=0 = SUID_DUMP_DISABLE, which blocks
+ptrace even same-uid).  A setuid exec sets dumpable=2 (suid-safe, from
+the sysctl), which does not block ptrace - but the uid rule (fsuid
+5014 vs 5013) does.  The L12 parked process became attachable because
+its fix_perms setresuid'd ruid=fsuid=5012 (the kernel re-evaluates
+dumpable on setresuid: ruid == fsuid -> dumpable 1) - the L13 level has
+NO drop, so fsuid stays 5014: the uid rule blocks at every moment.
+
+**The attach race for L13 is dead: post-exec attaches fail EPERM (uid
+mismatch, no CAP_SYS_PTRACE), pre-exec/traceme attaches don't change
+the gate's outcome.**
+
+### Step 4 — every outcome documented
+
+- static/dynamic: DYNAMIC (loader window exists, but no attach can use
+  it).
+- the attach errno: post-exec = EPERM (Operation not permitted); the
+  dumpable=0 same-uid test = EPERM (the PR_SET_DUMPABLE(0) rule).
+- the attach win rate: 20/20 pre-exec (useless); 0 post-exec.
+
+### Step 5 — what class of route remains untested
+
+No class of route remains untested for L13 on this lab: every exec
+path, the pre-main routes, the writeups, the helpers, the emulators,
+the hosts, and now external ptrace control are all closed.  The only
+lever is the lab host's kernel version (the 5.18+ empty-argv fix).
