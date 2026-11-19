@@ -1,3 +1,29 @@
+## Level 13 → vortex14 (BLOCKED 2026-11-19)
+- **No password obtained.**  The level's gate is `if (argc != 0) exit(1)` — main's FIRST check (`cmp [argc],0; je skip-exit`, bytes `83 38 00`/`74 0a` at 0x8049292).  The published technique needs argc==0, which is unreachable on this kernel.
+- **The program (verified against the live binary, md5 `5c9efbdf32e1d3473cb75511ccbf8fbd`):** `/vortex/vortex13`, mode 4750, setuid vortex14, group vortex13, 15200 bytes, not stripped, `GNU_STACK RW` (NX), partial RELRO:
+  ```c
+  void vuln(void) {                    /* 0x80491d6 */
+      unsigned n = 20;
+      char *buf = malloc(n);
+      if (!fgets(buf, n, stdin)) exit(1);
+      for (i = 0; i < 20; i++)
+          if (!strchr(ALLOW, (signed char)buf[i])) exit(1);
+      printf(buf);                     /* format string, allowlisted */
+      free(buf);
+  }
+  int main(...) {                      /* 0x804927b */
+      if (argc != 0) exit(1);          /* the gate */
+      /* zero every envp string byte (.bss array 0x804c040), then every
+         argv string byte (the ecx-thunk's [eax+4]) */
+      setreuid(geteuid(), geteuid());
+      vuln();
+  }
+  ```
+  ALLOW (rodata 0x0804a008) = `ABC..xyz0123456789%.$\n`; the strchr check covers 20 bytes of the fgets buffer including the NUL (`strchr(s,0)` returns non-NULL, so NUL passes).
+- **The published technique (l3ouu4n9, re-derived):** execve with NULL argv/envp gives argc==0 on pre-5.18 kernels, so the gate passes and the zeroing loops see no strings; the kernel's separate AT_EXECFN basename copy (a symlink with a crafted name) plants attacker bytes at the stack bottom; a fmt write (`%57316x%112$hn` in the writeup) repoints a stack slot into the crafted name and vuln's leave/ret pivots into system@libc("sh").
+- **Why it is blocked here (untraced evidence, 2026-11-19):** the lab's kernel 7.0.0-1014-aws (>= 5.18) forces a single empty string for an empty argv ("exec: Force single empty string when argv is empty"), so argc==0 is unreachable: printargc via execve with argv={NULL} and argv={NULL,NULL} both report argc=1; argv=NULL (glibc-normalized) also argc=1.  The real binary under an empty-argv exec: `execve("/vortex/vortex13", [], [])` → exit_group(1) with NO read(0) at all (strace, untraced) — main's argc gate exits before vuln().  The AT_EXECFN angle is downstream of the gate: vuln never runs, so no fmt write, no pivot, no shell.
+- **Files:** `tools/vx/l13/` (`probe13.c` execve probe, `printargc.c` argc printer, `argcprobe.c` self-re-exec probe, `NOTES.md` the verdict).
+
 
 ## Level 12 → vortex13 (SOLVED 2026-11-18)
 - **Password for vortex13:** `6iyARs3cY`, dropped by the planted script to a readable file and verified by logging in as vortex13 (`uid=5013`, `cat /etc/vortex_pass/vortex13` matches).  Recording: `recordings/vortex/L12.cast`.
