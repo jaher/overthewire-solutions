@@ -1,0 +1,20 @@
+@sleep 3
+@wait 12 D=$(mktemp -d); cd $D; pwd
+@wait 8 echo "--- angle 1: helper-exec audit ---"
+@wait 6 sudo -l 2>&1 | head -3
+@wait 10 getcap -r /usr/bin /bin 2>/dev/null | head -10
+@wait 6 getcap -r /vortex 2>/dev/null; ls /usr/bin/pkexec 2>&1
+@wait 10 ls -la /home/bandit26/bandit27-do /home/leviathan1/check 2>&1
+@wait 6 /home/leviathan1/check 2>&1 | head -1
+@wait 10 ls -la /etc/cron.d/ 2>/dev/null | head -12
+@wait 10 systemctl list-timers 2>&1 | head -5
+@wait 8 ps aux 2>/dev/null | grep -ci "vortex14"
+@wait 8 echo "--- angle 2: emulator probe ---"
+@wait 8 which qemu-i386 qemu-i386-static box86 box64 2>/dev/null; ls /usr/bin/qemu* 2>/dev/null | head -3
+@wait 10 find / -name "qemu*" -type f 2>/dev/null | head -5
+@wait 8 echo "--- angle 4: host recheck ---"
+@wait 6 hostname -I 2>/dev/null; uname -r
+@wait 8 echo "--- angle 5 scope: kvm + network ---"
+@wait 6 ls -la /dev/kvm 2>&1
+@wait 8 timeout 5 bash -c "echo > /dev/tcp/1.1.1.1/443" 2>&1 && echo "outbound OK" || echo "outbound blocked"
+@wait 8 exit

@@ -160,3 +160,80 @@ Angle 3 closed.  **Final verdict: L13 remains blocked on this lab -
 argc==0 is unreachable on kernel 7.0.0 (every exec path, every pre-main
 route audited), and no writeup addresses the 5.18 empty-argv fix.  The
 level stays blocked pending a kernel change on the lab host.**
+
+## Fourth attempt (2026-11-19): five new angles, all closed
+
+### Angle 1 — helper-exec audit
+
+- `sudo -l`: unusable ("sudo must be owned by uid 0 and have the setuid
+  bit set").
+- `getcap -r /usr/bin /bin`: only `ping`/`mtr-packet` (cap_net_raw=ep) -
+  no exec helper.  `getcap -r /vortex`: nothing.
+- pkexec: not installed.
+- The 88 setuid binaries (enumerated last session): the wargame
+  binaries + bandit26's bandit27-do (750 bandit27:bandit26), bandit20's
+  suconnect, leviathan helpers - all 750 owner-group only; vortex13 is
+  in none of those groups (`/home/leviathan1/check` -> Permission
+  denied).  Nothing yields euid 5014 or a caller-controlled-argv
+  launcher.
+- cron: only the shared lab cleanup jobs; systemd timers: system ones
+  (sysstat/fwupd/motd-news/tmpfiles-clean).
+- Running processes: only my sshd-session (no vortex14 helper).
+
+**No helper that launches a program with caller-controlled argv on
+vortex13's behalf exists.  Angle closed.**
+
+### Angle 2 — emulator probe
+
+- `which qemu-i386 qemu-i386-static box86 box64`: nothing.
+- `find / -name "qemu*" -type f`: only bash-completion/pwnlib headers
+  (no binary).  No box86/box64 anywhere.  dpkg: no qemu packages.
+
+**No user-mode emulator exists on the lab host; the "emulator builds
+its own guest stack" route is unavailable.  Angle closed.**
+
+### Angle 3 — pre-main stack check
+
+- NO `.preinit_array` section at all.
+- `.init_array`: one entry (0x80491d0 = frame_dummy - the standard
+  constructor: endbr32; jmp register_tm_clones; it touches nothing
+  attacker-relevant).
+- **ZERO R_386_IRELATIVE relocations: no IFUNC resolvers run.**
+- main's pre-gate code (0x804927b..0x8049292): lea ecx,[esp+4] (&argc);
+  and esp,~15; push [ecx-4] (the return address); push ebp/ebx/ecx;
+  sub esp,0x10; mov eax,ecx.  **No memory access except [ecx-4] and the
+  gate's [eax] - nothing touches argv/env.**
+- Gate bytes re-confirmed at 0x8049292: `83 38 00` (cmp [eax],0) /
+  `74 0a` (je past the exit).
+
+**Nothing before the gate can rewrite the argc slot.  Angle closed.**
+
+### Angle 4 — alternate-host recheck
+
+- 4 resolves: identical address every time (13.63.111.222, one IPv4, no
+  AAAA).  One STREAM/DGRAM/RAW host.
+- Filesystem sweep: no copy of the level binary outside /vortex; no
+  other reference to vortex_pass/vortex14 (the one grep -l hit was a
+  false positive: `grep -c` on the file is 0; od shows the 10-byte
+  password only).
+
+**Angle closed.**
+
+### Angle 5 — old-kernel VM feasibility (scope only)
+
+- No `qemu-system` binary on the host.
+- `/dev/kvm` does not exist: hardware virtualization unavailable.
+- Outbound network is firewall-blocked: 1.1.1.1:443 refused,
+  deb.debian.org:80 refused.
+
+**Booting a pre-5.18-kernel VM is infeasible here: no kvm, no
+qemu-system, no network to fetch a kernel.  Scope reported, nothing
+built.**
+
+## Final verdict (fourth attempt)
+
+L13 remains blocked on this lab.  argc==0 is unreachable (every exec
+path, every pre-main route audited, no helper-exec route, no emulator),
+and a pre-5.18-kernel VM is infeasible (no kvm, no qemu-system, no
+outbound network).  The level stays blocked pending a kernel change on
+the lab host.

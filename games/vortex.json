@@ -6510,8 +6510,33 @@
    "user": "vortex13",
    "steps": [
     {
-     "cmd": "    -fno-stack-protector    disable ProPolice",
+     "cmd": "    * Most LEVELS are stored in /somegame/.",
      "out": [
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around"
+     ]
+    },
+    {
+     "cmd": "    * don't annoy other players",
+     "out": [
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "--[ Tips ]--",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
       "    -Wl,-z,norelro          disable relro",
       "  In addition, the execstack tool can be used to flag the stack as",
       "  executable on ELF binaries.",
@@ -6543,107 +6568,194 @@
       "    ;   :    /       '   :  |     :   '  |--\"",
       "     \\   \\ .'        ;   |.'       \\   \\ ;",
       "  www. `---` ver     '---' he       '---\" ire.org",
+      "Welcome to OverTheWire!",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "--[ Playing the games ]--",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "    * USERNAMES are somegame0, somegame1, ...",
       "vortex13@vortex:~$ "
      ]
     },
     {
      "cmd": "D=$(mktemp -d); cd $D; pwd",
-     "out": []
-    },
-    {
-     "cmd": "/tmp/tmp.WOSjIYvWyA",
      "out": [
-      "vortex13@vortex:/tmp/tmp.WOSjIYvWyA$ "
+      "/tmp/tmp.YQueM9kftj",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ "
      ]
     },
     {
-     "cmd": "echo \"--- angle 1: the pre-main entry audit ---\"",
+     "cmd": "echo \"--- angle 1: helper-exec audit ---\"",
      "out": []
     },
     {
-     "cmd": "--- angle 1: the pre-main entry audit ---",
+     "cmd": "--- angle 1: helper-exec audit ---",
      "out": []
     },
     {
-     "cmd": "objdump -d /vortex/vortex13 -M intel | sed -n '/<_init>:/,/^$/p'",
+     "cmd": "sudo -l 2>&1 | head -3",
      "out": []
     },
     {
-     "cmd": "08049000 <_init>:",
+     "cmd": "sudo: sudo must be owned by uid 0 and have the setuid bit set",
+     "out": []
+    },
+    {
+     "cmd": "getcap -r /usr/bin /bin 2>/dev/null | head -10",
+     "out": []
+    },
+    {
+     "cmd": "/usr/bin/ping cap_net_raw=ep",
      "out": [
-      " 8049000:\t53                   \tpush   ebx",
-      " 8049001:\t83 ec 08             \tsub    esp,0x8",
-      " 8049004:\te8 07 01 00 00       \tcall   8049110 <__x86.get_pc_thunk.bx>",
-      " 8049009:\t81 c3 eb 2f 00 00    \tadd    ebx,0x2feb",
-      " 804900f:\t8b 83 fc ff ff ff    \tmov    eax,DWORD PTR [ebx-0x4]",
-      " 8049015:\t85 c0                \ttest   eax,eax",
-      " 8049017:\t74 02                \tje     804901b <_init+0x1b>",
-      " 8049019:\tff d0                \tcall   eax",
-      " 804901b:\t83 c4 08             \tadd    esp,0x8",
-      " 804901e:\t5b                   \tpop    ebx",
-      " 804901f:\tc3                   \tret"
+      "/usr/bin/mtr-packet cap_net_raw=ep",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ "
      ]
     },
     {
-     "cmd": "objdump -d /vortex/vortex13 -M intel | sed -n '/<_start>:/,/^$/p'",
+     "cmd": "getcap -r /vortex 2>/dev/null; ls /usr/bin/pkexec 2>&1",
      "out": []
     },
     {
-     "cmd": "readelf -x .init_array /vortex/vortex13",
+     "cmd": "ls: cannot access '/usr/bin/pkexec': No such file or directory",
      "out": []
     },
     {
-     "cmd": "readelf -x .fini_array /vortex/vortex13",
+     "cmd": "ls -la /home/bandit26/bandit27-do /home/leviathan1/check 2>&1",
      "out": []
     },
     {
-     "cmd": "echo \"--- the xref scan (typed in vim) ---\"",
-     "out": []
-    },
-    {
-     "cmd": "--- the xref scan (typed in vim) ---",
-     "out": []
-    },
-    {
-     "cmd": "vi xref13.py",
-     "out": []
-    },
-    {
-     "cmd": "python3 xref13.py",
-     "out": []
-    },
-    {
-     "cmd": "branches to vuln (0x80491d6):",
+     "cmd": "-rwsr-x--- 1 bandit27   bandit26   14880 Oct 25 13:37 \u001b[0m\u001b[37;41m/home/bandit26/bandit27-do\u001b[0m",
      "out": [
-      "  0x0804937e call",
-      ".init_array entry: 0x080491d0",
-      "  = frame_dummy"
+      "-r-sr-x--- 1 leviathan2 leviathan1 15080 Oct 25 13:39 /home/leviathan1/check",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ "
      ]
+    },
+    {
+     "cmd": "/home/leviathan1/check 2>&1 | head -1",
+     "out": [
+      "-bash: /home/leviathan1/check: Permission denied",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ "
+     ]
+    },
+    {
+     "cmd": "ls -la /etc/cron.d/ 2>/dev/null | head -12",
+     "out": []
+    },
+    {
+     "cmd": "total 56",
+     "out": [
+      "drwxr-xr-x   2 root root  4096 Oct 26 15:51 .",
+      "drwxr-xr-x 128 root root 12288 Nov  1 13:23 ..",
+      "-rw-r--r--   1 root root   102 Nov  5  2025 .placeholder",
+      "-r--r-----   1 root root    47 Oct 25 13:37 behemoth4_cleanup",
+      "-rw-r--r--   1 root root   127 Oct 26 15:51 clean_tmp",
+      "-rw-r--r--   1 root root   120 Oct 25 13:37 cronjob_bandit22",
+      "-rw-r--r--   1 root root   122 Oct 25 13:37 cronjob_bandit23",
+      "-rw-r--r--   1 root root   120 Oct 25 13:37 cronjob_bandit24",
+      "-rw-r--r--   1 root root   188 Feb 13  2026 e2scrub_all",
+      "-r--r-----   1 root root    48 Oct 25 13:39 leviathan5_cleanup",
+      "-rw-------   1 root root   138 Oct 25 13:39 manpage3_resetpw_job"
+     ]
+    },
+    {
+     "cmd": "systemctl list-timers 2>&1 | head -5",
+     "out": []
+    },
+    {
+     "cmd": "NEXT                            LEFT LAST                              PASSED UNIT                           ACTIVATES",
+     "out": [
+      "Thu 2026-11-19 08:50:00 UTC     6min Thu 2026-11-19 08:40:00 UTC 3min 28s ago sysstat-collect.timer          sysstat-collect.service",
+      "Thu 2026-11-19 09:17:06 UTC    33min Thu 2026-11-19 08:37:17 UTC     6min ago fwupd-refresh.timer            fwupd-refresh.service",
+      "Thu 2026-11-19 12:32:47 UTC 3h 49min Thu 2026-11-19 05:44:49 UTC 2h 58min ago motd-news.timer                motd-news.service",
+      "Thu 2026-11-19 13:26:02 UTC 4h 42min Wed 2026-11-18 13:26:01 UTC      19h ago update-notifier-download.timer update-notifier-download.service"
+     ]
+    },
+    {
+     "cmd": "ps aux 2>/dev/null | grep -ci \"vortex14\"",
+     "out": []
+    },
+    {
+     "cmd": "1",
+     "out": []
+    },
+    {
+     "cmd": "echo \"--- angle 2: emulator probe ---\"",
+     "out": []
+    },
+    {
+     "cmd": "--- angle 2: emulator probe ---",
+     "out": []
+    },
+    {
+     "cmd": "which qemu-i386 qemu-i386-static box86 box64 2>/dev/null; ls /usr/bin/qemu* 2>/dev/null | head -3",
+     "out": []
+    },
+    {
+     "cmd": "find / -name \"qemu*\" -type f 2>/dev/null | head -5",
+     "out": []
+    },
+    {
+     "cmd": "/usr/src/linux-aws-headers-7.0.0-1014/include/uapi/linux/qemu_fw_cfg.h",
+     "out": [
+      "/usr/share/bash-completion/completions/qemu",
+      "/usr/lib/python3/dist-packages/pwnlib/__pycache__/qemu.cpython-314.pyc",
+      "/usr/lib/python3/dist-packages/pwnlib/qemu.py",
+      "/usr/include/linux/qemu_fw_cfg.h"
+     ]
+    },
+    {
+     "cmd": "echo \"--- angle 4: host recheck ---\"",
+     "out": []
+    },
+    {
+     "cmd": "--- angle 4: host recheck ---",
+     "out": []
+    },
+    {
+     "cmd": "hostname -I 2>/dev/null; uname -r",
+     "out": []
+    },
+    {
+     "cmd": "10.0.1.99 ",
+     "out": []
     },
     {
      "cmd": "7.0.0-1014-aws",
      "out": []
     },
     {
-     "cmd": "hostname -I 2>/dev/null; hostname",
+     "cmd": "echo \"--- angle 5 scope: kvm + network ---\"",
      "out": [
-      "10.0.1.99 "
+      "--- angle 5 scope: kvm + network ---"
      ]
     },
     {
-     "cmd": "gibson-0",
-     "out": [
-      "vortex13@vortex:/tmp/tmp.WOSjIYvWyA$ "
-     ]
-    },
-    {
-     "cmd": "echo \"--- angle 2 writeups: l3ouu4n9 + rk700 rely on {NULL} argc=0 (2019/2014), predate the 5.18 fix ---\"",
+     "cmd": "ls -la /dev/kvm 2>&1",
      "out": []
     },
     {
-     "cmd": "exit",
+     "cmd": "ls: cannot access '/dev/kvm': No such file or directory",
+     "out": []
+    },
+    {
+     "cmd": "timeout 5 bash -c \"echo > /dev/tcp/1.1.1.1/443\" 2>&1 && echo \"outbound OK\" || echo \"outbound blocked\"",
+     "out": []
+    },
+    {
+     "cmd": "bash: connect: Connection refused",
      "out": [
-      "logout",
+      "bash: line 1: /dev/tcp/1.1.1.1/443: Connection refused",
+      "outbound blocked"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": []
+    },
+    {
+     "cmd": "logout",
+     "out": [
       "      ,----..            ,----,          .---.",
       "     /   /   \\         ,/   .`|         /. ./|",
       "    /   .     :      ,`   .'  :     .--'.  ' ;",
@@ -6657,19 +6769,112 @@
       "    ;   :    /       '   :  |     :   '  |--\"",
       "     \\   \\ .'        ;   |.'       \\   \\ ;",
       "  www. `---` ver     '---' he       '---\" ire.org",
-      "D=$(mktemp -d); cd $D; pwd",
-      "objdump -d /vortex/vortex13 -M intel | sed -n '/<_init>:/,/^$/p'",
-      "vi xref13.py",
-      ":set paste noai nosi nocindent",
-      "i -- INSERT (paste) --#!/usr/bin/env python3# xref13 - scan every e8/e9 branch in .text of /vortex/vortex13 and# compute its target: find every path to vuln (0x80491d6).from elftools.elf.elffile import ELFFileimport structf = open('/vortex/vortex13', 'rb')elf = ELFFile(f)text = elf.get_section_by_name('.text')code = text.data()base = text['sh_addr']hits = []for i in range(len(code) - 5):    if code[i] in (0xe8, 0xe9):rel = struct.unpack('<i', code[i+1:i+5])[0]tgt = base + i + 5 + relkind = 'call' if code[i] == 0xe8 else 'jmp'if tgt == 0x80491d6:hits.append((base + i, kind))print(\"branches to vuln (0x80491d6):\")for a, k in hits:    print(\"  0x%08x %s\" % (a, k))# the init_array entryia = elf.get_section_by_name('.init_array')val = struct.unpack('<I', ia.data())[0]print(\".init_array entry: 0x%08x\" % val)",
-      "for sym in elf.get_section_by_name('.symtab').iter_symbols():~                                                                                                   ",
-      "if sym['st_value'] == val:~                                                                                                   ",
-      "print(\"  = %s\" % sym.name)~                                                                                                   ^[  :wq",
-      "\u001b[>4;m\"xref13.py\" [New] 29L, 988B written",
-      "\u001b[>4;mvortex13@vortex:/tmp/tmp.WOSjIYvWyA$ branches to vuln (0x80491d6):",
-      "  0x0804937e call",
-      ".init_array entry: 0x080491d0",
-      "  = frame_dummy"
+      "Welcome to OverTheWire!",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "--[ Playing the games ]--",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "--[ Tips ]--",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "--[ Tools ]--",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "--[ More information ]--",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "  Enjoy your stay!",
+      "vortex13@vortex:~$ D=$(mktemp -d); cd $D; pwd",
+      "/tmp/tmp.YQueM9kftj",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ echo \"--- angle 1: helper-exec audit ---\"",
+      "sudo -l 2>&1 | head -3",
+      "sudo: sudo must be owned by uid 0 and have the setuid bit set",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ getcap -r /usr/bin /bin 2>/dev/null | head -10",
+      "/usr/bin/ping cap_net_raw=ep",
+      "/usr/bin/mtr-packet cap_net_raw=ep",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ getcap -r /vortex 2>/dev/null; ls /usr/bin/pkexec 2>&1",
+      "ls: cannot access '/usr/bin/pkexec': No such file or directory",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ ls -la /home/bandit26/bandit27-do /home/leviathan1/check 2>&1",
+      "-rwsr-x--- 1 bandit27   bandit26   14880 Oct 25 13:37 /home/bandit26/bandit27-do",
+      "-r-sr-x--- 1 leviathan2 leviathan1 15080 Oct 25 13:39 /home/leviathan1/check",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ /home/leviathan1/check 2>&1 | head -1",
+      "-bash: /home/leviathan1/check: Permission denied",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ ls -la /etc/cron.d/ 2>/dev/null | head -12",
+      "total 56",
+      "drwxr-xr-x   2 root root  4096 Oct 26 15:51 .",
+      "drwxr-xr-x 128 root root 12288 Nov  1 13:23 ..",
+      "-rw-r--r--   1 root root   102 Nov  5  2025 .placeholder",
+      "-r--r-----   1 root root    47 Oct 25 13:37 behemoth4_cleanup",
+      "-rw-r--r--   1 root root   127 Oct 26 15:51 clean_tmp",
+      "-rw-r--r--   1 root root   120 Oct 25 13:37 cronjob_bandit22",
+      "-rw-r--r--   1 root root   122 Oct 25 13:37 cronjob_bandit23",
+      "-rw-r--r--   1 root root   120 Oct 25 13:37 cronjob_bandit24",
+      "-rw-r--r--   1 root root   188 Feb 13  2026 e2scrub_all",
+      "-r--r-----   1 root root    48 Oct 25 13:39 leviathan5_cleanup",
+      "-rw-------   1 root root   138 Oct 25 13:39 manpage3_resetpw_job",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ systemctl list-timers 2>&1 | head -5",
+      "NEXT                            LEFT LAST                              PASSED UNIT                           ACTIVATES",
+      "Thu 2026-11-19 08:50:00 UTC     6min Thu 2026-11-19 08:40:00 UTC 3min 28s ago sysstat-collect.timer          sysstat-collect.service",
+      "Thu 2026-11-19 09:17:06 UTC    33min Thu 2026-11-19 08:37:17 UTC     6min ago fwupd-refresh.timer            fwupd-refresh.service",
+      "Thu 2026-11-19 12:32:47 UTC 3h 49min Thu 2026-11-19 05:44:49 UTC 2h 58min ago motd-news.timer                motd-news.service",
+      "Thu 2026-11-19 13:26:02 UTC 4h 42min Wed 2026-11-18 13:26:01 UTC      19h ago update-notifier-download.timer update-notifier-download.service",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ ps aux 2>/dev/null | grep -ci \"vortex14\"",
+      "1",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ echo \"--- angle 2: emulator probe ---\"",
+      "--- angle 2: emulator probe ---",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ which qemu-i386 qemu-i386-static box86 box64 2>/dev/null; ls /usr/bin/qemu* 2>/dev/null | head -3",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ find / -name \"qemu*\" -type f 2>/dev/null | head -5",
+      "/usr/src/linux-aws-headers-7.0.0-1014/include/uapi/linux/qemu_fw_cfg.h",
+      "/usr/share/bash-completion/completions/qemu",
+      "/usr/lib/python3/dist-packages/pwnlib/__pycache__/qemu.cpython-314.pyc",
+      "/usr/lib/python3/dist-packages/pwnlib/qemu.py",
+      "/usr/include/linux/qemu_fw_cfg.h",
+      "echo \"--- angle 4: host recheck ---\"",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ hostname -I 2>/dev/null; uname -r",
+      "10.0.1.99 ",
+      "7.0.0-1014-aws",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ echo \"--- angle 5 scope: kvm + network ---\"",
+      "--- angle 5 scope: kvm + network ---",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ ls -la /dev/kvm 2>&1",
+      "ls: cannot access '/dev/kvm': No such file or directory",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ timeout 5 bash -c \"echo > /dev/tcp/1.1.1.1/443\" 2>&1 && echo \"outbound OK\" || echo \"outbound blocked\"",
+      "bash: connect: Connection refused",
+      "bash: line 1: /dev/tcp/1.1.1.1/443: Connection refused",
+      "outbound blocked",
+      "vortex13@vortex:/tmp/tmp.YQueM9kftj$ exit",
+      "0"
      ]
     }
    ]
