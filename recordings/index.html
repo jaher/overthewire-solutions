@@ -167,7 +167,7 @@ const LEVELS = [
   ["Vortex",10,"srand-seed echo: reverse the srand seed from the printed 20-value rand() window with a libc-based C cracker; echo it as 4 raw bytes to get setresuid+sh -i"],
   ["Vortex",11,"phkmalloc heap overflow -> exit@GOT: 2048-byte strcpy overflows into the next page's header; corrupt next makes malloc(0x10) return exit@GOT; strncpy writes 15 bytes; exit(0) jumps into the EGG sled -> 73-byte int 0x80 shellcode reading /etc/vortex_pass/vortex12"],
   ["Vortex",12,"GOT write to system + privilege race: one ROP patches printf@GOT <- system@libc and returns main into safecode's loop; the thread calls system(\"%d\\n\") once a second - a planted executable named %d\\n copies the password; the thread's own fix_perms(setresuid 5013) wins the process-wide race on a later iteration"],
-  ["Vortex",13,"blocked by the kernel: main requires argc==0 as its first check; the kernel (7.0.0, >= 5.18) fills an empty argv with a single empty string so argc==0 is unreachable (printargc reports argc=1 under argv={NULL}); the level exits(1) with no stdin read under an empty-argv exec (strace evidence)"],
+  ["Vortex",13,"blocked by the kernel: main requires argc==0 as its first check; every exec path (execve argv=NULL/{NULL}/{NULL,NULL}, execveat, fexecve, posix_spawn) straced: the level exits(1) with zero stdin reads; no alternate route (vortex14.txt is 400 vortex14, no mail, no sudo, setgid/setreuid 5014 EPERM)"],
 ];
 
 const rows = document.getElementById('rows');
