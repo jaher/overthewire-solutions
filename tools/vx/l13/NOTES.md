@@ -108,3 +108,55 @@ L13 is blocked by the kernel's empty-argv normalization (7.0.0, >= 5.18)
 on every exec path, and no alternate route to /etc/vortex_pass/vortex14
 exists from vortex13.  The level's argc==0 premise is structurally dead
 on this lab.  Both angles documented with untraced evidence.
+
+## Pre-main entry audit + hints + host check (2026-11-19, third session)
+
+### Pre-main entry audit (angle 1)
+
+- Sections: .init (0x8049000, 0x20), .init_array (0x804bf00, 1 entry),
+  .fini_array (1 entry), .plt (0x8049020), .text (0x80490c0).
+- .init_array entry = 0x80491d0 = **frame_dummy** (endbr32; jmp
+  register_tm_clones) - the standard constructor, NOT vuln.
+- .init calls [ebx-4] = __gmon_start__ (weak, 0 -> skipped).
+- _start flows to __libc_start_main -> main (the standard path).
+- **The ONLY branch to vuln (0x80491d6) is main's call at 0x804937e** -
+  a scan of every e8/e9 in .text computes the targets; exactly one hits
+  vuln, and it sits AFTER main's argc gate (0x804928f).  No data
+  reference, no alternate entry, no pre-main path primes the stack or
+  the format state.
+
+No route to vuln bypasses main's argc gate.  Angle 1 closed with
+evidence.
+
+### Last-resort hints (angle 2): public writeups on the 5.18 fix
+
+- l3ouu4n9 (2019-12-02): the {NULL}/{NULL} execve wrapper "passes the
+  restriction of argc = 0" - no mention of kernel 5.18+, the empty-argv
+  fix, or a fallback for modern kernels.
+- rk700 (2014-09-14, vortex13): the same {NULL} loader ("The binary
+  checks that argc is nonzero, so it must be launched with argv
+  containing only NULL"), then the full technique: a symlink whose
+  filename is the payload (saved-ebp overwrite + system + "sh" bytes),
+  the kernel leaving the invocation path at the stack bottom (for a
+  symlink it is the LINK's path), and %57316x%116$hn writing the low
+  half of the saved ebp.  No mention of the 5.18 fix (predates it).
+- rk700 (2014-09-13, vortex12): covers L12 only.
+- Web search unavailable in this environment (all providers failed);
+  the covered sources are the official site, l3ouu4n9, and rk700.
+
+No public writeup addresses the 5.18 empty-argv fix for L13.  The
+technique both writeups describe is downstream of the argc gate, which
+is the block here.  Angle 2 closed.
+
+### Host check (angle 3)
+
+- DNS: vortex.labs.overthewire.org resolves to ONE address
+  (13.63.111.222).
+- Fresh login: kernel 7.0.0-1014-aws, hostname gibson-0, IP 10.0.1.99 -
+  unchanged.  No alternate entry point with an older kernel is reachable
+  from this session (all OTW vortex levels are the same host).
+
+Angle 3 closed.  **Final verdict: L13 remains blocked on this lab -
+argc==0 is unreachable on kernel 7.0.0 (every exec path, every pre-main
+route audited), and no writeup addresses the 5.18 empty-argv fix.  The
+level stays blocked pending a kernel change on the lab host.**

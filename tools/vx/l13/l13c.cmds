@@ -1,0 +1,47 @@
+@sleep 3
+@wait 12 D=$(mktemp -d); cd $D; pwd
+@wait 8 echo "--- angle 1: the pre-main entry audit ---"
+@wait 10 objdump -d /vortex/vortex13 -M intel | sed -n '/<_init>:/,/^$/p'
+@wait 10 objdump -d /vortex/vortex13 -M intel | sed -n '/<_start>:/,/^$/p'
+@wait 10 readelf -x .init_array /vortex/vortex13
+@wait 10 readelf -x .fini_array /vortex/vortex13
+@wait 8 echo "--- the xref scan (typed in vim) ---"
+@wait 6 vi xref13.py
+@sleep 3
+@literal :set paste noai nosi nocindent\r
+@literal i
+@line #!/usr/bin/env python3
+@line # xref13 - scan every e8/e9 branch in .text of /vortex/vortex13 and
+@line # compute its target: find every path to vuln (0x80491d6).
+@line from elftools.elf.elffile import ELFFile
+@line import struct
+@line f = open('/vortex/vortex13', 'rb')
+@line elf = ELFFile(f)
+@line text = elf.get_section_by_name('.text')
+@line code = text.data()
+@line base = text['sh_addr']
+@line hits = []
+@line for i in range(len(code) - 5):
+@line     if code[i] in (0xe8, 0xe9):
+@line         rel = struct.unpack('<i', code[i+1:i+5])[0]
+@line         tgt = base + i + 5 + rel
+@line         kind = 'call' if code[i] == 0xe8 else 'jmp'
+@line         if tgt == 0x80491d6:
+@line             hits.append((base + i, kind))
+@line print("branches to vuln (0x80491d6):")
+@line for a, k in hits:
+@line     print("  0x%08x %s" % (a, k))
+@line # the init_array entry
+@line ia = elf.get_section_by_name('.init_array')
+@line val = struct.unpack('<I', ia.data())[0]
+@line print(".init_array entry: 0x%08x" % val)
+@line for sym in elf.get_section_by_name('.symtab').iter_symbols():
+@line     if sym['st_value'] == val:
+@line         print("  = %s" % sym.name)
+@literal \x1b
+@literal :wq\r
+@wait 10 python3 xref13.py
+@wait 8 uname -r
+@wait 8 hostname -I 2>/dev/null; hostname
+@wait 8 echo "--- angle 2 writeups: l3ouu4n9 + rk700 rely on {NULL} argc=0 (2019/2014), predate the 5.18 fix ---"
+@wait 8 exit
