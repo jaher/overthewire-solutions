@@ -37,7 +37,7 @@
   <h1>OverTheWire — solved live, recorded</h1>
   <div class="sub">Every level solved live over SSH against the OTW labs, with the asciinema
   recording of the session. Each recording has a spoken narration that starts together with
-  the cast playback. Solutions: <a href="bandit-solutions.md">Bandit</a>, <a href="natas-solutions.md">Natas</a>, <a href="leviathan-solutions.md">Leviathan</a>, <a href="krypton-solutions.md">Krypton</a>, <a href="narnia-solutions.md">Narnia</a>, <a href="behemoth-solutions.md">Behemoth</a>, <a href="utumno-solutions.md">Utumno</a>, <a href="vortex-solutions.md">Vortex</a>.</div>
+  the cast playback. Solutions: <a href="bandit-solutions.md">Bandit</a>, <a href="natas-solutions.md">Natas</a>, <a href="leviathan-solutions.md">Leviathan</a>, <a href="krypton-solutions.md">Krypton</a>, <a href="narnia-solutions.md">Narnia</a>, <a href="behemoth-solutions.md">Behemoth</a>, <a href="utumno-solutions.md">Utumno</a>, <a href="vortex-solutions.md">Vortex</a>, <a href="maze-solutions.md">Maze</a>, <a href="manpage-solutions.md">Manpage</a>.</div>
 
   <table>
     <thead><tr><th>Game</th><th>Level</th><th>Technique</th><th>Recording</th><th>Narration</th></tr></thead>
@@ -172,6 +172,8 @@ const LEVELS = [
   ["Utumno",5,"strncpy caps long strings at 20 bytes; shellcode stays in envp[8]"],
   ["Utumno",6,"signed table index -1 rewrites the strcpy destination pointer"],
   ["Utumno",7,"longjmp restores an attacker-controlled ebp inside the overflowed buffer"],
+  ["Maze",0,"setuid TOCTOU: access()-then-open() race on a fixed /tmp path; a C loop rename()s between a readable file and a symlink to the next password, 15000 runs -> 132 winners, password Sp5VmLGFC0", null, true],
+  ["Maze",1,"relative DT_NEEDED ./libc.so.4: run from a 755 dir holding a planted 32-bit libc.so.4 whose constructor reads /etc/maze_pass/maze2 as setuid maze2 before main; password jJF6jn9qW6", null, false],
   ["Maze",2,"strncpy(argv[1],8) into buf whose address is the fp, RWE stack: corrected int 0x80 shellcode (the old one built its path backwards) in the env sled; sweep hit 0xffffd6e0, password pKWcO3NfC6"],
   ["Maze",3,"hand-written asm stub: the argc!=1 path mprotects RWX and XOR-decrypts its payload (0x12345678); argv[1] must start with de c0 37 13 (0x1337c0de); setreuid(15004)+execve /bin//sh"],
   ["Vortex",0,"TCP arithmetic service on 5842: read four uint32s, send the sum back; client written in vim"],
@@ -192,37 +194,49 @@ const rows = document.getElementById('rows');
 const key = (g,n) => g.toLowerCase() + "/L" + n;
 let current = null, player = null, audio = document.getElementById('audio');
 
-for (const [game, lvl, tech] of LEVELS) {
+// Optional 4th element: null => level has no recording (row shows a badge instead of a
+// dead link). Optional 5th element: false => no narration script/audio.
+for (const entry of LEVELS) {
+  const [game, lvl, tech] = entry;
+  const g = game.toLowerCase();
+  const hasCast = entry[3] === undefined ? true : entry[3] !== null;
+  const hasNarr = entry[4] === undefined ? true : entry[4];
+  const cast = hasCast ? `recordings/${g}/L${lvl}.cast` : null;
   const tr = document.createElement('tr');
-  const cast = `recordings/${game.toLowerCase()}/L${lvl}.cast`;
   tr.innerHTML = `<td>${game}</td><td>L${lvl}</td><td class="tech">${tech}</td>
-    <td><a href="${cast}">${cast}</a></td>
-    <td><a href="narration/${game.toLowerCase()}/L${lvl}.txt">script</a>
-        <span class="badge">audio: narration/${game.toLowerCase()}/L${lvl}.mp3</span></td>`;
+    <td>${cast ? `<a href="${cast}">${cast}</a>` : '<span class="badge">no recording</span>'}</td>
+    <td>${hasNarr
+        ? `<a href="narration/${g}/L${lvl}.txt">script</a>
+            <span class="badge">audio: narration/${g}/L${lvl}.mp3</span>`
+        : '<span class="badge">no script</span>'}</td>`;
   tr.style.cursor = 'pointer';
-  tr.onclick = () => select(game, lvl, tech);
+  tr.onclick = () => select(game, lvl, tech, cast, hasNarr);
   rows.appendChild(tr);
 }
 
-async function select(game, lvl, tech) {
-  current = { game, lvl };
+async function select(game, lvl, tech, cast, hasNarr) {
+  current = { game, lvl, cast, hasNarr };
   const g = game.toLowerCase();
   document.getElementById('now').textContent = `${game} L${lvl} — ${tech}`;
 
   if (player) { player.dispose(); player = null; }
   document.getElementById('player').innerHTML = '';
-  player = AsciinemaPlayer.create(`recordings/${g}/L${lvl}.cast`,
-    document.getElementById('player'), {
-      autoPlay: false, loop: false, fit: 'width', idleTimeLimit: 2,
-      preload: true
-    });
+  if (cast) {
+    player = AsciinemaPlayer.create(cast,
+      document.getElementById('player'), {
+        autoPlay: false, loop: false, fit: 'width', idleTimeLimit: 2,
+        preload: true
+      });
+  }
 
   audio.pause();
-  audio.src = `narration/${g}/L${lvl}.mp3`;
+  if (hasNarr) audio.src = `narration/${g}/L${lvl}.mp3`;
   audio.currentTime = 0;
 
-  const n = await fetch(`narration/${g}/L${lvl}.txt`, {cache:'no-store'})
-      .then(r => r.ok ? r.text() : '').catch(() => '');
+  const n = hasNarr
+      ? await fetch(`narration/${g}/L${lvl}.txt`, {cache:'no-store'})
+          .then(r => r.ok ? r.text() : '').catch(() => '')
+      : '(no narration script recorded for this level)';
   document.getElementById('narration').textContent = n;
 }
 
@@ -236,7 +250,7 @@ function playBoth() {
 
 document.getElementById('playBtn').onclick = playBoth;
 document.getElementById('restartBtn').onclick = () => {
-  if (current) select(current.game, current.lvl, '');
+  if (current) select(current.game, current.lvl, '', current.cast, current.hasNarr);
 };
 // Audio starts with playback: clicking Play (or the cast itself) starts both.
 document.getElementById('player').addEventListener('click', () => {
