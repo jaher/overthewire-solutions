@@ -72,6 +72,41 @@
     }
    ],
    "note": "maze2: strncpy(argv[1],8) into a 12-byte buf whose ADDRESS is the fp; GNU_STACK RWE; ASLR off. The last session's puzzle is diagnosed: the old sc.bin pushed its path dwords in forward order, so the stack held 'nib/hs//3ezam/ssap_ezam/cte/' and open() got ENOENT (empty output); the marker shell's dash also drops the elevated euid after execve, so the sweep's uid=15003 HIT condition never matched. Fix: read the file inside the shellcode before any exec, path dwords pushed in reverse chunk order. 71 NUL-free bytes; sweep hit 0xffffd6e0 dumping 10 B twice (fd1+fd2 signature). Verified: ssh login as maze3 (uid=15003), cat matches. Recording: recordings/maze/L2.cast (trial run showed the same HIT at the same address)."
+  },
+  {
+   "lvl": 3,
+   "pw": "MB583SjyFZ",
+   "user": "maze4",
+   "steps": [
+    {
+     "cmd": "file /maze/maze3; readelf -h /maze/maze3 | grep -i entry",
+     "out": [
+      "/maze/maze3: ELF 32-bit LSB executable, Intel 80386, statically linked, not stripped",
+      "Entry point address: 0x8049000"
+     ]
+    },
+    {
+     "cmd": "objdump -d /maze/maze3 (the whole .text, 0xa3 bytes)",
+     "out": [
+      "argc==1: print \"./level4 ev0lcmds!\"; exit",
+      "argc!=1: mprotect(0x8049000, 0xa3, 7); xor-decrypt 0x38 dwords at 0x804906b with 0x12345678; execute"
+     ]
+    },
+    {
+     "cmd": "python3: decrypt the payload with 0x12345678",
+     "out": [
+      "pop eax; cmp [eax],0x1337c0de; jne exit; ebx=0x3a9c(15004); eax=70(setreuid); int 0x80; execve(\"/bin//sh\")"
+     ]
+    },
+    {
+     "cmd": "/maze/maze3 $(printf '\\xde\\xc0\\x37\\x13')   # argc=2 path",
+     "out": [
+      "uid=15004(maze4) gid=15003(maze3)",
+      "MB583SjyFZ"
+     ]
+    }
+   ],
+   "note": "maze3 is a hand-written asm stub (static, 163 B of text). The argc!=2 path mprotects the text page RWX, XOR-decrypts 56 dwords at 0x804906b with 0x12345678 and executes them: the payload checks argv[1][0..3] == de c0 37 13 (0x1337c0de little-endian), setreuid(15004,15004)=maze4 and execve(\"/bin//sh\"). Running /maze/maze3 with that argument gives a shell as maze4 (uid=15004, gid stays 15003); password MB583SjyFZ read live and verified by ssh login as maze4. Recording: recordings/maze/L3.cast."
   }
  ],
  "goals": {
