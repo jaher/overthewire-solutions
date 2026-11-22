@@ -314,3 +314,69 @@ No class of route remains untested for L13 on this lab: every exec
 path, the pre-main routes, the writeups, the helpers, the emulators,
 the hosts, and now external ptrace control are all closed.  The only
 lever is the lab host's kernel version (the 5.18+ empty-argv fix).
+
+## Sixth attempt — close-out (2026-11-22)
+
+### Angle 1 — cron contents
+
+- `clean_tmp`: `*/30 * * * * root find /tmp -amin +60 -type f,l -delete
+  ...` — runs as **root** but only DELETES (no exec of user paths).
+- `behemoth4_cleanup` and the crontab itself: -r--r----- root:root —
+  unreadable by vortex13.
+- `cronjob_bandit22/23/24.sh`: run as **bandit22/23/24** (not
+  vortex14); the scripts are 750 banditN-group only (unreadable).
+- No cronjob runs as vortex14; the only root job just deletes.  A
+  vector would reach a bandit at best — **not a route to vortex14.
+  Closed.**
+
+### Angle 2 — writable trusted library dirs
+
+- `/etc/ld.so.conf`: include /etc/ld.so.conf.d/*.conf → libfakeroot,
+  libc.conf (/usr/local/lib), the multiarch dirs.
+- `/etc/ld.so.preload`: **does not exist**.
+- Every trusted dir tested read-only: /usr/lib/x86_64-linux-gnu,
+  /usr/lib32, /usr/local/lib, /usr/local/lib/x86_64-linux-gnu, the
+  libfakeroot dir, /lib32, /lib, /usr/lib — all ro; a touch in
+  /usr/local/lib → Permission denied.
+
+**No trusted dir is writable → the whole pre-main code-injection
+family (LD_PRELOAD with a bare soname, a planted .so in a trusted
+dir) is dead by filesystem.  Closed.**
+
+### Angle 3 — process_vm_readv/writev and /proc/<pid>/mem on the live setuid posture
+
+`pvm13.c` on the parked setuid vortex12 child (fix_perms'd, ruid ==
+fsuid, dumpable re-evaluated to 1): **all four succeed** (readv 16,
+writev 4, mem open, pwrite 4) — the direct-parent + dumpable=1
+posture IS writable.
+
+`rw13.c` on the REAL L13 posture (the setuid vortex14 level, fsuid
+5014, ruid 5013, dumpable=2, NO setresuid drop): **spawns=20
+writes-ok=0 eperm=20** — every post-exec write fails EPERM.  The L12
+child succeeded only because fix_perms made ruid == fsuid (the
+kernel re-evaluates dumpable on setresuid); the L13 level has no
+such call.
+
+**The uid rule blocks the parent at every moment of the L13
+process's life.  Closed.**
+
+### Angle 4 — userland-exec family (closed by reasoning + the setuid-loss point)
+
+A hand-built minimal ELF loader that maps /vortex/vortex13 and builds
+an argc==0 stack itself, and qemu-user guest argc==0 (no qemu on the
+host — confirmed in the fourth attempt), both **skip the kernel
+exec**: the setuid bit is a kernel-exec mechanism and never applies;
+the loader runs with the loader's own privileges (vortex13, fsuid
+5013); any shell it spawns is vortex13 and **cannot read the mode-400
+/etc/vortex_pass/vortex14** (owner vortex14 only).  The family is
+closed by the setuid-loss point, not merely by the emulator binary's
+absence.
+
+## Sixth-attempt verdict
+
+All four close-out angles closed with live evidence.  Combined with
+the five prior attempts (exec paths, pre-main audit, helper-exec,
+emulator absence, single host, external ptrace), **every route class
+is closed**: cron, trusted-dir injection, process_vm//proc-mem, and
+userland-exec.  L13 is completely stuck pending a lab-host kernel
+change (the 5.18+ empty-argv fix); no route remains.

