@@ -342,3 +342,54 @@ cat /etc/maze_pass/maze4   # MB583SjyFZ
 - **Recording:** `recordings/maze/L4.cast`.
 - **Gotcha worth remembering:** `/tmp` is `nosuid` on the maze lab — do setuid work under
   `/run/screen` (root filesystem).
+
+---
+
+## Level 5 → maze6 (SOLVED 2026-11-23)
+
+- **Account:** `maze5` (initial password `A3846ZPJuH`).
+- **Goal:** get the password for `maze6` from `/maze/maze5`.
+- **Technique:** keygen. The binary asks for an 8-char username and 8-char key
+  (`scanf("%8s")`), has a `ptrace(TRACEME)` anti-debug check, and validates the pair in
+  `foo()`: starting from the template `"printlol"`, it computes
+  `dec[i] = T[i] - (2*i + user[i] - 'A')` byte-wise (mod 256), then reverse-scans
+  `dec[i] == key[i]` — returning success only when the index wraps to −1. The key is
+  therefore a closed-form derivation from any chosen username.
+
+### Step-by-step discovery and crafting
+
+1. **Read the binary.** `/maze/maze5` (14940 bytes, i386, debug info, mode `4750
+   maze6:maze5`). Imports give the shape away: `scanf("%8s")` twice, `ptrace`, `strlen`,
+   `setreuid`, `system("/bin/sh")`.
+2. **Disassemble main + foo.** main: prompt → `%8s` username → `%8s` key → length==8
+   checks → `ptrace(0,0,0,0) != 0 → "nahnah..."` → `foo(user,key)` → on success
+   `setreuid(euid, euid); system("/bin/sh")`. foo: template `dec = "printlol"`
+   (two dword stores `0x6e697270`/`0x6c6f6c74` + NUL), the forward loop
+   `dec[i] -= 2*i + (user[i]-'A')`, and the reverse compare loop.
+3. **Solve the equation.** The forward pass and the reverse compare together mean
+   `key[i] = T[i] - 2*i - (user[i]-'A')  (mod 256)` for i = 0..7. The username is free;
+   take `AAAAAAAA` (offset 0): key = `ppehlbc^` (`70 70 65 68 6c 62 63 5e`).
+   (`tools/maze/l5/solve.py` derives and replays it.)
+4. **Run it — on a tty.** The spawned shell ignores piped stdin (it stalls silently);
+   run the level over `ssh -tt` and type at the prompts:
+
+   ```sh
+   ssh -tt -p 2225 maze5@maze.labs.overthewire.org
+   maze5@gibson:~$ /maze/maze5
+    Username: AAAAAAAA
+        Key: ppehlbc^
+
+   Yeh, here's your shell
+   $ id
+   uid=15006(maze6) gid=15005(maze5) groups=15005(maze5)
+   $ cat /etc/maze_pass/maze6
+   dXEKrdYgQR
+   ```
+
+   (Under strace the `ptrace(TRACEME)` trips — "nahnah..."; debug the static copy
+   instead. `setreuid(euid,euid)` fixes both uids to maze6, so `id` shows
+   uid=15006 with gid still 15005.)
+
+- **Password for maze6:** `dXEKrdYgQR`
+- **Verification:** confirmed by SSH login as `maze6` (uid 15006; password file matches).
+- **Recording:** `recordings/maze/L5.cast`.

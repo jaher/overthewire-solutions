@@ -172,6 +172,44 @@
     }
    ],
    "note": "maze4 stat-then-exec gate: read(fd,bufA,52); lseek(fd, *(int*)(bufA+28)) \u2014 the offset comes from the file's own bytes 28..31, NOT st_size; read(fd,bufB,32); passes iff dword(bufB+12) == bufA[7]*bufA[8] and st_size <= 123, then execv(argv[1]). For a script this would be enough \u2014 but /tmp is tmpfs nosuid (setuid bit stripped) and dash drops the euid anyway. Winner: a hand-built 123-byte i386 ELF (tinel.py): bytes 7,8 = EI_OSABI,EI_ABIVERSION = 0,0 so the product is 0; e_phoff = 52 is the lseek offset; phdr0.p_paddr = 0 (kernel-ignored) makes the compare 0 == 0; e_ident[9..14] hides the strings \"sh\\0-p\\0\"; the 26-byte stub at file offset 84 execve(\"sh\", {\"sh\",\"-p\",0}, 0) \u2014 a dash copy in the cwd, -p keeps euid. maze4's setuid gives euid=maze5 (visible: uid=15004 euid=15005), dash -p preserves it, cat prints A3846ZPJuH. Password verified by ssh login as maze5 (uid=15005). Recording: recordings/maze/L4.cast. NOTE: /tmp is nosuid on this lab \u2014 use /run/screen (root ext4) for setuid work."
+  },
+  {
+   "lvl": 5,
+   "pw": "dXEKrdYgQR",
+   "user": "maze6",
+   "steps": [
+    {
+     "cmd": "ls -la /maze/maze5; md5sum /maze/maze5",
+     "out": [
+      "-r-sr-x--- 1 maze6 maze5 14940 Oct 25 13:39 /maze/maze5",
+      "9c846f4312464a849f8a899c6d8ccc98  /maze/maze5"
+     ]
+    },
+    {
+     "cmd": "objdump -d -M intel /maze/maze5 (main 0x80492c8, foo 0x80491f6)",
+     "out": [
+      "scanf(\"%8s\", user); scanf(\"%8s\", key); strlen checks == 8",
+      "ptrace(0,0,0,0) != 0 -> \"nahnah...\" (anti-debug)",
+      "foo(user, key): dec=\"printlol\"; dec[i] -= 2*i + (user[i]-'A'); reverse scan dec[i]==key[i]",
+      "success -> setreuid(euid, euid); system(\"/bin/sh\")"
+     ]
+    },
+    {
+     "cmd": "derive: key[i] = \"printlol\"[i] - 2i - (user[i]-'A')  (mod 256), user = AAAAAAAA",
+     "out": [
+      "T = printlol; c=0 for all i: key = p p e h l b c ^  (70 70 65 68 6c 62 63 5e)"
+     ]
+    },
+    {
+     "cmd": "/maze/maze5  (user AAAAAAAA, key ppehlbc^)",
+     "out": [
+      "Yeh, here's your shell",
+      "$ id   -> uid=15006(maze6) gid=15005(maze5) groups=15005(maze5)",
+      "$ cat /etc/maze_pass/maze6 -> dXEKrdYgQR"
+     ]
+    }
+   ],
+   "note": "maze5 asks for an 8-char username + 8-char key (%8s), checks ptrace(TRACEME) (anti-debug: under strace it prints 'nahnah...'), and runs foo(user,key): foo XORs nothing \u2014 it computes dec[i] = 'printlol'[i] - (2*i + user[i] - 'A') byte-wise and reverse-scans dec[i]==key[i]; the reverse loop returns 1 only when the index wraps to -1. The key is therefore key[i] = 'printlol'[i] - 2i - (user[i]-'A') mod 256. With user 'AAAAAAAA' (c=0): key 'ppehlbc^'. The spawned shell needs a tty (piped stdin is ignored \u2014 it stalls), so run it over ssh -tt. setreuid(euid,euid) fixes BOTH uids to maze6 (id shows uid=15006 gid=15005). Password dXEKrdYgQR verified by ssh login as maze6 (uid=15006, cat matches). Recording: recordings/maze/L5.cast. Files: tools/maze/l5/ (maze5 copy, solve.py derivation, NOTES.md)."
   }
  ],
  "goals": {
