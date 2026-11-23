@@ -179,3 +179,9 @@ Maze | L7 | SOLVED (2026-11-23): ELF shdr printer where EVERY parameter comes fr
 - Formula One (formulaone.labs.overthewire.org): rescued from intruded.net; levels via SSH port 2232 (documented; open live-verified). L0 is a challenge: formulaone0/formulaone0 login DENIED (live-verified). Data in /formulaone/; the L1 source is reachable "by logging in to a wargame hosted on the same server" (figure out which). Details: games/formulaone.json.
 - Semtex (semtex.labs.overthewire.org): OFFLINE since 2022-08-16 (OTW page states it; live-verified 2026-11-23, no open ports). BLOCKED (offline) — do not spend a level timebox on it. Details: games/semtex.json.
 - Scheduling: finish the current Maze line (L6 next), then take Drifter and Formula One in that order (both start from solving L0). Semtex stays blocked.
+
+## Vortex L13 reattempt directive (user 2026-11-23)
+USER: "Vortex 13 should be reattempted at some point."
+- L13 was declared blocked (6th attempt, 2026-11-22) on the grounds that the lab kernel (7.0.0-1014-aws, >= 5.18) fills the empty-argv hole, making argc==0 unreachable.
+- STATUS CHECK 2026-11-23: vortex lab is on port 2228 (NOT the documented 2222, which is now CLOSED); kernel re-confirmed STILL 7.0.0-1014-aws via vortex13 (pw 6iyARs3cY still valid; lower users vortex9/11 now DENIED — lab rotated those passwords). So the structural kernel block PERSISTS as of now; a reattempt is valid only if (a) the kernel changes, or (b) a genuinely new route is found that does not need argc==0.
+- DIRECTIVE: schedule a fresh L13 attempt as a distinct task (new tools/vx/l13/ files, no re-solving of already-solved levels). First step of the reattempt: re-measure the kernel + re-confirm argc==0 is truly unreachable on the current lab (do not assume the 2026-11-22 verdict still holds); only if the kernel is now < 5.18 OR a new non-argc==0 route exists, proceed to build. Mark the attempt's outcome in this section.
