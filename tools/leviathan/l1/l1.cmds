@@ -1,0 +1,5 @@
+@wait 8 ./check
+@wait 4 sex
+@wait 6 id
+@wait 6 cat /etc/leviathan_pass/leviathan2
+@wait 6 exit
