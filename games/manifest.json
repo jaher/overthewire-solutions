@@ -44,6 +44,21 @@
    "key": "krypton",
    "title": "Krypton",
    "host": "krypton.labs.overthewire.org"
+  },
+  {
+   "key": "drifter",
+   "title": "Drifter",
+   "host": "drifter.labs.overthewire.org"
+  },
+  {
+   "key": "formulaone",
+   "title": "Formula One",
+   "host": "formulaone.labs.overthewire.org"
+  },
+  {
+   "key": "semtex",
+   "title": "Semtex",
+   "host": "semtex.labs.overthewire.org"
   }
  ]
 }
