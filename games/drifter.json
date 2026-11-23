@@ -1,8 +1,39 @@
 {
  "title": "Drifter",
  "host": "drifter.labs.overthewire.org",
- "port": 2220,
- "note": "Added upstream 2026-11-23. 'A wargame along the lines of Vortex.' Shares the lab's sshd port grid (2220 open live-verified 2026-11-23; the game's own port is not documented on the OTW page — probe 2220-2232, all of 2220/2221/2223-2226/2232 are open on this host). drifter0/drifter0 login DENIED live-verified 2026-11-23 => L0 is a challenge to solve first.",
- "levels": [],
+ "port": 2230,
+ "note": "Added upstream 2026-11-23. 'A wargame along the lines of Vortex.' SSH port 2230 (identified live 2026-11-23: the only port on the drifter host with no 'does not match the X game' warning for drifter0; grid 2220=bandit, 2221=behemoth, 2223=leviathan, 2224=manpage, 2225=maze, 2226=narnia, 2227=utumno, 2228=vortex, 2230=drifter, 2231=krypton, 2232=formulaone). L0 SOLVED 2026-11-23 (see levels[0]).",
+ "levels": [
+  {
+   "lvl": 0,
+   "pw": "yttCfzKiorcOz5V0Nr9AVk6SZ13IonYV",
+   "user": "drifter0",
+   "steps": [
+    {
+     "cmd": "ls /drifter/drifter0_src/; cat drifter0.c rc4.c (world-readable source)",
+     "out": [
+      "daemon: chroot /home/drifter0/chroot, drop privs to uid 19000",
+      "listens on 1111; RC4 keymat = sin_addr(4B) + sin_port(2B) of the accepted conn",
+      "both streams skip 42 iterations of rc4(keymat,6) = 252 keystream bytes",
+      "loop: read 36B = 9 dwords; rc4-decrypt; syscall(args[0], args[1..8]);",
+      "       rc4-encrypt the 4B int return; write it back"
+     ]
+    },
+    {
+     "cmd": "python3 exploit.py 127.0.0.1 1111 (run on the shared backend)",
+     "out": [
+      "getuid -> 19000 (keymat = getsockname(): MY ip+port, not the server's!)",
+      "mmap2(0x10000000, 0x1000, RW, MAP_PRIVATE|ANON) -> 0x10000000",
+      "fstat fd-scan: the accepted socket is fd 4",
+      "read-into-page: send the read(4, buf, 19) FRAME first, then the raw path bytes",
+      "open(/drifter0.password) -> 3; read(3, buf+0x200, 64) -> 33",
+      "write(4, buf+0x200, 33) exfil: raw file bytes + the 4B RC4 reply after them",
+      "EXFIL: b'yttCfzKiorcOz5V0Nr9AVk6SZ13IonYV\\n'"
+     ]
+    }
+   ],
+   "note": "Vortex-style remote syscall service. /drifter/drifter0 + its full C source are world-readable; the daemon chroots to /home/drifter0/chroot (drifter0.password, 33 bytes, mode 400), drops to uid 19000, listens on 1111, and executes arbitrary i386 syscalls from RC4-encrypted 36-byte frames. Keymat = the 4-byte source IP + 2-byte source port AS THE SERVER SEES THEM (getsockname() on the client; getpeername() gives the SERVER's port - the first desync). Both streams skip 42*6=252 keystream bytes; key_in/key_out are independent RC4 states. Syscall gadget: mmap2(0x10000000,4096,RW,MAP_PRIVATE|MAP_ANONYMOUS,-1,0) for scratch memory (fd 4 = the accepted socket, found by fstat-scan since lseek can't distinguish EBADF/ESPIPE); data is delivered by sending the read(4,buf,n) frame FIRST and the raw bytes right after (the server consumes them from the socket); exfil is write(4,buf,n) whose n raw bytes arrive on the stream BEFORE its own 4-byte RC4 reply. The daemon sees the client's REAL source IP - running the client ON the backend (via any game's ssh) gives keymat ip 127.0.0.1. Password yttCfzKiorcOz5V0Nr9AVk6SZ13IonYV verified by ssh login as drifter0 (uid=19000) on port 2230. Recording: recordings/drifter/L0.cast. Files: tools/drifter/l0/ (exploit.py)."
+  }
+ ],
  "goals": {}
 }

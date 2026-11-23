@@ -531,3 +531,63 @@ Traps hit along the way:
 - **Password for maze8:** `avdYfGdEvv`
 - **Verification:** confirmed by SSH login as `maze8` (uid 15008; password file matches).
 - **Recording:** `recordings/maze/L7.cast`.
+
+---
+
+# Drifter
+
+## Drifter — Level 0
+
+**Level goal:** The source of `/drifter/drifter0` (world-readable, Vortex
+style) shows a daemon that chroots to `/home/drifter0/chroot`, drops to uid
+19000, listens on port 1111, and executes **arbitrary syscalls** from
+RC4-encrypted frames. Get it to read `/drifter0.password` (mode 400, owner
+drifter0 — exactly the dropped uid) and send it back.
+
+### The protocol (`/drifter/drifter0_src/drifter0.c`)
+
+- `keymat = sin_addr (4 bytes) + sin_port (2 bytes)` of the accepted
+  connection — as the **server** sees it.
+- Two independent RC4 states (`key_in`, `key_out`) prepared from keymat; both
+  streams then skip 42 iterations of `rc4(keymat, 6)` = 252 keystream bytes.
+- Loop: `read(skt, &args, 36)` → `rc4(args, 36, key_in)` →
+  `syscall(args[0], args[1..8])` → `rc4(&ret, 4, key_out)` → `write` it back.
+
+### Traps hit
+
+1. **The keymat is *my* socket name, not the server's.** `getpeername()` on
+   the client returns the server's port (1111); the server keys on
+   `getsockname()` — my IP and ephemeral port. Every "garbage getpid" came
+   from this. Validated by building the daemon locally from the same source
+   (stub chroot/setresuid, port 21111) and diffing keystreams.
+2. **No memory to point at.** Syscall args are values, not pointers. First
+   `mmap2(0x10000000, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS,
+   -1, 0)` to get a scratch page.
+3. **Which fd is the socket?** `lseek` can't distinguish EBADF from ESPIPE
+   (both −9... here both surfaced as −1 through the syscall wrapper);
+   `fstat(fd, statbuf)` returns 0 only for open descriptors → the accepted
+   socket is **fd 4**.
+4. **Delivering data.** The path string goes over the same socket: send the
+   `read(4, buf, n)` *frame* first, then the raw bytes — the server is
+   blocked in `read()` for the frame, executes the syscall, and the syscall
+   consumes the raw bytes that follow.
+5. **Exfil ordering.** `write(4, buf, n)` emits the n raw bytes during the
+   syscall; its own 4-byte RC4 reply lands *after* them on the stream.
+
+Run the client **on the backend** (any game's ssh session): the daemon sees
+the client's real source IP, so from the lab the keymat IP is 127.0.0.1.
+
+```
+$ python3 exploit.py 127.0.0.1 1111
+getuid -> 19000
+mmap2 -> 0x10000000
+socket fd: 4
+read path -> 19
+open -> 3
+read file -> 33
+EXFIL raw: b'yttCfzKiorcOz5V0Nr9AVk6SZ13IonYV\n'
+```
+
+- **Password for drifter0:** `yttCfzKiorcOz5V0Nr9AVk6SZ13IonYV`
+- **Verification:** confirmed by SSH login as `drifter0` (uid 19000, port 2230; password file matches).
+- **Recording:** `recordings/drifter/L0.cast`.
