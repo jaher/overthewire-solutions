@@ -642,3 +642,40 @@ formulaone0's own SSH password on port 2232.
 - **Password for formulaone0:** `U6pyn4b5DVhJdbyTD7fOBlnyxkSozcTQ`
 - **Verification:** confirmed by SSH login as `formulaone0` (uid 20000, port 2232).
 - **Recording:** `recordings/formulaone/L0.cast`.
+
+## Formula One — Level 1
+
+**Level goal:** `/formulaone/formulaone1` is setuid formulaone1 and does
+
+```c
+if (access(argv[1], R_OK) < 0) return 1;
+printf("Contents:\n");
+int f = open(argv[1], O_RDONLY);
+/* cat it out */
+```
+
+`access()` evaluates as the **real** uid (formulaone0) while `open()` runs as
+formulaone1 — a textbook **access()/open() TOCTOU** (the Leviathan L2 family).
+
+### The race
+
+Toggle a symlink between a readable decoy and the password file at C speed
+(`tools/formulaone/l1/racer.c`):
+
+1. `unlink("target"); symlink("decoy", "target");`
+2. fork a child that `symlink("/etc/formulaone_pass/formulaone1", tmp)` then
+   **`rename(tmp, "target")`** (atomic replace — never a window where target
+   is missing);
+3. fork a second child that execs the binary on `target`;
+4. drain the output pipe to EOF — the first racer version misclassified
+   partial decoy reads (`r`) as hits.
+
+The C racer wins at ~iteration 2122 (a bash `ln -sf` loop never won):
+
+```
+HIT iter 2122: lyRzImzq8DFfsDJEhGRIqc71CVqipvxo
+```
+
+- **Password for formulaone1:** `lyRzImzq8DFfsDJEhGRIqc71CVqipvxo`
+- **Verification:** confirmed by SSH login as `formulaone1` (uid 20001, port 2232; password file matches).
+- **Recording:** `recordings/formulaone/L1.cast`.

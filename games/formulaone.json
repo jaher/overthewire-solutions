@@ -33,6 +33,35 @@
     }
    ],
    "note": "formulaone0 is a TCP password gate (port 4091) with a byte-by-byte compare whose oracle is the recv() BLOCK: a wrong byte gets an immediate 'WRONG PASSWORD' while a correct byte leaves the daemon blocked reading the next one (no response in 1.5 s). Scanning the alphabet position by position yields the 32-char password in ~32x70 connections. The trailing-'a' artefact past position 32 is the spawned shell swallowing extra bytes (password length found by the scan stopping at 32 with the full string then spawning a shell). Through the dup2-ed /bin/sh: id = uid 20000(formulaone0); cat /etc/formulaone_pass/formulaone0 = the same string = the SSH login password for formulaone0 on port 2232. Verified by ssh login (uid=20000). Recording: recordings/formulaone/L0.cast. Files: tools/formulaone/l0/ (solve.py)."
+  },
+  {
+   "lvl": 1,
+   "pw": "lyRzImzq8DFfsDJEhGRIqc71CVqipvxo",
+   "user": "formulaone1",
+   "steps": [
+    {
+     "cmd": "cat /formulaone/formulaone1.c (as formulaone0, group-readable)",
+     "out": [
+      "access(argv[1], R_OK) -> open(argv[1]) -> cat. Binary is setuid formulaone1.",
+      "access() evaluates as the REAL uid (formulaone0), open() as formulaone1."
+     ]
+    },
+    {
+     "cmd": "setup: echo readable > decoy; racer toggles 'target' symlink",
+     "out": [
+      "racer: unlink+symlink(decoy) then fork{symlink(password)->rename to target, atomic}",
+      "|| fork{execl /formulaone/formulaone1 target}; drain the pipe to EOF"
+     ]
+    },
+    {
+     "cmd": "./racer (200k iterations, C-speed)",
+     "out": [
+      "HIT iter 2122: lyRzImzq8DFfsDJEhGRIqc71CVqipvxo",
+      "(bash+ln racer too slow; the C racer hits in ~2k iterations)"
+     ]
+    }
+   ],
+   "note": "Classic access()/open() TOCTOU (same family as Leviathan L2): access(argv[1],R_OK) is evaluated as formulaone0 while open() runs as formulaone1 via setuid, so a path that is readable at access() time and points at /etc/formulaone_pass/formulaone1 at open() time leaks the password. The winning racer: parent does unlink+symlink(decoy,target), forks a child that atomically renames a password symlink onto target, and a second child that execs the binary on target; the pipe is drained to EOF (the first version misclassified partial decoy reads like 'r' as hits). C-speed toggle hits at ~iter 2122; the bash ln-loop never won. Password lyRzImzq8DFfsDJEhGRIqc71CVqipvxo verified by ssh login as formulaone1 (uid=20001). Recording: recordings/formulaone/L1.cast. Files: tools/formulaone/l1/ (racer.c)."
   }
  ],
  "goals": {}
