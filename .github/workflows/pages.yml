@@ -28,3 +28,20 @@ jobs:
           path: .
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # Transient deploy-pages failures observed 2026-11-23 21:34/21:36Z: upload-pages-artifact
+  # succeeded, deploy-pages failed ~30s in, and the very next run (21:51Z) deployed fine.
+  # The github-pages artifact persists at run scope, so retry the deploy once after a
+  # backoff when the primary job fails instead of leaving the run red until the next push.
+  deploy-retry:
+    needs: deploy
+    if: ${{ needs.deploy.result == 'failure' }}
+    environment:
+      name: github-pages
+      url: ${{ steps.redeploy.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Backoff
+        run: sleep 90
+      - id: redeploy
+        uses: actions/deploy-pages@v4
