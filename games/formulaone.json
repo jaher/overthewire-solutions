@@ -87,6 +87,36 @@
     }
    ],
    "note": "formulaone2 (setuid formulaone2) invents /tmp/tmp_XXXX (26^4 = 456976 possibilities), requires stat(name)!=0, then fopen(name,\"r\") and cats it. Attack: pre-create 456,975 of the names as symlinks to /etc/formulaone_pass/formulaone2 (1M free inodes on tmpfs - enough), leaving ONE hole; the binary spins in the stat loop (all other names exist) and returns the hole within ~1M fast iterations. A toggle loop flips the hole between absent and a password symlink: when the stat loop observes it absent but fopen sees the symlink, the setuid binary reads the password and fwrites 256 bytes (33-byte fgets + uninitialized tail). Fork-per-round with WNOHANG watch: a round where fopen hit the DOWN state segfaults harmlessly. Password Bf125B7St83elbZFOoXpp0FKprbD1hZP verified by ssh login as formulaone2 (uid=20002). Recording: recordings/formulaone/L2.cast. Files: tools/formulaone/l2/ (attack.c)."
+  },
+  {
+   "lvl": 3,
+   "pw": "O50RB7ijle1PYuGyw595NuU9O8S49b4o",
+   "user": "formulaone3",
+   "steps": [
+    {
+     "cmd": "cat /formulaone/formulaone3.c (group formulaone2); objdump doecho",
+     "out": [
+      "shmget(keys[argv[1][0]&3], 8192, IPC_CREAT|0777); shmat(SHM_EXEC) = RWX",
+      "if(echo->sz) if(echo->sz < sizeof(buf)) { puts; memcpy(buf, echo->ptr, echo->sz); puts }",
+      "DISASM: echo->sz is LOADED TWICE - once for the cmp 0xff check (0x80491e2)",
+      "and again for the memcpy size (0x8049205) - a double-read race window",
+      "spanning the puts() call. GNU_STACK RW, no canary in the plain binary."
+     ]
+    },
+    {
+     "cmd": "attack.c: create the 0777 shm; toggler flips sz 10 <-> 0x400;",
+     "out": [
+      "payload at shm+4: 1KB of 'A' + ret-slot dword at +0x110 = shm_base+0x200",
+      "shellcode at shm+0x200: open/read/write /etc/formulaone_pass/formulaone3",
+      "fork the setuid binary per round; when the check sees 10 but memcpy sees",
+      "0x400, 1KB smears the stack and doecho returns into the RWX shm",
+      "GOTCHA: pass the key as 0xADC00ADC - strtoul base 0 parses 'ADC..' as 0",
+      "shm base swept 4KB steps around the mimic-probe address: 0xf7fb9000",
+      "O50RB7ijle1PYuGyw595NuU9O8S49b4o"
+     ]
+    }
+   ],
+   "note": "formulaone3 (setuid, no canary) maps a SysV shm segment SHM_EXEC (RWX) and does a DOUBLE READ of echo->sz: load #1 for the sz<=0xff check, load #2 for the memcpy size, with the puts() call between them. We own the segment (created 0777 before the run); a toggler flips sz between 10 and 0x400 so the check passes while memcpy smears 1KB of our data over the stack (sz=0x400 stays inside the 8KB shm - 0x2000 would fault mid-copy and never return). The payload sets doecho's saved EIP (buf+0x110 <- shm+0x114) to shellcode inside the RWX shm (ret2shm; GNU_STACK is RW so the stack itself is not executable). The shm VA is deterministic with ASLR off; a mimic probe (same shmget/shmat in a plain process) gave 0x7ffff7fb5000 and a 4KB sweep around that region hit the true base at 0xf7fb9000. GOTCHA: strtoul('ADC00ADC',0,0) parses base-0 as DECIMAL and fails - pass 0xADC00ADC or the attacker creates key 0 while the binary uses its own segment (silent no-op). Password O50RB7ijle1PYuGyw595NuU9O8S49b4o verified by ssh login as formulaone3 (uid=20003). Recording: recordings/formulaone/L3.cast. Files: tools/formulaone/l3/ (attack.c)."
   }
  ],
  "goals": {}

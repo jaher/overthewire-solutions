@@ -713,3 +713,54 @@ Bf125B7St83elbZFOoXpp0FKprbD1hZP<uninitialized 256-byte tail>
 - **Password for formulaone2:** `Bf125B7St83elbZFOoXpp0FKprbD1hZP`
 - **Verification:** confirmed by SSH login as `formulaone2` (uid 20002, port 2232; password file matches).
 - **Recording:** `recordings/formulaone/L2.cast`.
+
+## Formula One — Level 3
+
+**Level goal:** `/formulaone/formulaone3` (setuid formulaone3, no stack
+canary) maps a SysV shared-memory segment with `SHM_EXEC` (**RWX**) and
+"echoes" whatever is in it:
+
+```c
+shmid = shmget(SHMKEY, 8192, IPC_CREAT | 0777);   /* WE create it first */
+echo  = shmat(shmid, NULL, SHM_EXEC);
+if (echo->sz && echo->sz < sizeof(buf)) {
+    puts("The msg is...");
+    memcpy(buf, echo->ptr, echo->sz);              /* buf[256] */
+    puts(buf);
+}
+```
+
+### The double-read race
+
+The disassembly loads `echo->sz` **twice** — once for the `cmp 0xff` check
+(`0x80491e2`) and again for the memcpy size (`0x8049205`), with the `puts()`
+call in between. We own the segment, so a toggler flips `sz` between 10 and
+`0x400` in a tight loop: when the check sees 10 but memcpy sees 0x400, **1 KB
+of our data is smeared over the stack**.
+
+(`0x400` stays inside the 8 KB shm — a size of 0x2000 would fault mid-copy and
+`memcpy` would never return, so there'd be no `ret` to hijack.)
+
+### ret2shm
+
+`GNU_STACK` is RW, but the shm mapping is RWX. The payload places doecho's
+saved EIP value at `shm+0x114` (the memcpy source offset that lands on
+`buf+0x110`), pointing at shellcode inside the shm: open/read/write
+`/etc/formulaone_pass/formulaone3` → fd 1.
+
+The shm VA is deterministic with ASLR off. A mimic process (same
+shmget/shmat in a plain binary) attached at `0x7ffff7fb5000`; a 4 KB sweep
+around that region found the setuid binary's base at **`0xf7fb9000`**.
+
+**Gotcha:** `strtoul("ADC00ADC", 0, 0)` parses base-0 as *decimal* and returns
+0 — the attacker then creates key `0` while the binary uses its own segment
+(silent no-op). Pass `0xADC00ADC`.
+
+```
+$ timeout 60 ./f1l3 0xADC00ADC 0xf7fb9000 | grep -aE '^[A-Za-z0-9]{20,}' | head -1
+O50RB7ijle1PYuGyw595NuU9O8S49b4o
+```
+
+- **Password for formulaone3:** `O50RB7ijle1PYuGyw595NuU9O8S49b4o`
+- **Verification:** confirmed by SSH login as `formulaone3` (uid 20003, port 2232; password file matches).
+- **Recording:** `recordings/formulaone/L3.cast`.
