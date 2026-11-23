@@ -591,3 +591,54 @@ EXFIL raw: b'yttCfzKiorcOz5V0Nr9AVk6SZ13IonYV\n'
 - **Password for drifter0:** `yttCfzKiorcOz5V0Nr9AVk6SZ13IonYV`
 - **Verification:** confirmed by SSH login as `drifter0` (uid 19000, port 2230; password file matches).
 - **Recording:** `recordings/drifter/L0.cast`.
+
+---
+
+# Formula One
+
+## Formula One — Level 0
+
+**Level goal:** `/formulaone/formulaone0` (source world-readable) is a TCP
+daemon on port 4091 that asks for a password and, on success, `dup2`s the
+connection onto stdin/stdout/stderr and runs `/bin/sh` — as formulaone0.
+Extract the compile-time password and use the shell.
+
+### The oracle
+
+The check is byte-by-byte:
+
+```c
+for(i=0; i < strlen(PASSWD); i++)
+    if( PASSWD[i] != read_byte(fd) ) break;
+```
+
+A **wrong** byte gets an immediate `WRONG PASSWORD`; a **correct** byte makes
+the daemon call `recv()` again — and block, waiting for the next byte. No
+response within a timeout *is* the signal that the byte was right. Scan the
+alphabet at each position (`~32 × 70` short connections) and the 32-character
+password falls out:
+
+```
+U6pyn4b5DVhJdbyTD7fOBlnyxkSozcTQ
+```
+
+(Past position 32 every candidate "blocks" — the shell is already spawned and
+swallows the extra bytes; the scan length is fixed at 32.)
+
+### The shell
+
+Send the password, then commands:
+
+```
+$ id
+uid=20000(formulaone0) gid=20000(formulaone0) groups=20000(formulaone0)
+$ cat /etc/formulaone_pass/formulaone0
+U6pyn4b5DVhJdbyTD7fOBlnyxkSozcTQ
+```
+
+The daemon runs as formulaone0 (not setuid), so the level password is
+formulaone0's own SSH password on port 2232.
+
+- **Password for formulaone0:** `U6pyn4b5DVhJdbyTD7fOBlnyxkSozcTQ`
+- **Verification:** confirmed by SSH login as `formulaone0` (uid 20000, port 2232).
+- **Recording:** `recordings/formulaone/L0.cast`.
