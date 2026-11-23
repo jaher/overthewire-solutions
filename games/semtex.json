@@ -1,6 +1,8 @@
 {
  "title": "Semtex",
  "host": "semtex.labs.overthewire.org",
+ "port": 2222,
+ "note": "Added upstream 2026-11-23. OFFLINE since 2022-08-16 per the OTW page ('Semtex is offline'). Live-verified 2026-11-23: no open ports (22/2222/2223/31337 all closed). Do NOT start work on this game — it is unreachable. Mark BLOCKED (offline) in OTW-PROGRESS.md instead of a level timebox.",
  "levels": [],
  "goals": {}
 }

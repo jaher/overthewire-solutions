@@ -171,3 +171,9 @@ Maze | L5 | SOLVED (2026-11-23): keygen - scanf("%8s") username+key, ptrace(TRAC
   "no script" badge instead of a dead link when a cast/script is absent (Maze L0 has a script+audio but no cast;
   Maze L1 has neither). All Maze rows now point only to files that exist. Render logic verified (node --check +
   a DOM-stub render test: L0/L1 badges, L2/L3 real cast links, legacy 3-elem rows unchanged).
+
+## New games added upstream (2026-11-23, commit 55ff630)
+- Drifter (drifter.labs.overthewire.org): "a wargame along the lines of Vortex." L0 is a challenge: drifter0/drifter0 login DENIED (live-verified 2026-11-23). Port not documented on the OTW page; the lab sshd grid is open on 2220/2221/2223-2226/2232 (shared-lab convention) — probe to find the game's port, then solve L0. Details: games/drifter.json.
+- Formula One (formulaone.labs.overthewire.org): rescued from intruded.net; levels via SSH port 2232 (documented; open live-verified). L0 is a challenge: formulaone0/formulaone0 login DENIED (live-verified). Data in /formulaone/; the L1 source is reachable "by logging in to a wargame hosted on the same server" (figure out which). Details: games/formulaone.json.
+- Semtex (semtex.labs.overthewire.org): OFFLINE since 2022-08-16 (OTW page states it; live-verified 2026-11-23, no open ports). BLOCKED (offline) — do not spend a level timebox on it. Details: games/semtex.json.
+- Scheduling: finish the current Maze line (L6 next), then take Drifter and Formula One in that order (both start from solving L0). Semtex stays blocked.

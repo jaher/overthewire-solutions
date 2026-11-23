@@ -1,6 +1,8 @@
 {
  "title": "Drifter",
  "host": "drifter.labs.overthewire.org",
+ "port": 2220,
+ "note": "Added upstream 2026-11-23. 'A wargame along the lines of Vortex.' Shares the lab's sshd port grid (2220 open live-verified 2026-11-23; the game's own port is not documented on the OTW page — probe 2220-2232, all of 2220/2221/2223-2226/2232 are open on this host). drifter0/drifter0 login DENIED live-verified 2026-11-23 => L0 is a challenge to solve first.",
  "levels": [],
  "goals": {}
 }

@@ -1,6 +1,8 @@
 {
  "title": "Formula One",
  "host": "formulaone.labs.overthewire.org",
+ "port": 2232,
+ "note": "Added upstream 2026-11-23. Rescued from intruded.net (formulaone.intruded.net). Levels formulaone0.. via SSH port 2232 (documented on the OTW page; 2232 open live-verified 2026-11-23). Data in /formulaone/. 'The source code for the first level can be accessed by logging in to a wargame hosted on the same server' — figure out which game that is. formulaone0/formulaone0 login DENIED live-verified 2026-11-23 => L0 is a challenge to solve first.",
  "levels": [],
  "goals": {}
 }
