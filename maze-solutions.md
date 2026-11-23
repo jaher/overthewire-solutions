@@ -448,3 +448,86 @@ cat /etc/maze_pass/maze4   # MB583SjyFZ
 - **Password for maze7:** `ckkOx2s4Ev`
 - **Verification:** confirmed by SSH login as `maze7` (uid 15007; password file matches).
 - **Recording:** `recordings/maze/L6.cast`.
+
+---
+
+## Maze — Level 7 → Level 8
+
+**Level goal:** `/maze/maze7` runs as `maze8`; hand it a file it will parse and
+make it print the contents of `/etc/maze_pass/maze8`.
+
+### The program
+
+`maze7` is an ELF section-header printer. `main` reads the first `0x34` bytes
+of `argv[1]` (the ELF header) into a 0x34-byte stack buffer, then calls
+`Print_Shdrs(fd, e_shoff, e_shstrndx, e_shnum, e_shentsize)` — **every
+"parameter" comes straight from the file being parsed**. Inside
+`Print_Shdrs`:
+
+1. `lseek(fd, e_shoff)`; `malloc(e_shnum * 40)`; read the section-header array.
+2. `sh = buf + e_shstrndx*40`; `lseek(sh->sh_offset)`; `malloc(sh->sh_size)`;
+   read the string table.
+3. Print loop `i = 0 .. e_shnum` **inclusive** (a `jle` — off by one). Each
+   iteration re-reads the section header it is about to print:
+
+   ```c
+   read(fd, header, e_shentsize);      /* header = 0x34-byte stack buffer */
+   printf("%2d: %-16s\t0x%08x\t0x%04x\n", i, strtab + sh_name, ...);
+   ```
+
+4. `free(strtab); free(shdrbuf);` — both pointers live at `header+0x28` /
+   `header+0x30`, inside the overflow window.
+
+### The bug
+
+On a real ELF `e_shentsize` is 40, matching `sizeof(Elf32_Shdr)`, so the
+per-iteration read is harmless. In a **crafted** file `e_shentsize` is just a
+number — set it to 0x100 and every loop iteration reads 256 bytes into the
+0x34-byte buffer. The read starts at file offset `e_shoff`, so the
+section-header-array region of the file **is** the overflow payload, with
+NUL bytes allowed. Saved EIP sits at `header+0x40`.
+
+### The exploit (`tools/maze/l7/gen.py`)
+
+Craft a 640-byte "ELF" with `e_shoff = 0x40`, `e_shnum = 1`,
+`e_shentsize = 0x100`:
+
+```
+0x00  Elf32_Shdr #0   (sh_name = 0 → printf's %s sees strtab+0 = a NUL byte)
+0x28  [ebp-0x14] free(strtab)  → 0x0804d050  (real heap address, repaired)
+0x30  [ebp-0xc]  free(shdrbuf) → 0x0804d020  (real heap address, repaired)
+0x34  [ebp-0x8]  loop counter i → 1   (i++ makes 2 > e_shnum: clean exit)
+0x40  saved EIP → buf+0x60
+0x60  69-byte shellcode: open/read/write /etc/maze_pass/maze8 → fd 1
+```
+
+Traps hit along the way:
+
+1. **Payload offset.** Appending the payload at 0x34 while `e_shoff` was 0x40
+   shifted every control dword 12 bytes early — `free()` received 1 and 0, EIP
+   was 0. Pad the header to `e_shoff`.
+2. **The heap is not executable.** The first EIP target was the malloc'd
+   string table (heap is `rw-p`); only the stack is executable
+   (`GNU_STACK RWE`). The shellcode rides inside the payload at buf+0x60.
+3. **printf's `%s`.** The `%s` argument is `strtab + sh_name` — the shellcode
+   bytes themselves in early builds, an unterminated garbage string that
+   crashed inside vfprintf. Give the strtab a leading NUL so it prints empty.
+4. **free() repairs.** Both heap pointers are inside the overflow window;
+   restore them with the real malloc addresses (gdb-measured once, ASLR is
+   off) or glibc aborts with `free(): invalid size`.
+5. **Shellcode push order.** `push imm32` writes the immediate
+   little-endian-reversed: the path chunks must be pushed so the stack holds
+   `/etc/maze_pass/maze8\0` forward (a wrong order yields
+   `/etc/maze_pass/m8eza` → ENOENT).
+6. **Address sweep.** The buffer address is environment-dependent (gdb:
+   `0xffffdb34`); sweeping ±0x1000 in 4-byte steps **inside the recorded
+   session itself** (the L6 lesson) hit **buf = 0xffffd308**:
+
+   ```
+   $ /maze/maze7 /run/screen/l7/evil.elf
+   avdYfGdEvv
+   ```
+
+- **Password for maze8:** `avdYfGdEvv`
+- **Verification:** confirmed by SSH login as `maze8` (uid 15008; password file matches).
+- **Recording:** `recordings/maze/L7.cast`.
