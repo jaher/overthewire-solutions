@@ -54,8 +54,9 @@ missing / empty output" symptoms:
 
 ## Result
 
-Sweep hit at **0xffffd6e0** (same address in the trial and in the
-recorded run), dumping 10 bytes twice — the fd1+fd2 signature —
+Sweep hit at **0xffffd6e8** in the recorded interactive run (an earlier
+trial hit `0xffffd6e0` — the env-sled address varies with the environment
+layout), dumping 10 bytes twice — the fd1+fd2 signature —
 `pKWcO3NfC6`, the maze3 password.  Verified by ssh login as maze3
 (uid=15003, cat /etc/maze_pass/maze3 matches).  Recording:
 recordings/maze/L2.cast.

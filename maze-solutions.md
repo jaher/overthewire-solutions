@@ -166,7 +166,9 @@ getconf PAGESIZE; sysctl kernel.randomize_va_space   # ASLR off
 #      (push imm32=T ; ret ; 2 pad bytes) -> jumps into the env sled at T.
 #    Run /maze/maze2; stop when the 10-byte password is printed twice.
 ```
-  Sweep hit at **0xffffd6e0**, dumping the 10-byte password twice (the fd1+fd2 signature):
+  Sweep hit at **0xffffd6e8** in the recorded run (an earlier trial session hit
+  `0xffffd6e0` — the sled's exact address varies with the environment layout),
+  dumping the 10-byte password twice (the fd1+fd2 signature):
   `pKWcO3NfC6`.
 
 - **Step-by-step discovery and crafting** (from `tools/maze/l2/NOTES.md` + `narration/maze/L2.txt`):
@@ -186,7 +188,7 @@ getconf PAGESIZE; sysctl kernel.randomize_va_space   # ASLR off
        the bug that bit the previous attempt — see below). 71 bytes, no NULs.
     5. **Sweep the target address.** For every 4-byte-aligned address from the low stack upward,
        build `argv[1] = \x68 <T> \xc3 AA`, run `/maze/maze2`, and stop when anything is printed.
-       First hit at `0xffffd6e0`, printing the 10-char password twice.
+       Hit at `0xffffd6e8` (recorded run), printing the 10-char password twice.
     6. **The "it works but empty output" puzzle (the hard part).** The first shellcode attempt
        dumped nothing. Two independent bugs, both diagnosed:
        - the 85-byte pass-reader pushed its path dwords in **forward** chunk order, so the stack
@@ -197,10 +199,14 @@ getconf PAGESIZE; sysctl kernel.randomize_va_space   # ASLR off
          uid=15002 and the sweep's `uid=15003` condition never fired.
      Fix: read the file **inside the shellcode** before any `exec`, with the path dwords in
      reverse order.
+    7. **Finalize.** Read the hit address from `hit.txt`, re-run `/maze/maze2` with
+       `argv[1] = push <hit>; ret` once, and take the printed password.
 - **Password for maze3:** `pKWcO3NfC6`
 - **Verification:** confirmed by SSH login as `maze3` (uid 15003; `cat /etc/maze_pass/maze3`
   matches).
-- **Recording:** `recordings/maze/L2.cast` (the trial run hit the same address `0xffffd6e0`).
+- **Recording:** `recordings/maze/L2.cast` — a genuine interactive SSH session as `maze2`
+  (typed commands, heredoc-typed shellcode + sweep driver, live sweep hitting
+  `0xffffd6e8` after 215 targets, live re-exploit printing the password).
 
 ---
 

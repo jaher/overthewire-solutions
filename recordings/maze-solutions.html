@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OverTheWire Maze — step-by-step solutions</title>
+<style>
+:root{--green:#33ff66;--dim:#1fae4a;--bg:#050805;--panel:#0a0f0a;--bright:#eaffea;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--green);
+ font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:14px;line-height:1.55}
+.wrap{max-width:920px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:22px;font-weight:700;margin:0 0 4px;color:var(--bright)}
+.sub{color:var(--dim);font-size:13px;margin-bottom:18px}
+a{color:#7dff9e}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 28px}
+.toc a{display:inline-block;padding:5px 12px;border:1px solid var(--dim);border-radius:6px;
+ font-size:13px;text-decoration:none}
+.toc a:hover{background:#0f1f0f}
+.level{border:1px solid #14532d;border-radius:10px;background:var(--panel);
+ padding:18px 20px;margin:26px 0;scroll-margin-top:12px}
+.level h2{font-size:17px;margin:0 0 10px;color:var(--bright)}
+.level h3{font-size:14px;margin:18px 0 8px;color:#9dff9d}
+ul,ol{margin:6px 0;padding-left:22px}
+li{margin:4px 0}
+code{background:#04140a;padding:1px 5px;border-radius:4px;font-size:13px}
+pre{background:#000;border:1px solid #14532d;border-radius:8px;padding:12px 14px;
+ overflow-x:auto;font-size:13px;line-height:1.45}
+pre code{background:none;padding:0}
+p{margin:8px 0}
+.pw{color:var(--bright);font-weight:700;background:#0a2412;padding:1px 7px;border-radius:5px}
+.steps{counter-reset:step;list-style:none;padding-left:0;margin:10px 0}
+.steps>li{counter-increment:step;position:relative;padding:10px 12px 10px 46px;margin:8px 0;
+ border:1px solid #123a1f;border-radius:8px;background:#06110a}
+.steps>li::before{content:counter(step);position:absolute;left:10px;top:10px;
+ width:24px;height:24px;border-radius:50%;background:#14532d;color:var(--bright);
+ font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.steps>li p:first-child{margin-top:2px}
+.nav{display:flex;justify-content:space-between;gap:10px;margin:34px 0 10px}
+.nav a{border:1px solid var(--dim);border-radius:8px;padding:8px 14px;text-decoration:none;font-size:13px}
+.nav a:hover{background:#0f1f0f}
+footer{color:var(--dim);font-size:12px;margin-top:36px}
+.back{display:inline-block;margin-bottom:18px;font-size:13px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap" id="top">
+  <h1>OverTheWire Maze — step-by-step solutions</h1>
+  <div class="sub">Every level solved live against <code>maze.labs.overthewire.org</code> (SSH, port 2225).
+  Each level: goal, technique and <em>why it works</em>, exact commands, a numbered step-by-step
+  account of the discovery process, the password, verification, and the recording.
+  Generated from <code>maze-solutions.md</code> in the repo.</div>
+  <a class="back" href="index.html">← back to recordings index</a>
+  <div class="toc"><a href="#level-0">L0</a><a href="#level-1">L1</a><a href="#level-2">L2</a><a href="#level-3">L3</a><a href="#level-4">L4</a></div>
+  <h1>OverTheWire Maze — Solutions</h1>
+<p>Every level solved live against <code>maze.labs.overthewire.org</code> (SSH, port 2225) in this run.
+Maze levels are <strong>setuid 32-bit binaries</strong> under <code>/maze/</code>: <code>/maze/maze&lt;N&gt;</code> is owned by the
+<em>next</em> user (<code>setuid maze&lt;N+1&gt;</code>), so the goal at each level is to run the level's binary and
+make it <strong>print the password for the next account</strong>. That password then unlocks an SSH login
+as <code>maze&lt;N+1&gt;</code>, from which you read <code>/etc/maze_pass/&lt;next&gt;</code> and move on.</p>
+<p>For each level below: the goal, the technique and <strong>why it works</strong>, the exact commands, and a
+<strong>step-by-step account of the discovery process</strong> (what the recording shows, where one exists,
+or how the transcript unfolded otherwise). Per-level <code>cmds</code>/<code>out</code>/<code>pw</code> transcripts are in
+<code>games/maze.json</code>; live notes in <code>tools/maze/l&lt;N&gt;/NOTES.md</code>; recordings in
+<code>recordings/maze/L&lt;N&gt;.cast</code> where present.</p>
+<p><strong>Verification rule used throughout:</strong> a password is accepted only once an SSH login as the
+next user works <strong>and</strong> <code>cat /etc/maze_pass/&lt;next&gt;</code> prints it.</p>
+<hr />
+  <section class="level" id="level-0"><ul>
+<li><strong>Account:</strong> <code>maze0</code> (initial password <code>maze0</code>).</li>
+<li><strong>Goal:</strong> get the password for <code>maze1</code> from <code>/maze/maze0</code>.</li>
+<li><strong>Technique and why it works:</strong> <code>/maze/maze0</code> reads a fixed path
+  <code>/tmp/128ecf542a35ac5270a87dc740918404</code> and does, in order:
+  <code>access(PATH, R_OK)</code> → <code>setresuid(euid)</code> (drop to the setuid identity) → <code>open(PATH)</code> →
+  read and print the contents. The <strong>check and the open are two separate syscalls on the same
+  path</strong>, so the file that path names can change <em>between</em> them. That is the classic
+  <strong>check-then-open TOCTOU race</strong>: pass <code>access()</code> a regular readable file you own, then swap
+  the path to a symlink pointing at <code>/etc/maze_pass/maze1</code> before <code>open()</code> runs. <code>open()</code>
+  follows the symlink, so it reads the password file while <code>access()</code> had already approved a
+  harmless file. Because the swap happens in a tiny window, it only wins sometimes — so you
+  run the binary in a tight loop and collect the rare winning outputs.</li>
+<li><strong>Commands:</strong></li>
+</ul>
+<pre><code># 1. Disassemble to see the access()/open() split on the same fixed path
+objdump -d /maze/maze0
+# main(): access(PATH, R_OK) -&gt; setresuid(euid) -&gt; open(PATH) -&gt; read/print
+# PATH is /tmp/128ecf542a35ac5270a87dc740918404
+
+# 2. Plant a readable filler file and a symlink to the next password
+printf 'AAAA...' &gt; /tmp/real_f
+ln -s /etc/maze_pass/maze1 /tmp/link_s
+
+# 3. A small C loop rename()s the fixed path back and forth between the two
+#    (see the transcript in games/maze.json)
+
+# 4. Fire the binary 15,000 times and keep the rare winners
+for i in $(seq 15000); do /maze/maze0; done | sort | uniq -c
+</code></pre>
+<p>Output: mostly <code>AAAA...</code> filler, but <strong>132 winning runs</strong> print <code class="pw">Sp5VmLGFC0</code>.</p>
+<ul>
+<li><strong>Step-by-step discovery and crafting</strong> (from the narration script, <code>narration/maze/L0.txt</code>):<ol class="steps">
+<li><strong>Read the binary first.</strong> <code>objdump -d /maze/maze0</code> shows <code>main()</code> calls <code>access()</code> on a
+   fixed <code>/tmp</code> path, drops privileges with <code>setresuid</code>, then <code>open()</code>s the <em>same</em> path and
+   prints what it reads. The fixed path is a long md5-looking name.</li>
+<li><strong>Notice the two-step check.</strong> Because <code>access()</code> and <code>open()</code> are separate calls on the
+   same path, the file at that path can change in the gap. That gap is the whole exploit.</li>
+<li><strong>Build the two states.</strong> A normal readable file full of <code>A</code>s at a path you own, and a
+   symlink from the level's fixed path to <code>/etc/maze_pass/maze1</code>.</li>
+<li><strong>Race the rename.</strong> A C loop flips the fixed path between the readable file and the
+   symlink thousands of times while you run <code>/maze/maze0</code> in a loop.</li>
+<li><strong>Collect the winners.</strong> Most runs see the readable file and print <code>A</code>s. The runs where the
+   swap lands in the window pass the check on the file and <code>open()</code> the symlink: the
+   password file comes back. 132 of 15,000 runs print <code class="pw">Sp5VmLGFC0</code>.</li>
+</ol>
+</li>
+<li><strong>Password for maze1:</strong> <code class="pw">Sp5VmLGFC0</code></li>
+<li><strong>Verification:</strong> confirmed by logging in as <code>maze1</code>. (Note 2026-11-17: the <code>maze0</code> login
+  works again on the current lab, uid 15000 live, initial password <code>maze0</code>; the recorded solve
+  stands.)</li>
+<li><strong>Recording:</strong> none recorded — the transcript and narration are the record
+  (<code>games/maze.json</code> L0, <code>narration/maze/L0.txt</code> + <code>L0.mp3</code>).</li>
+</ul>
+<hr /></section><div class="nav"><span></span><a href="#top">↑ top</a><a href="#level-1">L1 →</a></div>
+<section class="level" id="level-1"><ul>
+<li><strong>Account:</strong> <code>maze1</code>.</li>
+<li><strong>Goal:</strong> get the password for <code>maze2</code> from <code>/maze/maze1</code>.</li>
+<li><strong>Technique and why it works:</strong> <code>/maze/maze1</code> is setuid <code>maze2</code>, and its dynamic
+  <code>DT_NEEDED</code> list includes <code>./libc.so.4</code> — a <em>relative</em> path (alongside the normal
+  <code>libc.so.6</code>). A relative <code>DT_NEEDED</code> is resolved against the current working directory at
+  exec time. So if you run the binary from a directory that contains a <strong>planted</strong>
+  <code>libc.so.4</code>, the dynamic loader loads <em>your</em> library. A <strong>constructor</strong> in that library
+  runs at load time — <em>before <code>main</code></em> — with the setuid binary's fsuid (i.e. <code>maze2</code>), so it
+  can <code>open()</code> and print <code>/etc/maze_pass/maze2</code> directly. No overflow, no shellcode: you just
+  get code to run as <code>maze2</code> by controlling a library the binary is already going to load.</li>
+<li><strong>Commands:</strong></li>
+</ul>
+<pre><code># 1. Confirm the relative DT_NEEDED
+readelf -d /maze/maze1 | grep NEEDED
+# 0x00000001 (RPATH/NEEDED) ... ./libc.so.4     &lt;- the relative one
+# 0x00000001 (NEEDED) ... libc.so.6
+
+# 2. Build the planted library (tools/maze/l1/lib4.c) with a constructor
+#    that reads /etc/maze_pass/maze2 and writes it to stdout.
+
+# 3. Run the binary from a 755 dir containing the planted 32-bit libc.so.4
+D=$(mktemp -d); chmod 755 &quot;$D&quot;; cp &quot;$D/libc.so.4&quot; ...; cd &quot;$D&quot;; /maze/maze1
+# jJF6jn9qW6
+# Hello World!
+</code></pre>
+<ul>
+<li><strong>Step-by-step discovery and crafting</strong> (from <code>tools/maze/l1/NOTES.md</code> + <code>lib4.c</code>):<ol class="steps">
+<li><strong>Read the binary's load config.</strong> <code>readelf -d /maze/maze1</code> reveals <code>DT_NEEDED ./libc.so.4</code>
+   — a relative path. That is the hook: the loader will look for <code>libc.so.4</code> <em>in the
+   current working directory</em> before anything else.</li>
+<li><strong>Plant a libc.so.4 with a constructor.</strong> <code>lib4.c</code> defines an
+   <code>__attribute__((constructor))</code> function that opens <code>/etc/maze_pass/maze2</code>, reads it, and
+   <code>write()</code>s it to fd 1. Constructors run at load time, before <code>main</code>, and — because the
+   binary is setuid — with the fsuid of the <em>owner</em> (<code>maze2</code>), which is exactly the identity
+   that can read the password file.</li>
+<li><strong>Compile to a valid 32-bit shared object.</strong> Two loader gotchas, both measured live:</li>
+<li>the loader opens libraries using the setuid binary's <strong>fsuid</strong>, so the temp directory
+   must be <strong>755</strong> (a 700 dir owned by <code>maze1</code> is unreadable by fsuid <code>maze2</code> → "Permission
+   denied");</li>
+<li>the planted file must be a <strong>valid 32-bit ELF shared object</strong> (an empty file → "file too
+   short"; a 64-bit build → "wrong ELF class: ELFCLASS64").</li>
+</ol>
+</li>
+<li><strong>Run from the planted directory.</strong> <code>cd</code> into the 755 dir containing <code>libc.so.4</code> and run
+     <code>/maze/maze1</code>. The loader loads the planted library, the constructor fires as <code>maze2</code>,
+     and it prints <code class="pw">jJF6jn9qW6</code> (then <code>main</code> prints "Hello World!").</li>
+<li><strong>Password for maze2:</strong> <code class="pw">jJF6jn9qW6</code></li>
+<li><strong>Verification:</strong> confirmed by logging in as <code>maze2</code> (uid 15002; <code>cat /etc/maze_pass/maze2</code>
+  matches).</li>
+<li><strong>Recording:</strong> none recorded on disk (<code>recordings/maze/</code> has no <code>L1.cast</code>). Files:
+  <code>tools/maze/l1/</code> (<code>lib4.c</code>, <code>NOTES.md</code>, live <code>maze1</code> copy).</li>
+</ul>
+<hr /></section><div class="nav"><a href="#level-0">← L0</a><a href="#top">↑ top</a><a href="#level-2">L2 →</a></div>
+<section class="level" id="level-2"><ul>
+<li><strong>Account:</strong> <code>maze2</code>.</li>
+<li><strong>Goal:</strong> get the password for <code>maze3</code> from <code>/maze/maze2</code>.</li>
+<li><strong>Technique and why it works:</strong> <code>main</code> (reconstructed from objdump with debug info) is:</li>
+</ul>
+<pre><code class="language-c">char buf[12];
+void (*fp)(void) = &amp;buf;      /* the address of buf is the function pointer */
+if (argc != 2) exit(1);
+strncpy(buf, argv[1], 8);     /* copy the first 8 bytes of argv[1] into buf */
+fp();                         /* call buf — those 8 copied bytes now execute */
+</code></pre>
+<p>The stack is <strong>GNU_STACK RWE</strong> (executable) and <strong>ASLR is off</strong>, so the 8 bytes you control
+  via <code>argv[1]</code> run in place at a predictable stack address. The trick is that only <strong>8 bytes</strong>
+  are copied, so you can't put full shellcode in <code>argv[1]</code>. Instead the 8 bytes are a tiny
+  <code>push imm32; ret</code> (6 real bytes + 2 pad) that jumps to an <strong>absolute address</strong> where the real
+  shellcode lives — a big <strong>NOP sled</strong> in the environment. The shellcode itself does the
+  privilege work: <code>open("/etc/maze_pass/maze3")</code>, read, and write the bytes to fd 1 <strong>and</strong> fd 2
+  (so the answer is unmissable), then exit.
+- <strong>Commands:</strong></p>
+<pre><code># 1. Read the program: argc gate, strncpy(8), call through buf's address
+objdump -d /maze/maze2          # lea eax,[ebp-0xc]; mov [ebp-0x10],eax; call eax
+readelf -l /maze/maze2         # GNU_STACK RWE
+getconf PAGESIZE; sysctl kernel.randomize_va_space   # ASLR off
+
+# 2. Corrected int 0x80 shellcode (tools/maze/l2/sc.asm) assembles to 71 NUL-free bytes:
+#    open(&quot;/etc/maze_pass/maze3&quot;) -&gt; read -&gt; write(count) to fd 1 AND fd 2 -&gt; exit.
+#    Path dwords pushed in REVERSE chunk order (aze3 first, /etc last) so the stack
+#    holds &quot;/etc/maze_pass/maze3\0&quot; forwards.
+
+# 3. Driver: env = 'A'*2000 + shellcode; sweep 4-aligned stack targets.
+#    For each candidate address T: argv[1] = \x68 &lt;T&gt; \xc3 AA
+#      (push imm32=T ; ret ; 2 pad bytes) -&gt; jumps into the env sled at T.
+#    Run /maze/maze2; stop when the 10-byte password is printed twice.
+</code></pre>
+<p>Sweep hit at <strong>0xffffd6e8</strong> in the recorded run (an earlier trial session hit <code class="pw">0xffffd6e0</code> — the sled's exact address varies with the environment layout), dumping the 10-byte password twice (the fd1+fd2 signature):
+  <code class="pw">pKWcO3NfC6</code>.</p>
+<ul>
+<li><strong>Step-by-step discovery and crafting</strong> (from <code>tools/maze/l2/NOTES.md</code> + <code>narration/maze/L2.txt</code>):<ol class="steps">
+<li><strong>Disassemble and find the call.</strong> <code>main</code> copies the first 8 bytes of <code>argv[1]</code> into a
+   12-byte buffer whose <em>address</em> is held in a function pointer, then calls through it. So the
+   8 bytes you send in <code>argv[1]</code> are executed as code.</li>
+<li><strong>Prove the mechanism live.</strong> Put <code>int3</code> in <code>argv[1]</code> → SIGTRAP; put 8 <code>A</code>s → the <code>A</code>s
+   run as code and crash. Confirmed the 8 copied bytes execute at a known, RWE, non-ASLR stack
+   address.</li>
+<li><strong>Decide on delivery.</strong> 8 bytes is too small for the full shellcode, so make the 8 bytes a
+   6-byte <code>push imm32; ret</code> that jumps to an absolute address, and hide the real shellcode in
+   the environment behind a huge NOP sled (its exact address is fuzzy, the sled absorbs the
+   error).</li>
+<li><strong>Write the shellcode to do the job.</strong> <code>open("/etc/maze_pass/maze3")</code> via <code>int 0x80</code>, read
+   into a stack buffer, <code>write()</code> the byte count to <strong>fd 1 and fd 2</strong>, exit. Crucially, push
+   the path dwords in <strong>reverse</strong> chunk order so the assembled string reads forwards (this is
+   the bug that bit the previous attempt — see below). 71 bytes, no NULs.</li>
+<li><strong>Sweep the target address.</strong> For every 4-byte-aligned address from the low stack upward,
+   build <code>argv[1] = \x68 &lt;T&gt; \xc3 AA</code>, run <code>/maze/maze2</code>, and stop when anything is printed.
+   Hit at <code class="pw">0xffffd6e8</code> (recorded run), printing the 10-char password twice.</li>
+<li><strong>The "it works but empty output" puzzle (the hard part).</strong> The first shellcode attempt
+   dumped nothing. Two independent bugs, both diagnosed:</li>
+<li>the 85-byte pass-reader pushed its path dwords in <strong>forward</strong> chunk order, so the stack
+     held the string <em>backwards</em> (<code>nib/hs//3ezam/ssap_ezam/cte/</code>) and <code>open()</code> returned
+     ENOENT → empty output;</li>
+<li>the marker-shell HIT condition could never match: a <code>execve("/bin//sh")</code> stage ran, but
+     the spawned dash drops the elevated euid after <code>execve</code> (no <code>-p</code>), so <code>id</code> showed
+     uid=15002 and the sweep's <code>uid=15003</code> condition never fired.
+ Fix: read the file <strong>inside the shellcode</strong> before any <code>exec</code>, with the path dwords in
+ reverse order.</li>
+</ol>
+</li>
+<li><strong>Password for maze3:</strong> <code class="pw">pKWcO3NfC6</code></li>
+<li><strong>Verification:</strong> confirmed by SSH login as <code>maze3</code> (uid 15003; <code>cat /etc/maze_pass/maze3</code>
+  matches).</li>
+<li><strong>Recording:</strong> <code>recordings/maze/L2.cast</code> — a genuine interactive SSH session as <code>maze2</code> (typed commands, heredoc-typed shellcode + sweep driver, live sweep hitting <code class="pw">0xffffd6e8</code> after 215 targets, live re-exploit printing the password).</li>
+</ul>
+<hr /></section><div class="nav"><a href="#level-1">← L1</a><a href="#top">↑ top</a><a href="#level-3">L3 →</a></div>
+<section class="level" id="level-3"><ul>
+<li><strong>Account:</strong> <code>maze3</code>.</li>
+<li><strong>Goal:</strong> get the password for <code>maze4</code> from <code>/maze/maze3</code>.</li>
+<li><strong>Technique and why it works:</strong> <code>/maze/maze3</code> is a tiny <strong>hand-written assembly stub</strong> (see below)
+  statically linked, 0xa3 bytes of <code>.text</code>, entry <code>0x8049000</code>. It has two paths:</li>
+<li><code>argc == 1</code>: prints <code>./level4 ev0lcmds!</code> and exits (a red herring);</li>
+<li><code>argc != 1</code>: <code>mprotect(0x8049000, 0xa3, 7)</code> makes its own text page <strong>RWX</strong>, then
+    XOR-decrypts 0x38 dwords at <code>0x804906b</code> with key <code class="pw">0x12345678</code> and falls into the
+    decrypted bytes.
+  So the "payload" is sitting in the binary, encrypted. You XOR it back with the key, read the
+  resulting assembly, and learn its <em>gate</em>: it checks that <code>argv[1][0..3] == de c0 37 13</code>
+  (little-endian <code class="pw">0x1337c0de</code>), and only if that matches does it <code>setreuid(15004,15004)</code>
+  (= <code>maze4</code>) and <code>execve("/bin//sh")</code>. So the exploit is simply: <strong>run <code>/maze/maze3</code></strong> with
+  an argument whose first four bytes are <code>de c0 37 13</code> (<code class="pw">0x1337c0de</code> little-endian) — you
+  get a shell as <code>maze4</code>.</li>
+<li><strong>Commands:</strong></li>
+</ul>
+<pre><code># 1. Identify the program
+file /maze/maze3                      # ELF 32-bit, statically linked, not stripped
+readelf -h /maze/maze3 | grep -i entry # Entry point 0x8049000
+objdump -d /maze/maze3                # whole .text is 0xa3 bytes; two paths
+
+# 2. Recover the XOR-decrypted payload (key 0x12345678)
+python3 - &lt;&lt;'PY'
+key=0x12345678
+# 0x38 dwords at 0x804906b (from the dumped section)
+# payload -&gt; pop eax; cmp [eax],0x1337c0de; jne exit;
+#           ebx=0x3a9c(15004); eax=70(setreuid); int 0x80; execve(&quot;/bin//sh&quot;)
+PY
+
+# 3. Run with the argv magic
+/maze/maze3 $(printf '\xde\xc0\x37\x13')
+# uid=15004(maze4) gid=15003(maze3)
+cat /etc/maze_pass/maze4   # MB583SjyFZ
+</code></pre>
+<ul>
+<li><strong>Step-by-step discovery and crafting</strong> (from <code>games/maze.json</code> L3 + <code>narration/maze/L3.txt</code>):<ol class="steps">
+<li><strong>Read the stub.</strong> <code>file</code>/<code>readelf</code>/<code>objdump -d</code> show the whole program is 0xa3 bytes with
+   an <code>argc</code> branch: one path just prints a string, the other does the work.</li>
+<li><strong>Decode the work path.</strong> The <code>argc != 1</code> branch <code>mprotect</code>s its text page to RWX, then
+   XOR-decrypts 56 dwords at <code>0x804906b</code> with <code class="pw">0x12345678</code> and executes the result. So the real
+   logic is the decrypted payload.</li>
+<li><strong>Decrypt it.</strong> Re-XOR the 56 dwords with <code class="pw">0x12345678</code> (a short python one-liner) and read
+   the revealed assembly: compare <code>[argv[1]]</code> against <code class="pw">0x1337c0de</code>, and on a match do
+   <code>setreuid(15004,15004)</code> (maze4) + <code>execve("/bin//sh")</code>.</li>
+<li><strong>Meet the gate.</strong> The argument must begin with the bytes <code>de c0 37 13</code>
+   (<code class="pw">0x1337c0de</code> little-endian).</li>
+<li><strong>Run it.</strong> <code>/maze/maze3 $(printf '\xde\xc0\x37\x13')</code> → shell as <code>maze4</code>
+   (uid=15004, gid stays 15003). <code>cat /etc/maze_pass/maze4</code> → <code class="pw">MB583SjyFZ</code>.</li>
+</ol>
+</li>
+<li><strong>Password for maze4:</strong> <code class="pw">MB583SjyFZ</code></li>
+<li><strong>Verification:</strong> confirmed by SSH login as <code>maze4</code> (uid 15004; password file matches).</li>
+<li><strong>Recording:</strong> <code>recordings/maze/L3.cast</code>.</li>
+</ul>
+<hr /></section><div class="nav"><a href="#level-2">← L2</a><a href="#top">↑ top</a><a href="#level-4">L4 →</a></div>
+<section class="level" id="level-4"><ul>
+<li><strong>Account:</strong> <code>maze4</code>.</li>
+<li><strong>Goal:</strong> get the password for <code>maze5</code> from <code>/maze/maze4</code>.</li>
+<li><strong>Status:</strong> in progress (2026-11-22). The <code>maze4</code> binary is downloaded to
+  <code>tools/maze/l4/maze4</code>; static analysis (file / readelf / objdump, then a <code>maze5</code>-login
+  verification via <code>ssh -p 2225</code>) is the next step. Recorded here as the continuation target;
+  the full educational write-up for this level is added once it is solved and committed.</li>
+</ul></section><div class="nav"><a href="#level-3">← L3</a><a href="#top">↑ top</a><a href="index.html">recordings index →</a></div>
+  <footer>Maze solutions — generated from maze-solutions.md. Educational step-by-step format, 2026-11-22.</footer>
+</div>
+</body>
+</html>
