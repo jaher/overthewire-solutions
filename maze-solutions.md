@@ -679,3 +679,37 @@ HIT iter 2122: lyRzImzq8DFfsDJEhGRIqc71CVqipvxo
 - **Password for formulaone1:** `lyRzImzq8DFfsDJEhGRIqc71CVqipvxo`
 - **Verification:** confirmed by SSH login as `formulaone1` (uid 20001, port 2232; password file matches).
 - **Recording:** `recordings/formulaone/L1.cast`.
+
+## Formula One — Level 2
+
+**Level goal:** `/formulaone/formulaone2` (setuid formulaone2) invents a
+tempfile name `/tmp/tmp_XXXX` (4 random lowercase letters — only 26⁴ =
+456,976 possibilities), requires `stat(name) != 0`, then `fopen(name, "r")`,
+`fgets`, and `fwrite(buf, 256, 1, stdout)`.
+
+### The attack (`tools/formulaone/l2/attack.c`)
+
+The `stat()`/`fopen()` pair is a TOCTOU, and the name space is tiny:
+
+1. Pre-create **456,975** of the 456,976 names as symlinks to
+   `/etc/formulaone_pass/formulaone2` (tmpfs had 1M free inodes).
+2. Leave exactly one hole (`tmp_mzzz`). The stat loop skips every existing
+   name and spins until it randomly picks the hole — millions of fast
+   iterations, well under a second.
+3. Toggle the hole in a loop: `symlink(password, hole); unlink(hole); ...`.
+   When the stat loop observes it *absent* but `fopen` sees it *present*
+   (≈50 % duty cycle), the setuid binary opens the **password file** and
+   cats it out.
+4. Fork a fresh binary per round (with a `WNOHANG` watch): a round where
+   `fopen` hit the absent state segfaults harmlessly on the NULL FILE\*.
+
+```
+Bf125B7St83elbZFOoXpp0FKprbD1hZP<uninitialized 256-byte tail>
+```
+
+(The garbage after the password is `fwrite` of a 256-byte buffer filled by a
+33-byte `fgets`.)
+
+- **Password for formulaone2:** `Bf125B7St83elbZFOoXpp0FKprbD1hZP`
+- **Verification:** confirmed by SSH login as `formulaone2` (uid 20002, port 2232; password file matches).
+- **Recording:** `recordings/formulaone/L2.cast`.

@@ -62,6 +62,31 @@
     }
    ],
    "note": "Classic access()/open() TOCTOU (same family as Leviathan L2): access(argv[1],R_OK) is evaluated as formulaone0 while open() runs as formulaone1 via setuid, so a path that is readable at access() time and points at /etc/formulaone_pass/formulaone1 at open() time leaks the password. The winning racer: parent does unlink+symlink(decoy,target), forks a child that atomically renames a password symlink onto target, and a second child that execs the binary on target; the pipe is drained to EOF (the first version misclassified partial decoy reads like 'r' as hits). C-speed toggle hits at ~iter 2122; the bash ln-loop never won. Password lyRzImzq8DFfsDJEhGRIqc71CVqipvxo verified by ssh login as formulaone1 (uid=20001). Recording: recordings/formulaone/L1.cast. Files: tools/formulaone/l1/ (racer.c)."
+  },
+  {
+   "lvl": 2,
+   "pw": "Bf125B7St83elbZFOoXpp0FKprbD1hZP",
+   "user": "formulaone2",
+   "steps": [
+    {
+     "cmd": "cat /formulaone/formulaone2_src/{formulaone2,tmpnam}.c (group formulaone1)",
+     "out": [
+      "mytmpnam: /tmp/tmp_XXXX, XXXX = 4 rand()%26 letters (srand(urandom 32-bit seed));",
+      "loops until stat(name)!=0 then returns it; main: fopen(name,\"r\") + fgets +",
+      "fwrite(buf,256,1,stdout). Binary is setuid formulaone2.",
+      "fopen() can land on a name WE create in the stat->fopen window."
+     ]
+    },
+    {
+     "cmd": "gcc attack.c; ./f1l2_attack (pre-create 456975 symlinks + toggle one hole)",
+     "out": [
+      "made 0 symlinks on rerun (EEXIST - run 1 created them)",
+      "toggle: symlink(pw,hole); unlink(hole) in a loop; binary forked per round",
+      "Bf125B7St83elbZFOoXpp0FKprbD1hZP + garbage tail (fwrite 256 of a 33-byte fgets)"
+     ]
+    }
+   ],
+   "note": "formulaone2 (setuid formulaone2) invents /tmp/tmp_XXXX (26^4 = 456976 possibilities), requires stat(name)!=0, then fopen(name,\"r\") and cats it. Attack: pre-create 456,975 of the names as symlinks to /etc/formulaone_pass/formulaone2 (1M free inodes on tmpfs - enough), leaving ONE hole; the binary spins in the stat loop (all other names exist) and returns the hole within ~1M fast iterations. A toggle loop flips the hole between absent and a password symlink: when the stat loop observes it absent but fopen sees the symlink, the setuid binary reads the password and fwrites 256 bytes (33-byte fgets + uninitialized tail). Fork-per-round with WNOHANG watch: a round where fopen hit the DOWN state segfaults harmlessly. Password Bf125B7St83elbZFOoXpp0FKprbD1hZP verified by ssh login as formulaone2 (uid=20002). Recording: recordings/formulaone/L2.cast. Files: tools/formulaone/l2/ (attack.c)."
   }
  ],
  "goals": {}
