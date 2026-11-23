@@ -393,3 +393,58 @@ cat /etc/maze_pass/maze4   # MB583SjyFZ
 - **Password for maze6:** `dXEKrdYgQR`
 - **Verification:** confirmed by SSH login as `maze6` (uid 15006; password file matches).
 - **Recording:** `recordings/maze/L5.cast`.
+
+---
+
+## Level 6 → maze7 (SOLVED 2026-11-23)
+
+- **Account:** `maze6` (initial password `dXEKrdYgQR`).
+- **Goal:** get the password for `maze7` from `/maze/maze6`.
+- **Technique:** stack overflow through an unbounded `strcpy` into a FILE-based
+  arbitrary write. `main` copies `argv[2]` into a 0x100-byte buffer with no bound,
+  frobnicates it (XOR 42 — an involution), and ends with `exit(0)` — so the saved
+  EIP is dead and the exploit must corrupt the `FILE *f` (FSOP) plus repair the
+  caller frame, then hijack `exit@GOT` and pivot to shellcode that reads the
+  password file directly.
+
+### Step-by-step discovery and crafting
+
+1. **Read the binary.** `/maze/maze6` (14352 bytes, i386, debug info, mode `4750
+   maze7:maze6`): `fopen(argv[1],"a")` → `strcpy(buf[0x100], argv[2])` →
+   `memfrob(buf, strlen(buf))` → `fprintf(f, "%s : %s\n", argv[1], buf)` →
+   `exit(0)`. `GNU_STACK RWE`, ASLR off.
+2. **Recognize the two primitives.** memfrob XORs with 42 (involution): send
+   `payload ^ 42` as argv[2] and `buf` arrives as the raw payload (a raw NUL
+   rides in argv[2] as a `*` byte — the payload must avoid 0x2a). And since
+   main calls `exit(0)`, overwriting the saved EIP is pointless — the targets
+   are the `FILE *f` at buf+0x100 and the caller frame.
+3. **Repair the caller frame.** The overflow smashes argc/argv/envp
+   (buf+0x10c..0x114) and the argv[] array (buf+0x1d0): restore argc=3, argv →
+   the rebuilt array inside the payload, and point argv[1] at a **path string
+   copied into the payload** — pointing it at the original path left the
+   fprintf line length env-dependent and the GOT write always missed.
+4. **Forge the FILE.** Copy the real heap FILE struct byte-exactly (0xa0 bytes —
+   the first 0x8c-byte copy missed the vtable pointer at offset 0x94 and glibc
+   aborted with `invalid stdio handle`), redirect `_IO_write_base/_IO_write_ptr`
+   to `exit@GOT - 24`, extend write_end/buf_end. The real vtable
+   (`_IO_file_jumps`) passes glibc's vtable check, so fprintf memcpy's the line
+   `path : buf` into the GOT — line offset 24 lands **buf[0..4] exactly on
+   exit@GOT**.
+5. **Hijack exit.** buf[0..4] = `leave; ret` (libc+0x1af32e). After fprintf
+   returns, `call exit@plt → jmp *exit@GOT` runs leave;ret: `esp := ebp`
+   (main's ebp = our value at buf+0x104), `pop ebp`, `ret` → eip = [buf+0x108]
+   = the shellcode (open/read/write `/etc/maze_pass/maze7` to fd 1 — no execve,
+   dash would drop the euid).
+6. **Hit the stack address.** buf depends on the environment; sweep it
+   (`fire.py`, ±0x1000 in 4-byte steps) — HIT at `buf = 0xffffcfb4` in the
+   recorded pty session:
+
+   ```
+   $ python3 fire.py
+   HIT buf 0xffffcfb4
+   ckkOx2s4Ev
+   ```
+
+- **Password for maze7:** `ckkOx2s4Ev`
+- **Verification:** confirmed by SSH login as `maze7` (uid 15007; password file matches).
+- **Recording:** `recordings/maze/L6.cast`.
