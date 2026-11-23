@@ -194,13 +194,6 @@ Formula One | L3 | SOLVED (2026-11-23): double-read race on echo->sz + ret2shm -
 ## Re-record queue (user rule 2026-11-23 — casts must be fully legit; spec in RECORDING-STANDARD.md)
 Every cast must: start with a visible typed ssh login (user@host -p port, password, MOTD, level prompt); show every compiled/run file being WRITTEN in-session (vim or labeled heredoc, code visible); only real commands (comments as `#` or `echo` narration); no raw binary dumps (xxd/strings/od -c); password in clean text + login-verified.
 Re-record (in order, serialized, one at a time; then continue unsolved levels):
-1. drifter L0 (cast opens as maze7@maze client session; f1_solve.py / level0.c never shown being written; must start with the client ssh + the game-0 daemon interaction)
-2. formulaone L0 (same: client-side; f1_solve.py unshown)
-3. formulaone L1 (racer.c unshown; no ssh login at top)
-4. formulaone L2 (attack binary unshown; RAW BINARY DUMP at end — pipe through xxd/strings)
-5. formulaone L3 (same driver as L2)
-6. maze L3 (scripted rec3.sh driver)
-7. maze L4 (tinel.py arrived via base64 blob; ptyrun header; rebuild so the code is visibly entered)
-8. maze L6 (fire.py, sc.py unshown)
+DONE 2026-11-23 (all re-recorded to the standard, checked in): 1. drifter L0 (1fc70d2), 2. formulaone L0 (730ca58), 3. formulaone L1 (e1989cb), 4. formulaone L2 (a443115), 5. formulaone L3 (edc9711), 6. maze L3 (f59c3c4), 7. maze L4 (6711ab7), 8. maze L6 (this commit). Each: typed ssh login + MOTD at the top, sources written via labeled heredocs, clean output (strings/xxd where binary), password clean + verified; cast scripts kept in tools/<game>/<lvl>/cast-script.txt.
 9. then the long tail: natas L0-L33, bandit L0-L33, narnia, leviathan, behemoth, krypton, manpage, utumno, vortex casts — re-record each to the standard (start from oldest game, level by level).
 NOTE: the client-side "client" for F1/drifter L0 can be ANY lab account, but the client ssh login itself must be visible in the cast.
