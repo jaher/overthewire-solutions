@@ -272,7 +272,7 @@ passwords) are the recorded ones.
    ```
    The `xxd` output is the check against the `0x0b` rule: none of the bytes is `0x0b` (the byte `0x00` inside the string pushes is fine for the *file*, only argv cannot carry NULs).
 4. **Write `/tmp/e_behemoth6.py` in vim.** It loads `/tmp/b6.bin`, asserts `b"\x0b" not in sc`, creates `/tmp/b6work` (world-writable), writes the bytes to `shellcode.txt` there, `chdir`s into it, and runs `behemoth6` on a **raw-mode pty** (so the shell it execs is interactive); then it feeds `id`, `cat /etc/behemoth_pass/behemoth7`, `exit` and prints what the shell produced.
-5. **Run it.** The recording shows `shellcode (41 bytes): 31c050687479...`, `wrote /tmp/b6work/shellcode.txt (41 bytes)`, `Correct.`, `uid=13007(behemoth7) gid=13006(behemoth6)`, and `aHHctqVRgi`.
+5. **Run it.** The recording shows `wrote shellcode.txt (41 bytes)`, `Correct.`, `uid=13007(behemoth7) gid=13006(behemoth6)`, `aHHctqVRgi`, and `B6DONE`.
 6. **Verify.** Log in as behemoth7 (`whoami` → `behemoth7`).
 - **Password for behemoth7:** `aHHctqVRgi`
 - **Verification:** logged in as `behemoth7` with this password.

