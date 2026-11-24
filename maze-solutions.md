@@ -816,3 +816,9 @@ localhost is blocked") — the maze9 verification happens from the client.
 - **Password for maze9:** `bmMHy7DM3E`
 - **Verification:** confirmed by SSH login as `maze9` (uid 15009, port 2225; password file matches).
 - **Recording:** `recordings/maze/L8.cast`.
+
+## Maze — final level
+
+`maze9` is the last account: logging in shows `~/CONGRATULATIONS` —
+"Well done! It sure looks like you enjoy swimming in memory." The Maze line
+is complete (levels 0–8 solved and verified).
