@@ -205,6 +205,7 @@ VI RE-RECORD QUEUE (replaces the old heredoc re-records; serialized, one at a ti
 1. drifter L0 (done, ea316b4)  2. formulaone L0 (done, bf124f2)  3. formulaone L1 (done, 5c4aa0e)  4. formulaone L2 (done, 222b63b)  5. formulaone L3 (done, 643156f)
 6. maze L3 (done, 91edd1d — L3 has no exploit file; stub run shown with printf'd magic + xxd)  7. maze L4 (done, daf97f9 — tinel.py written in vi)  8. maze L6 (done, aef2e27 — sc.py/exploit.py/w6.py written in vi; sweep hit 0xffffcfc4 live)  9. maze L8 (done, 53a5467 — exp.py written in vi; payload fired live; verified via typed maze9 hop from the client)
 10. then the long tail of older games (natas, bandit, narnia, leviathan, behemoth, krypton, manpage, utumno, vortex L0-L12 as needed) re-recorded vi-style to the standard.
+LONG TAIL PROGRESS: natas L0-L15 (done, commits bfdf222/7c3e997/b6899ed/b388aa6 + L14/L15), natas L16 (done, f99f9c5 — n16grep.py written in vi; full 32-char extraction, FINAL KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx; first attempt truncated by the 180s drain — use @wait for long loops), natas L17 recording in flight (timing oracle, @wait 2600). NOTE: games/natas.json "pw" = the NEXT level's password (natasN.pw logs in as natasN+1).
 NOTE: vortex L3+ casts already use real vim sessions (reference style); verify them and re-record any that don't meet §0/§3.
 
 ## REPLAYABLE-TRANSCRIPT queue (user rule 2026-11-24 01:17 UTC) — spec in RECORDING-STANDARD.md §6
