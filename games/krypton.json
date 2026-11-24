@@ -349,12 +349,27 @@
    "steps": [
     {
      "cmd": "ssh krypton7@krypton.labs.overthewire.org -p 2231",
-     "out": []
+     "out": [
+      "(login banner)",
+      "krypton7@krypton:~$ "
+     ]
+    },
+    {
+     "cmd": "whoami",
+     "out": [
+      "krypton7"
+     ]
     },
     {
      "cmd": "cat /krypton/krypton7/README",
      "out": [
       "Congratulations on beating Krypton!"
+     ]
+    },
+    {
+     "cmd": "ls -la /krypton/krypton7",
+     "out": [
+      "README"
      ]
     }
    ]
