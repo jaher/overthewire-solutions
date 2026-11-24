@@ -202,7 +202,7 @@ NOTE: the client-side "client" for F1/drifter L0 can be ANY lab account, but the
 ## Recording standard v2 (user rules 2026-11-24) — vi-only + LIVE/verbatim
 Standard v2 in RECORDING-STANDARD.md: §0 LIVE+verbatim (cast = live session against the real level; terminal mirrors the real solve; code in vi = the exact verified source; cast's own run solves the level), §2 vi/vim-only file writes (no heredocs; driver ptyrun2.py @vi FILE ... @viend, verified live), §3 no terminal-side comments (comments inside the file only), gcc from mktemp -d in /tmp.
 VI RE-RECORD QUEUE (replaces the old heredoc re-records; serialized, one at a time):
-1. drifter L0  2. formulaone L0  3. formulaone L1  4. formulaone L2  5. formulaone L3
-6. maze L3  7. maze L4  8. maze L6  9. maze L8 (heredoc exp.py + echo '# ' narration)
+1. drifter L0 (done, ea316b4)  2. formulaone L0 (done, bf124f2)  3. formulaone L1 (done, 5c4aa0e)  4. formulaone L2 (done, 222b63b)  5. formulaone L3 (done, 643156f)
+6. maze L3 (done, 91edd1d — L3 has no exploit file; stub run shown with printf'd magic + xxd)  7. maze L4 (done, daf97f9 — tinel.py written in vi)  8. maze L6 (done, aef2e27 — sc.py/exploit.py/w6.py written in vi; sweep hit 0xffffcfc4 live)  9. maze L8 (done, 53a5467 — exp.py written in vi; payload fired live; verified via typed maze9 hop from the client)
 10. then the long tail of older games (natas, bandit, narnia, leviathan, behemoth, krypton, manpage, utumno, vortex L0-L12 as needed) re-recorded vi-style to the standard.
 NOTE: vortex L3+ casts already use real vim sessions (reference style); verify them and re-record any that don't meet §0/§3.
