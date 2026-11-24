@@ -78,7 +78,13 @@
         <option value="0.15">4×</option>
       </select>
     </label>
-    <label class="lvl">Game
+    <label class="lvl">Wargame
+      <select id="familySel">
+        <option value="otw" selected>OverTheWire</option>
+        <option value="s2s">SmashTheStack</option>
+      </select>
+    </label>
+    <label class="lvl">Mission
       <select id="gameSel"></select>
     </label>
     <label class="lvl">Level
@@ -177,10 +183,15 @@ const jump = document.getElementById('jump');
 const gameSel = document.getElementById('gameSel');
 const speedSel = document.getElementById('speed');
 function curGame(){ return GAMES[gameKey]; }
-function fillLevels(){ jump.innerHTML=''; curGame().levels.forEach(L => { const o=document.createElement('option'); o.value=L.lvl; o.textContent='Level '+L.lvl; jump.appendChild(o); }); }
-function fillGames(){ gameSel.innerHTML=''; const order=['narnia','natas','bandit','leviathan','krypton','manpage','behemoth','utumno','maze','vortex']; Object.keys(GAMES).sort((a,b)=>order.indexOf(a)-order.indexOf(b)).forEach(k => { const o=document.createElement('option'); o.value=k; o.textContent=GAMES[k].title; gameSel.appendChild(o); }); gameSel.value=gameKey; }
+const FAMILY_OF = {};
+['narnia','natas','bandit','leviathan','krypton','manpage','behemoth','utumno','maze','vortex','drifter','formulaone','semtex'].forEach(k => FAMILY_OF[k]='otw');
+['tux','logic','blackbox','blowfish','amateria','apfel'].forEach(k => FAMILY_OF[k]='s2s');
+const familySel = document.getElementById('familySel');
+function fillLevels(){ jump.innerHTML=''; const Ls = curGame().levels; if (!Ls.length){ const o=document.createElement('option'); o.textContent='— no levels yet —'; o.disabled=true; jump.appendChild(o); jump.disabled=true; return; } jump.disabled=false; Ls.forEach(L => { const o=document.createElement('option'); o.value=L.lvl; o.textContent='Level '+L.lvl; jump.appendChild(o); }); }
+function fillGames(){ gameSel.innerHTML=''; const fam = familySel.value; const order=['narnia','natas','bandit','leviathan','krypton','manpage','behemoth','utumno','maze','vortex','drifter','formulaone','semtex','apfel','tux','logic','blackbox','blowfish','amateria']; const keys = Object.keys(GAMES).filter(k => (FAMILY_OF[k]||'otw') === fam).sort((a,b)=>order.indexOf(a)-order.indexOf(b)); keys.forEach(k => { const o=document.createElement('option'); o.value=k; o.textContent=GAMES[k].title.replace(/ \(SmashTheStack\)$/,''); gameSel.appendChild(o); }); if (keys.length && keys.indexOf(gameKey) < 0) gameKey = keys[0]; gameSel.value = gameKey; }
 fillGames(); fillLevels();
 gameSel.onchange = () => { window.__userPickedGame = true; gameKey = gameSel.value; fillLevels(); playing = true; playBtn.textContent='⏸ Pause'; playLevel(0); };
+familySel.onchange = () => { window.__userPickedGame = true; fillGames(); fillLevels(); playing = true; playBtn.textContent='⏸ Pause'; playLevel(0); };
 async function loadManifest(){
   try {
     const m = await (await fetch('games/manifest.json', {cache:'no-store'})).json();
