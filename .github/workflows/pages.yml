@@ -14,21 +14,27 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
-# NOTE (2026-11-24): This is the canonical, GitHub-supported Pages workflow.
-# An earlier revision added a custom in-workflow retry that POSTed
-# /pages/deployments directly (to dodge what looked like deploy-pages@v4
-# flakiness). Evidence from the run history showed the opposite: that custom
-# step failed 5/5 (an OIDC-envelope bug made every POST 400; job logs are
-# unreadable without repo admin rights, so it couldn't be debugged), while
-# actions/deploy-pages@v4 succeeded 5/5 as the fallback and the site always
-# deployed correctly. The transient-failure resilience that matters is already
-# built in: deploy-pages@v4 relies on GitHub's Pages service auto-rescheduling
-# a failed deployment (deployment_attempt_error). Keeping a single, supported
-# deploy step is more reliable than the home-grown retry, so it is the sole
-# deploy path here.
+# Reliability notes (2026-11-24):
+# The Pages service intermittently reports a terminal failure status
+# (deployment_failed) for an otherwise valid artifact, roughly 1 in 4
+# deploys over the last few days. deploy-pages@v4 polls until a terminal
+# status or a 10-min timeout and has no retry-on-terminal-failure, and
+# GitHub's server-side auto-reschedule only covers the temporary
+# deployment_attempt_error status.
+#
+# We therefore re-run the SAME official action up to 3 times total
+# (publish, then retry-1, retry-2), each in its own job. The
+# github-pages artifact uploaded in `publish` is run-scoped, so the retry
+# jobs deploy it directly (no re-upload, no re-checkout of content needed
+# beyond the standard steps). Each attempt gets GitHub's full poll window
+# (10 min) and its own server-side auto-retry of temporary errors.
+#
+# A home-grown in-workflow API retry (POST /pages/deployments + poll) was
+# tried first but failed every run and its logs are unreadable without repo
+# admin rights, so it was dropped in favour of this first-party-only chain.
 
 jobs:
-  deploy:
+  publish:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -41,4 +47,30 @@ jobs:
         with:
           path: .
       - id: deployment
+        uses: actions/deploy-pages@v4
+
+  retry-1:
+    needs: publish
+    if: failure()
+    environment: github-pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Deploy (retry 1/2)
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  retry-2:
+    needs: retry-1
+    if: failure()
+    environment: github-pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Deploy (retry 2/2)
+        id: deployment
         uses: actions/deploy-pages@v4
