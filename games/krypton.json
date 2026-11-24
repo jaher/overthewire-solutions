@@ -138,9 +138,11 @@
      ]
     },
     {
-     "cmd": "cat /krypton/krypton2/krypton3 | tr 'A-Z' 'O-ZA-N'",
+     "cmd": "python3 /tmp/k2crypt.py",
      "out": [
-      "CAESARISEASY"
+      "encrypt(AAAA...) -> MMMMMMMMMM",
+      "shift = 12",
+      "krypton3 = CAESARISEASY"
      ]
     }
    ]
