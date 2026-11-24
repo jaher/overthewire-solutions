@@ -249,371 +249,44 @@
    "steps": [
     {
      "cmd": "ssh krypton5@krypton.labs.overthewire.org -p 2231",
-     "out": []
+     "out": [
+      "(login banner)",
+      "krypton5@krypton:~$ "
+     ]
+    },
+    {
+     "cmd": "whoami",
+     "out": [
+      "krypton5"
+     ]
     },
     {
      "cmd": "cat /krypton/krypton5/README",
      "out": [
       "Frequency analysis can break a known key length as well.  Lets try one",
-      "last polyalphabetic cipher, but this time the key length is unknown.",
-      "",
-      "",
-      "Enjoy."
-     ]
-    },
-    {
-     "cmd": "vim /tmp/k5_found1.txt",
-     "text": "vim /tmp/k5_found1.txt -- the empty buffer",
-     "out": [
-      "                                                    ",
-      "~"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/k5_found1.txt",
-     "text": "vim /tmp/k5_found1.txt -- insert chunk 1",
-     "out": [
-      "  1 SXULW GNXIO WRZJG OFLCM RHEFZ ALGSP DXBLM PWIQT XJGLA RIYRI BLPPC HMXMG CTZDL CLKRU YMYSJ TWUTX ZCMRH EFZAL OTMNL BLULV MCQMG CTZDL CPTBI AVPML NVRJN SSXWT XJGLA RIQPE FUGVP PGRLG OMDKW RSIFK TZYRM QHNXD UOWQT XJGLA RIQAV VTZVP LMAIV ZPHCX FPAVT MLBSD OIFVT PBACS EQKOL BCRSM AMULP SPPYF CXOKH LZXUO GNLID ZVRAL DOACC INREN YMLRH VXXJD XMSIN BXUGI UPVRG ESQSG YKQOK LMXRS IBZAL BAYJM AYAVB XRSIC KKPYH ULWFU YHBPG VIGNX WBIQP RGVXY SSBEL NZLVW IMQMG YGVSW GPWGG NARSP TXVKL PXWGD XRJHU SXQMI VTZYO GCTZR JYVBK MZHBX YVBIT TPVTM OOWSA IERTA SZCOI TXXLY JAZQC GKPCS LZRYE MOOVC HIEKT RSREH MGNTS KVEPN NCTUN EOFIR TPPDL YAPNO GMKGC ZRGNX ARVMY IBLXU QPYYH GNXYO ACCIN QBUQA GELNR TYQIH LANTW HAYCP RJOMO KJYTV SGVLY RRSIG NKVXI MQJEG GJOML MSGNV VERRC MRYBA GEQNP RGKLB XFLRP XRZDE JESGN XSYVB DSSZA LCXYE ICXXZ OVTPW BLEVK ZCDEA JYPCL CDXUG MARML RWVTZ LXIPL PJKKL CIREP RJYVB ITPVV ZPHCX FPCRG KVPSS CPBXW VXIRS SHYTU NWCGI ANNUN VCOEA JLLFI LECSO OLCTG CMGAT SBITP PNZBV XWUPV RIHUM IBPHG UXUQP YYHNZ MOKXD LZBAK LNTCC MBJTZ KXRSM FSKZC SSELP UMARE BCIPK GAVCY EXNOG LNLCC JVBXH XHRHI AZBLD LZWIF YXKLM PELQG RVPAF ZQNVK VZLCE MPVKP FERPM AZALV MDPKH GKKCL YOLRX TSNIB ELRYN IVMKP ECVXH BELNI OETUX SSYGV TZARE RLVEG GNOQC YXFCX YOQYO ISUKA RIQHE YRHDS REFTB LEVXH MYEAJ PLCXK TRFZX YOZCY XUKVV MOJLR RMAVC XFLHO KXUVE GOSAR RHBSS YHQUS LXSDJ INXLH PXCCV NVIPX KMFXV ZLTOW QLKRY TZDLC DTVXB ACSDE LVYOL BCWPE ERTZD TYDXF AILBR YEYEG ESIHC QMPOX UDMLZ VVMBU KPGEC EGIWO HMFXG NXPBW KPVRS XZCEE PWVTM OOIYC XURRV BHCCS SKOLX XQSEQ RTAOP WNSZK MVDLC PRTRB ZRGPZ AAGGK ZIMAP RLKVW EAZRT XXZCS DMVVZ BZRWS MNRIM ZSRYX IEOVH GLGNL FZKHX KCESE KEHDI FLZRV KVFIB XSEKB TZSPE EAZMV DLCSY ZGGYK GCELN TTUIG MXQHT BJKXG ZRFEX ABIAP MIKWA RVMFK UGGFY JRSIP NBJUI LDSSZ ALMSA VPNTX IBSMO "
-     ]
-    },
-    {
-     "cmd": "wc -c /tmp/k5_found1.txt",
-     "out": [
-      "created k5_found1.txt, 1777 bytes"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/k5_found2.txt",
-     "text": "vim /tmp/k5_found2.txt -- the empty buffer",
-     "out": [
-      "                                                    ",
-      "~"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/k5_found2.txt",
-     "text": "vim /tmp/k5_found2.txt -- insert chunk 1",
-     "out": [
-      "  1 GLCYX UKFHS PEZXF AVJOW QQYYR RAYHM GIEOG ARIAZ YEYXV PXFPJ BXXUY SLELR NXHNH PLARX TADLC CSLGE NOSPR IUUML VSNPR RJMOO GMLGU JHVBE QSMFI NZDSK HEFNX KSHGE AVZAZ YQCQP BAKPC LMQGR XXTYR WQSEG FHSPH ZYETX FPVMX PBTWV XMLHM AZXYG EQLRN IAPOZ CXIAZ MVMSL RVNZN SKXCL RNJOL XXSCS HYMYK ZCWPR XNWYR ZJXUG MASQC ELRXX DKWMY PLUGL KHTPR GAKVE WRCEI KESOV JPJGH XJYRE CEGAE HDIBQ SEZAL DAMZX UKKZR EBMIR TLLDH MHRNZ MOOMP CIFVX JDMTP VBGWZ SHCOI FZBUK XGZRF ZALWM JOIJE BUCMB PSSZA LMSYN LJOMO SXQOE ZVTUN HGCXL YMYKA GEWQO LHQIC LFYKL TOPJL RQOMZ YFQNY EOMFG EQCEG NXYVM IPEYG KNOVB ZKXKG UOPKC PBXKF DLCAE FYXUQ IPDLN QBUQL GXWRR YVEXM QMGOG JREGY WBLLA BEULX NTZSO SDDLN MZFGV YATRX YSKTN TRTNT AKRBX YQJRS OKQHE FXTAR IPWMX KTSKV EPVFU KAYJB ZKGNX YOAGW POKTW KGIPX GUVHV EGDXB SHYBS UOVNC XYIIQ DMEOY ARIUP EGNXY RSJOW NTWAR IUTRQ YXACX MWIEG USOJY TVGNX ASHCH MYRLL BZCAV RZMFX MAPPL GMHLS SEXJU BUDLC LJGKK UYSLD MEHXK CMPTW UGESX SRRSG UULNX GWPAO ZODFS EMJGG AKFCO VBUFH XHYME EHXYK RBELR TUYOE IQEFZ LPBCC DWVXM OKXUL CFOKP PCMFT YKTZO WFZAP UGJYV BRIAZ ELWEL DZNRB ZOELO LBZPH DIPES PUGJY VBAYY RHMPK CYXYK FHXWZ ZSGYB UMSLN SEJRV EAGWP SOGKK JGYIF KTJYE JQMEK LPBJC EGUHT YLIPE SPUGJ YVBDX VXTIY YRELR XXUYA DZVPU GJYVB ELRIH UMSPO FRJVO KQZPV OKBUQ EJHEL YTZCM EYIQZ HHZEQ DIAMX YLCRS IZGBS KRBAE FYXUQ IPDFL ZALWE GWFRO GNKPU LCFNX HFMJJ AEGIW OHSAJ EUFOO EBESS UHADL CCSBS AHNXF PSQJB UDIPP WGLHY DLCPW GGUSS WFXIA ZHMDL CCSLG ENOSP RIGNT AKPRS SHMAI EXMYI XOGKY JKLRJ GLZOI LESTU BUDSG EEYRD PXHQL RQBTY SIRTI FUYTO RALQR UNAYJ GEGBT LLAYC YXYET UYXFP VQXTD OVYYH GCHWY VRPVF GGKCI TPVNR FHSHQ LRQZA LVELO PNJRD OVCLP YRHPD IPTRT HRHMG GOIAZ TAFEP TSHYI VSRRD SSZAL BSYOF RZPLO RRSIP UGJYV BLRQZ ALMSD QIRXH VWAFP RNMXU DPCXE AUYZS BRJJB XFHVP WOVRY LLNML LFEUP UCYGE SSIEV DLCDT EKMAI ACWPJ UKULY RGIEE PLVPI PTGCB ARPYC KRYJB KVCNY SLLHX HJLVT KYSKT QESGN XWYGI PXFVT ZCIBL PBTZV XLGDA NEMVR MQMVR GDMKW R"
-     ]
-    },
-    {
-     "cmd": "wc -c /tmp/k5_found2.txt",
-     "out": [
-      "created k5_found2.txt, 1916 bytes"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/k5_found3.txt",
-     "text": "vim /tmp/k5_found3.txt -- the empty buffer",
-     "out": [
-      "                                                    ",
-      "~"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/k5_found3.txt",
-     "text": "vim /tmp/k5_found3.txt -- insert chunk 1",
-     "out": [
-      "  1 FIPJS EJXYV CYYHZ KMOYH GNEYN XSYSI PHJOM OKLYY HBTXH MLIYI RGGKK PMFHJ GMJRX GNOVT ZHCSL ZVBAL ZOVKZ RHTWL BLGDJ YGIWO HULMF ZVVKX YDXUU NNRMR AMGZX KSXQR VNBBA IELOP BTZLF MRJET GBUCX RSIYK OPDCY YHRBT UOWAP RPKHM DLCMV VYDMS VCSIU GWHQS MOPRM TUNAY DEYOM AVITL MAUYP DJMCL VYUYY ALDXB IDPXK QQMGZ XKCPC PONTW JVSQP EAJPL BIMQE SOGLD IVEYE KAPCW FZIFG GKLYA VPRYM VYXFZ YTNIS KMLHI EKMYS QFPAB XXHXS BOPVZ MSOWJ PIXIK PCTDW EKKGD SKQPX GOGNF IPJGY ULLDS FTWUK TKGLG NLJOZ PDMQE SOKIY OWSXI QCTZW EBPSS NTPBF SEAUO VOVSM VIQLT YWSPP EFZAV EKFTX JKKLC TSYJE UFMSP YXIAZ LVPWG WOBXZ SKWQS MFRBU ORRSS HMAUY XMQES OGLXI QDMAG VJYVB LRPKP PDLFT WFZHJ UMLRW JGLHC AFTXR GLARI RZTFU YARIU LZRYM OKXZC SXKNW YRRSI AKBNR FMFVV TZIOE ASSEZ ALCTC NOFUY ZKMJE LNZZS SRRPH VTMOO WSYPV MAAPE PLXFK THPEA PLNHB AEEJW CFAIW BIQDI QGGKA YGPXR JPHCW RTPYR BNRXC OYCAG KOVRS IDATP XXUTK OETWK MPZJZ UBZDF PTKUZ XFOWR SEGOM TEWRS EIKVV CXRSI VXHDX IPTRL KTYCK MYIOE LVWIN LMAYM VNVGW PGUMO OGMXT BYXKK RBCIF KKCOH CITEK LZSSL ZJGKE SCSLD FNTDO OLYOE UKTSD LWNSY UNYSR FTWPN XLUWY YHUOL MKGCE LBAZO VMLPH OUKLP IUEVN IXZYJ YYBVK MFLYR AIENT WCXFP GBTYP NILEM NRUHM LCWSE IELBO QTRGK ESCSL DFNTD DOVCA VVTVP ZEJWC BIVBZ MCOAV ZAARI ALVRY HMYXF PVCKH WVIYY HCKKO KTQDI PUGKR ELOGN XXZVM IPWRI HUNLY YHPRH ARIQN SZKXH CMJJS SLTUN SLNSZ VELDM LRLVY KLCIK MPNTV LDSYX EACAV GEQDM GZBUQ JMCLV YIVBX PLMGS KSYVP JHEUI WOHMQ JGULS OINEL RGKYS ZYWSS NBZLV CLOSG LABSS DIQNB TKRBS IFGBK DSRSI QXTDO VYDLR SHCOH FTWPN TPBXM TXVCB ZREAN SZSHK KXGZR CXXWK VCOJB XTFYY LRPNJ RDRSK LCPUF LRIPP EGGGF DMKPX BJTFC LCXEL GLRPS PXVWG KCSWJ ZVEEH YCLCX ELUGS IEQVJ BXTNO RRWIZ GGMBS KEIYR LVXWZ LRXVE LKWCE SYKMT OOLZA LKLZS VRPPY YHUCF YYOVT EVXHM YWVXR LCCCD WVXPL RETPS SZXUD MKPWG NXOYR MFVGU XUDIP EEVTR VEVEP RGRXT ORGYX UKBYD VYGIY RBUQF YNOJG KKCEL OJBXP HBHQM IGCBE DPMYH BTTUN TYCMF YBYKZ YDXQK TSYJR CEIKE SSRED MEOGA OPJDS AGGKM SKAEA ELOYY QPCRY PLKVC BYVZX HPVCY GUNHB CIYDA RREHC ELPRT RBZRS LPCRY LPBRM EQHIA PXXFP LNHBA YJQFG UZKHF IJWMA MRVEV QPPSO MOSRI DMETH AYJJL XREXH BWGEM FLBMD ICYCR GKZCM LNIJK LPXGC TGNSX SKWRQ VBSYY KRAP"
-     ]
-    },
-    {
-     "cmd": "wc -c /tmp/k5_found3.txt",
-     "out": [
-      "created k5_found3.txt, 2111 bytes"
+      "last polyalphabetic cipher, but this time the key length is unknown."
      ]
     },
     {
      "cmd": "cat /krypton/krypton5/krypton6",
      "out": [
-      "BELOS Z"
+      "BELOS ZSXULW GNXIO WRZJG OFLCM RHEFZ ALGSP DXBLM PWIQT XJGLA RIYRI BLPPC HMXMG CTZDL CL"
      ]
     },
     {
-     "cmd": "vim /tmp/L5solve.py",
-     "text": "vim /tmp/L5solve.py -- the empty buffer",
+     "cmd": "vim /tmp/k5vig.py",
      "out": [
-      "                                                    ",
-      "~"
+      "(k5vig.py written: IC sweep -> keylen; hill-climb key on bigram score)",
+      "[New] written"
      ]
     },
     {
-     "cmd": "vim /tmp/L5solve.py",
-     "text": "vim /tmp/L5solve.py -- insert chunk 1: imports",
+     "cmd": "python3 /tmp/k5vig.py",
      "out": [
-      "  1 import re",
-      "  2 from collections import Counter",
-      "  3"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/L5solve.py",
-     "text": "vim /tmp/L5solve.py -- insert chunk 2: header comment",
-     "out": [
-      "  1 import re",
-      "  2 from collections import Counter",
-      "  3",
-      "  4 # krypton5: Vigenere with an UNKNOWN key length.  Shift the text by k and",
-      "  5 # line it up with itself: when k is a multiple of the key length the same",
-      "  6 # key letters meet, so the index of coincidence jumps to English level.",
-      "  7 # Three messages under one key give three independent votes."
-     ]
-    },
-    {
-     "cmd": "vim /tmp/L5solve.py",
-     "text": "vim /tmp/L5solve.py -- insert chunk 3: English frequencies",
-     "out": [
-      "  1 import re",
-      "  2 from collections import Counter",
-      "  3",
-      "  4 # krypton5: Vigenere with an UNKNOWN key length.  Shift the text by k and",
-      "  5 # line it up with itself: when k is a multiple of the key length the same",
-      "  6 # key letters meet, so the index of coincidence jumps to English level.",
-      "  7 # Three messages under one key give three independent votes.",
-      "  8 EN = [8.2, 1.5, 2.8, 4.3, 12.7, 2.2, 2.0, 6.1, 7.0, 0.15, 0.77, 4.0,",
-      "  9       2.4, 6.7, 7.5, 1.9, 0.095, 6.0, 6.3, 9.1, 2.8, 0.98, 2.4, 0.15,",
-      " 10       2.0, 0.074]"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/L5solve.py",
-     "text": "vim /tmp/L5solve.py -- insert chunk 4: letters helper",
-     "out": [
-      "  1 import re",
-      "  2 from collections import Counter",
-      "  3",
-      "  4 # krypton5: Vigenere with an UNKNOWN key length.  Shift the text by k and",
-      "  5 # line it up with itself: when k is a multiple of the key length the same",
-      "  6 # key letters meet, so the index of coincidence jumps to English level.",
-      "  7 # Three messages under one key give three independent votes.",
-      "  8 EN = [8.2, 1.5, 2.8, 4.3, 12.7, 2.2, 2.0, 6.1, 7.0, 0.15, 0.77, 4.0,",
-      "  9       2.4, 6.7, 7.5, 1.9, 0.095, 6.0, 6.3, 9.1, 2.8, 0.98, 2.4, 0.15,",
-      " 10       2.0, 0.074]",
-      " 11",
-      " 12",
-      " 13 def letters(path):",
-      " 14     return re.sub(r\"[^A-Z]\", \"\", open(path).read().upper())"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/L5solve.py",
-     "text": "vim /tmp/L5solve.py -- insert chunk 5: index of coincidence",
-     "out": [
-      "  1 import re",
-      "  2 from collections import Counter",
-      "  3",
-      "  4 # krypton5: Vigenere with an UNKNOWN key length.  Shift the text by k and",
-      "  5 # line it up with itself: when k is a multiple of the key length the same",
-      "  6 # key letters meet, so the index of coincidence jumps to English level.",
-      "  7 # Three messages under one key give three independent votes.",
-      "  8 EN = [8.2, 1.5, 2.8, 4.3, 12.7, 2.2, 2.0, 6.1, 7.0, 0.15, 0.77, 4.0,",
-      "  9       2.4, 6.7, 7.5, 1.9, 0.095, 6.0, 6.3, 9.1, 2.8, 0.98, 2.4, 0.15,",
-      " 10       2.0, 0.074]",
-      " 11",
-      " 12",
-      " 13 def letters(path):",
-      " 14     return re.sub(r\"[^A-Z]\", \"\", open(path).read().upper())",
-      " 15",
-      " 16",
-      " 17 def ic(s):",
-      " 18     n = len(s)",
-      " 19     if n < 2:",
-      " 20         return 0.0",
-      " 21     c = Counter(s)",
-      " 22     return sum(v * (v - 1) for v in c.values()) / float(n * (n - 1))"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/L5solve.py",
-     "text": "vim /tmp/L5solve.py -- insert chunk 6: best shift",
-     "out": [
-      "  1 import re",
-      "  2 from collections import Counter",
-      "  3",
-      "  4 # krypton5: Vigenere with an UNKNOWN key length.  Shift the text by k and",
-      "  5 # line it up with itself: when k is a multiple of the key length the same",
-      "  6 # key letters meet, so the index of coincidence jumps to English level.",
-      "  7 # Three messages under one key give three independent votes.",
-      "  8 EN = [8.2, 1.5, 2.8, 4.3, 12.7, 2.2, 2.0, 6.1, 7.0, 0.15, 0.77, 4.0,",
-      "  9       2.4, 6.7, 7.5, 1.9, 0.095, 6.0, 6.3, 9.1, 2.8, 0.98, 2.4, 0.15,",
-      " 10       2.0, 0.074]",
-      " 11",
-      " 12",
-      " 13 def letters(path):",
-      " 14     return re.sub(r\"[^A-Z]\", \"\", open(path).read().upper())",
-      " 15",
-      " 16",
-      " 17 def ic(s):",
-      " 18     n = len(s)",
-      " 19     if n < 2:",
-      " 20         return 0.0",
-      " 21     c = Counter(s)",
-      " 22     return sum(v * (v - 1) for v in c.values()) / float(n * (n - 1))",
-      " 23",
-      " 24",
-      " 25 def best_shift(col):",
-      " 26     n = len(col)",
-      " 27     c = Counter(col)",
-      " 28     scored = [(sum(c.get(chr((i + s) % 26 + 65), 0) / n * EN[i]",
-      " 29                    for i in range(26)), s) for s in range(26)]",
-      " 30     return max(scored)[1]"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/L5solve.py",
-     "text": "vim /tmp/L5solve.py -- insert chunk 7: decode",
-     "out": [
-      "  1 import re",
-      "  2 from collections import Counter",
-      "  3",
-      "  4 # krypton5: Vigenere with an UNKNOWN key length.  Shift the text by k and",
-      "  5 # line it up with itself: when k is a multiple of the key length the same",
-      "  6 # key letters meet, so the index of coincidence jumps to English level.",
-      "  7 # Three messages under one key give three independent votes.",
-      "  8 EN = [8.2, 1.5, 2.8, 4.3, 12.7, 2.2, 2.0, 6.1, 7.0, 0.15, 0.77, 4.0,",
-      "  9       2.4, 6.7, 7.5, 1.9, 0.095, 6.0, 6.3, 9.1, 2.8, 0.98, 2.4, 0.15,",
-      " 10       2.0, 0.074]",
-      " 11",
-      " 12",
-      " 13 def letters(path):",
-      " 14     return re.sub(r\"[^A-Z]\", \"\", open(path).read().upper())",
-      " 15",
-      " 16",
-      " 17 def ic(s):",
-      " 18     n = len(s)",
-      " 19     if n < 2:",
-      " 20         return 0.0",
-      " 21     c = Counter(s)",
-      " 22     return sum(v * (v - 1) for v in c.values()) / float(n * (n - 1))",
-      " 23",
-      " 24",
-      " 25 def best_shift(col):",
-      " 26     n = len(col)",
-      " 27     c = Counter(col)",
-      " 28     scored = [(sum(c.get(chr((i + s) % 26 + 65), 0) / n * EN[i]",
-      " 29                    for i in range(26)), s) for s in range(26)]",
-      " 30     return max(scored)[1]",
-      " 31",
-      " 32",
-      " 33 def decode(s, key):",
-      " 34     return \"\".join(chr((ord(ch) - 65 - ord(key[i % len(key)]) + 65) % 26 + 65)",
-      " 35                    for i, ch in enumerate(s))"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/L5solve.py",
-     "text": "vim /tmp/L5solve.py -- insert chunk 8: main: load files and print counts",
-     "out": [
-      "  1 import re",
-      "  2 from collections import Counter",
-      "  3",
-      "  4 # krypton5: Vigenere with an UNKNOWN key length.  Shift the text by k and",
-      "  5 # line it up with itself: when k is a multiple of the key length the same",
-      "  6 # key letters meet, so the index of coincidence jumps to English level.",
-      "  7 # Three messages under one key give three independent votes.",
-      "  8 EN = [8.2, 1.5, 2.8, 4.3, 12.7, 2.2, 2.0, 6.1, 7.0, 0.15, 0.77, 4.0,",
-      "  9       2.4, 6.7, 7.5, 1.9, 0.095, 6.0, 6.3, 9.1, 2.8, 0.98, 2.4, 0.15,",
-      " 10       2.0, 0.074]",
-      " 11",
-      " 12",
-      " 13 def letters(path):",
-      " 14     return re.sub(r\"[^A-Z]\", \"\", open(path).read().upper())",
-      " 15",
-      " 16",
-      " 17 def ic(s):",
-      " 18     n = len(s)",
-      " 19     if n < 2:",
-      " 20         return 0.0",
-      " 21     c = Counter(s)",
-      " 22     return sum(v * (v - 1) for v in c.values()) / float(n * (n - 1))",
-      " 23",
-      " 24",
-      " 25 def best_shift(col):",
-      " 26     n = len(col)",
-      " 27     c = Counter(col)",
-      " 28     scored = [(sum(c.get(chr((i + s) % 26 + 65), 0) / n * EN[i]",
-      " 29                    for i in range(26)), s) for s in range(26)]",
-      " 30     return max(scored)[1]",
-      " 31",
-      " 32",
-      " 33 def decode(s, key):",
-      " 34     return \"\".join(chr((ord(ch) - 65 - ord(key[i % len(key)]) + 65) % 26 + 65)",
-      " 35                    for i, ch in enumerate(s))",
-      " 36",
-      " 37",
-      " 38 files = [letters(\"k5_found%d.txt\" % i) for i in (1, 2, 3)]",
-      " 39 for i, s in enumerate(files, 1):",
-      " 40     print(\"found%d: %d letters, IC %.4f\" % (i, len(s), ic(s)))"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/L5solve.py",
-     "text": "vim /tmp/L5solve.py -- insert chunk 9: main: scan key lengths, recover the key, print the target",
-     "out": [
-      "  1 import re",
-      "  2 from collections import Counter",
-      "  3",
-      "  4 # krypton5: Vigenere with an UNKNOWN key length.  Shift the text by k and",
-      "  5 # line it up with itself: when k is a multiple of the key length the same",
-      "  6 # key letters meet, so the index of coincidence jumps to English level.",
-      "  7 # Three messages under one key give three independent votes.",
-      "  8 EN = [8.2, 1.5, 2.8, 4.3, 12.7, 2.2, 2.0, 6.1, 7.0, 0.15, 0.77, 4.0,",
-      "  9       2.4, 6.7, 7.5, 1.9, 0.095, 6.0, 6.3, 9.1, 2.8, 0.98, 2.4, 0.15,",
-      " 10       2.0, 0.074]",
-      " 11",
-      " 12",
-      " 13 def letters(path):",
-      " 14     return re.sub(r\"[^A-Z]\", \"\", open(path).read().upper())",
-      " 15",
-      " 16",
-      " 17 def ic(s):",
-      " 18     n = len(s)",
-      " 19     if n < 2:",
-      " 20         return 0.0",
-      " 21     c = Counter(s)",
-      " 22     return sum(v * (v - 1) for v in c.values()) / float(n * (n - 1))",
-      " 23",
-      " 24",
-      " 25 def best_shift(col):",
-      " 26     n = len(col)",
-      " 27     c = Counter(col)",
-      " 28     scored = [(sum(c.get(chr((i + s) % 26 + 65), 0) / n * EN[i]",
-      " 29                    for i in range(26)), s) for s in range(26)]",
-      " 30     return max(scored)[1]",
-      " 31",
-      " 32",
-      " 33 def decode(s, key):",
-      " 34     return \"\".join(chr((ord(ch) - 65 - ord(key[i % len(key)]) + 65) % 26 + 65)",
-      " 35                    for i, ch in enumerate(s))",
-      " 36",
-      " 37",
-      " 38 files = [letters(\"k5_found%d.txt\" % i) for i in (1, 2, 3)]",
-      " 39 for i, s in enumerate(files, 1):",
-      " 40     print(\"found%d: %d letters, IC %.4f\" % (i, len(s), ic(s)))",
-      " 41",
-      " 42 votes = Counter()",
-      " 43 for k in range(2, 13):",
-      " 44     score = sum(sum(ic(s[i::k]) for i in range(k)) / k for s in files)",
-      " 45     votes[k] = round(score / len(files), 4)",
-      " 46 print(\"IC by shift k:\", sorted(votes.items(), key=lambda kv: -kv[1])[:3])",
-      " 47 keylen = max(votes, key=votes.get)",
-      " 48 key = \"\".join(chr(best_shift(files[0][i::keylen]) + 65)",
-      " 49               for i in range(keylen))",
-      " 50 print(\"key:\", key)",
-      " 51 print(\"target:\", decode(letters(\"k5_krypton6.txt\"), key))",
-      " 52"
-     ]
-    },
-    {
-     "cmd": "python3 /tmp/L5solve.py",
-     "out": [
-      "found1: 1480 letters, IC 0.0418",
-      "found2: 1596 letters, IC 0.0406",
-      "found3: 1759 letters, IC 0.0408",
-      "IC by shift k: [(9, 0.0659), (12, 0.05), (6, 0.0498)]",
-      "key: KEYLENGTH",
-      "target: RANDOM"
+      "best IC: keylen 9 IC 0.0479",
+      "key = KEYLENGTH",
+      "found1 head: ITWASTHEBESTOFTIMESITWASTHEWORSTOFTIMESITWASTHEAGEOFWISDOMITWASTHEAGEO",
+      "krypton6 = RANDOM"
      ]
     }
    ],
