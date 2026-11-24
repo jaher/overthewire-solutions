@@ -54,7 +54,23 @@
    "steps": [
     {
      "cmd": "ssh krypton1@krypton.labs.overthewire.org -p 2231",
-     "out": []
+     "out": [
+      "(login banner)",
+      "krypton1@krypton:~$ "
+     ]
+    },
+    {
+     "cmd": "whoami",
+     "out": [
+      "krypton1"
+     ]
+    },
+    {
+     "cmd": "cat /krypton/krypton1/README",
+     "out": [
+      "Encrypt the following...",
+      "ROT13 is its own inverse"
+     ]
     },
     {
      "cmd": "cat /krypton/krypton1/krypton2",
