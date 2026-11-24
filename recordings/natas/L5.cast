@@ -1,6 +1,10 @@
-{"version":3,"term":{"cols":100,"rows":32},"timestamp":1793469345,"idle_time_limit":2.0,"command":"python3 -I /home/claude/tools/ptyrun_sh.py /home/claude/solves/natas/L5.sh","title":"Natas L5 solve","env":{"SHELL":"/bin/bash"}}
-[0.012, "o", "$ curl -sI -u natas5:<pw> http://natas5.natas.labs.overthewire.org/ | grep -i set-cookie\r\r\n"]
-[1.206, "o", "Set-Cookie: loggedin=0\r\r\r\n"]
-[0.001, "o", "$ curl -s -u natas5:<pw> -b \"loggedin=1\" http://natas5.natas.labs.overthewire.org/\r\r\n"]
-[0.887, "o", "Access granted. The password for natas6 is 7mhjtShJAcld2NYbKHEadnhEwRn2P8VT</div>\r\r\n"]
-[0.003, "x", "0"]
+{"version": 2, "width": 80, "height": 24, "timestamp": 1795482661, "env": {"SHELL": "/bin/bash", "TERM": "xterm"}}
+[0.009763, "o", "\u001b[?2004hbash-5.2$ "]
+[1.013446, "o", "export PS1='shell$ '\r\r\n\u001b[?2004l\r\u001b[?2004hshell$ "]
+[2.617546, "o", "curl -sI -u natas5:e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M http://natas5.natas.labs.overthewire.org/ | grep -i set-cookie\r\r\n\u001b[?2004l\r"]
+[3.131123, "o", "Set-Cookie: loggedin=0\r\r\r\n"]
+[3.132417, "o", "\u001b[?2004hshell$ "]
+[3.132741, "o", "curl -s -u natas5:e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M -b 'loggedin=1' http://natas5.natas.labs.overthewire.org/ | grep -i \"granted\"\r\r\n\u001b[?2004l\r"]
+[3.536162, "o", "Access granted. The password for natas6 is 7mhjtShJAcld2NYbKHEadnhEwRn2P8VT</div>\r\r\n"]
+[3.537395, "o", "\u001b[?2004hshell$ "]
+[3.537686, "o", "exit\r\r\n\u001b[?2004l\rexit\r\r\n"]
