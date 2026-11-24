@@ -198,3 +198,11 @@ Re-record (in order, serialized, one at a time; then continue unsolved levels):
 DONE 2026-11-23 (all re-recorded to the standard, checked in): 1. drifter L0 (1fc70d2), 2. formulaone L0 (730ca58), 3. formulaone L1 (e1989cb), 4. formulaone L2 (a443115), 5. formulaone L3 (edc9711), 6. maze L3 (f59c3c4), 7. maze L4 (6711ab7), 8. maze L6 (this commit). Each: typed ssh login + MOTD at the top, sources written via labeled heredocs, clean output (strings/xxd where binary), password clean + verified; cast scripts kept in tools/<game>/<lvl>/cast-script.txt.
 9. then the long tail: natas L0-L33, bandit L0-L33, narnia, leviathan, behemoth, krypton, manpage, utumno, vortex casts — re-record each to the standard (start from oldest game, level by level).
 NOTE: the client-side "client" for F1/drifter L0 can be ANY lab account, but the client ssh login itself must be visible in the cast.
+
+## Recording standard v2 (user rules 2026-11-24) — vi-only + LIVE/verbatim
+Standard v2 in RECORDING-STANDARD.md: §0 LIVE+verbatim (cast = live session against the real level; terminal mirrors the real solve; code in vi = the exact verified source; cast's own run solves the level), §2 vi/vim-only file writes (no heredocs; driver ptyrun2.py @vi FILE ... @viend, verified live), §3 no terminal-side comments (comments inside the file only), gcc from mktemp -d in /tmp.
+VI RE-RECORD QUEUE (replaces the old heredoc re-records; serialized, one at a time):
+1. drifter L0  2. formulaone L0  3. formulaone L1  4. formulaone L2  5. formulaone L3
+6. maze L3  7. maze L4  8. maze L6  9. maze L8 (heredoc exp.py + echo '# ' narration)
+10. then the long tail of older games (natas, bandit, narnia, leviathan, behemoth, krypton, manpage, utumno, vortex L0-L12 as needed) re-recorded vi-style to the standard.
+NOTE: vortex L3+ casts already use real vim sessions (reference style); verify them and re-record any that don't meet §0/§3.
