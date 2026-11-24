@@ -14,11 +14,24 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+# NOTE (2026-11-24): This is the canonical, GitHub-supported Pages workflow.
+# An earlier revision added a custom in-workflow retry that POSTed
+# /pages/deployments directly (to dodge what looked like deploy-pages@v4
+# flakiness). Evidence from the run history showed the opposite: that custom
+# step failed 5/5 (an OIDC-envelope bug made every POST 400; job logs are
+# unreadable without repo admin rights, so it couldn't be debugged), while
+# actions/deploy-pages@v4 succeeded 5/5 as the fallback and the site always
+# deployed correctly. The transient-failure resilience that matters is already
+# built in: deploy-pages@v4 relies on GitHub's Pages service auto-rescheduling
+# a failed deployment (deployment_attempt_error). Keeping a single, supported
+# deploy step is more reliable than the home-grown retry, so it is the sole
+# deploy path here.
+
 jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url || steps.api_deploy.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -27,147 +40,5 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .
-
-      # actions/deploy-pages@v4 has flaked on most runs (transient Pages
-      # service failures on create + poll; see run history 2026-11-23/24,
-      # and the broken workflow_run retry: download-artifact@v4 has no
-      # github-run-id input, so it always pulled the wrong run's artifacts).
-      # Retry the SAME deployment in-workflow first (the uploaded
-      # github-pages artifact stays valid across attempts), with backoff;
-      # only if every attempt fails, fall through to the official action.
-      # Mirrors actions/deploy-pages@v4: POST /repos/{owner}/{repo}/pages/deployments
-      # with {artifact_id, pages_build_version, oidc_token}, then poll
-      # /repos/{owner}/{repo}/pages/deployments/{id} until terminal status.
-      - name: Deploy with retries (up to 5 attempts)
-        id: api_deploy
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -uo pipefail
-          API="${GITHUB_API_URL:-https://api.github.com}"
-          REPO="${GITHUB_REPOSITORY}"
-          SHA="${GITHUB_SHA}"
-          RUN_ID="${GITHUB_RUN_ID}"
-          MAX_ATTEMPTS=5
-          POLL_TIMEOUT=120
-          MAX_POLL_ERRORS=10
-          ATTEMPT=1
-
-          api() { curl -sS -f -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/json" "$@"; }
-
-          # Same as @actions/core getIDToken(): ask the runner for an OIDC
-          # token for the default audience api://githubactions.
-          fetch_id_token() {
-            local url="${ACTIONS_ID_TOKEN_REQUEST_URL}"
-            [ -n "${url}" ] || { echo "::warning::no ACTIONS_ID_TOKEN_REQUEST_URL (id-token: write?)"; return 1; }
-            local req="${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
-            [ -n "${req}" ] || { echo "::warning::no ACTIONS_ID_TOKEN_REQUEST_TOKEN"; return 1; }
-            # Runner token endpoint returns a JSON envelope; @actions/core's
-            # OidcClient.getIDToken() extracts res.result?.value (the JWT), not
-            # the raw body. Match that, and append audience with the right sep.
-            local sep='?' raw tok
-            case "${url}" in *'?'*) sep='&' ;; esac
-            raw="$(curl -sS -f "${url}${sep}audience=api%3A%2F%2Fgithubactions" -H "Authorization: Bearer ${req}")" || {
-              echo "::warning::OIDC token fetch HTTP failed"
-              return 1
-            }
-            tok="$(printf '%s' "${raw}" | jq -r '.value // empty')"
-            [ -n "${tok}" ] || { echo "::warning::OIDC token: no .value in response"; return 1; }
-            printf '%s' "${tok}"
-          }
-
-          echo "::group::Locating github-pages artifact for run ${RUN_ID}"
-          artifact_id="$(api "${API}/repos/${REPO}/actions/artifacts?per_page=20&name=github-pages" \
-            | jq -r --argjson rid "$RUN_ID" '.artifacts[] | select(.workflow_run.id == $rid) | .id' | tail -1)"
-          if [ -z "${artifact_id}" ] || [ "${artifact_id}" = "null" ]; then
-            echo "::error::github-pages artifact not found for run ${RUN_ID} - upload step failed?"
-            exit 1
-          fi
-          echo "artifact_id=${artifact_id}" >> "${GITHUB_OUTPUT}"
-
-          for (( ; ATTEMPT <= MAX_ATTEMPTS; ATTEMPT++ )); do
-            echo "::group::Deploy attempt ${ATTEMPT}/${MAX_ATTEMPTS}"
-            if ! ID_TOKEN="$(fetch_id_token)"; then
-              ID_TOKEN=""
-              echo "::warning::OIDC token fetch failed"
-            fi
-            if [ -n "${ID_TOKEN}" ]; then
-              RESP="$(curl -sS -w $'\n%{http_code}' -X POST "${API}/repos/${REPO}/pages/deployments" \
-                -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/json" \
-                -H "Content-Type: application/json" \
-                --data "$(jq -n --argjson a "$artifact_id" --arg b "$SHA" --arg o "$ID_TOKEN" \
-                          '{artifact_id: $a, pages_build_version: $b, oidc_token: $o}')" 2>&1)" || true
-              HTTP="${RESP##*$'\n'}"
-              BODY="${RESP%$'\n'*}"
-              echo "POST /pages/deployments -> ${HTTP}"
-              case "${HTTP}" in
-                2*)
-                  DEP_ID="$(printf '%s' "${BODY}" | jq -r '.id // empty' 2>/dev/null)"
-                  PAGE_URL="$(printf '%s' "${BODY}" | jq -r '.page_url // empty' 2>/dev/null)"
-                  if [ -z "${DEP_ID}" ]; then
-                    echo "::error::deployment created but no id in response: ${BODY}"
-                    break
-                  fi
-                  echo "deployment_id=${DEP_ID}"
-                  # Poll until terminal status (like deploy-pages@v4)
-                  SLEEP=10; ELAPSED=0; ERRORS=0
-                  while [ "${ELAPSED}" -lt "${POLL_TIMEOUT}" ]; do
-                    sleep "${SLEEP}"; ELAPSED=$((ELAPSED + SLEEP))
-                    if ! STATUS_BODY="$(api "${API}/repos/${REPO}/pages/deployments/${DEP_ID}")" 2>/dev/null; then
-                      ERRORS=$((ERRORS+1))
-                      echo "poll error (${ERRORS}/${MAX_POLL_ERRORS})"
-                      if [ "${ERRORS}" -ge "${MAX_POLL_ERRORS}" ]; then
-                        echo "::error::too many poll errors, cancelling deployment ${DEP_ID}"
-                        api "${API}/repos/${REPO}/pages/deployments/${DEP_ID}/cancel" -X POST >/dev/null 2>&1 || true
-                        break
-                      fi
-                      continue
-                    fi
-                    STATUS="$(printf '%s' "${STATUS_BODY}" | jq -r '.status // empty')"
-                    case "${STATUS}" in
-                      succeed)
-                        echo "page_url=${PAGE_URL}" >> "${GITHUB_OUTPUT}"
-                        echo "::notice::Deployed via API attempt ${ATTEMPT}: ${PAGE_URL}"
-                        echo "::endgroup::"
-                        exit 0
-                        ;;
-                      deployment_failed|deployment_content_failed|deployment_cancelled|deployment_lost)
-                        echo "::error::final deployment status: ${STATUS} ($(printf '%s' "${STATUS_BODY}" | jq -r '.error // empty' 2>/dev/null))"
-                        # Don't exit here: let the remaining attempts and the
-                        # official-action fallback below get a chance (the
-                        # transient deployment_failed state is exactly what
-                        # actions/deploy-pages@v4 auto-retries server-side).
-                        break
-                        ;;
-                      *)
-                        echo "poll (${ELAPSED}s): status=${STATUS}"
-                        ;;
-                    esac
-                    SLEEP=$(( SLEEP * 3 > 30 ? 30 : SLEEP * 3 ))
-                  done
-                  echo "::warning::poll timed out (${POLL_TIMEOUT}s); cancelling deployment ${DEP_ID}"
-                  api "${API}/repos/${REPO}/pages/deployments/${DEP_ID}/cancel" -X POST >/dev/null 2>&1 || true
-                  ;;
-                5*|429)
-                  echo "::warning::transient error (${HTTP}) creating deployment: ${BODY}"
-                  ;;
-                *)
-                  echo "::error::fatal HTTP ${HTTP} creating deployment: ${BODY}"
-                  break
-                  ;;
-              esac
-            else
-              echo "::warning::skipping attempt ${ATTEMPT} (no OIDC token)"
-            fi
-            echo "::endgroup::"
-            [ "${ATTEMPT}" -lt "${MAX_ATTEMPTS}" ] && sleep $(( 90 * ATTEMPT ))
-          done
-          echo "::error::all ${MAX_ATTEMPTS} API deploy attempts failed"
-          exit 1
-
-      # Final fallback: the official action (also leaves a proper environment
-      # deployment record for the common single-shot success path).
-      - name: Deploy via actions/deploy-pages (fallback)
-        id: deployment
-        if: always() && steps.api_deploy.outcome != 'success'
+      - id: deployment
         uses: actions/deploy-pages@v4
