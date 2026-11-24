@@ -206,3 +206,14 @@ VI RE-RECORD QUEUE (replaces the old heredoc re-records; serialized, one at a ti
 6. maze L3 (done, 91edd1d — L3 has no exploit file; stub run shown with printf'd magic + xxd)  7. maze L4 (done, daf97f9 — tinel.py written in vi)  8. maze L6 (done, aef2e27 — sc.py/exploit.py/w6.py written in vi; sweep hit 0xffffcfc4 live)  9. maze L8 (done, 53a5467 — exp.py written in vi; payload fired live; verified via typed maze9 hop from the client)
 10. then the long tail of older games (natas, bandit, narnia, leviathan, behemoth, krypton, manpage, utumno, vortex L0-L12 as needed) re-recorded vi-style to the standard.
 NOTE: vortex L3+ casts already use real vim sessions (reference style); verify them and re-record any that don't meet §0/§3.
+
+## REPLAYABLE-TRANSCRIPT queue (user rule 2026-11-24 01:17 UTC) — spec in RECORDING-STANDARD.md §6
+The site transcripts (games/*.json `steps`) are SCRIPTS: typing the exact verbatim keystrokes, in order, on the live lab must solve the level. ALL code written in vi in the transcript too (vortex L4 staged-vim style: empty buffer → chunks → finished → :wq). Every level must be REPLAYED against the live server to prove it (harness drives a real pty session from the steps; final output/password must match). Revisit ALL levels (old + new) — fix JSON + cast + docs until each replays to a solve.
+Known defects to fix in this pass (found 2026-11-24):
+- maze L0 (maze-solutions.md + games/maze.json): `printf 'AAAA...'` placeholder (real filler = 19 A's: AAAAAAAAAAAAAAAAAAA), objdump shown with NO output (real main() disassembly captured live 2026-11-24), flipper C never published (live-verified 2026-11-24: rename-race flipper + 15k runs → Sp5VmLGFC0), and maze L0 has NO cast at all — record one (vi-style, typed ssh login).
+- maze L1: `cp "$D/libc.so.4" ...` placeholder in the md (real copy from tools/maze/l1/lib4.c build); L1/L2 JSON steps are 1-line "see notes" stubs — expand into full verbatim steps.
+- maze L2/L3: narration txt exists but NO mp3/sync — build once the Muse/Helios TTS path is fixed (build_narration.py /opt/hatch/bin/tts path is stale; current TTS at ~/shadow-six-packs/tools/audio/narration/tts.py — pin the voice = Helios).
+- vortex L13: no mp3/sync (level blocked but narration should still exist for the blocked-analysis page).
+- drifter L0 + formulaone L0-L3: NO narration at all (mp3/sync/segments) — author + build.
+- Run tools/editor_audit.js + tools/player_check.js + tools/narration_audit.py on every level after fixes (8 alignment flags open: bandit L12/L14/L15/L20/L24, utumno L4, vortex L12/L13).
+REPLAY ORDER: maze L0-L8 first (just re-recorded + known doc defects), then formulaone L0-L3, drifter L0, then the older games oldest-first (natas, bandit, narnia, leviathan, behemoth, krypton, manpage, utumno, vortex) — serialized, one level at a time.

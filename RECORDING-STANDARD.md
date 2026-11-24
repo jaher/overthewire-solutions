@@ -73,6 +73,28 @@ this to every new level AND to any re-record of an older cast.
 - Show the `id` / login-as-next-user / `cat /etc/<game>_pass/<next>` that proves
   the level was actually solved, with the password in clean text.
 
+## 6. REPLAYABLE TRANSCRIPT (user rule 2026-11-24) — games/*.json steps
+- The `steps` array in `games/<game>.json` (what the site player renders and
+  replays with narration highlighting) is a **script**: it must be a full,
+  complete solution on the remote machine. Someone typing EXACTLY those steps,
+  verbatim, in that order, on the live lab, must reach the solved state — every
+  keystroke must work, no placeholders, no elided commands (no `printf 'AAAA...'`,
+  no `cp ... `, no `# (see notes)` steps standing in for the real work).
+- **All code is written in vi in the transcript too**: file creation steps use the
+  staged `vim file` + `vim <keystroke>` lines (vortex L4 cast style: empty buffer
+  first, buffer growing chunk by chunk, finished buffer, then the compile/run).
+  The staged-vim convention (empty buffer → chunks → finished, `tools/editor_audit.js`)
+  must hold for every level.
+- **Every level is REPLAYED against the live server to prove it**: a harness takes
+  the steps, drives a real pty session on the lab (ssh login + each typed line,
+  verbatim), and checks the final output/password. A level is only "done" when its
+  own transcript replays to a solve. Revisit ALL levels (old and new) for this —
+  any step that doesn't verbatim-work on the live server must be fixed in the JSON,
+  the cast, and the docs until the replay passes.
+- Vi sessions in the transcript must look as good as the vortex levels (esp. L4):
+  real editor chrome (line numbers / `~` rows where the player renders them), the
+  keystrokes shown (i, Esc, :wq), the buffer content visible as it is typed.
+
 ## Acceptance (re-audit before commit)
 Before committing a cast, re-open it and confirm:
   [ ] opens with a typed ssh login + MOTD,
