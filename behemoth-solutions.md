@@ -221,7 +221,7 @@ passwords) are the recorded ones.
    data, addr = s.recvfrom(4096)
    print("received %d bytes from %s: %r" % (len(data), addr, data))
    ```
-3. **Run it.** The recording shows `listening on 127.0.0.1:1337`, then `received 11 bytes from ('127.0.0.1', 39451): b'gLmUCSSlkL\n'`.
+3. **Run it.** The recording shows `listening on 127.0.0.1:1337`, then `received 11 bytes from ('127.0.0.1', 57926): b'gLmUCSSlkL\n'`, and `B5DONE`.
 4. **Verify.** Log in as behemoth6 (`whoami` → `behemoth6`).
 - **Password for behemoth6:** `gLmUCSSlkL`
 - **Verification:** logged in as `behemoth6` with this password.

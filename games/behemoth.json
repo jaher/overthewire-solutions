@@ -2054,7 +2054,7 @@
      "cmd": "python3 /tmp/e_behemoth5.py",
      "out": [
       "listening on 127.0.0.1:1337",
-      "received 11 bytes from ('127.0.0.1', 35757): b'gLmUCSSlkL\\n'",
+      "received 11 bytes from ('127.0.0.1', 57926): b'gLmUCSSlkL\\n'",
       "B5DONE"
      ]
     }
