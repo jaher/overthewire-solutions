@@ -197,7 +197,7 @@ passwords) are the recorded ones.
    os.waitpid(pid, 0)
    ```
    The parent knows the pid because `fork()` returns it.
-3. **Run it.** The recording shows `planted /tmp/78 -> /etc/behemoth_pass/behemoth5`, `Finished sleeping, fgetcing`, and `UCEVVD7tz3`.
+3. **Run it.** The recording shows `planted /tmp/47 -> /etc/behemoth_pass/behemoth5`, `Finished sleeping, fgetcing`, `UCEVVD7tz3`, and `B4DONE`.
 4. **Verify.** Log in as behemoth5 (`whoami` → `behemoth5`).
 - **Password for behemoth5:** `UCEVVD7tz3`
 - **Verification:** logged in as `behemoth5` with this password.
