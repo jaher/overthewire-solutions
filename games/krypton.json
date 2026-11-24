@@ -8,9 +8,41 @@
    "pw": "KRYPTONISGREAT",
    "steps": [
     {
+     "cmd": "ssh krypton1@krypton.labs.overthewire.org -p 2231",
+     "out": [
+      "(login banner)",
+      "krypton1@krypton:~$ "
+     ]
+    },
+    {
+     "cmd": "whoami",
+     "out": [
+      "krypton1"
+     ]
+    },
+    {
      "cmd": "echo S1JZUFRPTklTR1JFQVQ= | base64 -d",
      "out": [
       "KRYPTONISGREAT"
+     ]
+    },
+    {
+     "cmd": "cat /krypton/krypton1/README",
+     "out": [
+      "Welcome to Krypton!",
+      "Enjoy!"
+     ]
+    },
+    {
+     "cmd": "cat /krypton/krypton1/krypton2",
+     "out": [
+      "YRIRY GJB CNFFJBEQ EBGGRA"
+     ]
+    },
+    {
+     "cmd": "cat /krypton/krypton1/krypton2 | tr 'A-Za-z' 'N-ZA-Mn-za-m'",
+     "out": [
+      "LEVEL TWO PASSWORD ROTTEN"
      ]
     }
    ]
