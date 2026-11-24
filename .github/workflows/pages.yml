@@ -62,7 +62,18 @@ jobs:
             [ -n "${url}" ] || { echo "::warning::no ACTIONS_ID_TOKEN_REQUEST_URL (id-token: write?)"; return 1; }
             local req="${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
             [ -n "${req}" ] || { echo "::warning::no ACTIONS_ID_TOKEN_REQUEST_TOKEN"; return 1; }
-            curl -sS -f "${url}?audience=api%3A%2F%2Fgithubactions" -H "Authorization: Bearer ${req}"
+            # Runner token endpoint returns a JSON envelope; @actions/core's
+            # OidcClient.getIDToken() extracts res.result?.value (the JWT), not
+            # the raw body. Match that, and append audience with the right sep.
+            local sep='?' raw tok
+            case "${url}" in *'?'*) sep='&' ;; esac
+            raw="$(curl -sS -f "${url}${sep}audience=api%3A%2F%2Fgithubactions" -H "Authorization: Bearer ${req}")" || {
+              echo "::warning::OIDC token fetch HTTP failed"
+              return 1
+            }
+            tok="$(printf '%s' "${raw}" | jq -r '.value // empty')"
+            [ -n "${tok}" ] || { echo "::warning::OIDC token: no .value in response"; return 1; }
+            printf '%s' "${tok}"
           }
 
           echo "::group::Locating github-pages artifact for run ${RUN_ID}"
@@ -84,7 +95,7 @@ jobs:
               RESP="$(curl -sS -w $'\n%{http_code}' -X POST "${API}/repos/${REPO}/pages/deployments" \
                 -H "Authorization: Bearer ${GH_TOKEN}" -H "Accept: application/json" \
                 -H "Content-Type: application/json" \
-                --data "$(jq -n --arg a "$artifact_id" --arg b "$SHA" --arg o "$ID_TOKEN" \
+                --data "$(jq -n --argjson a "$artifact_id" --arg b "$SHA" --arg o "$ID_TOKEN" \
                           '{artifact_id: $a, pages_build_version: $b, oidc_token: $o}')" 2>&1)" || true
               HTTP="${RESP##*$'\n'}"
               BODY="${RESP%$'\n'*}"
@@ -122,7 +133,11 @@ jobs:
                         ;;
                       deployment_failed|deployment_content_failed|deployment_cancelled|deployment_lost)
                         echo "::error::final deployment status: ${STATUS} ($(printf '%s' "${STATUS_BODY}" | jq -r '.error // empty' 2>/dev/null))"
-                        exit 1
+                        # Don't exit here: let the remaining attempts and the
+                        # official-action fallback below get a chance (the
+                        # transient deployment_failed state is exactly what
+                        # actions/deploy-pages@v4 auto-retries server-side).
+                        break
                         ;;
                       *)
                         echo "poll (${ELAPSED}s): status=${STATUS}"
