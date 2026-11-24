@@ -299,31 +299,45 @@
    "steps": [
     {
      "cmd": "ssh krypton6@krypton.labs.overthewire.org -p 2231",
-     "out": []
+     "out": [
+      "(login banner)",
+      "krypton6@krypton:~$ "
+     ]
     },
     {
-     "cmd": "cat /krypton/krypton6/HINT2",
+     "cmd": "whoami",
      "out": [
+      "krypton6"
+     ]
+    },
+    {
+     "cmd": "cat /krypton/krypton6/HINT1 /krypton/krypton6/HINT2",
+     "out": [
+      "The 'random' generator has a limited number of bits, and is periodic.",
+      "There is a pattern!",
       "8 bit LFSR"
      ]
     },
     {
-     "cmd": "D=$(mktemp -d); cd \"$D\"; chmod 777 .; ln -s /krypton/krypton6/keyfile.dat",
-     "out": []
-    },
-    {
-     "cmd": "python3 -c 'open(\"p.txt\",\"wb\").write(b\"A\"*600)'",
-     "out": []
-    },
-    {
-     "cmd": "/krypton/krypton6/encrypt6 p.txt o.bin",
-     "out": []
-    },
-    {
-     "cmd": "python3 /tmp/L6solve.py",
+     "cmd": "cat /krypton/krypton6/krypton7",
      "out": [
-      "period 30 K: [4, 8, 2, 19, 3, 6, 24, 8, 24, 25, 10, 19, 7, 13, 18, 8, 17, 5, 23, 24, 2, 15, 5, 20, 4, 14, 2, 10, 17, 13]",
-      "krypton7 plaintext: b'LFSRISNOTRANDOM'"
+      "PNUKLYLWRQKGKBE"
+     ]
+    },
+    {
+     "cmd": "vim /tmp/k6lfsr.py",
+     "out": [
+      "(k6lfsr.py written: chosen plaintext A*30 -> keystream -> decrypt)",
+      "[New] written"
+     ]
+    },
+    {
+     "cmd": "python3 /tmp/k6lfsr.py",
+     "out": [
+      "encrypt6(A*30) -> EICTDGYIYZKTHNSIRFXYCPFUEOCKRN",
+      "keystream: [4, 8, 2, 19, 3, 6, 24, 8, 24, 25, 10, 19, 7, 13, 18, 8, 17, 5, 23, 24, 2, 15, 5, 20, 4, 14, 2, 10, 17, 13]",
+      "krypton7 cipher: PNUKLYLWRQKGKBE",
+      "krypton7 = LFSRISNOTRANDOM"
      ]
     }
    ]
