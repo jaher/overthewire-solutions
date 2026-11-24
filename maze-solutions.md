@@ -764,3 +764,55 @@ O50RB7ijle1PYuGyw595NuU9O8S49b4o
 - **Password for formulaone3:** `O50RB7ijle1PYuGyw595NuU9O8S49b4o`
 - **Verification:** confirmed by SSH login as `formulaone3` (uid 20003, port 2232; password file matches).
 - **Recording:** `recordings/formulaone/L3.cast`.
+
+---
+
+## Maze — Level 8 (network daemon, format string)
+
+**Level goal:** `/maze/maze8` (setuid maze9) is a TCP daemon: bind a port,
+fork per connection, `setreuid(euid,euid)` to maze9 in the child, send
+`Give the correct password to proceed: `, `recv` 512 bytes, and on mismatch:
+
+```c
+snprintf(errbuf, 0x200, input);      /* the INPUT is the format string! */
+strlen(errbuf);                      /* -> GOT overwrite target */
+send(sockfd, errbuf, strlen(errbuf), 0);
+```
+
+("god" is a troll — matching it prints a joke and exits.)
+
+### The exploit
+
+`strlen@GOT` (`0x0804b288`, writable — partial RELRO) is called immediately
+after the snprintf: overwrite it with `system@libc`
+(`0xf7d6d000 + 0x53ce0`, ASLR off) and `strlen(errbuf)` becomes
+`system(errbuf)` — running the *formatted output* as euid maze9. The format
+string starts with `\ncat /etc/maze_pass/maze9 > /tmp/o9 2>&1;\n` so the first
+line of the output is the command (the `%c` padding becomes a harmless second
+line of spaces).
+
+The 4 `%hhn` writes (byte-wise, so every width stays sane):
+
+- the deltas are sorted mod-256 from the **running char total, which includes
+  the literal command text** (`len(CMD)` at the start — forgetting this cost
+  two failed rounds);
+- the vararg indices were **measured with a marker scan** (write `ZZZZ` at
+  buf+152, find which `%N$08x` prints `5a5a5a5a`): `arg N = buf + 4N - 536`,
+  i.e. `N = 134 + offset/4` — an earlier off-by-one wrote into our own pointer
+  slots and crashed the child;
+- glibc's `%n` counts are *virtual* past snprintf's 512-byte truncation, so
+  byte targets above the buffer limit are fine;
+- the GOT write was first validated by targeting `printf` (the reply echoed
+  `errbuf` back — observable proof the write landed).
+
+```
+$ cat /tmp/o9
+bmMHy7DM3E
+```
+
+GOTCHA: ssh-ing from the lab box to itself is blocked ("Connecting from
+localhost is blocked") — the maze9 verification happens from the client.
+
+- **Password for maze9:** `bmMHy7DM3E`
+- **Verification:** confirmed by SSH login as `maze9` (uid 15009, port 2225; password file matches).
+- **Recording:** `recordings/maze/L8.cast`.

