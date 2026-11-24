@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OverTheWire: Bandit — solved live from DGX 5</title>
+<title>Wargames: Bandit — solved live (OverTheWire + SmashTheStack)</title>
 <style>
   :root { --green:#33ff66; --dim:#1fae4a; --bg:#050805; --panel:#0a0f0a; }
   * { box-sizing: border-box; }
@@ -60,7 +60,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>OverTheWire: Bandit — the full run</h1>
+  <h1>Wargames: Bandit — the full run</h1>
   <div class="sub">Every level (0–33) solved from a DGX Spark (“DGX 5”), replayed in a shell — watch it type, or jump to a level. Passwords are the game's own level passwords. Full writeup in the <a href="https://github.com/jaher/overthewire-solutions">repo</a>.</div>
 
   <div id="nowPlaying" style="font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--green);font-size:20px;font-weight:700;letter-spacing:1px;margin:14px 0 6px;">—</div>
@@ -701,7 +701,7 @@ async function playLevel(idx){
   if (myNarr) narrFF = true;
   if (myNarr) tryStartNarrAudio();
   document.getElementById('nowPlaying').textContent = G.title.toUpperCase() + ' — LEVEL ' + L.lvl;
-  document.title = G.title + ' Level ' + L.lvl + ' — OverTheWire solutions';
+  document.title = G.title + ' Level ' + L.lvl + ' — Wargames solutions';
   term.innerHTML = '';
   jump.value = L.lvl;
   fill.style.width = (idx / (G.levels.length - 1) * 100) + '%';

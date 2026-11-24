@@ -59,6 +59,31 @@
    "key": "semtex",
    "title": "Semtex",
    "host": "semtex.labs.overthewire.org"
+  },
+  {
+   "key": "tux",
+   "title": "Tux (SmashTheStack)",
+   "host": "tux.smashthestack.org"
+  },
+  {
+   "key": "logic",
+   "title": "Logic (SmashTheStack)",
+   "host": "logic.smashthestack.org"
+  },
+  {
+   "key": "blackbox",
+   "title": "Blackbox (SmashTheStack)",
+   "host": "blackbox.smashthestack.org"
+  },
+  {
+   "key": "blowfish",
+   "title": "Blowfish (SmashTheStack)",
+   "host": "blowfish.smashthestack.org"
+  },
+  {
+   "key": "amateria",
+   "title": "Amateria (SmashTheStack)",
+   "host": "amateria.smashthestack.org"
   }
  ]
 }

@@ -1,0 +1,10 @@
+{
+ "title": "Logic (SmashTheStack)",
+ "host": "logic.smashthestack.org",
+ "network": "smashthestack.org",
+ "port": 2227,
+ "status": "online (probed 2026-11-24 18:30Z: web port 88 open)",
+ "note": "Added to scope 2026-11-24. Level 1 is a WEB level at http://logic.smashthestack.org:8181/index.html. After that: ssh -l levelN logic.smashthestack.org -p2227 (replace levelN with the current level, e.g. level3). Tags/hall-of-fame links on the game page (logic.smashthestack.org:88) show level2..level11, i.e. at least 11 levels beyond the web level1. Mix of buffer overflows, format strings, assembly, vulnerable web apps, heap attacks. Verify live level count when starting.",
+ "levels": [],
+ "goals": {}
+}

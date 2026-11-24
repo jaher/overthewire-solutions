@@ -1,0 +1,10 @@
+{
+ "title": "Amateria (SmashTheStack)",
+ "host": "amateria.smashthestack.org",
+ "network": "smashthestack.org",
+ "port": 2229,
+ "status": "online (probed 2026-11-24 18:30Z: web port 89 open; SSH 2229 not yet probed - verify)",
+ "note": "Added to scope 2026-11-24. Intermediate game. SSH: ssh -p2229 levelX@amateria.smashthestack.org. Levels in /wargame/, passwords in /home/<user>/password, workspace /tmp/<random>. Level 0 is REMOTE (not ssh): source at http://amateria.smashthestack.org:89/level1.py; NO outbound connections allowed (no connectback/bindshell). Tags on the game page show level1..level7 => at least 8 levels (verify live).",
+ "levels": [],
+ "goals": {}
+}

@@ -218,3 +218,17 @@ Known defects to fix in this pass (found 2026-11-24):
 - drifter L0 + formulaone L0-L3: NO narration at all (mp3/sync/segments) — author + build.
 - Run tools/editor_audit.js + tools/player_check.js + tools/narration_audit.py on every level after fixes (8 alignment flags open: bandit L12/L14/L15/L20/L24, utumno L4, vortex L12/L13).
 REPLAY ORDER: maze L0-L8 first (just re-recorded + known doc defects), then formulaone L0-L3, drifter L0, then the older games oldest-first (natas, bandit, narnia, leviathan, behemoth, krypton, manpage, utumno, vortex) — serialized, one level at a time.
+
+
+## SmashTheStack scope (added 2026-11-24)
+
+User extended scope from OverTheWire to ALL wargames: repo becomes `wargames-solutions`.
+All smashthestack.org missions are in scope (APFEL offline; CTF excluded). Live-verified 2026-11-24:
+
+- **Blowfish** (beginner, 13 levels): ssh levelN@blowfish.smashthestack.org (port 22, OpenSSH_5.3). Entry password: telnet blowfish.smashthestack.org 6666 -> "Encrypted Password is: GungJnfRnfl..." (decrypt to get level1->2 login). Passwords in /pass, scratch in /code.
+- **Tux** (intermediate, 0-7+): entry ssh -L 6667:0:6667 -p 2226 pfwd@tux.smashthestack.org (pw "pfwd"), then nc localhost 6667; afterwards ssh levelN@tux.smashthestack.org -p 2226, pw in /pass/levelN.
+- **Amateria** (intermediate, 0-7+): ssh -p 2229 levelX@amateria.smashthestack.org; levels /wargame/, pw /home/<user>/password; L0 remote (source http://amateria.smashthestack.org:89/level1.py, NO outbound).
+- **Logic** (intermediate, 1-11+): L1 web at http://logic.smashthestack.org:8181/index.html; then ssh -l levelN logic.smashthestack.org -p 2227.
+- **Blackbox** (advanced): ssh -l levelN blackbox.smashthestack.org -p 2225 (legacy OpenSSH_4.3, slow banner); web page :85 down. Level count unknown until live recon.
+
+Games registered in games/manifest.json + games/{tux,logic,blackbox,blowfish,amateria}.json (stub levels:[] until solved). Serialized rule still applies: one level at a time, commit after each.

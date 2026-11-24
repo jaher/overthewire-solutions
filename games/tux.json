@@ -1,0 +1,10 @@
+{
+ "title": "Tux (SmashTheStack)",
+ "host": "tux.smashthestack.org",
+ "network": "smashthestack.org",
+ "port": 2226,
+ "status": "online (probed 2026-11-24 18:30Z: port 86 web + port 2226 SSH both open)",
+ "note": "Added to scope 2026-11-24 (user: extend wargames-solutions to all SmashTheStack missions). Entry level: ssh -L 6667:0:6667 -p 2226 pfwd@tux.smashthestack.org (password 'pfwd') forwards the remote service; then connect with nc localhost 6667. Later levels: ssh levelN@tux.smashthestack.org -p 2226, password stored in /pass/levelN. Hall-of-fame links on the game page (tux.smashthestack.org:86) show level0..level7, i.e. at least 8 levels (level0..level7); verify live level count when starting. SSH banner read timed out from this host (legacy sshd, slow banner) - drive it via the claude-otw container plumbing.",
+ "levels": [],
+ "goals": {}
+}

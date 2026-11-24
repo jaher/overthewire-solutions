@@ -1,0 +1,10 @@
+{
+ "title": "Blowfish (SmashTheStack)",
+ "host": "blowfish.smashthestack.org",
+ "network": "smashthestack.org",
+ "port": 22,
+ "status": "online (probed 2026-11-24 18:30Z: port 6666 telnet open, serves 'Encrypted Password is: GungJnfRnfl...'; port 22 SSH open, OpenSSH_5.3)",
+ "note": "Added to scope 2026-11-24. Beginner game, 13 levels (level1..level13 per game page). Entry: telnet blowfish.smashthestack.org 6666 returns an ENCRYPTED password; decrypt it to get the level1->level2 login. SSH on port 22 as levelN. Passwords live in /pass; do testing in /code (per game MOTD) and clean up after. Level count: 13 (verify live).",
+ "levels": [],
+ "goals": {}
+}

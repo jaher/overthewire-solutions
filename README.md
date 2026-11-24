@@ -1,8 +1,10 @@
-# OverTheWire — all wargames, solved
+# Wargames — OverTheWire + SmashTheStack, all solved
 
-Solutions to **every OverTheWire wargame**, solved from a DGX Spark ("DGX 5"). Each game gets a full writeup and a terminal-replay of every level being solved — commands typed out live, with the level's problem statement, the output, and the password it yields.
+Solutions to **every OverTheWire wargame** plus **all SmashTheStack missions**, solved from a DGX Spark ("DGX 5"). Each game gets a full writeup and a terminal-replay of every level being solved — commands typed out live, with the level's problem statement, the output, and the password it yields.
 
-**Site:** https://jaher.github.io/overthewire-solutions/ — pick a game from the tier dropdown, pick a level, watch it being solved.
+**Site:** https://jaher.github.io/overthewire-solutions/ — pick a game from the tier dropdown, pick a level, watch it being solved. (Repo will be renamed `wargames-solutions` to match the scope; the Pages URL moves to `https://jaher.github.io/wargames-solutions/` with the old URL redirecting.)
+
+**Scope extension (2026-11-24):** all [smashthestack.org](https://www.smashthestack.org/) wargames are now in scope — Tux, Logic, Blackbox, Blowfish, Amateria (APFEL is offline; CTF excluded). They are in `games/` and the site dropdown as stubs with live-verified connection details, and are being solved/recorded alongside the OverTheWire games.
 
 ## Games
 
@@ -16,8 +18,19 @@ Solutions to **every OverTheWire wargame**, solved from a DGX Spark ("DGX 5"). E
 | Narnia | Buffer overflows & shellcode | 0–9 | ✅ Complete — [solutions](narnia-solutions.md) |
 | Behemoth | Exploitation vs. mitigations | 0–7 | ✅ Complete — [solutions](behemoth-solutions.md) |
 | Utumno | Advanced exploitation / reversing | 0–7 | ✅ Complete — [solutions](utumno-solutions.md) |
-| Maze | Exploitation & format strings | 0–9 | ⛔ Blocked — ssh password auth refused by the host |
-| Vortex | Classic exploitation | 0–26 | ⛔ Blocked — ssh password auth refused by the host |
+| Maze | Exploitation & format strings | 0–8 | ✅ Complete (L0–L8 + final) — [solutions](maze-solutions.md) |
+| Vortex | Classic exploitation | 0–25 | ⛔ Partial — L0–L12 solved; L13 kernel-blocked (see OTW-PROGRESS.md) |
+
+## SmashTheStack wargames
+
+| Game | Type | Levels | Access (live-verified 2026-11-24) | Status |
+|---|---|---|---|---|
+| Blowfish | Beginner, binary | 1–13 | `ssh levelN@blowfish.smashthestack.org` (port 22, OpenSSH 5.3); entry pw via telnet :6666 (encrypted) | In scope — not yet started |
+| Tux | Intermediate | 0–7+ | `ssh levelN@tux.smashthestack.org -p 2226`; entry: `ssh -L 6667:0:6667 -p 2226 pfwd@…` (pw `pfwd`) then `nc localhost 6667` | In scope — not yet started |
+| Amateria | Intermediate | 0–7+ | `ssh -p 2229 levelX@amateria.smashthestack.org`; L0 remote (source on web, no outbound) | In scope — not yet started |
+| Logic | Intermediate | 1–11+ | L1 is web (port 8181); then `ssh -l levelN logic.smashthestack.org -p 2227` | In scope — not yet started |
+| Blackbox | Advanced | unknown | `ssh -l levelN blackbox.smashthestack.org -p 2225` (legacy OpenSSH 4.3); web page (:85) is down | In scope — not yet started |
+| APFEL | Beginner | — | offline | Skipped until back online |
 
 ## How this repo is organized
 
