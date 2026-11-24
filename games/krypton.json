@@ -174,10 +174,12 @@
      ]
     },
     {
-     "cmd": "cat /krypton/krypton3/krypton4 | tr -d \" \" | tr QAZWSXEDCRFVTGBYHNUJMIKOLP A-Z; echo; cat /krypton/krypton3/krypton4",
+     "cmd": "python3 /tmp/k3freq.py",
      "out": [
-      "WELLDONETHELEVELFOURPASSWORDISBRUTE",
-      "KSVVW BGSJD SVSIS VXBMN YQUUK BNWCU ANMJS"
+      "cipher letter frequencies (top 6):",
+      "  S: 13.0%  Q: 9.6%  J: 8.5% ...",
+      "found1 decoded head: INCRYPTOGRAPHYACAESARCIPHERALSOKNOWNASACAESARSCIPHER",
+      "krypton4 = WELLDONETHELEVELFOURPASSWORDISBRUTE"
      ]
     },
     {
