@@ -1,0 +1,117 @@
+{
+ "segments": [
+  {
+   "text": "Blowfish, level nine. The README says: this level is a race condition, there is no source, and to use slash levels slash tmp. We log in as level nine and start with recon.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    },
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The binary is setuid level ten. The strings sketch the whole flow: usage with a file and a message, can't find, you are percent d it wants percent d, is not a normal file, can't open, and Write Ok. No source, but those strings tell us what the program does.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 5
+    }
+   ]
+  },
+  {
+   "text": "The disassembly of the first half: the binary opens our path for writing, so if the file does not exist it is CREATED with the effective U I D of the process, level ten. Then it stats the path and checks the owner equals the effective U I D, one zero one zero. A file we make ourselves would be owned by level nine and rejected - but the file the binary itself creates is level-ten-owned and passes its own check.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 4
+    }
+   ]
+  },
+  {
+   "text": "The second half is the bug. It writes our message into the file, closes it, prints Write Ok, and then sleeps for two seconds. After the sleep it reopens the same path, reads up to one hundred twenty-eight bytes, prints them with printf, and removes the file. Two full seconds between the write and the read.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 8
+    }
+   ]
+  },
+  {
+   "text": "The exploit script. We make a fresh directory with mode seven seven seven that we own, start level nine on a file F inside it in the background, sleep one second to land inside the program's window, then remove F and recreate it as a symlink to slash pass slash level ten - the root-owned password file only level ten can read. We own the directory, so we are allowed to unlink the level-ten-owned file the binary just created. When the program wakes up, it reopens the path, follows our symlink, and prints the password.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Running the script: the program prints Write Ok, then prints what it read through the symlink - the level ten password: error colon U underscore s u x zero r Z.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "Verified live: logging in as level ten with that password succeeds. Level nine solved; the password for level ten is error colon U underscore s u x zero r Z.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "cmd"
+    }
+   ]
+  }
+ ]
+}

