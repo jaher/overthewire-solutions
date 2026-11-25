@@ -62,7 +62,26 @@ typed commands, same editor sessions, same output, same final state.**
 - Then commit (one commit per level, message naming the level + technique +
   password source). Do NOT `git push` — the operator pushes from the host.
 
-## Rule 5 — Repo hygiene
+## Rule 5 — No gaps: every level, contiguous, all solved
+- Every level of a game gets its own entry in `games/<game>.json`, numbered
+  contiguously over the GAME's own level sequence (L0, L1, L2, … Lmax) —
+  no missing numbers, no silent skips. Client-side levels (telnet, decrypt,
+  any pre-ssh work) are real levels too: record them as client-side casts
+  (asciinema of the local terminal) and give them their own entries.
+- If a level appears unreachable on the live server, STOP and report to the
+  operator with the evidence — never skip a number quietly, and never mark
+  an unsolved level solved.
+
+## Rule 6 — No redundant commands
+- Each command is typed exactly as often as the real session typed it. A
+  build/analysis shown ONCE in the cast appears ONCE in the JSON — no
+  repeated objdump/objcopy/nasm blocks, no duplicate probe commands, no
+  filler re-runs. One vi session per file = one contiguous run of staged
+  steps.
+- A JSON step that adds no new information relative to the cast is a
+  defect. The replay is the cast, not a superset of it.
+
+## Rule 7 — Repo hygiene
 - Casts: `recordings/<game>/L<n>.cast`; driver scripts stay in the
   recording container (`/tmp/<game>_scripts/`); sources extracted from a
   cast must byte-match its `:wq` marker (N L, M C) before use.
