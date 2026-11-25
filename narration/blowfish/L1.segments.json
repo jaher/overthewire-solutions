@@ -1,0 +1,43 @@
+{
+ "segments": [
+  {
+   "text": "Blowfish, level one. This is the only step in the whole game that happens before you ever log in. The entry point is not SSH at all: the server on port six thousand and sixty-six hands you the level two password, but ROT13-encrypted. So the whole level is: connect with telnet, read the banner, decode it.",
+   "lines": [
+    {
+     "role": "goal",
+     "step": -1
+    },
+    {
+     "role": "cmd",
+     "step": 0
+    }
+   ]
+  },
+  {
+   "text": "Connecting to blowfish dot smashthestack dot org on port six thousand and sixty-six, the service prints Encrypted Password is, Gung Jnf Rnfl, and closes the connection. That is the entire service - no interaction, just a one-line banner.",
+   "lines": [
+    {
+     "role": "out",
+     "step": 0,
+     "from": 0,
+     "to": 7
+    }
+   ]
+  },
+  {
+   "text": "The cipher is ROT13, which means every letter is shifted thirteen places in the alphabet, and the tr command with the A to Z and N to Z A to M ranges is the one-line decoder. Feed the ciphertext through it: Gung Jnf Rnfl becomes ThatWasEasy. That string is the level two login password, and the very next level proves it - level two logs in with ThatWasEasy. Level one solved.",
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 1
+    },
+    {
+     "role": "out",
+     "step": 1,
+     "from": 0,
+     "to": 0
+    }
+   ]
+  }
+ ]
+}

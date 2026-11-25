@@ -28,23 +28,30 @@
   },
   {
    "lvl": 1,
-   "user": "level1",
-   "pw": "level1",
+   "user": "level2",
+   "pw": "ThatWasEasy",
    "steps": [
     {
      "cmd": "telnet blowfish.smashthestack.org 6666",
      "out": [
-      "Encrypted Password is: GungJnfRnfl"
+      "Trying 84.22.114.35...",
+      "Connected to blowfish.smashthestack.org.",
+      "Escape character is '^]'.",
+      "",
+      "",
+      "Encrypted Password is: GungJnfRnfl",
+      "",
+      "Connection closed by foreign host."
      ]
     },
     {
      "cmd": "echo GungJnfRnfl | tr 'A-Za-z' 'N-ZA-Mn-za-m'",
      "out": [
-      "LbWtUrRhey"
+      "ThatWasEasy"
      ]
     }
    ],
-   "note": "Client-side: telnet 6666 gives ROT13 of the level2 password. GungJnfRnfl -> ThatWasEasy (level2 login). Needs its own client-side cast per Rule 5 (audit backlog)."
+   "note": "Client-side entry (the only non-SSH step in the game): the server on port 6666 hands out the level2 password ROT13-encrypted. GungJnfRnfl -> ThatWasEasy (level2 login, verified live 2026-11-25; see L2.cast step 2 where level2 logs in with it). Cast: recordings/blowfish/L1.cast."
   },
   {
    "lvl": 2,
@@ -123,8 +130,81 @@
    "lvl": 3,
    "user": "level3",
    "pw": "",
-   "steps": [],
-   "note": "SKIPPED BY DESIGN (evidence 2026-11-25): the level2 backdoor /var/local/.<spaces>level4_backdoor is setuid level4 and jumps the chain 2->4; the real level3 path (/var/opt/.level3_backdoor) lost its setuid bit server-side. No level3 user content reachable; level numbering stays contiguous with this stub."
+   "steps": [
+    {
+     "cmd": "ssh -p 2222 level2@blowfish.smashthestack.org",
+     "out": [
+      "(MOTD: READ READ READ)",
+      "level2@blowfish:~$ "
+     ]
+    },
+    {
+     "cmd": "whoami",
+     "out": [
+      "level2"
+     ]
+    },
+    {
+     "cmd": "cat ~/README",
+     "out": [
+      "There is a backdoor to the next level hidden somewhere on this system, find it, and get the pass for level3 from /pass/level3"
+     ]
+    },
+    {
+     "cmd": "ls -la /var/opt/",
+     "out": [
+      "total 20",
+      "drwxr-xr-x  2 root   root    4096 Nov 23  2012 .",
+      "drwxr-xr-x 12 root   root    4096 Nov 23  2012 ..",
+      "-rwxr-xr-x  1 level3 level2 11529 Dec  3  2012 .level3_backdoor"
+     ]
+    },
+    {
+     "cmd": "ls -la /var/local/",
+     "out": [
+      "total 20",
+      "drwxrwsr-x  2 root   staff   4096 Nov 23  2012 .",
+      "-rwsr-xr-x  1 level4 level3 11529 Dec  3  2012 .      level4_backdoor",
+      "drwxr-xr-x 12 root   root    4096 Nov 23  2012 .."
+     ]
+    },
+    {
+     "cmd": "find / -perm -4000 -type f 2>/dev/null",
+     "out": [
+      "/bin/su",
+      "/levels/level9",
+      "/levels/level10",
+      "/levels/level4",
+      "/levels/level12",
+      "/levels/level5",
+      "/levels/level13",
+      "/levels/level11",
+      "/levels/level6",
+      "/levels/level7",
+      "/levels/level8",
+      "/var/local/.      level4_backdoor"
+     ]
+    },
+    {
+     "cmd": "/var/opt/.level3_backdoor",
+     "out": [
+      "sh-3.2$ "
+     ]
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=1002(level2) gid=1002(level2) groups=1002(level2)"
+     ]
+    },
+    {
+     "cmd": "cat /pass/level3",
+     "out": [
+      "cat: /pass/level3: Permission denied"
+     ]
+    }
+   ],
+   "note": "DOCUMENTED-BLOCKED (verified live 2026-11-25, cast L3.cast): the level2 README points at a hidden backdoor for level3. The level3 backdoor /var/opt/.level3_backdoor exists (owned level3, mode 755) but its setuid bit was stripped server-side - contrast the working level4 backdoor (-rwsr-xr-x). Running it grants no euid elevation (id still uid=1002(level2)), and /pass/level3 is -r--r----- level3:level3, so cat returns Permission denied. No server-side path to level3 exists; the chain jumps 2 -> 4 via the setuid level4 backdoor (see L2). Numbering stays contiguous with this evidence entry."
   },
   {
    "lvl": 4,

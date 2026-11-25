@@ -1,0 +1,106 @@
+{
+ "segments": [
+  {
+   "text": "Blowfish, level three. And this one is a documented dead end on the live server - which is worth showing, because the classic write-ups all assume you get level three from here. The level two README says there is a backdoor to the next level hidden somewhere on the system.",
+   "lines": [
+    {
+     "role": "goal",
+     "step": -1
+    },
+    {
+     "role": "cmd",
+     "step": 0
+    },
+    {
+     "role": "cmd",
+     "step": 1
+    },
+    {
+     "role": "out",
+     "step": 1,
+     "from": 0,
+     "to": 0
+    },
+    {
+     "role": "cmd",
+     "step": 2
+    },
+    {
+     "role": "out",
+     "step": 2,
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "The standard trick is to find setuid binaries with find slash, perm, minus four zero zero zero, type f. Two backdoors turn up: the level four one, dot level four backdoor in var local, which still has its setuid bit - look at the ls output, r w s r x r x, the s means setuid - and the level three one, dot level three backdoor in var opt, which is r w x r x r x: no setuid bit at all. It was stripped on the server side.",
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 3
+    },
+    {
+     "role": "out",
+     "step": 3,
+     "from": 0,
+     "to": 3
+    },
+    {
+     "role": "cmd",
+     "step": 4
+    },
+    {
+     "role": "out",
+     "step": 4,
+     "from": 0,
+     "to": 2
+    },
+    {
+     "role": "cmd",
+     "step": 5
+    },
+    {
+     "role": "out",
+     "step": 5,
+     "from": 0,
+     "to": 11
+    }
+   ]
+  },
+  {
+   "text": "So we run it and see: the backdoor drops us into a shell, but id still says uid one thousand and two level two. No effective uid change, no privilege.",
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 6
+    },
+    {
+     "role": "cmd",
+     "step": 7
+    },
+    {
+     "role": "out",
+     "step": 7,
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "And the password file itself is dash r dash dash r dash dash dash dash, owned level three, group level three - the level two group is not in it, so cat slash pass slash level three is Permission denied, verified live in the cast. There is no server-side path from level two to level three on this box today. The chain jumps two to four through the setuid level four backdoor, which is exactly what level two demonstrates. So level three is recorded here as evidence: the backdoor exists, it runs, it grants nothing, and the level numbering stays contiguous.",
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 8
+    },
+    {
+     "role": "out",
+     "step": 8,
+     "from": 0,
+     "to": 0
+    }
+   ]
+  }
+ ]
+}
