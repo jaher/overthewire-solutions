@@ -55,7 +55,7 @@
     {
      "cmd": "ls -la '/var/local/.      level4_backdoor'",
      "out": [
-      "-rwsr-xr-x 1 level4 level3 11529 ... /var/local/.      level4_backdoor"
+      "-rwsr-xr-x 1 level4 level3 11529 Dec  3  2012 /var/local/.      level4_backdoor"
      ]
     },
     {
@@ -99,21 +99,20 @@
     {
      "cmd": "cat /levels/level4.c",
      "out": [
-      "char buf[256]; ... strcpy(buf,argv[1]); printf(\"%s\", buf);"
+      "#include <stdio.h>\n\nint main(int argc, char * argv[]) {\n\nchar buf[256];\n\nif(argc == 1) {\nprintf(\"Usage: %s input\\n\", argv[0]);\nexit(0);\n}\n\nstrcpy(buf,argv[1]);\nprintf(\"%s\", buf);\n\n}"
      ]
     },
     {
      "cmd": "objdump -d --no-show-raw-insn /levels/level4 | sed -n '/<main>:/,/ret/p'",
      "out": [
-      "lea -0x108(%ebp),%eax ... call strcpy@plt",
-      "(buf at ebp-0x108 -> ret at offset 268)"
+      "080483f4 <main>:\n 80483f4:\tpush   %ebp\n 80483f5:\tmov    %esp,%ebp\n 80483f7:\tsub    $0x118,%esp\n 80483fd:\tand    $0xfffffff0,%esp\n 8048400:\tmov    $0x0,%eax\n 8048405:\tsub    %eax,%esp\n 8048407:\tcmpl   $0x1,0x8(%ebp)\n 804840b:\tjne    804842e <main+0x3a>\n 804840d:\tmov    0xc(%ebp),%eax\n 8048410:\tmov    (%eax),%eax\n 8048412:\tmov    %eax,0x4(%esp)\n 8048416:\tmovl   $0x8048574,(%esp)\n 804841d:\tcall   80482f8 <printf@plt>\n 8048422:\tmovl   $0x0,(%esp)\n 8048429:\tcall   8048308 <exit@plt>\n 804842e:\tmov    0xc(%ebp),%eax\n 8048431:\tadd    $0x4,%eax\n 8048434:\tmov    (%eax),%eax\n 8048436:\tmov    %eax,0x4(%esp)\n 804843a:\tlea    -0x108(%ebp),%eax\n 8048440:\tmov    %eax,(%esp)\n 8048443:\tcall   8048318 <strcpy@plt>\n 8048448:\tlea    -0x108(%ebp),%eax\n 804844e:\tmov    %eax,0x4(%esp)\n 8048452:\tmovl   $0x8048585,(%esp)\n 8048459:\tcall   80482f8 <printf@plt>\n 804845e:\tleave  \n 804845f:\tret    "
      ]
     },
     {
      "cmd": "cat /proc/sys/kernel/randomize_va_space; readelf -lW /levels/level4 | grep GNU_STACK",
      "out": [
       "0",
-      "GNU_STACK ... RWE"
+      "  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x4"
      ]
     },
     {
@@ -175,8 +174,7 @@
     {
      "cmd": "objdump -d --no-show-raw-insn /levels/level5 | sed -n '/<main>:/,/ret/p'",
      "out": [
-      "lea -0x408(%ebp),%eax ... call strcpy@plt",
-      "(buf at ebp-0x408 -> ret at offset 1036)"
+      "08048484 <main>:\n 8048484:\tpush   %ebp\n 8048485:\tmov    %esp,%ebp\n 8048487:\tsub    $0x418,%esp\n 804848d:\tand    $0xfffffff0,%esp\n 8048490:\tmov    $0x0,%eax\n 8048495:\tsub    %eax,%esp\n 8048497:\tmovl   $0x8048640,(%esp)\n 804849e:\tcall   8048364 <getenv@plt>\n 80484a3:\ttest   %eax,%eax\n 80484a5:\tjne    80484c8 <main+0x44>\n 80484a7:\tmovl   $0x8048645,0x4(%esp)\n 80484af:\tmov    0x804979c,%eax\n 80484b4:\tmov    %eax,(%esp)\n 80484b7:\tcall   8048354 <fprintf@plt>\n 80484bc:\tmovl   $0x1,(%esp)\n 80484c3:\tcall   8048394 <exit@plt>\n 80484c8:\tmovl   $0x8048640,(%esp)\n 80484cf:\tcall   8048364 <getenv@plt>\n 80484d4:\tmov    %eax,0x4(%esp)\n 80484d8:\tlea    -0x408(%ebp),%eax\n 80484de:\tmov    %eax,(%esp)\n 80484e1:\tcall   80483a4 <strcpy@plt>\n 80484e6:\tlea    -0x408(%ebp),%eax\n 80484ec:\tmov    %eax,0x4(%esp)\n 80484f0:\tmovl   $0x8048660,(%esp)\n 80484f7:\tcall   8048384 <printf@plt>\n 80484fc:\tmov    $0x0,%eax\n 8048501:\tleave  \n 8048502:\tret    "
      ]
     },
     {
