@@ -59,8 +59,10 @@ typed commands, same editor sessions, same output, same final state.**
   when a full live replay is impractical: 0 clears, 0 edits, final buffer
   == the cast's `:wq` byte count); (c) narration sync/segments step indices
   re-keyed if steps were inserted/removed; (d) `python3 tools/audit_verbatim.py <game>`
-  exits clean (no ABSENT/ELISION/OMITTED findings) — any finding is fixed by
-  rebuilding the `out` verbatim from the cast, or the level is re-recorded.
+  is run and every finding is resolved: rebuild the `out` verbatim from the
+  cast (or re-record the level) — or, if it is a tool false positive
+  (client-side content, 80-col wrap, staged vi screen), mark it as such in
+  the commit message.
 - Then commit (one commit per level, message naming the level + technique +
   password source). Do NOT `git push` — the operator pushes from the host.
 
@@ -103,7 +105,8 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   `note` field or the narration transcript (Rule 7) — never in `out`.
 - **Enforcement:** run `python3 tools/audit_verbatim.py <game>` before
   committing (Rule 4d). It cross-checks every `out` line against the cast
-  stream; ABSENT/ELISION/OMITTED findings must be cleared before the commit.
+  stream (ABSENT / ELISION / OMITTED findings). No level commits with
+  unresolved findings.
 
 ## Rule 7 — Educational transcript: every level gets a step-by-step explanation
 - Every level ships a narration transcript — `narration/<game>/L<n>.segments.json`
