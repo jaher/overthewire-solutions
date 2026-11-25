@@ -212,7 +212,22 @@ const speed = () => parseFloat(speedSel.value);
 function sleep(ms){ return new Promise(r => { const iv = setInterval(() => { if (playing) { clearInterval(iv); r(); } }, 60); setTimeout(() => {}, 0); }); }
 function delay(ms){ if (narrFF) return Promise.resolve(); return new Promise(r => { let t = 0; const iv = setInterval(() => { if (playing) { t += 50; if (t >= ms) { clearInterval(iv); r(); } } }, 50); }); }
 function line(html, cls, colwrap){ const d = document.createElement('div'); if (cls) d.className = cls + (colwrap ? ' w100' : ''); d.innerHTML = html; term.appendChild(d); term.scrollTop = term.scrollHeight; return d; }
-function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+/* Terminals expand \t to the next 8-column stop. Browsers do not: with
+   white-space:pre-wrap the CSS initial tab-size is 8px (less than one
+   character of the 14px mono font), so tab-indented code rendered with
+   its indentation skipped. Expand tabs to 8-column stops before
+   rendering, exactly as the recorded terminal did. */
+function expandTabs(s){
+  let out = '', col = 0;
+  for (let i = 0; i < s.length; i++){
+    const ch = s[i];
+    if (ch === '\n'){ out += ch; col = 0; }
+    else if (ch === '\t'){ const n = col % 8 ? 8 - col % 8 : 8; out += ' '.repeat(n); col += n; }
+    else { out += ch; col++; }
+  }
+  return out;
+}
+function esc(s){ return expandTabs(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
 /* ---- Spoken narration, synced to the typed lines ----
    A level with a sync map (narration/<game>/L<n>.sync.json) is narrated
@@ -749,7 +764,7 @@ async function playLevel(idx){
         if (my !== runId) return;
         await narrGate(si, 'out', oi, my);
         if (my !== runId) return;
-        const od = line(esc(o), 'out', o.length > 100);
+        const od = line(esc(o), 'out', expandTabs(o).length > 100);
         tagNarr(od, si, 'out', oi);
         await delay(160 * speed());
       }
@@ -764,7 +779,7 @@ async function playLevel(idx){
         else await typeCmd(L.user, c, my);
       }
     }
-    for (const o of (L.out || [])) { if (my !== runId) return; line(esc(o), 'out', o.length > 100); await delay(160 * speed()); }
+    for (const o of (L.out || [])) { if (my !== runId) return; line(esc(o), 'out', expandTabs(o).length > 100); await delay(160 * speed()); }
   }
   if (L.pw) { await narrGate(-1, 'pw', undefined, my); const pd = line('The password is <span class="pw">' + L.pw + '</span>', 'out'); tagNarr(pd, -1, 'pw'); }
   if (L.note) { line('<span class="note">' + esc(L.note) + '</span>', 'note'); }
