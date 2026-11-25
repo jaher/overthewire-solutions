@@ -106,5 +106,13 @@ Before committing a cast, re-open it and confirm:
   [ ] no raw-binary terminal dumps,
   [ ] the shell transcript is clean: only real commands; NO bare `#` comment
         lines and NO `echo '# …'` terminal commentary (comments are in the file),
-  [ ] the next level's password is shown in clean text and login-verified.
+  [ ] the next level's password is shown in clean text and login-verified,
+  [ ] an EDUCATIONAL transcript exists: narration/<game>/L<n>.segments.json is
+        a step-by-step teaching explanation of the solve (goal → each phase in
+        order: login, recon, vulnerability analysis, exploit design, the vi
+        session, build, run, verification → flag), explaining WHY each command
+        is run and what the output reveals, anchored to the real typed lines so
+        the site highlights each line as it is spoken; L<n>.mp3 + L<n>.sync.json
+        built via `python3 tools/build_narration.py <game> <n>` and committed
+        in the same commit (CLAUDE.md Rule 7). A level without it is not done.
 If any box fails, re-record. Do not commit a cast that fails this standard.

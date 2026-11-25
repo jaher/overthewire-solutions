@@ -81,7 +81,32 @@ typed commands, same editor sessions, same output, same final state.**
 - A JSON step that adds no new information relative to the cast is a
   defect. The replay is the cast, not a superset of it.
 
-## Rule 7 — Repo hygiene
+## Rule 7 — Educational transcript: every level gets a step-by-step explanation
+- Every level ships a narration transcript — `narration/<game>/L<n>.segments.json`
+  (the source of truth) plus the built `L<n>.mp3` + `L<n>.sync.json` from
+  `python3 tools/build_narration.py <game> <n>` — and it must read as a
+  **teaching explanation of the solve**, not a caption track.
+- Structure: (a) a goal segment naming the level and what it requires;
+  (b) one spoken segment per phase in the order the session runs — login,
+  recon, vulnerability analysis, exploit design, code written in vi, build,
+  run, verification; (c) a closing segment with the flag/password.
+- The explanation must answer WHY: what each command is for, what the
+  output reveals (e.g. "buf sits at ebp-0x108, so the saved return address
+  is 268 bytes into the payload"), and how the pieces connect into the
+  exploit. A reader listening ONLY to the transcript should understand how
+  the level was solved, without reading the terminal.
+- Every segment's `lines` refs anchor it to the real typed lines (step
+  index + role, out-lines by index range) so the site highlights each line
+  as it is spoken — no segment floats free of the transcript, and the
+  builder's warnings (commands never anchored) must be reviewed and cleared.
+- Tone: conversational, first-person, concrete numbers/addresses/offsets
+  as they appear on screen. No "as we can see here" filler, no terminal-
+  side commentary duplicated as text — the narration explains, the terminal
+  shows.
+- Levels added or re-recorded get their transcript in the SAME commit.
+  A level without an educational transcript is not done.
+
+## Rule 8 — Repo hygiene
 - Casts: `recordings/<game>/L<n>.cast`; driver scripts stay in the
   recording container (`/tmp/<game>_scripts/`); sources extracted from a
   cast must byte-match its `:wq` marker (N L, M C) before use.
