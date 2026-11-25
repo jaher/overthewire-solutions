@@ -1,0 +1,102 @@
+{
+ "segments": [
+  {
+   "text": "Blowfish, level ten. The README is empty - you're on your own. The binary is setuid level eleven.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    },
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The disassembly tells the story. The program calls geteuid, passes it to setuid, then calls system with a string from rodata. Then it prints a prompt, reads up to one hundred twenty-seven bytes, sleeps two seconds, takes strlen of the buffer, and compares it against a negative constant that strlen can never return. So the password game itself is unwinnable - the comparison always fails and the program prints Incorrect password and Goodbye. The only code that matters happens before any of that: the system call.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 7
+    }
+   ]
+  },
+  {
+   "text": "The rodata dump shows what system runs: the string clear, sitting right after a decoy password y zero y zero c zero n g r a seven s. system executes slash bin sh minus c clear - a shell that searches PATH for the first clear executable. And we control PATH.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 8
+    }
+   ]
+  },
+  {
+   "text": "The exploit script is tiny. We write a shell script named clear that cats slash pass slash level eleven, make it executable, and run the binary with our directory first on PATH. The child shell that system spawns keeps the elevated effective U I D, so our clear runs as level eleven and reads the password file.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Running it: our clear prints the level eleven password first - p h j three three r underscore t u X - then the game prints its irrelevant Incorrect password and Goodbye.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "out",
+     "from": 0,
+     "to": 2
+    }
+   ]
+  },
+  {
+   "text": "Verified live: logging in as level eleven with p h j three three r underscore t u X succeeds. Level ten solved.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  }
+ ]
+}
