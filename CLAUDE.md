@@ -58,7 +58,9 @@ typed commands, same editor sessions, same output, same final state.**
   (or are byte-checked with the site's own parseVimScreen/buildVimScript
   when a full live replay is impractical: 0 clears, 0 edits, final buffer
   == the cast's `:wq` byte count); (c) narration sync/segments step indices
-  re-keyed if steps were inserted/removed.
+  re-keyed if steps were inserted/removed; (d) `python3 tools/audit_verbatim.py <game>`
+  exits clean (no ABSENT/ELISION/OMITTED findings) — any finding is fixed by
+  rebuilding the `out` verbatim from the cast, or the level is re-recorded.
 - Then commit (one commit per level, message naming the level + technique +
   password source). Do NOT `git push` — the operator pushes from the host.
 
@@ -72,18 +74,36 @@ typed commands, same editor sessions, same output, same final state.**
   operator with the evidence — never skip a number quietly, and never mark
   an unsolved level solved.
 
-## Rule 6 — No redundant commands
-- Each command is typed exactly as often as the real session typed it. A
-  build/analysis shown ONCE in the cast appears ONCE in the JSON — no
-  repeated objdump/objcopy/nasm blocks, no duplicate probe commands, no
-  filler re-runs. One vi session per file = one contiguous run of staged
-  steps.
-- A JSON step that adds no new information relative to the cast is a
-  defect. The replay is the cast, not a superset of it.
-- A JSON `out` that shortens the cast's output (e.g. `char buf[256]; ...
-  strcpy(buf,argv[1]);`) is a defect: the step's output must be the FULL
-  cast-verbatim output (every line the terminal printed), exactly as in the
-  cast. No `...` elisions, no abridged snippets (user rule, 2026-11-25).
+## Rule 6 — The replay mirrors the cast EXACTLY: no more, no less, nothing different
+The one test for any JSON step's `out`: **every line in it must be a line
+the terminal actually displayed during that step** (whitespace-normalized;
+80-column soft wraps joined back into one line). If a line was not on the
+terminal screen, it does not belong in `out` — no matter how useful it is.
+- **No redundant commands (no MORE):** each command is typed exactly as often
+  as the real session typed it. A build/analysis shown ONCE in the cast
+  appears ONCE in the JSON — no repeated objdump/objcopy/nasm blocks, no
+  duplicate probe commands, no filler re-runs. One vi session per file = one
+  contiguous run of staged steps. A JSON step that adds no new information
+  relative to the cast is a defect. The replay is the cast, not a superset of
+  it.
+- **No elisions (no LESS):** the step's output must be the FULL
+  cast-verbatim output — every line the terminal printed, in order. No `...`
+  elisions, no abridged snippets (e.g. `char buf[256]; ... strcpy(buf,
+  argv[1]);` is a defect), no "(N more lines)" summaries, no dropped tail
+  lines. Long outputs (objdump, file listings, full MOTD/banner) are shown in
+  full. (user rule, 2026-11-25)
+- **No annotation (nothing DIFFERENT):** no author commentary in `out` — no
+  parentheticals explaining the step (e.g. `(ASLR off -> fixed libc base)`,
+  `(55-byte NUL-free shellcode)`), no paraphrased or "cleaned-up" output, no
+  abbreviated editor state. Editor steps carry the real staged screens
+  (numbered lines + `~` rows + status line, per Rule 3) and the session's
+  last step ends with the `:wq` save marker EXACTLY as the terminal printed
+  it — `"/dev/shm/e_bf6.py" [New] 37L, 1132C written`, never a shorthand
+  `[New] written`. If a step needs a description, it goes in the level's
+  `note` field or the narration transcript (Rule 7) — never in `out`.
+- **Enforcement:** run `python3 tools/audit_verbatim.py <game>` before
+  committing (Rule 4d). It cross-checks every `out` line against the cast
+  stream; ABSENT/ELISION/OMITTED findings must be cleared before the commit.
 
 ## Rule 7 — Educational transcript: every level gets a step-by-step explanation
 - Every level ships a narration transcript — `narration/<game>/L<n>.segments.json`
