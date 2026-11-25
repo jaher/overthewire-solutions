@@ -80,6 +80,10 @@ typed commands, same editor sessions, same output, same final state.**
   steps.
 - A JSON step that adds no new information relative to the cast is a
   defect. The replay is the cast, not a superset of it.
+- A JSON `out` that shortens the cast's output (e.g. `char buf[256]; ...
+  strcpy(buf,argv[1]);`) is a defect: the step's output must be the FULL
+  cast-verbatim output (every line the terminal printed), exactly as in the
+  cast. No `...` elisions, no abridged snippets (user rule, 2026-11-25).
 
 ## Rule 7 — Educational transcript: every level gets a step-by-step explanation
 - Every level ships a narration transcript — `narration/<game>/L<n>.segments.json`
