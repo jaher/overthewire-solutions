@@ -26,7 +26,11 @@ Exit 0 clean / 1 defects.
 """
 import json, glob, os, re, sys
 
-ESCRE = re.compile(r'\x1b\[[0-9;?]*[a-zA-Z]|\x1b\][^\x07]*\x07|\x1b[()][0-9A-B]|\x1b[78MmDE]')
+ESCRE = re.compile(r'\x1b\[[0-9;?]*[a-zA-Z]|\x1b\][^\x07]*(?:\x07|\x1b\\)|\x1b[()][0-9A-B]|\x1b[78MmDE]')
+# NOTE: some captures terminate OSC with ST (ESC \\) not BEL — the old
+# greedy-to-BEL pattern swallowed whole screen regions (e.g. narnia L1 cat).
+# Also normalize \r-runs (this capture family separates lines with \r\r\r\n,
+# not \r\n) BEFORE unwrapping, and collapse ALL whitespace when matching.
 
 def raw_stream(path):
     lines = open(path).read().splitlines()
@@ -54,7 +58,7 @@ def detect_prompt(stream):
 def unwrap(s):
     """Join 80-col soft wraps: a line not ending in space, followed by a line
     not starting in space, is one logical line split by the terminal."""
-    s = s.replace('\r\r\n', '\n').replace('\r', '')
+    s = re.sub(r'\r+', '\n', s)
     lines = s.split('\n')
     res = []
     for ln in lines:
@@ -66,7 +70,7 @@ def unwrap(s):
     return '\n'.join(res)
 
 def norm(s):
-    return re.sub(r'[ \t]+', ' ', s).strip()
+    return re.sub(r'\s+', ' ', s).strip()
 
 def find_cmd(stream, cmd, after=0):
     """Find the command line in the cast. Tries the full cmd first, then
