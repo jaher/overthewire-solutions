@@ -1,1 +1,295 @@
-{"segments":[{"lines":[{"role":"goal","step":-1}],"text":"Utumno, level two."},{"lines":[{"role":"cmd","step":0}],"text":"I log in as utumno two."},{"lines":[{"role":"cmd","step":1},{"from":0,"role":"out","step":1,"to":0},{"role":"cmd","step":2},{"from":0,"role":"out","step":2,"to":0}],"text":"Running it with no arguments, and again with four As, both print Aw dot dot and exit one."},{"lines":[{"role":"cmd","step":3}],"text":"The disassembly shows why."},{"lines":[{"from":4,"role":"out","step":3,"to":12}],"text":"The guard wants exactly one argument, and that argument must be the empty string: argc equal to one, and the first byte of argv zero is zero."},{"lines":[{"from":18,"role":"out","step":3,"to":20}],"text":"The second quirk is the copy source."},{"lines":[{"from":21,"role":"out","step":3,"to":25}],"text":"The program does strcpy into a twelve byte buffer, but the source is argv ten, ten pointers past the start of argv."},{"lines":[{"from":18,"role":"out","step":3,"to":20}],"text":"With one argument, argv ten is past the null terminator, inside the environment array. The kernel puts envp immediately after argv on the initial stack, so argv ten is envp eight, the value of the ninth environment variable."},{"lines":[{"from":22,"role":"out","step":3,"to":25}],"text":"That gives us a full string to copy. Twelve bytes fill the buffer, the next four overwrite the saved frame pointer, and the next four the return address."},{"lines":[{"role":"cmd","step":4},{"from":0,"role":"out","step":4,"to":0},{"role":"cmd","step":5},{"from":0,"role":"out","step":5,"to":0}],"text":"The stack is executable and address randomisation is off."},{"lines":[{"role":"vimcmd","step":6},{"role":"vim","step":6}],"text":"I open vim and write the shellcode:"},{"lines":[{"role":"vim","step":7}],"text":"The header, the start label, and the marker comment, with eax zeroed."},{"lines":[{"role":"vim","step":8}],"text":"The marker write: push a zero, push PWN exclamation, then write four bytes to standard output."},{"lines":[{"role":"vim","step":9}],"text":"Then the user-id calls: geteuid, then setreuid with the id in both slots."},{"lines":[{"role":"vim","step":10}],"text":"Then setuid, and the start of the execve: a zeroed eax pushed as the terminator."},{"lines":[{"role":"vim","step":11}],"text":"Then the execve of slash bin slash sh. The last two path words are pushed so the string sits on the stack, the stack pointer becomes the path argument, and the argument array is built from a zero and that pointer. Eleven is loaded as the syscall number and the interrupt makes the call."},{"lines":[{"role":"cmd","step":12},{"role":"cmd","step":13},{"from":0,"role":"out","step":13,"to":5},{"role":"cmd","step":14},{"role":"cmd","step":15},{"from":0,"role":"out","step":15,"to":2},{"role":"cmd","step":16},{"from":0,"role":"out","step":16,"to":0}],"text":"We assemble with nasm, inspect the encoding with objdump, extract the text section with objcopy, check the bytes with xxd, and wc counts seventy eight bytes."},{"lines":[{"role":"cmd","step":20}],"text":"Python refuses to build an empty argv zero: the execve call says the first element cannot be empty, so we call libc dot execve directly through ctypes, with a pointer array we build ourselves."},{"lines":[{"role":"cmd","step":20},{"from":0,"role":"out","step":20,"to":0}],"text":"The environment value is the prefix E zero eight equals, then eight nops, then four filler bytes, then the return address, then the shellcode."},{"lines":[{"role":"cmd","step":20},{"from":1,"role":"out","step":20,"to":2}],"text":"The exploit forks once per candidate address and looks for the marker in the child output. The sweep hits at f f f f d c d zero."},{"lines":[{"role":"cmd","step":20},{"from":3,"role":"out","step":20,"to":4},{"role":"pw","step":-1}],"text":"Re-running that address with the commands piped in gives a shell as utumno three and the password y i T c a Z b p J nine."}]}
+{
+ "segments": [
+  {
+   "lines": [
+    {
+     "role": "goal",
+     "step": -1
+    }
+   ],
+   "text": "Utumno, level two."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 0
+    }
+   ],
+   "text": "I log in as utumno two."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 1
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 1,
+     "to": 0
+    },
+    {
+     "role": "cmd",
+     "step": 2
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 2,
+     "to": 0
+    }
+   ],
+   "text": "Running it with no arguments, and again with four As, both print Aw dot dot and exit one."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 3
+    }
+   ],
+   "text": "The disassembly shows why."
+  },
+  {
+   "lines": [
+    {
+     "from": 4,
+     "role": "out",
+     "step": 3,
+     "to": 12
+    }
+   ],
+   "text": "The guard wants exactly one argument, and that argument must be the empty string: argc equal to one, and the first byte of argv zero is zero."
+  },
+  {
+   "lines": [
+    {
+     "from": 18,
+     "role": "out",
+     "step": 3,
+     "to": 20
+    }
+   ],
+   "text": "The second quirk is the copy source."
+  },
+  {
+   "lines": [
+    {
+     "from": 21,
+     "role": "out",
+     "step": 3,
+     "to": 25
+    }
+   ],
+   "text": "The program does strcpy into a twelve byte buffer, but the source is argv ten, ten pointers past the start of argv."
+  },
+  {
+   "lines": [
+    {
+     "from": 18,
+     "role": "out",
+     "step": 3,
+     "to": 20
+    }
+   ],
+   "text": "With one argument, argv ten is past the null terminator, inside the environment array. The kernel puts envp immediately after argv on the initial stack, so argv ten is envp eight, the value of the ninth environment variable."
+  },
+  {
+   "lines": [
+    {
+     "from": 22,
+     "role": "out",
+     "step": 3,
+     "to": 25
+    }
+   ],
+   "text": "That gives us a full string to copy. Twelve bytes fill the buffer, the next four overwrite the saved frame pointer, and the next four the return address."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 4
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 4,
+     "to": 0
+    },
+    {
+     "role": "cmd",
+     "step": 5
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 5,
+     "to": 0
+    }
+   ],
+   "text": "The stack is executable and address randomisation is off."
+  },
+  {
+   "lines": [
+    {
+     "role": "vimcmd",
+     "step": 6
+    },
+    {
+     "role": "vim",
+     "step": 6
+    }
+   ],
+   "text": "I open vim and write the shellcode:"
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 7
+    }
+   ],
+   "text": "The header, the start label, and the marker comment, with eax zeroed."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 8
+    }
+   ],
+   "text": "The marker write: push a zero, push PWN exclamation, then write four bytes to standard output."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 9
+    }
+   ],
+   "text": "Then the user-id calls: geteuid, then setreuid with the id in both slots."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 10
+    }
+   ],
+   "text": "Then setuid, and the start of the execve: a zeroed eax pushed as the terminator."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 11
+    }
+   ],
+   "text": "Then the execve of slash bin slash sh. The last two path words are pushed so the string sits on the stack, the stack pointer becomes the path argument, and the argument array is built from a zero and that pointer. Eleven is loaded as the syscall number and the interrupt makes the call."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 12
+    },
+    {
+     "role": "cmd",
+     "step": 13
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 13,
+     "to": 5
+    },
+    {
+     "role": "cmd",
+     "step": 14
+    },
+    {
+     "role": "cmd",
+     "step": 15
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 15,
+     "to": 2
+    },
+    {
+     "role": "cmd",
+     "step": 16
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 16,
+     "to": 0
+    }
+   ],
+   "text": "We assemble with nasm, inspect the encoding with objdump, extract the text section with objcopy, check the bytes with xxd, and wc counts seventy eight bytes."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 29
+    }
+   ],
+   "text": "Python refuses to build an empty argv zero: the execve call says the first element cannot be empty, so we call libc dot execve directly through ctypes, with a pointer array we build ourselves."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 29
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 29,
+     "to": 0
+    }
+   ],
+   "text": "The environment value is the prefix E zero eight equals, then eight nops, then four filler bytes, then the return address, then the shellcode."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 29
+    },
+    {
+     "from": 1,
+     "role": "out",
+     "step": 29,
+     "to": 2
+    }
+   ],
+   "text": "The exploit forks once per candidate address and looks for the marker in the child output. The sweep hits at f f f f d c d zero."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 29
+    },
+    {
+     "from": 3,
+     "role": "out",
+     "step": 29,
+     "to": 4
+    },
+    {
+     "role": "pw",
+     "step": -1
+    }
+   ],
+   "text": "Re-running that address with the commands piped in gives a shell as utumno three and the password y i T c a Z b p J nine."
+  }
+ ]
+}

@@ -217,6 +217,53 @@ Known defects to fix in this pass (found 2026-11-24):
 - vortex L13: no mp3/sync (level blocked but narration should still exist for the blocked-analysis page).
 - drifter L0 + formulaone L0-L3: NO narration at all (mp3/sync/segments) — author + build.
 - Run tools/editor_audit.js + tools/player_check.js + tools/narration_audit.py on every level after fixes (8 alignment flags open: bandit L12/L14/L15/L20/L24, utumno L4, vortex L12/L13).
+
+## Code-writing visibility queue (user rule 2026-11-25) — every .py executed / .c|.cc compiled / .asm assembled must be SHOWN being written in vi, in the cast AND in the JSON replay (all levels, all games)
+
+Repo-wide audit 2026-11-25 (host, OpenClaw). Two classes:
+
+FIXED (committed 59d7ac9):
+- utumno L7: e.py vim session added (75L verbatim from cast) + duplicated nasm/objdump/
+  objcopy build block removed (JSON had two builds; cast shows one); L7 narration
+  sync/segments re-keyed (python3 e.py: step 22 -> 30).
+
+A) CAST HAS the vi/vim session, JSON omits it -> add the staged vim steps (screen
+   snapshots) to games/*.json, re-key narration sync/segments if present. The
+   source can be lifted from the cast (vim buffer lines) or from `cat <file>` in
+   the cast; must be byte-identical to what ran.
+- behemoth L1-L7: e_behemothN.py (cast: `vi /tmp/e_behemothN.py` -> N written)
+- formulaone L0: solve.py; L2: attack.c
+- krypton L2: k2crypt.py
+- maze L4: tinel.py; L6: sc.py
+- utumno L1-L6: e.py (L7 done above)
+
+B) JSON vim steps are PLACEHOLDERS (out = "(x written: ...)", no gutter screen) ->
+   replace with real staged screen snapshots from the cast:
+- krypton L4: k4vig.py; L5: k5vig.py; L6: k6lfsr.py (cast has full vim sessions:
+  k4vig 45L, k5vig ?, k6lfsr ?; k2crypt L2 is class A)
+
+C) CAST HAS NO writing session (heredoc/other, or never shown) -> RE-RECORD that
+   level's cast to the standard (vi-only) OR, where the level is otherwise
+   re-queued, fold the fix into that re-record:
+- drifter L0: exploit.py (client-side, run via maze7 backend — show the client vi session)
+- maze L7: gen.py, fire.py
+- natas L26: n26jar.py
+- utumno L0: dump.c (cast writes dump.c in vi but the JSON step list jumps
+  straight to `gcc -o dump.so dump.c` — check JSON for the dump.c vim steps; if
+  absent, add them from the cast)
+- vortex L11: h11.c (heredoc in cast); L12: drv12.c + build12.py (heredocs)
+- vortex L13: in active scope (user "Solve l13") — any code there must follow the
+  standard (vi) in the re-record
+- manpage L0-L4: NO casts at all (never re-recorded; JSON from transcript) —
+  full re-record to standard when its turn comes
+
+RULE for all fixes: the JSON replay must mirror the cast 1:1 — no build step
+repeated verbatim (that was the utumno L7 objcopy-twice defect), no `python3 x`
+without a preceding vim session for x, no placeholder screens.
+
+STATUS: open — queued to claude-otw with the S2S/vortex-L13 brief. Do these as
+each level is revisited; do NOT re-solve anything.
+
 REPLAY ORDER: maze L0-L8 first (just re-recorded + known doc defects), then formulaone L0-L3, drifter L0, then the older games oldest-first (natas, bandit, narnia, leviathan, behemoth, krypton, manpage, utumno, vortex) — serialized, one level at a time.
 
 

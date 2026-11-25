@@ -91,6 +91,7 @@ this to every new level AND to any re-record of an older cast.
   own transcript replays to a solve. Revisit ALL levels (old and new) for this —
   any step that doesn't verbatim-work on the live server must be fixed in the JSON,
   the cast, and the docs until the replay passes.
+**Every `.py` executed, `.c`/`.cc` compiled, `.asm` assembled has a vim-writing session** (user rule 2026-11-25, all levels, all games): the replay (games/*.json) must show the code being written in vi — never just `python3 x.py` / `gcc x.c` for a file whose source was never shown. Audit 2026-11-25 (repo-wide): utumno L1-L7 e.py fixed in 59d7ac9 (L7 also had a duplicated nasm/objdump/objcopy build — a replay must NOT repeat a build step verbatim; the JSON mirrors the cast 1:1). Known remaining defects — fix as each level is revisited (cast has the session, JSON omits it: behemoth L1-L7 e_behemothN.py, formulaone L0 solve.py + L2 attack.c, krypton L2 k2crypt.py, maze L4 tinel.py + L6 sc.py; krypton L4/L5/L6 vim steps are PLACEHOLDERS, no screen; cast has NO writing session: drifter L0 exploit.py, maze L7 gen.py/fire.py, natas L26 n26jar.py, utumno L0 dump.c, vortex L11 h11.c + L12 drv12.c/build12.py (heredocs — vi re-record needed), vortex L13 (in-scope per L13 work); manpage L0-L4 have no casts at all).
 - Vi sessions in the transcript must look as good as the vortex levels (esp. L4):
   real editor chrome (line numbers / `~` rows where the player renders them), the
   keystrokes shown (i, Esc, :wq), the buffer content visible as it is typed.
