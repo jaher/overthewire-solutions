@@ -1,0 +1,175 @@
+{
+ "segments": [
+  {
+   "text": "Maze, level one. We log in as maze one - the race from level zero paid off - and the goal is the maze two password from /etc/maze_pass/maze2. The gate: /maze/maze1, setuid maze2.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 82
+    },
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Recon first: file says a thirty-two-bit setuid ELF; readelf shows the dynamic section - and there is the whole level in one line: the binary needs a library called dot-slash libc dot so dot four. A RELATIVE path, resolved from the current working directory. And objdump shows main is twenty-three bytes: just puts hello world. The program does nothing - whatever runs before it is everything.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    },
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 8
+    }
+   ]
+  },
+  {
+   "text": "So we plant our own libc.so.4 in a temp directory we control. Two loader gotchas, both measured live on this box: the dynamic loader opens libraries with the setuid binary's file-uid - maze2 - so the directory must be world-readable, seven fifty-five, or the open fails as permission denied; and the plant must be a valid thirty-two-bit shared object, not an empty file or a sixty-four-bit build.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "The library source goes in through vi: a constructor attribute - a function the loader calls at load time, before main - opens /etc/maze_pass/maze2 and writes it to stdout. At that moment the process already runs as e-u-i-d maze2, so the read succeeds. A dummy variable keeps the linker from doing anything clever with an otherwise empty object.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Compile it as a thirty-two-bit shared object with position-independent code - seventeen lines, four hundred seventy-nine bytes - list it, and run the level binary from the planted directory.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "cmd"
+    },
+    {
+     "step": 11,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 12,
+     "role": "cmd"
+    },
+    {
+     "step": 12,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 13,
+     "role": "cmd"
+    },
+    {
+     "step": 13,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 14,
+     "role": "cmd"
+    },
+    {
+     "step": 14,
+     "role": "out",
+     "from": 0,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "The constructor fires before main: the password j J F six j n nine q W six prints, then main's hello world. Level solved - the loader itself is the privilege escalation, and a relative DT_NEEDED path is the hole.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  },
+  {
+   "text": "Verification, client-side, per the rules: exit to the client terminal and log in as maze two with the password we just read - u i d fifteen thousand two - and cat /etc/maze_pass/maze2 confirms the same string. Maze one done.",
+   "lines": [
+    {
+     "step": 15,
+     "role": "cmd"
+    },
+    {
+     "step": 16,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 17,
+     "role": "cmd"
+    },
+    {
+     "step": 17,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    }
+   ]
+  }
+ ]
+}
