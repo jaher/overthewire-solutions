@@ -179,6 +179,16 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   the bytes on screen mean.
 
 
+## Standing rule — log corrections (user 2026-11-26)
+- When a defect in a cast, JSON, or narration is found and fixed, ask: is
+  the lesson generalizable? If yes, add it to this file (new rule or a note
+  on the rule it extends) in the SAME commit, so the next recording follows
+  it without being told again. If it is a one-off or a site/tooling defect
+  (e.g. the `vimFileOf` regex only matching `vim`, the OSC-greedy ESCRE bug),
+  fix it where it lives and leave a one-line note here only if it can bite
+  again. Do not pad this file with trivia; a rule earns its place by being
+  violated once.
+
 See RECORDING-STANDARD.md for the full v2 standard; this file adds the
 character-exact fidelity and vi-everywhere rules (user, 2026-11-25) and the
 vortex-quality step-by-step + post-solve verbatim rules (user, 2026-11-26).
