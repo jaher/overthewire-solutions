@@ -188,6 +188,21 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   fix it where it lives and leave a one-line note here only if it can bite
   again. Do not pad this file with trivia; a rule earns its place by being
   violated once.
+- Recorded-run debugging discipline (added 2026-11-26, from maze L2): when
+  a recorded run's behavior contradicts the intended script, DO NOT
+  re-record blind — first diff the actual on-machine file (`cat f`) against
+  the intended buffer inside the failed cast itself. The two recurring
+  causes are both silent: (a) editor corruption of the typed buffer (vim's
+  auto comment-leader/indent; now neutralized in ptyrun2's @vi setup with
+  `formatoptions=`), and (b) the shell stripping NUL bytes from a binary
+  payload passed through command substitution (`$(cat sc.bin)`) or shell
+  variables — assemble NUL-free encodings at the SOURCE (asm imm8 forms,
+  printable path dwords) instead of filtering after the fact. A payload
+  that must survive a shell round-trip is NUL-free by construction, not
+  by filtering. The same diff-first rule catches driver bugs: a
+  `@waitfor` directive with only two fields, or a stage window that missed
+  because the payload size changed, shows up as stage1-miss lines in the
+  failed cast — read them before touching the recorder.
 
 See RECORDING-STANDARD.md for the full v2 standard; this file adds the
 character-exact fidelity and vi-everywhere rules (user, 2026-11-25) and the

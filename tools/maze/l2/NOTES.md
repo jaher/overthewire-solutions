@@ -61,6 +61,30 @@ layout), dumping 10 bytes twice — the fd1+fd2 signature —
 (uid=15003, cat /etc/maze_pass/maze3 matches).  Recording:
 recordings/maze/L2.cast.
 
+## Standard-v2 re-record (2026-11-26, attempt 13 — the committed cast)
+
+The re-record surfaced two more payload-encoding lessons (see the
+"Recorded-run debugging discipline" note in CLAUDE.md):
+
+1. **`sub esp, 0x80` is NOT NUL-free.**  The imm32 form encodes
+   `81 EC 80 00 00 00` — three NUL bytes that the sweep's
+   `$(cat sc.bin)` silently stripped ("ignored null byte in input"),
+   truncating the sled.  The imm8 form `sub esp, 0x7f`
+   (`83 EC 7F`) is NUL-free; the read count (0x2000 via `mov dh`)
+   still covers the 12-byte password.  sc.bin dropped 81 → 78 bytes.
+2. **The sweep's argv must carry the full 8 bytes**: `\x68` push
+   opcode + target LE + `\xc3` ret + `AA` pad.  Attempt 12 built only
+   the 4 raw address bytes (`A=$(printf "\x${T:6:2}...")`), so every
+   run executed garbage and died silently — stage 1 and 2 both
+   "missed" without a single error message.
+
+Final recorded run: stage 1 (0xffffd6d0–0xffffd720) missed — the layout
+shifted because the sled shrank — stage 2 hit **0xffffd010**, password
+printed twice (fd1+fd2).  Verified live as maze3 (uid=15003).  The
+post-solve verbatim replay (Rule 4b) reproduced the vi sessions to the
+same `:wq` markers (sc.asm 41L/1355B, sweep.sh 27L/957B) and the same
+solved state via tools/replay/gen_ptyrun2.py + the two-phase wrapper.
+
 ## Files
 
 - `sc.asm` / `sc.bin` — the corrected shellcode (this run's bytes).

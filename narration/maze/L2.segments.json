@@ -1,0 +1,178 @@
+{
+ "segments": [
+  {
+   "text": "Maze, level two. We log in as maze two - level one's planted-constructor trick paid off - and the goal is the maze3 password. The gate: /maze/maze2, a setuid maze3 binary.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "Recon: file says a thirty-two-bit setuid ELF with debug info. readelf shows the GNU stack segment is read-write-execute, so code on the stack is legal, and this lab runs with address randomization off. The objdump of main is the whole level in a handful of instructions: with exactly one argument, it lea's a twelve-byte buffer, stores the buffer's own address into a pointer, strncpy's the first eight bytes of argv one into that buffer, then calls the pointer. So the eight copied bytes ARE the code, and the code sits at the buffer's address.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 33
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "Eight bytes is only a push and a ret: hex six-eight, the target address little-endian, hex c-three ret, and two A's of padding to fill what strncpy copies. Where does the push point? Into the environment: we export a variable holding two thousand A's with our shellcode at the end - a NOP sled - and aim the push anywhere inside it. The processor sleds forward into the shellcode, so the exact stack layout stops mattering and a sweep over candidate addresses finds the shot.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The shellcode is the part that took two sessions to get right. It opens the password file, reads it, and writes it to both standard output and standard error - reading inside the shellcode, before any exec, because a spawned shell drops the elevated identity. Two constraints shaped the code. First, the path /etc/maze_pass/maze3 must be built on the stack with pushes, and every dword must be NUL-free because it all rides through C strings: the fix is repeated slashes - four before etc, two before maze_pass, two before maze3 - Linux collapses them, and each four-byte chunk becomes printable. The chunks are pushed in reverse order, null first, since the stack grows down. Second, the stack reservation itself: sub esp with an immediate-zero-eighty encodes as a four-byte instruction with three NUL bytes in it, which silently corrupted the environment plant last attempt - the shell stripped them at the dollar-cat. The imm8 form, sub esp comma zero-x-seven-f, encodes NUL-free, and the read count of two thousand easily covers the twelve-byte password.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Nasm assembles it to seventy-eight bytes of NUL-free thirty-two-bit code - the size also confirms the imm8 encoding took effect. Then the driver, typed in vi: the sweep builds the push-ret argument for every four-aligned address in a window, skipping any whose packed bytes contain a null, runs the level with the sled exported, and stops at the first run that prints anything. Stage one sweeps the window that hit in the earlier session; if the layout has shifted, stage two widens to a full sixty-four-kilobyte band of the stack.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "cmd"
+    },
+    {
+     "step": 11,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": 12,
+     "role": "cmd"
+    },
+    {
+     "step": 13,
+     "role": "cmd"
+    },
+    {
+     "step": 14,
+     "role": "cmd"
+    },
+    {
+     "step": 15,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The run confirms the lesson live: cat shows the script byte-exact, and the sweep's stage one misses - the stack layout did shift, exactly the uncertainty the sled absorbs - then stage two hits at zero-x-f-f-f-f-d-zero-one-zero and the password prints, twice, once per descriptor: that double print is the read-inside-the-shellcode signature. Verification, per the rules: exit, log in fresh as maze three with the password we just read - u i d fifteen thousand three - and cat /etc/maze_pass/maze3 shows the same string. Maze two done.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "cmd"
+    },
+    {
+     "step": 16,
+     "role": "out",
+     "from": 27,
+     "to": 27
+    },
+    {
+     "step": 17,
+     "role": "cmd"
+    },
+    {
+     "step": 17,
+     "role": "out",
+     "from": 1,
+     "to": 4
+    },
+    {
+     "step": 18,
+     "role": "cmd"
+    },
+    {
+     "step": 19,
+     "role": "cmd"
+    },
+    {
+     "step": 20,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": 21,
+     "role": "cmd"
+    },
+    {
+     "step": 21,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": 22,
+     "role": "cmd"
+    }
+   ]
+  }
+ ]
+}
