@@ -45,14 +45,20 @@ def raw_stream(path):
     return ESCRE.sub('', ''.join(data))
 
 def detect_prompt(stream):
+    """Return one alternation regex covering ALL user@host prompt tokens
+    seen in the stream (multi-level sessions switch users mid-cast)."""
     toks = re.findall(r'\b[\w.-]+@[\w.-]+\b', stream)
     best = {}
     for t in toks:
         best[t] = best.get(t, 0) + 1
-    if best:
-        top = max(best, key=best.get)
-        if best[top] >= 2:
-            return re.compile(r'\n\s*' + re.escape(top) + r'[^\n]*\$')
+    # keep tokens that sit in a prompt-looking position: shortly before a '$'
+    # on some line (command/password/MOTD lines don't have that)
+    live = [t for t in best
+            if best[t] >= 2
+            and re.search(r'\n[^\n]*' + re.escape(t) + r'[^\n]{0,20}\$', stream)]
+    if live:
+        alt = '|'.join(re.escape(t) for t in sorted(live, key=lambda t: -best[t]))
+        return re.compile(r'\n[^\n]*(?:' + alt + r')[^\n]*\$')
     return re.compile(r'\n[^\n]*\$')
 
 def unwrap(s):
@@ -74,7 +80,9 @@ def norm(s):
 
 def find_cmd(stream, cmd, after=0):
     """Find the command line in the cast. Tries the full cmd first, then
-    'leading token + path', then bare leading token (shorthand cmds)."""
+    'leading token + path', then bare leading token (shorthand cmds).
+    Matches are anchored to a line start so 'id' doesn't hit inside
+    arbitrary text; falls back to substring only if no line-start hit."""
     cands = [cmd]
     m = re.match(r'^(\S+)(\s+(\S+))?', cmd)
     if m:
@@ -83,10 +91,23 @@ def find_cmd(stream, cmd, after=0):
             cands.append(lead + ' ' + arg)
         cands.append(lead)
     for c in cands:
+        j = after
+        while True:
+            j = stream.find(c, j)
+            if j < 0:
+                break
+            # accept a match whose line has a short prompt-like prefix
+            # ([user@host ~]$ id, client$ cmd) and reject mid-text hits
+            # (zoidberg, setresuid); the char before must be a boundary
+            prev = stream[j - 1] if j else '\n'
+            ls = stream.rfind('\n', 0, j) + 1
+            if (j == 0 or (not (prev.isalnum() or prev in '_-')
+                           and len(stream[ls:j]) <= 40)):
+                return j, len(c)
+            j += 1
+    for c in cands:
         j = stream.find(c, after)
         if j >= 0:
-            # ensure we land on a prompt line (or start)
-            line_start = stream.rfind('\n', 0, j) + 1
             return j, len(c)
     return -1, 0
 
@@ -110,8 +131,8 @@ def audit_game(game):
     defects = []
     for li, lv in enumerate(d.get('levels', [])):
         castpath = None
-        for cand in (f'recordings/{game}/L{li}.cast',
-                     f'recordings/{game}/L{lv.get("lvl")}.cast'):
+        for cand in (f'recordings/{game}/L{lv.get("lvl")}.cast',
+                     f'recordings/{game}/L{li}.cast'):
             if os.path.exists(cand):
                 castpath = cand
                 break

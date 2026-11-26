@@ -3,7 +3,7 @@
  "host": "logic.smashthestack.org",
  "network": "smashthestack.org",
  "port": 2227,
- "status": "online (L1 solved 2026-11-26: web upload -> PHP webshell -> .bash_history -> level2 login verified)",
+ "status": "online (L1+L2 solved 2026-11-26; L2 = Caesar decode of level2_alt -> level3 login verified)",
  "note": "Added to scope 2026-11-24. Level 1 is a WEB level at http://logic.smashthestack.org:8181/index.html. After that: ssh -l levelN logic.smashthestack.org -p2227 (replace levelN with the current level, e.g. level3). Tags/hall-of-fame links on the game page (logic.smashthestack.org:88) show level2..level11, i.e. at least 11 levels beyond the web level1. Mix of buffer overflows, format strings, assembly, vulnerable web apps, heap attacks. Verify live level count when starting.",
  "levels": [
   {
@@ -111,6 +111,278 @@
     }
    ],
    "note": "WEB level: send_clearance.php moves ANY uploaded file into /srv/www/level1/uploads/ with no extension/type check, and PHP executes there: a one-line webshell runs as uid=601(level1). Poking around the user dirs (the page's own hint) reveals /home/level1/.bash_history with the level2 password typed in plain (ach3sa6F, right after 'cat README'). The box's SSH banner confirms level1 is web-only. Level2 login verified live 2026-11-26; ~/.pass = ach3sa6F. SSH kex: needs -o KexAlgorithms=+diffie-hellman-group14-sha1 (old sshd)."
+  },
+  {
+   "lvl": 2,
+   "user": "level3",
+   "pw": "PIZIPMWKEC",
+   "steps": [
+    {
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 level2@logic.smashthestack.org -p 2227",
+     "out": [
+      "",
+      "Problems connecting? Visit us on IRC at irc.smashthestack.org",
+      "(port +6697) in channel #logic. Or email mh@smashthestack.org",
+      "",
+      "Level1 is not accessed via SSH. Please find it online at:",
+      "http://logic.smashthestack.org:8181/index.html",
+      "",
+      "level2@logic.smashthestack.org's password: ",
+      "       __       ______   _______    ________  ______",
+      "      /_/\\     /_____/\\ /______/\\  /_______/\\/_____/\\",
+      "      \\:\\ \\    \\:::_ \\ \\\\::::__\\/__\\__.::._\\/\\:::__\\/",
+      "       \\:\\ \\    \\:\\ \\ \\ \\\\:\\ /____/\\  \\::\\ \\  \\:\\ \\  __",
+      "        \\:\\ \\____\\:\\ \\ \\ \\\\:\\\\_  _\\/  _\\::\\ \\__\\:\\ \\/_/\\",
+      "         \\:\\/___/\\\\:\\_\\ \\ \\\\:\\_\\ \\ \\ /__\\::\\__/\\\\:\\_\\ \\ \\",
+      "          \\_____\\/ \\_____\\/ \\_____\\/ \\________\\/ \\_____\\/",
+      "",
+      "        Welcome to the Logic Wargame on Smash The Stack",
+      "",
+      "              Developers:  mh, level, zoidberg, frank^2",
+      "",
+      "         Please email staff@smashthestack.org for help",
+      "",
+      "                   Levels are in /levels/",
+      "                Passes are located in ~/.pass",
+      "",
+      "        Join us on IRC in #logic at irc.smashthestack.org",
+      "",
+      "=================================================================",
+      "     Anything in /tmp older than 30 days will automatically",
+      "    be cleaned up. Please keep this in mind while doing your",
+      "                     work and taking breaks.",
+      "",
+      "Rules:",
+      "        * NO rooting the box",
+      "        * NO causing intentional damage to the system",
+      "        * NO outbound connections",
+      "        * All code belongs in /tmp/your_directory",
+      ""
+     ]
+    },
+    {
+     "cmd": "ls -la /levels/level2/",
+     "out": [
+      "total 68",
+      "drwx-w----  2 level2 level2 4096 Mar 18  2026 .",
+      "drwxr-xr-x 12 root   root   4096 May  7  2010 ..",
+      "-rwxrwxr-x  1 level2 level2  217 Jul  9  2023 a.sh",
+      "-rw-rw-r--  1 level2 level2  421 Feb 22  2026 exploit.py",
+      "-rwxrwxr-x  1 level2 level2 5054 Feb 22  2026 getenv",
+      "-rw-rw-r--  1 level2 level2  114 Feb 22  2026 getenv.c",
+      "-rwxrwxr-x  1 level2 level2 5751 Nov 17  2024 level2",
+      "-r--r-----  1 level3 level2  579 Feb  8  2010 level2.c",
+      "-rwxrwxr-x  1 level2 level2 5751 Aug  3  2022 level22",
+      "-r--r-----  1 level3 level2  201 Sep  3  2014 level2_alt",
+      "-rwxrwxr-x  1 level2 level2 5702 Mar  2  2026 set",
+      "-rw-rw-r--  1 level2 level2  945 Jul  9  2023 set.c",
+      "-rw-rw-r--  1 level2 level2   23 Sep  8  2022 shellcode"
+     ]
+    },
+    {
+     "cmd": "cat /levels/level2/level2.c",
+     "out": [
+      "/*",
+      "\tPassword has been blanked out of the source. Enjoy :)",
+      "",
+      "\t\t\t\tLevel\t",
+      "",
+      "",
+      "*/",
+      "",
+      "#include <stdlib.h>",
+      "#include <stdio.h>",
+      "#include <string.h>",
+      "#include <unistd.h>",
+      "",
+      "int main(int argc, const char **argv) {",
+      "\tif (argc < 2) { printf(\"Fail. More Args...\\n\"); return 1; } ",
+      "\telse {",
+      "\t\tsetresuid(geteuid(),geteuid(),geteuid());",
+      "\t\tchar buf2[4096];",
+      "\t\tchar buf[16];",
+      "\t\tconst char password[]=\"XXXXXXXXXXX\";",
+      "\t\tstrncpy(buf, argv[1], sizeof(buf) - 1);",
+      "\t\tif (strcmp(buf,password) != 0) {",
+      "\t\t\tprintf(\"Wrong.\\n\");",
+      "\t\t\treturn 1;",
+      "\t\t}",
+      "\t\telse {",
+      "\t\t\tstrcpy(buf2,argv[2]);",
+      "\t\t\tprintf(\"%s\",buf2);",
+      "\t\t\treturn 0;",
+      "\t\t}",
+      "\t}",
+      "}"
+     ]
+    },
+    {
+     "cmd": "cat /levels/level2/level2_alt",
+     "out": [
+      "",
+      "\"as a rule, men worry more about what they can't see than about what they can.\"",
+      "                                            - Julius Caesar ",
+      "",
+      "Level2_alt: BPMXIAAEWZLGWCIZMTWWSQVONWZQAXQHQXUESMK",
+      "",
+      "- mh"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/dec.py",
+     "out": [
+      "",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/dec.py",
+     "out": [
+      "#!/usr/bin/python",
+      "# level2_alt is Caesar-shifted; print all 25 non-trivial shifts",
+      "ct = \"BPMXIAAEWZLGWCIZMTWWSQVONWZQAXQHQXUESMK\"",
+      "for k in range(1, 26):",
+      "    pt = \"\"",
+      "    for c in ct:",
+      "        if c.isalpha():",
+      "            base = 65",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/dec.py",
+     "out": [
+      "#!/usr/bin/python",
+      "# level2_alt is Caesar-shifted; print all 25 non-trivial shifts",
+      "ct = \"BPMXIAAEWZLGWCIZMTWWSQVONWZQAXQHQXUESMK\"",
+      "for k in range(1, 26):",
+      "    pt = \"\"",
+      "    for c in ct:",
+      "        if c.isalpha():",
+      "            base = 65",
+      "            if not c.isupper():",
+      "                base = 97",
+      "            pt = pt + chr((ord(c) - base - k) % 26 + base)",
+      "        else:",
+      "            pt = pt + c",
+      "    print k, pt",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/dec.py",
+     "out": [
+      "#!/usr/bin/python",
+      "# level2_alt is Caesar-shifted; print all 25 non-trivial shifts",
+      "ct = \"BPMXIAAEWZLGWCIZMTWWSQVONWZQAXQHQXUESMK\"",
+      "for k in range(1, 26):",
+      "    pt = \"\"",
+      "    for c in ct:",
+      "        if c.isalpha():",
+      "            base = 65",
+      "            if not c.isupper():",
+      "                base = 97",
+      "            pt = pt + chr((ord(c) - base - k) % 26 + base)",
+      "        else:",
+      "            pt = pt + c",
+      "    print k, pt",
+      "~",
+      "\"/tmp/dec.py\" 15L, 399C written",
+      ""
+     ]
+    },
+    {
+     "cmd": "python /tmp/dec.py",
+     "out": [
+      "2 ZNKVGYYCUXJEUAGXKRUUQOTMLUXOYVOFOVSCQKI",
+      "3 YMJUFXXBTWIDTZFWJQTTPNSLKTWNXUNENURBPJH",
+      "4 XLITEWWASVHCSYEVIPSSOMRKJSVMWTMDMTQAOIG",
+      "5 WKHSDVVZRUGBRXDUHORRNLQJIRULVSLCLSPZNHF",
+      "6 VJGRCUUYQTFAQWCTGNQQMKPIHQTKURKBKROYMGE",
+      "7 UIFQBTTXPSEZPVBSFMPPLJOHGPSJTQJAJQNXLFD",
+      "8 THEPASSWORDYOUARELOOKINGFORISPIZIPMWKEC",
+      "9 SGDOZRRVNQCXNTZQDKNNJHMFENQHROHYHOLVJDB",
+      "10 RFCNYQQUMPBWMSYPCJMMIGLEDMPGQNGXGNKUICA",
+      "11 QEBMXPPTLOAVLRXOBILLHFKDCLOFPMFWFMJTHBZ",
+      "12 PDALWOOSKNZUKQWNAHKKGEJCBKNEOLEVELISGAY",
+      "13 OCZKVNNRJMYTJPVMZGJJFDIBAJMDNKDUDKHRFZX",
+      "14 NBYJUMMQILXSIOULYFIIECHAZILCMJCTCJGQEYW",
+      "15 MAXITLLPHKWRHNTKXEHHDBGZYHKBLIBSBIFPDXV",
+      "16 LZWHSKKOGJVQGMSJWDGGCAFYXGJAKHARAHEOCWU",
+      "17 KYVGRJJNFIUPFLRIVCFFBZEXWFIZJGZQZGDNBVT",
+      "18 JXUFQIIMEHTOEKQHUBEEAYDWVEHYIFYPYFCMAUS",
+      "19 IWTEPHHLDGSNDJPGTADDZXCVUDGXHEXOXEBLZTR",
+      "20 HVSDOGGKCFRMCIOFSZCCYWBUTCFWGDWNWDAKYSQ",
+      "21 GURCNFFJBEQLBHNERYBBXVATSBEVFCVMVCZJXRP",
+      "22 FTQBMEEIADPKAGMDQXAAWUZSRADUEBULUBYIWQO",
+      "23 ESPALDDHZCOJZFLCPWZZVTYRQZCTDATKTAXHVPN",
+      "24 DROZKCCGYBNIYEKBOVYYUSXQPYBSCZSJSZWGUOM",
+      "25 CQNYJBBFXAMHXDJANUXXTRWPOXARBYRIRYVFTNL"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "Connection to logic.smashthestack.org closed."
+     ]
+    },
+    {
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group14-sha1 -l level3 logic.smashthestack.org -p 2227",
+     "out": [
+      "level3@logic.smashthestack.org's password: ",
+      "       __       ______   _______    ________  ______",
+      "      /_/\\     /_____/\\ /______/\\  /_______/\\/_____/\\",
+      "      \\:\\ \\    \\:::_ \\ \\\\::::__\\/__\\__.::._\\/\\:::__\\/",
+      "       \\:\\ \\    \\:\\ \\ \\ \\\\:\\ /____/\\  \\::\\ \\  \\:\\ \\  __",
+      "        \\:\\ \\____\\:\\ \\ \\ \\\\:\\\\_  _\\/  _\\::\\ \\__\\:\\ \\/_/\\",
+      "         \\:\\/___/\\\\:\\_\\ \\ \\\\:\\_\\ \\ \\ /__\\::\\__/\\\\:\\_\\ \\ \\",
+      "          \\_____\\/ \\_____\\/ \\_____\\/ \\________\\/ \\_____\\/",
+      "",
+      "        Welcome to the Logic Wargame on Smash The Stack",
+      "",
+      "              Developers:  mh, level, zoidberg, frank^2",
+      "",
+      "         Please email staff@smashthestack.org for help",
+      "",
+      "                   Levels are in /levels/",
+      "                Passes are located in ~/.pass",
+      "",
+      "        Join us on IRC in #logic at irc.smashthestack.org",
+      "",
+      "=================================================================",
+      "     Anything in /tmp older than 30 days will automatically",
+      "    be cleaned up. Please keep this in mind while doing your",
+      "                     work and taking breaks.",
+      "",
+      "Rules:",
+      "        * NO rooting the box",
+      "        * NO causing intentional damage to the system",
+      "        * NO outbound connections",
+      "        * All code belongs in /tmp/your_directory",
+      ""
+     ]
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=602(level3) gid=602(level3) groups=602(level3),615(nosu)"
+     ]
+    },
+    {
+     "cmd": "cat ~/.pass",
+     "out": [
+      "PIZIPMWKEC"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to logic.smashthestack.org closed."
+     ]
+    }
+   ],
+   "note": "The original level2 setuid binary is GONE from /levels/level2/ (the remaining 'level2' binary is a player-recompiled copy of the X-blanked source; /levels/level3/ is empty). The LIVE challenge = level2_alt: a Caesar-shifted string with a Julius Caesar hint. dec.py (typed in vi, py2.4-compatible - the box's python rejects conditional expressions) prints all 25 shifts; shift 8 = 'THEPASSWORDYOUARELOOKINGFORISPIZIPMWKEC' = the level3 password. Verified live 2026-11-26: level3 login, uid=602, ~/.pass = PIZIPMWKEC. Gotchas: the box cannot reach its own sshd from inside (the level3 login is typed client-side after exiting the level2 session); level3's ancient sshd rejects HostKeyAlgorithms/KexAlgorithms options entirely - the short option set; the level2 sshd needs the full KexAlgorithms=+... set (old sshd)."
   }
  ],
  "goals": {}
