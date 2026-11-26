@@ -1238,34 +1238,215 @@
    "user": "maze4",
    "steps": [
     {
-     "cmd": "file /maze/maze3; readelf -h /maze/maze3 | grep -i entry",
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new maze3@drifter.labs.overthewire.org -p 2225",
      "out": [
-      "/maze/maze3: ELF 32-bit LSB executable, Intel 80386, statically linked, not stripped",
-      "Entry point address: 0x8049000"
+      "maze3@drifter.labs.overthewire.org's password: ",
+      "",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "",
+      "",
+      "Welcome to OverTheWire!",
+      "",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "",
+      "--[ Playing the games ]--",
+      "",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "",
+      "--[ Tips ]--",
+      "",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "",
+      "--[ Tools ]--",
+      "",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "",
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!",
+      ""
      ]
     },
     {
-     "cmd": "objdump -d /maze/maze3 (the whole .text, 0xa3 bytes)",
+     "cmd": "id",
      "out": [
-      "argc==1: print \"./level4 ev0lcmds!\"; exit",
-      "argc!=1: mprotect(0x8049000, 0xa3, 7); xor-decrypt 0x38 dwords at 0x804906b with 0x12345678; execute"
+      "",
+      "uid=15003(maze3) gid=15003(maze3) groups=15003(maze3)"
      ]
     },
     {
-     "cmd": "python3: decrypt the payload with 0x12345678",
+     "cmd": "ls -la /maze/maze3",
      "out": [
-      "pop eax; cmp [eax],0x1337c0de; jne exit; ebx=0x3a9c(15004); eax=70(setreuid); int 0x80; execve(\"/bin//sh\")"
+      "",
+      "-r-sr-x--- 1 maze4 maze3 4728 Oct 25 13:39 /maze/maze3"
      ]
     },
     {
-     "cmd": "/maze/maze3 $(printf '\\xde\\xc0\\x37\\x13')   # argc=2 path",
+     "cmd": "objdump -d -M intel /maze/maze3 --section=.text | head -40",
      "out": [
-      "uid=15004(maze4) gid=15003(maze3)",
-      "MB583SjyFZ"
+      "",
+      "/maze/maze3:     file format elf32-i386",
+      "",
+      "",
+      "Disassembly of section .text:",
+      "",
+      "08049000 <_start>:",
+      " 8049000:\t58                   \tpop    eax",
+      " 8049001:\t48                   \tdec    eax",
+      " 8049002:\t75 32                \tjne    8049036 <fine>",
+      " 8049004:\te8 14 00 00 00       \tcall   804901d <_start+0x1d>",
+      " 8049009:\t2e 2f                \tcs das",
+      " 804900b:\t6c                   \tins    BYTE PTR es:[edi],dx",
+      " 804900c:\t65 76 65             \tgs jbe 8049074 <d1+0x9>",
+      " 804900f:\t6c                   \tins    BYTE PTR es:[edi],dx",
+      " 8049010:\t34 20                \txor    al,0x20",
+      " 8049012:\t65 76 30             \tgs jbe 8049045 <fine+0xf>",
+      " 8049015:\t6c                   \tins    BYTE PTR es:[edi],dx",
+      " 8049016:\t63 6d 64             \tarpl   WORD PTR [ebp+0x64],ebp",
+      " 8049019:\t73 21                \tjae    804903c <fine+0x6>",
+      " 804901b:\t0a 00                \tor     al,BYTE PTR [eax]",
+      " 804901d:\tb8 04 00 00 00       \tmov    eax,0x4",
+      " 8049022:\tbb 01 00 00 00       \tmov    ebx,0x1",
+      " 8049027:\t59                   \tpop    ecx",
+      " 8049028:\tba 14 00 00 00       \tmov    edx,0x14",
+      " 804902d:\tcd 80                \tint    0x80",
+      " 804902f:\tb8 01 00 00 00       \tmov    eax,0x1",
+      " 8049034:\tcd 80                \tint    0x80",
+      "",
+      "08049036 <fine>:",
+      " 8049036:\t58                   \tpop    eax",
+      " 8049037:\tb8 7d 00 00 00       \tmov    eax,0x7d",
+      " 804903c:\tbb 00 90 04 08       \tmov    ebx,0x8049000",
+      " 8049041:\t81 e3 00 f0 ff ff    \tand    ebx,0xfffff000",
+      " 8049047:\tb9 a3 00 00 00       \tmov    ecx,0xa3",
+      " 804904c:\tba 07 00 00 00       \tmov    edx,0x7",
+      " 8049051:\tcd 80                \tint    0x80",
+      " 8049053:\t8d 35 6b 90 04 08    \tlea    esi,ds:0x804906b",
+      " 8049059:\t89 f7                \tmov    edi,esi",
+      " 804905b:\tb9 38 00 00 00       \tmov    ecx,0x38"
+     ]
+    },
+    {
+     "cmd": "objdump -d -M intel /maze/maze3 --section=.text | grep -A6 \"8049065\"",
+     "out": [
+      "",
+      "08049065 <l1>:",
+      " 8049065:\tad                   \tlods   eax,DWORD PTR ds:[esi]",
+      " 8049066:\t31 d0                \txor    eax,edx",
+      " 8049068:\tab                   \tstos   DWORD PTR es:[edi],eax",
+      " 8049069:\te2 fa                \tloop   8049065 <l1>",
+      "",
+      "0804906b <d1>:",
+      " 804906b:\t20 d7                \tand    bh,dl",
+      " 804906d:\t0c cc                \tor     al,0xcc",
+      " 804906f:\tb8 61 27 67 5d       \tmov    eax,0x5d672761",
+      " 8049074:\ted                   \tin     eax,dx"
+     ]
+    },
+    {
+     "cmd": "cd /tmp && mkdir -p /tmp/m3.$$",
+     "out": [
+      ""
+     ]
+    },
+    {
+     "cmd": "cd /tmp/m3.$$",
+     "out": [
+      ""
+     ]
+    },
+    {
+     "cmd": "printf '\\xde\\xc0\\x37\\x13' > magic.bin",
+     "out": [
+      ""
+     ]
+    },
+    {
+     "cmd": "xxd magic.bin",
+     "out": [
+      "",
+      "00000000: dec0 3713                                ..7."
+     ]
+    },
+    {
+     "cmd": "/maze/maze3 $(cat magic.bin)",
+     "out": [
+      "",
+      "$ id",
+      "uid=15004(maze4) gid=15003(maze3) groups=15003(maze3)",
+      "$ cat /etc/maze_pass/maze4",
+      "MB583SjyFZ",
+      "$ exit"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "",
+      "logout",
+      "Connection to drifter.labs.overthewire.org closed."
      ]
     }
    ],
-   "note": "maze3 is a hand-written asm stub (static, 163 B of text). The argc!=2 path mprotects the text page RWX, XOR-decrypts 56 dwords at 0x804906b with 0x12345678 and executes them: the payload checks argv[1][0..3] == de c0 37 13 (0x1337c0de little-endian), setreuid(15004,15004)=maze4 and execve(\"/bin//sh\"). Running /maze/maze3 with that argument gives a shell as maze4 (uid=15004, gid stays 15003); password MB583SjyFZ read live and verified by ssh login as maze4. Recording: recordings/maze/L3.cast."
+   "note": "maze3: hand-written asm stub (4728 B file, 0xa3 bytes .text, static). The argc==1 path prints the 20-byte './level4 ev0lcmds!' string and exits; the argc==2 path mprotects the text page RWX (0x8049000, 0xa3 bytes), XOR-decrypts 0x38 dwords at 0x804906b with edx=0x12345678 (lods/xor/stos/loop at 0x8049065), and the decrypted stub checks argv[1][0..3]==de c0 37 13 (0x1337c0de), setreuid(euid,euid)=maze4, execve('./level4 ev0lcmds!'). The magic dword rides in from a file (printf > magic.bin, xxd-verified de c0 37 13) so the $(cat) argv carries the raw bytes 0xde 0xc0 (no shell mangling); /maze/maze3 $(cat magic.bin) drops to the maze4 shell (uid=15004), cat /etc/maze_pass/maze4 = MB583SjyFZ. Cast recorded on the drifter host (pre-rename); JSON mirrors it 1:1."
   },
   {
    "lvl": 4,

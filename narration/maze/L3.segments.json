@@ -1,0 +1,102 @@
+{
+ "segments": [
+  {
+   "text": "Maze, level three. We log in as maze three - level two's stack-pivot sweep paid off - and the goal is the maze4 password. The gate: /maze/maze3, setuid maze4, and file shows it is tiny: four point seven kilobytes, statically linked, no libc - this is hand-written assembly.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    }
+   ]
+  },
+  {
+   "text": "The disassembly of the text section tells the whole story. The entry point pops the argument count and decrements it: with no argument it prints the twenty-byte string dot-slash-level4-space-e-v-zero-l-c-m-d-s-bang - which is literally the command line of the next stage - and exits. With an argument it mprotects the page at zero-eight-zero-four-nine-zero-zero for zero-x-a-three bytes with read-write-execute - the program rewrites its own code - then loads the decrypt loop: esi and edi point at zero-eight-zero-four-nine-zero-six-bee, ecx counts zero-x-three-eight dwords, and the loop at zero-eight-zero-four-nine-zero-six-five does load-eax, xor with edx, store-eax, loop. A plain XOR decrypt of one hundred and fifty-two bytes of the program's own text, in place.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 0,
+     "to": 39
+    },
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 11
+    }
+   ]
+  },
+  {
+   "text": "The key: just before the loop the code moves edx, one-two-three-four-five-six-seven-eight hex - the XOR key is zero-x-one-three-three-seven-c-zero-d-e read the other way, one-three-three-seven-c-zero-d-e: leet spelling. We don't need to decrypt it ourselves; the program decrypts at run time. The decrypted stub checks the first four bytes of our argument against de-c-zero-three-seven-one-three - zero-x-one-three-three-seven-c-zero-d-e little-endian, the same leet constant - then setreuids to maze4 and execs the argument string it printed in the argc-one path. So the argument is a four-byte magic: d-e, c-zero, three-seven, one-three.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 11
+    }
+   ]
+  },
+  {
+   "text": "Those bytes can't go through a quoted shell argument - d-e is not printable - so they ride in from a file: printf with the four hex escapes writes magic.bin, xxd confirms the bytes de c-zero 37 13, and command substitution hands the raw bytes to the binary as argv one. The gate passes, the setuid drops us into the maze4 shell - u i d fifteen thousand four - and cat /etc/maze_pass/maze4 reads M B five-eight-three S j y F Z. Maze three done.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": 9,
+     "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "out",
+     "from": 1,
+     "to": 5
+    }
+   ]
+  }
+ ]
+}

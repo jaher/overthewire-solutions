@@ -1,0 +1,182 @@
+bash-5.2$ export PS1='client$ '
+
+client$ ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 maze3@maze.labs.overthewire.org -p 2225
+
+                                                    
+                            _ __ ___   __ _ _______ 
+                           | '_ ` _ \ / _` |_  / _ \
+                           | | | | | | (_| |/ /  __/
+                           |_| |_| |_|\__,_/___\___|
+                                                    
+
+                      This is an OverTheWire game server. 
+            More information on http://www.overthewire.org/wargames
+
+backend: gibson-0
+
+maze3@maze.labs.overthewire.org's password: 
+
+      ,----..            ,----,          .---.
+     /   /   \         ,/   .`|         /. ./|
+    /   .     :      ,`   .'  :     .--'.  ' ;
+   .   /   ;.  \   ;    ;     /    /__./ \ : |
+  .   ;   /  ` ; .'___,/    ,' .--'.  '   \' .
+  ;   |  ; \ ; | |    :     | /___/ \ |    ' '
+  |   :  | ; | ' ;    |.';  ; ;   \  \;      :
+  .   |  ' ' ' : `----'  |  |  \   ;  `      |
+  '   ;  \; /  |     '   :  ;   .   \    .\  ;
+   \   \  ',  /      |   |  '    \   \   ' \ |
+    ;   :    /       '   :  |     :   '  |--"
+     \   \ .'        ;   |.'       \   \ ;
+  www. `---` ver     '---' he       '---" ire.org
+
+
+Welcome to OverTheWire!
+
+If you find any problems, please report them to the #wargames channel on
+discord or IRC.
+
+--[ Playing the games ]--
+
+  This machine might hold several wargames.
+  If you are playing "somegame", then:
+
+    * USERNAMES are somegame0, somegame1, ...
+    * Most LEVELS are stored in /somegame/.
+    * PASSWORDS for each level are stored in /etc/somegame_pass/.
+
+  Write-access to homedirectories is disabled. It is advised to create a
+  working directory with a hard-to-guess name in /tmp/.  You can use the
+  command "mktemp -d" in order to generate a random and hard to guess
+  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc
+  restricted so that users cannot snoop on eachother. Files and directories
+  with easily guessable or short names will be periodically deleted! The /tmp
+  directory is regularly wiped.
+  Please play nice:
+
+    * don't leave orphan processes running
+    * don't leave exploit-files laying around
+    * don't annoy other players
+    * don't post passwords or spoilers
+    * again, DONT POST SPOILERS!
+      This includes writeups of your solution on your blog or website!
+
+--[ Tips ]--
+
+  This machine has a 64bit processor and many security-features enabled
+  by default, although ASLR has been switched off.  The following
+  compiler flags might be interesting:
+
+    -m32                    compile for 32bit
+    -fno-stack-protector    disable ProPolice
+    -Wl,-z,norelro          disable relro
+
+  In addition, the execstack tool can be used to flag the stack as
+  executable on ELF binaries.
+
+  Finally, network-access is limited for most levels by a local
+  firewall.
+
+--[ Tools ]--
+
+ For your convenience we have installed a few useful tools which you can find
+ in the following locations:
+
+    * gef (https://github.com/hugsy/gef) in /opt/gef/
+    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/
+    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/
+    * pwntools (https://github.com/Gallopsled/pwntools)
+    * radare2 (http://www.radare.org/)
+
+--[ More information ]--
+
+  For more information regarding individual wargames, visit
+  http://www.overthewire.org/wargames/
+
+  For support, questions or comments, contact us on discord or IRC.
+
+  Enjoy your stay!
+
+maze3@maze:~$ id
+
+uid=15003(maze3) gid=15003(maze3) groups=15003(maze3)
+maze3@maze:~$ ls -la /maze/maze3
+
+-r-sr-x--- 1 maze4 maze3 4728 Oct 25 13:39 /maze/maze3
+maze3@maze:~$ objdump -d -M intel /maze/maze3 --section=.text | head -40
+
+/maze/maze3:     file format elf32-i386
+
+
+Disassembly of section .text:
+
+08049000 <_start>:
+ 8049000:	58                   	pop    eax
+ 8049001:	48                   	dec    eax
+ 8049002:	75 32                	jne    8049036 <fine>
+ 8049004:	e8 14 00 00 00       	call   804901d <_start+0x1d>
+ 8049009:	2e 2f                	cs das
+ 804900b:	6c                   	ins    BYTE PTR es:[edi],dx
+ 804900c:	65 76 65             	gs jbe 8049074 <d1+0x9>
+ 804900f:	6c                   	ins    BYTE PTR es:[edi],dx
+ 8049010:	34 20                	xor    al,0x20
+ 8049012:	65 76 30             	gs jbe 8049045 <fine+0xf>
+ 8049015:	6c                   	ins    BYTE PTR es:[edi],dx
+ 8049016:	63 6d 64             	arpl   WORD PTR [ebp+0x64],ebp
+ 8049019:	73 21                	jae    804903c <fine+0x6>
+ 804901b:	0a 00                	or     al,BYTE PTR [eax]
+ 804901d:	b8 04 00 00 00       	mov    eax,0x4
+ 8049022:	bb 01 00 00 00       	mov    ebx,0x1
+ 8049027:	59                   	pop    ecx
+ 8049028:	ba 14 00 00 00       	mov    edx,0x14
+ 804902d:	cd 80                	int    0x80
+ 804902f:	b8 01 00 00 00       	mov    eax,0x1
+ 8049034:	cd 80                	int    0x80
+
+08049036 <fine>:
+ 8049036:	58                   	pop    eax
+ 8049037:	b8 7d 00 00 00       	mov    eax,0x7d
+ 804903c:	bb 00 90 04 08       	mov    ebx,0x8049000
+ 8049041:	81 e3 00 f0 ff ff    	and    ebx,0xfffff000
+ 8049047:	b9 a3 00 00 00       	mov    ecx,0xa3
+ 804904c:	ba 07 00 00 00       	mov    edx,0x7
+ 8049051:	cd 80                	int    0x80
+ 8049053:	8d 35 6b 90 04 08    	lea    esi,ds:0x804906b
+ 8049059:	89 f7                	mov    edi,esi
+ 804905b:	b9 38 00 00 00       	mov    ecx,0x38
+maze3@maze:~$ objdump -d -M intel /maze/maze3 --section=.text | grep -A6 "8049065"
+
+08049065 <l1>:
+ 8049065:	ad                   	lods   eax,DWORD PTR ds:[esi]
+ 8049066:	31 d0                	xor    eax,edx
+ 8049068:	ab                   	stos   DWORD PTR es:[edi],eax
+ 8049069:	e2 fa                	loop   8049065 <l1>
+
+0804906b <d1>:
+ 804906b:	20 d7                	and    bh,dl
+ 804906d:	0c cc                	or     al,0xcc
+ 804906f:	b8 61 27 67 5d       	mov    eax,0x5d672761
+ 8049074:	ed                   	in     eax,dx
+maze3@maze:~$ cd /tmp && mkdir -p /tmp/m3.$$
+
+maze3@maze:/tmp$ cd /tmp/m3.$$
+
+maze3@maze:/tmp/m3.3$ printf '\xde\xc0\x37\x13' > magic.bin
+
+maze3@maze:/tmp/m3.3$ xxd magic.bin
+
+00000000: dec0 3713                                ..7.
+maze3@maze:/tmp/m3.3$ /maze/maze3 $(cat magic.bin)
+
+$ id
+uid=15004(maze4) gid=15003(maze3) groups=15003(maze3)
+$ cat /etc/maze_pass/maze4
+MB583SjyFZ
+$ exit
+maze3@maze:/tmp/m3.3$ exit
+
+logout
+Connection to maze.labs.overthewire.org closed.
+client$ exit
+
+exit

@@ -1,0 +1,17 @@
+@line id
+@line ls -la /maze/maze3
+@line objdump -d -M intel /maze/maze3 --section=.text | head -40
+@line objdump -d -M intel /maze/maze3 --section=.text | grep -A6 "8049065"
+@line cd /tmp && mkdir -p /tmp/m3.$$
+@line cd /tmp/m3.$$
+@line printf '\xde\xc0\x37\x13' > magic.bin
+@line xxd magic.bin
+@line /maze/maze3 $(cat magic.bin)
+@sleep 2
+@line id
+@sleep 2
+@line cat /etc/maze_pass/maze4
+@sleep 2
+@line exit
+@sleep 2
+@line exit
