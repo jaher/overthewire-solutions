@@ -49,7 +49,17 @@
    "text": "I read the binary: the check and the open are two separate steps, so the file at that path can change in between.",
    "lines": [
     {
-     "step": 0,
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "out",
+     "from": 0,
+     "to": 63
+    },
+    {
+     "step": 5,
      "role": "cmd"
     }
    ]
@@ -58,7 +68,11 @@
    "text": "I place a readable file full of A's at my own path, and a symlink from the level's path to /etc/maze_pass/maze1.",
    "lines": [
     {
-     "step": 2,
+     "step": 13,
+     "role": "cmd"
+    },
+    {
+     "step": 14,
      "role": "cmd"
     }
    ]
@@ -67,8 +81,28 @@
    "text": "Then a C loop renames the level's path back and forth between the readable file and the symlink, thousands of times, while I run the level in a loop.",
    "lines": [
     {
-     "step": 3,
-     "role": "note"
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "cmd"
+    },
+    {
+     "step": 11,
+     "role": "cmd"
+    },
+    {
+     "step": 12,
+     "role": "cmd"
     }
    ]
   },
@@ -76,32 +110,54 @@
    "text": "Most runs see the readable file and print A's.",
    "lines": [
     {
-     "step": 4,
-     "role": "cmd",
+     "step": 15,
+     "role": "cmd"
+    },
+    {
+     "step": 16,
+     "role": "cmd"
+    },
+    {
+     "step": 18,
+     "role": "out",
      "from": 0,
-     "to": 0
+     "to": 4
     }
    ]
   },
   {
-   "text": "Some runs pass the check on the readable file and open the symlink: the password file comes back.",
+   "text": "Some runs pass the access check on the readable file and open the symlink instead: the A-prefix lines in the count are the partial wins where the filler leaked into the read buffer before the swap.",
    "lines": [
     {
-     "step": 4,
-     "role": "cmd",
+     "step": 18,
+     "role": "out",
      "from": 0,
      "to": 0
-    }
-   ]
-  },
-  {
-   "text": "One hundred and thirty two winning runs out of fifteen thousand print Sp five V m L G F C zero.",
-   "lines": [
+    },
     {
-     "step": 4,
-     "role": "cmd",
+     "step": 18,
+     "role": "out",
      "from": 1,
      "to": 1
+    }
+   ]
+  },
+  {
+   "text": "Eight hundred and fifty-three clean winning runs out of one thousand two hundred and seven, plus the A-prefixed partials: the maze one password is S p five V m L G F C zero.",
+   "lines": [
+    {
+     "step": 18,
+     "role": "cmd"
+    },
+    {
+     "step": 19,
+     "role": "cmd"
+    },
+    {
+     "step": 19,
+     "role": "out",
+     "from": 0,
+     "to": 0
     }
    ]
   },
@@ -109,8 +165,24 @@
    "text": "The level is solved.",
    "lines": [
     {
-     "step": -1,
-     "role": "pw"
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 0,
+     "to": 0
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 0,
+     "to": 0
     }
    ]
   },
