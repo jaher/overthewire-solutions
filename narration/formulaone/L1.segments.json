@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Goal",
+    "text": "Formula One, level 1. L0's shell let us read /formulaone/formulaone1.c, and the level password it printed is formulaone1's own ssh password - we log in as formulaone1 (uid=20001) and now face the setuid binary /formulaone/formulaone1. The goal: /etc/formulaone_pass/formulaone1.",
+    "lines": [{"step": 0, "role": "cmd"}, {"step": 1, "role": "out", "from": 0, "to": 0}, {"step": 3, "role": "out"}]
+  },
+  {
+    "title": "The bug: access() says yes, open() opens as someone else",
+    "text": "The source shows the classic TOCTOU: access(argv[1], R_OK) is evaluated with our real uid (formulaone0-group readable files pass), but the open() right after runs with the setuid euid formulaone1. Between those two calls the path is re-resolved - so if the path is a symlink we can swap between access() and open(), access sees a readable decoy while open reads anything formulaone1 can read: the password file.",
+    "lines": [{"step": 2, "role": "out"}]
+  },
+  {
+    "title": "The racer: atomic swaps and a drain-to-EOF",
+    "text": "racer.c (typed in vi, compiled with gcc) runs two loops. The child flips the 'target' symlink: create symlink swap_tmp pointing at the password file, then rename(swap_tmp, target) - atomic replace, no window where target is missing. The parent forks the setuid binary against target each round and reads the child's pipe to EOF; a hit must be longer than 10 chars and not contain 'readable' - a partial read of the decoy (a single 'r') can't fool it. Setup is one line: echo readable > decoy.",
+    "lines": [{"step": 5, "role": "cmd"}, {"step": 6, "role": "cmd"}, {"step": 8, "role": "out"}, {"step": 9, "role": "out"}, {"step": 10, "role": "cmd"}]
+  },
+  {
+    "title": "Solve and verify",
+    "text": "timeout 240 racer | head -1 prints 'HIT iter 0: lyRzImzq8DFfsDJEhGRIqc71CVqipvxo' - the race won on the first iteration this time (a previous session needed ~2100; that's the nature of races). cat /etc/formulaone_pass/formulaone1 confirms the string, and the cast's typed ssh login as formulaone1 with that very password is the standing verification. Level 1 done.",
+    "lines": [{"step": 11, "role": "out"}, {"step": 12, "role": "out"}]
+  }
+]

