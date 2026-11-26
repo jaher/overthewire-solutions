@@ -1,0 +1,27 @@
+[
+  {
+    "title": "Goal",
+    "text": "Maze level 7. We're maze7 and we need maze8's password from /etc/maze_pass/maze8. The setuid binary /maze/maze7 prints ELF section headers - but as we'll see, every parameter of that printer comes from the file we hand it, which makes it a stack-overflow oracle we fully control.",
+    "lines": [{"step": 0, "role": "cmd"}, {"step": 1, "role": "out", "from": 0, "to": 0}]
+  },
+  {
+    "title": "Recon: the printer and its attacker-controlled parameters",
+    "text": "Login recon first: /maze/maze7 is setuid maze8, 14796 bytes, i386, and readelf shows GNU_STACK is RWE - the stack is executable and ASLR is off on this lab. Disassembling Print_Shdrs shows the shape: main reads the first 0x34 bytes of our file into a 0x34-byte stack buffer and passes e_shoff, e_shstrndx, e_shnum and e_shentsize straight from our header into Print_Shdrs. The loop body at 0x80492ba is the key: it does read(fd, ebp-0x3c, e_shentsize) - the read SIZE comes from our file, into a 0x34-byte buffer. On a real ELF e_shentsize is 40 and all is well; we set it to 0x100 and every iteration overflows.",
+    "lines": [{"step": 2, "role": "out"}, {"step": 5, "role": "out"}, {"step": 6, "role": "out"}, {"step": 7, "role": "out"}, {"step": 8, "role": "out"}]
+  },
+  {
+    "title": "Exploit design: one iteration, repaired frees, shellcode on the stack",
+    "text": "The design writes itself once you count the frames. The loop read lands our payload in the same buffer, so the file's section-header region IS the overflow: at buf+0x28 and buf+0x30 sit the two pointers free() will call on (strtab and shdrbuf) - we repair them with the real malloc'd addresses, 0x804d050 and 0x804d020, measured in gdb with ASLR off. At buf+0x34 we place the loop counter's new value: the read overwrites i with 1, i++ makes 2, 2 > e_shnum=1 exits cleanly after exactly one iteration. At buf+0x40 sits the saved EIP, pointing at buf+0x60 where our shellcode lives - in the payload itself, because the heap is rw-p and only the stack is executable (GNU_STACK RWE). The shellcode is the 69-byte open/read/write of /etc/maze_pass/maze8 to fd 1, NUL-free, with the path built on the stack by pushes. One trap from the first attempts: printf's %s argument is strtab plus sh_name, so sh_name=0 and a strtab starting with NUL keeps vfprintf happy - a long garbage %s crashed it. Another: the header must be padded so the payload really lands at e_shoff - appending at 0x34 shifted every control dword 12 bytes early.",
+    "lines": [{"step": 12, "role": "out"}, {"step": 13, "role": "out"}, {"step": 16, "role": "out"}, {"step": 17, "role": "out"}]
+  },
+  {
+    "title": "Build and sweep in the live session",
+    "text": "Three files typed in vi. sc7.py emits the 69-byte shellcode (41 lines, 2099 bytes saved). gen.py builds the crafted ELF: header with e_shoff=0x40, e_shentsize=0x100, e_shnum=1, then shdr0, the free-repair dwords, the loop-exit dword, the saved-EIP dword and the shellcode - 640 bytes as probe.elf. fire7.py is the sweep: the loop buffer's stack address is environment-dependent (gdb measured 0xffffdb34 in a plain ssh exec env), so it rebuilds evil.elf for each candidate buf = 0xffffdb08 plus delta over the plausible band, step 4, and runs /maze/maze7 on it inside THIS live session. The hit prints HIT buf and the child's stdout: the password.",
+    "lines": [{"step": 10, "role": "cmd"}, {"step": 12, "role": "out"}, {"step": 14, "role": "cmd"}, {"step": 16, "role": "out"}, {"step": 18, "role": "cmd"}, {"step": 20, "role": "out"}, {"step": 21, "role": "out"}]
+  },
+  {
+    "title": "Solve and verify",
+    "text": "The sweep fires: HIT buf 0xffffd308 and the password avdYfGdEvv printed by the shellcode's write call - rc=0 confirms a clean exit through the repaired frees. Then the verify: ssh as maze8 with that password, id shows uid=15008(maze8), and cat /etc/maze_pass/maze8 prints avdYfGdEvv. Level 7 done.",
+    "lines": [{"step": 21, "role": "out"}, {"step": 22, "role": "out"}, {"step": 24, "role": "cmd"}, {"step": 25, "role": "out"}, {"step": 26, "role": "out"}]
+  }
+]

