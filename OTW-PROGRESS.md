@@ -320,3 +320,18 @@ BLOWFISH PROGRESS (2026-11-25): L2 5b7c0f5-era backdoor cast; L4/L5/L6/L7/L8 com
 - **Blackbox** (advanced): ssh -l levelN blackbox.smashthestack.org -p 2225 (legacy OpenSSH_4.3, slow banner); web page :85 down. Level count unknown until live recon.
 
 Games registered in games/manifest.json + games/{tux,logic,blackbox,blowfish,amateria}.json (stub levels:[] until solved). Serialized rule still applies: one level at a time, commit after each.
+
+## Standing-rule sweep (2026-11-26 ~07:00-07:10Z): Tux + Amateria re-probes
+- TUX (one probe, per the standing rule): kex_exchange_identification reset on 2226 - same as
+  the parked state. Combined with the host-wide sshd lockout (see OTW-BLACKBOX-PROBE.md),
+  2226 is unreachable; TUX stays PARKED. The amateria pickle service on the SAME IP answers
+  while every sshd instance rejects -> the lockout is ssh-specific; the box itself is up.
+- AMATERIA (one re-probe, per the standing rule): the cPickle service on 54321 is ALIVE but
+  the admin hardening is now COMPLETE - GLOBAL/INST/OBJ opcode families ALL fail fast
+  ('fail :(' immediately, no more hangs; cposix/cos/__builtin__ with int/list/range/
+  _reconstructor all rejected) while plain-data lists still answer instantly
+  ([1,2,3]->6, []->0, [-3,8]->5). The live binary no longer matches the published
+  :89/level1.py (still a bare cPickle.loads - the published source is stale/decoy). The
+  classic unrestricted-pickle solve is DEAD; the exit-code oracle and the no-fork read
+  chain both need a global reduce and are dead with it. AMATERIA L0 stays PARKED
+  (documented once, moving on per the standing rule).
