@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Goal",
+    "text": "Formula One, level 0. We ssh in as formulaone0 on port 2232 - the level password is the account's own password, so we're breaking our own login. The target: /formulaone/formulaone0.c, a world-readable TCP password gate on port 4091.",
+    "lines": [{"step": 0, "role": "cmd"}, {"step": 1, "role": "out", "from": 0, "to": 0}, {"step": 2, "role": "out"}]
+  },
+  {
+    "title": "Reading the gate: the oracle is the block",
+    "text": "The source says it all: the daemon sends 'Password: ' and then reads the user's bytes ONE at a time - read_byte recv's a single byte per PASSWD character. A wrong byte breaks the loop and answers 'WRONG PASSWORD' immediately. A correct byte does nothing visible: the daemon stays blocked in recv waiting for the next byte. That asymmetry is the oracle - wrong answers fast, right answers slow.",
+    "lines": [{"step": 3, "role": "out"}]
+  },
+  {
+    "title": "The solve: alphabet sweep with a timing classifier",
+    "text": "f1_solve.py classifies each candidate byte with a 1.5-second recv timeout: a reply means WRONG, a timeout means the daemon blocked - correct. So we sweep 62 characters (letters, digits, and the punctuation set) position by position, 32 positions, building the password incrementally - you can watch it grow on screen: pos 0 finds U, pos 1 appends 6, and by pos 31 the full string U6pyn4b5DVhJdbyTD7fOBlnyxkSozcTQ is on screen. Roughly two thousand connections, all inside the live session.",
+    "lines": [{"step": 5, "role": "cmd"}, {"step": 6, "role": "out"}, {"step": 7, "role": "out"}]
+  },
+  {
+    "title": "Cash out and verify",
+    "text": "With the password known, a fresh connection sends it, the gate dup2's the socket onto stdin/stdout/stderr and hands us /bin/sh - the solver pipes id and cat /etc/formulaone_pass/formulaone0 through it: uid=20000(formulaone0) and the same string back. The level password is formulaone0's own ssh password, so the verification IS the login we started with.",
+    "lines": [{"step": 8, "role": "out"}, {"step": 9, "role": "out"}]
+  }
+]

