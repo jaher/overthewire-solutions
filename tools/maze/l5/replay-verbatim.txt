@@ -1,0 +1,343 @@
+bash-5.2$ export PS1='client$ '
+
+client$ ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 maze5@maze.labs.overthewire.org -p 2225
+
+                                                    
+                            _ __ ___   __ _ _______ 
+                           | '_ ` _ \ / _` |_  / _ \
+                           | | | | | | (_| |/ /  __/
+                           |_| |_| |_|\__,_/___\___|
+                                                    
+
+                      This is an OverTheWire game server. 
+            More information on http://www.overthewire.org/wargames
+
+backend: gibson-0
+
+maze5@maze.labs.overthewire.org's password: 
+
+      ,----..            ,----,          .---.
+     /   /   \         ,/   .`|         /. ./|
+    /   .     :      ,`   .'  :     .--'.  ' ;
+   .   /   ;.  \   ;    ;     /    /__./ \ : |
+  .   ;   /  ` ; .'___,/    ,' .--'.  '   \' .
+  ;   |  ; \ ; | |    :     | /___/ \ |    ' '
+  |   :  | ; | ' ;    |.';  ; ;   \  \;      :
+  .   |  ' ' ' : `----'  |  |  \   ;  `      |
+  '   ;  \; /  |     '   :  ;   .   \    .\  ;
+   \   \  ',  /      |   |  '    \   \   ' \ |
+    ;   :    /       '   :  |     :   '  |--"
+     \   \ .'        ;   |.'       \   \ ;
+  www. `---` ver     '---' he       '---" ire.org
+
+
+Welcome to OverTheWire!
+
+If you find any problems, please report them to the #wargames channel on
+discord or IRC.
+
+--[ Playing the games ]--
+
+  This machine might hold several wargames.
+  If you are playing "somegame", then:
+
+    * USERNAMES are somegame0, somegame1, ...
+    * Most LEVELS are stored in /somegame/.
+    * PASSWORDS for each level are stored in /etc/somegame_pass/.
+
+  Write-access to homedirectories is disabled. It is advised to create a
+  working directory with a hard-to-guess name in /tmp/.  You can use the
+  command "mktemp -d" in order to generate a random and hard to guess
+  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc
+  restricted so that users cannot snoop on eachother. Files and directories
+  with easily guessable or short names will be periodically deleted! The /tmp
+  directory is regularly wiped.
+  Please play nice:
+
+    * don't leave orphan processes running
+    * don't leave exploit-files laying around
+    * don't annoy other players
+    * don't post passwords or spoilers
+    * again, DONT POST SPOILERS!
+      This includes writeups of your solution on your blog or website!
+
+--[ Tips ]--
+
+  This machine has a 64bit processor and many security-features enabled
+  by default, although ASLR has been switched off.  The following
+  compiler flags might be interesting:
+
+    -m32                    compile for 32bit
+    -fno-stack-protector    disable ProPolice
+    -Wl,-z,norelro          disable relro
+
+  In addition, the execstack tool can be used to flag the stack as
+  executable on ELF binaries.
+
+  Finally, network-access is limited for most levels by a local
+  firewall.
+
+--[ Tools ]--
+
+ For your convenience we have installed a few useful tools which you can find
+ in the following locations:
+
+    * gef (https://github.com/hugsy/gef) in /opt/gef/
+    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/
+    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/
+    * pwntools (https://github.com/Gallopsled/pwntools)
+    * radare2 (http://www.radare.org/)
+
+--[ More information ]--
+
+  For more information regarding individual wargames, visit
+  http://www.overthewire.org/wargames/
+
+  For support, questions or comments, contact us on discord or IRC.
+
+  Enjoy your stay!
+
+maze5@maze:~$ id
+
+uid=15005(maze5) gid=15005(maze5) groups=15005(maze5)
+maze5@maze:~$ ls -la /maze/maze5
+
+-r-sr-x--- 1 maze6 maze5 14940 Oct 25 13:39 /maze/maze5
+maze5@maze:~$ file /maze/maze5
+
+/maze/maze5: setuid ELF 32-bit LSB executable, Intel i386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=89a78300c5f70850f43fec2aba262f37ab17a4b4, for GNU/Linux 3.2.0, with debug_info, not stripped
+maze5@maze:~$ md5sum /maze/maze5
+
+9c846f4312464a849f8a899c6d8ccc98  /maze/maze5
+maze5@maze:~$ objdump -d -M intel /maze/maze5 | sed -n '/<main>:/,/8049393/p'
+
+080492c8 <main>:
+ 80492c8:	55                   	push   ebp
+ 80492c9:	89 e5                	mov    ebp,esp
+ 80492cb:	53                   	push   ebx
+ 80492cc:	83 ec 18             	sub    esp,0x18
+ 80492cf:	65 a1 14 00 00 00    	mov    eax,gs:0x14
+ 80492d5:	89 45 f8             	mov    DWORD PTR [ebp-0x8],eax
+ 80492d8:	31 c0                	xor    eax,eax
+ 80492da:	68 08 a0 04 08       	push   0x804a008
+ 80492df:	e8 9c fd ff ff       	call   8049080 <puts@plt>
+ 80492e4:	83 c4 04             	add    esp,0x4
+ 80492e7:	68 1a a0 04 08       	push   0x804a01a
+ 80492ec:	e8 4f fd ff ff       	call   8049040 <printf@plt>
+ 80492f1:	83 c4 04             	add    esp,0x4
+ 80492f4:	8d 45 e6             	lea    eax,[ebp-0x1a]
+ 80492f7:	50                   	push   eax
+ 80492f8:	68 26 a0 04 08       	push   0x804a026
+ 80492fd:	e8 6e fd ff ff       	call   8049070 <__isoc23_scanf@plt>
+ 8049302:	83 c4 08             	add    esp,0x8
+ 8049305:	68 2a a0 04 08       	push   0x804a02a
+ 804930a:	e8 31 fd ff ff       	call   8049040 <printf@plt>
+ 804930f:	83 c4 04             	add    esp,0x4
+ 8049312:	8d 45 ef             	lea    eax,[ebp-0x11]
+ 8049315:	50                   	push   eax
+ 8049316:	68 26 a0 04 08       	push   0x804a026
+ 804931b:	e8 50 fd ff ff       	call   8049070 <__isoc23_scanf@plt>
+ 8049320:	83 c4 08             	add    esp,0x8
+ 8049323:	8d 45 e6             	lea    eax,[ebp-0x1a]
+ 8049326:	50                   	push   eax
+ 8049327:	e8 94 fd ff ff       	call   80490c0 <strlen@plt>
+ 804932c:	83 c4 04             	add    esp,0x4
+ 804932f:	83 f8 08             	cmp    eax,0x8
+ 8049332:	75 11                	jne    8049345 <main+0x7d>
+ 8049334:	8d 45 ef             	lea    eax,[ebp-0x11]
+ 8049337:	50                   	push   eax
+ 8049338:	e8 83 fd ff ff       	call   80490c0 <strlen@plt>
+ 804933d:	83 c4 04             	add    esp,0x4
+ 8049340:	83 f8 08             	cmp    eax,0x8
+ 8049343:	74 14                	je     8049359 <main+0x91>
+ 8049345:	68 36 a0 04 08       	push   0x804a036
+ 804934a:	e8 31 fd ff ff       	call   8049080 <puts@plt>
+ 804934f:	83 c4 04             	add    esp,0x4
+ 8049352:	6a ff                	push   0xffffffff
+ 8049354:	e8 47 fd ff ff       	call   80490a0 <exit@plt>
+ 8049359:	6a 00                	push   0x0
+ 804935b:	6a 00                	push   0x0
+ 804935d:	6a 00                	push   0x0
+ 804935f:	6a 00                	push   0x0
+ 8049361:	e8 6a fd ff ff       	call   80490d0 <ptrace@plt>
+ 8049366:	83 c4 10             	add    esp,0x10
+ 8049369:	85 c0                	test   eax,eax
+ 804936b:	74 14                	je     8049381 <main+0xb9>
+ 804936d:	68 48 a0 04 08       	push   0x804a048
+ 8049372:	e8 09 fd ff ff       	call   8049080 <puts@plt>
+ 8049377:	83 c4 04             	add    esp,0x4
+ 804937a:	b8 00 00 00 00       	mov    eax,0x0
+ 804937f:	eb 58                	jmp    80493d9 <main+0x111>
+ 8049381:	8d 45 ef             	lea    eax,[ebp-0x11]
+ 8049384:	50                   	push   eax
+ 8049385:	8d 45 e6             	lea    eax,[ebp-0x1a]
+ 8049388:	50                   	push   eax
+ 8049389:	e8 68 fe ff ff       	call   80491f6 <foo>
+ 804938e:	83 c4 08             	add    esp,0x8
+ 8049391:	85 c0                	test   eax,eax
+ 8049393:	74 32                	je     80493c7 <main+0xff>
+maze5@maze:~$ objdump -d -M intel /maze/maze5 | sed -n '/<foo>:/,/8049225/p'
+
+080491f6 <foo>:
+ 80491f6:	55                   	push   ebp
+ 80491f7:	89 e5                	mov    ebp,esp
+ 80491f9:	83 ec 20             	sub    esp,0x20
+ 80491fc:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
+ 80491ff:	89 45 e4             	mov    DWORD PTR [ebp-0x1c],eax
+ 8049202:	8b 45 0c             	mov    eax,DWORD PTR [ebp+0xc]
+ 8049205:	89 45 e0             	mov    DWORD PTR [ebp-0x20],eax
+ 8049208:	65 a1 14 00 00 00    	mov    eax,gs:0x14
+ 804920e:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
+ 8049211:	31 c0                	xor    eax,eax
+ 8049213:	c7 45 f3 70 72 69 6e 	mov    DWORD PTR [ebp-0xd],0x6e697270
+ 804921a:	c7 45 f7 74 6c 6f 6c 	mov    DWORD PTR [ebp-0x9],0x6c6f6c74
+ 8049221:	c6 45 fb 00          	mov    BYTE PTR [ebp-0x5],0x0
+ 8049225:	c7 45 e8 00 00 00 00 	mov    DWORD PTR [ebp-0x18],0x0
+maze5@maze:~$ cd /tmp; rm -rf l5exp; mkdir l5exp; chmod 755 l5exp; cd l5exp
+
+maze5@maze:/tmp/l5exp$ vi keygen.py
+
+[>4;2m="keygen.py" [New]▽  Pzz\[0%m           [>c~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   0,0-1All^[  ^[  :set noai nocin nosi indentexpr= formatoptions=
+0,0-1AlldG  i -- INSERT --0,1All#1,2 3m4aze7 8L9510 1k2e3y4g5e6n7:8 9f20o1o2(3)()4 ()5c6o7m8p9u30t1e2s3 4d5e6c7[8i9][]40 [i]1=2 3'4p5r6i7n8t9l50o1l2'3[4i5][]6 [i]7-8 9(6021*2i3 4+5 6u7s8e9r70[1i2][]3-[i]4'5A6'7)2,1 #2 3(4t5h6e7 8t9w10o1 2d3w4o5r6d7 8s9t20o1r2e3s4 5b6u7i8l9d30 the4 t6e7m8p9l40a1t2e3 4'5p6r7i8n9t50l1o2l3'4,5 6t7h8e9 60l1oo3p4 5s6u7b8t9r70a1c2t3s43,1 #2 324*5i6 7+8 9u10s1e2r3[4i5][]6-[i]7'8A9'20 1f2r3o4m5 6i7t8)()9,()30 1t2h3e4n5 6r7e8v9e40r1s2e3-4s5c6a7n8s9 50d1e2c3[4i5][]6=[i]7=8k9e60y1[2i3][]4 [i]5u6n7t8i9l70 1t2h3e44,1 #2 3i4n5d6e7x8 9w10r1a2p3s4 5t6o7 8-9120:1 2s3u4c5c6e7s8s9 30i1f2f3 4k5e6y7[8i9][]40 [i]1m2a3t4c5h6e7s8 9f50o1r2 3e4v5e6r7y8 9i60 1f2r3o4m5 677 8d9o70w1n2 3t4o5 607.85,1 #2 3C4l5o6s7e8d9 10f1o2r3m4:5 6k7e8y9[20i1][]2 [i]3=4 5'6p7r8i9n30t1l2o3l4'5[6i7][]8 [i]9-40 122*3i4 5-6 7(8u9s50e1r2[3i4][]5-[i]6'7A8'9)()60 ()1 2(3m4o5d6 72859670)()1.()26,1 T23=45b6b"7p8r9i10n1t2l3o4l5"67,1 u2s3e4r56=78b9b"10A1A2A3A4AA6A7A8"98,1 k2e3y45=67b8y9t10e1bytes2(3(4T5[6i7][i]8[i]9-201223*45i67-89(30u1s2e3r4[5i6][i]7[i]8-940o1or2ord3(4'5A6'7)()8)(())9)(())50()1%232455667f8o9for601i23i4in56r7a8n9g70range1(283)()4)(())5()9,1 p2r3i4n5
+print6(7u8s9e10r1.2d3e4c5o6d7e8(9)()20,()12k3e4y5.6d7e8c9o30d1e2(3)()4)(())5()10,1^[  10,0-1All:wq
+[>4;m"keygen.py" [New] 10L, 522B written
+>[>4;mmaze5@maze:/tmp/l5exp$ python3 keygen.py
+
+AAAAAAAA ppehlbc^
+maze5@maze:/tmp/l5exp$ /maze/maze5
+
+X----------------
+ Username: AAAAAAAA
+      Key: ppehlbc^
+
+Yeh, here's your shell
+$ id
+uid=15006(maze6) gid=15005(maze5) groups=15005(maze5)
+$ cat /etc/maze_pass/maze6
+dXEKrdYgQR
+$ exit
+
+[1]+  Stopped                    /maze/maze5
+maze5@maze:/tmp/l5exp$ exit
+
+logout
+There are stopped jobs.
+maze5@maze:/tmp/l5exp$ exit
+
+logout
+Connection to maze.labs.overthewire.org closed.
+client$ exit
+
+exit
+bash-5.2$ export PS1='client$ '
+
+client$ ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 maze6@maze.labs.overthewire.org -p 2225
+
+                                                    
+                            _ __ ___   __ _ _______ 
+                           | '_ ` _ \ / _` |_  / _ \
+                           | | | | | | (_| |/ /  __/
+                           |_| |_| |_|\__,_/___\___|
+                                                    
+
+                      This is an OverTheWire game server. 
+            More information on http://www.overthewire.org/wargames
+
+backend: gibson-0
+
+maze6@maze.labs.overthewire.org's password: 
+
+      ,----..            ,----,          .---.
+     /   /   \         ,/   .`|         /. ./|
+    /   .     :      ,`   .'  :     .--'.  ' ;
+   .   /   ;.  \   ;    ;     /    /__./ \ : |
+  .   ;   /  ` ; .'___,/    ,' .--'.  '   \' .
+  ;   |  ; \ ; | |    :     | /___/ \ |    ' '
+  |   :  | ; | ' ;    |.';  ; ;   \  \;      :
+  .   |  ' ' ' : `----'  |  |  \   ;  `      |
+  '   ;  \; /  |     '   :  ;   .   \    .\  ;
+   \   \  ',  /      |   |  '    \   \   ' \ |
+    ;   :    /       '   :  |     :   '  |--"
+     \   \ .'        ;   |.'       \   \ ;
+  www. `---` ver     '---' he       '---" ire.org
+
+
+Welcome to OverTheWire!
+
+If you find any problems, please report them to the #wargames channel on
+discord or IRC.
+
+--[ Playing the games ]--
+
+  This machine might hold several wargames.
+  If you are playing "somegame", then:
+
+    * USERNAMES are somegame0, somegame1, ...
+    * Most LEVELS are stored in /somegame/.
+    * PASSWORDS for each level are stored in /etc/somegame_pass/.
+
+  Write-access to homedirectories is disabled. It is advised to create a
+  working directory with a hard-to-guess name in /tmp/.  You can use the
+  command "mktemp -d" in order to generate a random and hard to guess
+  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc
+  restricted so that users cannot snoop on eachother. Files and directories
+  with easily guessable or short names will be periodically deleted! The /tmp
+  directory is regularly wiped.
+  Please play nice:
+
+    * don't leave orphan processes running
+    * don't leave exploit-files laying around
+    * don't annoy other players
+    * don't post passwords or spoilers
+    * again, DONT POST SPOILERS!
+      This includes writeups of your solution on your blog or website!
+
+--[ Tips ]--
+
+  This machine has a 64bit processor and many security-features enabled
+  by default, although ASLR has been switched off.  The following
+  compiler flags might be interesting:
+
+    -m32                    compile for 32bit
+    -fno-stack-protector    disable ProPolice
+    -Wl,-z,norelro          disable relro
+
+  In addition, the execstack tool can be used to flag the stack as
+  executable on ELF binaries.
+
+  Finally, network-access is limited for most levels by a local
+  firewall.
+
+--[ Tools ]--
+
+ For your convenience we have installed a few useful tools which you can find
+ in the following locations:
+
+    * gef (https://github.com/hugsy/gef) in /opt/gef/
+    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/
+    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/
+    * pwntools (https://github.com/Gallopsled/pwntools)
+    * radare2 (http://www.radare.org/)
+
+--[ More information ]--
+
+  For more information regarding individual wargames, visit
+  http://www.overthewire.org/wargames/
+
+  For support, questions or comments, contact us on discord or IRC.
+
+  Enjoy your stay!
+
+maze6@maze:~$ id
+
+uid=15006(maze6) gid=15006(maze6) groups=15006(maze6)
+maze6@maze:~$ cat /etc/maze_pass/maze6
+
+dXEKrdYgQR
+maze6@maze:~$ exit
+
+logout
+Connection to maze.labs.overthewire.org closed.
+client$ exit
+
+exit

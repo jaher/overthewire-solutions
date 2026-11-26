@@ -203,6 +203,18 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   `@waitfor` directive with only two fields, or a stage window that missed
   because the payload size changed, shows up as stage1-miss lines in the
   failed cast — read them before touching the recorder.
+- Driver-script gotchas (added 2026-11-26, from maze L5's five attempts):
+  (a) `@waitfor <token> <rest>` splits on SPACES — a token containing
+  spaces ("Yeh, here's your shell") makes ptyrun2 treat the token's tail
+  as the rest field and TYPE it into the freshly spawned shell (the cast
+  showed `$ here's your shell` and a `>` continuation prompt). Tokens must
+  be a single word; pick a distinctive single word from the expected output.
+  (b) After a solve spawns an interactive shell, exiting needs one exit per
+  layer PLUS a second exit when bash prints "There are stopped jobs." (the
+  level binary sits behind as a stopped job; the first exit only warns).
+  Count the layers before typing: spawned shell → remote shell (warning →
+  second exit) → client shell. One exit too many types the next command
+  into a dead pty — its echo appears with no output, which is the signature.
 
 See RECORDING-STANDARD.md for the full v2 standard; this file adds the
 character-exact fidelity and vi-everywhere rules (user, 2026-11-25) and the

@@ -1,0 +1,55 @@
+@line id
+@waitfor uid=15005 
+@line ls -la /maze/maze5
+@sleep 3
+@line file /maze/maze5
+@sleep 3
+@line md5sum /maze/maze5
+@sleep 3
+@line objdump -d -M intel /maze/maze5 | sed -n '/<main>:/,/8049393/p'
+@sleep 5
+@line objdump -d -M intel /maze/maze5 | sed -n '/<foo>:/,/8049225/p'
+@sleep 5
+@line cd /tmp; rm -rf l5exp; mkdir l5exp; chmod 755 l5exp; cd l5exp
+@sleep 2
+@vi keygen.py
+# maze L5 keygen: foo() computes dec[i] = 'printlol'[i] - (2*i + user[i]-'A')
+# (the two dword stores build the template 'printlol', the loop subtracts
+# 2*i + user[i]-'A' from it), then reverse-scans dec[i]==key[i] until the
+# index wraps to -1: success iff key[i] matches for every i from 7 down to 0.
+# Closed form: key[i] = 'printlol'[i] - 2*i - (user[i]-'A')  (mod 256).
+T = b"printlol"
+user = b"AAAAAAAA"
+key = bytes((T[i] - 2 * i - (user[i] - ord('A'))) % 256 for i in range(8))
+print(user.decode(), key.decode())
+@viend
+@sleep 2
+@line python3 keygen.py
+@waitfor ppehlbc^ 
+@sleep 2
+@line /maze/maze5
+@waitfor Username: 
+@line AAAAAAAA
+@waitfor Key: 
+@line ppehlbc^
+@waitfor shell -
+@sleep 5
+@line id
+@waitfor uid=15006 
+@sleep 1
+@line cat /etc/maze_pass/maze6
+@waitfor dXEKrdYgQR 
+@sleep 1
+@line exit
+@sleep 3
+@line exit
+@sleep 3
+@line exit
+@sleep 3
+@nowait ssh -o StrictHostKeyChecking=accept-new -o PreferredAuthentications=password -o PubkeyAuthentication=no -p 2225 maze6@maze.labs.overthewire.org
+@waitfor password: dXEKrdYgQR
+@waitfor maze6@maze:~$ id
+@waitfor uid=15006 
+@line cat /etc/maze_pass/maze6
+@waitfor dXEKrdYgQR 
+@sleep 1
