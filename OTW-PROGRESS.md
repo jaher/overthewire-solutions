@@ -214,6 +214,9 @@ DONE 2026-11-23 (all re-recorded to the standard, checked in): 1. drifter L0 (1f
 9. then the long tail: natas L0-L33, bandit L0-L33, narnia, leviathan, behemoth, krypton, manpage, utumno, vortex casts — re-record each to the standard (start from oldest game, level by level).
 NOTE: the client-side "client" for F1/drifter L0 can be ANY lab account, but the client ssh login itself must be visible in the cast.
 
+## Standing rule (2026-11-26): always find another level to solve if stuck
+When a level or game is stuck (blocked, locked, rate-limited, or otherwise not making progress), do NOT idle on it: immediately move to the next solvable level anywhere in the queue (any game, any level) and keep solving. A stuck level gets documented once (blocked row + evidence) and is only re-tried when conditions demonstrably change (e.g. lab kernel changed, lockout lifted). Never wait for the operator to pick the next level - pick the next most-tractable one yourself and keep the pipeline moving.
+
 ## Recording standard v2 (user rules 2026-11-24) — vi-only + LIVE/verbatim
 Standard v2 in RECORDING-STANDARD.md: §0 LIVE+verbatim (cast = live session against the real level; terminal mirrors the real solve; code in vi = the exact verified source; cast's own run solves the level), §2 vi/vim-only file writes (no heredocs; driver ptyrun2.py @vi FILE ... @viend, verified live), §3 no terminal-side comments (comments inside the file only), gcc from mktemp -d in /tmp.
 VI RE-RECORD QUEUE (replaces the old heredoc re-records; serialized, one at a time):
