@@ -79,7 +79,12 @@ def main():
         if is_vi:
             # compare only the :wq marker line and the buffer body lines that
             # appear verbatim in the segment (the screen is redraw-heavy)
-            marker = [l for l in expected if l.startswith('"')]
+            # only vim's status/save line is a marker: "file" [New] N L, M C
+            # written. A source buffer's own """docstring""" lines also start
+            # with '"' - filtering on startswith('"') misclassifies them as
+            # markers (L6: every docstring line flagged MARKER MISSING)
+            marker = [l for l in expected
+                      if re.match(r'^"[^"]*"\s+(\[New\]\s+)?\d+L,\s*\d+[BC]', l)]
             seg_n = [norm(l) for l in seg]
             for mk in marker:
                 # the [New] token reflects file pre-existence, not content: a

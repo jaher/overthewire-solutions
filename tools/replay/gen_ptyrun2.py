@@ -37,7 +37,14 @@ def main():
             while j < len(steps) and steps[j]['cmd'] in (f'vi {fname}', f'vim {fname}'):
                 cand = steps[j]['out']
                 if isinstance(cand, list):
-                    body = [l for l in cand if l != '~' and not l.startswith('"')]
+                    # drop only vim's status/save line ("file" [New] N L, M C
+                    # written) - NOT every line starting with '"': a source
+                    # buffer's own """docstring""" lines start with '"' too and
+                    # are SOURCE TEXT; stripping them corrupts the saved file
+                    # (the L6 replay's sc.py/w6.py SyntaxError was exactly
+                    # this). Match the full status shape including [New].
+                    body = [l for l in cand if l != '~'
+                            and not re.match(r'^"[^"]*"\s+(\[New\]\s+)?\d+L,\s*\d+[BC]', l)]
                     if len(body) > len(buf):
                         buf = body
                 j += 1

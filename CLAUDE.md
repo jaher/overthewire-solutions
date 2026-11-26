@@ -215,6 +215,12 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   Count the layers before typing: spawned shell → remote shell (warning →
   second exit) → client shell. One exit too many types the next command
   into a dead pty — its echo appears with no output, which is the signature.
+  (c) A `@waitfor` token must not appear in any SOURCE TEXT typed before the
+  awaited event: the typed buffer is part of the same stream, so waiting for
+  "HIT" fired on the exploit's own print("HIT buf", ...) line while it was
+  being typed into vi, and the follow-up commands landed inside the editor.
+  Pick a token that exists only in the awaited output (e.g. the password the
+  run prints), never one that occurs in code, comments, or prompts.
 
 See RECORDING-STANDARD.md for the full v2 standard; this file adds the
 character-exact fidelity and vi-everywhere rules (user, 2026-11-25) and the
