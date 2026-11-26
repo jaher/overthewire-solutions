@@ -231,6 +231,10 @@ The site transcripts (games/*.json `steps`) are SCRIPTS: typing the exact verbat
 Known defects to fix in this pass (found 2026-11-24):
 - maze L0 (maze-solutions.md + games/maze.json): `printf 'AAAA...'` placeholder (real filler = 19 A's: AAAAAAAAAAAAAAAAAAA), objdump shown with NO output (real main() disassembly captured live 2026-11-24), flipper C never published (live-verified 2026-11-24: rename-race flipper + 15k runs → Sp5VmLGFC0), and maze L0 has NO cast at all — record one (vi-style, typed ssh login).
 - maze L1: `cp "$D/libc.so.4" ...` placeholder in the md (real copy from tools/maze/l1/lib4.c build); L1/L2 JSON steps are 1-line "see notes" stubs — expand into full verbatim steps.
+  - DONE 2026-11-26 (e935d15): L1 JSON rebuilt cast-verbatim from a fresh standard-v2 re-record
+    (typed login, vi-only lib4.c, live solve + client-side maze2 verify); narration L1 written;
+    cast script at tools/maze/l1/cast-script.txt. Remaining L1 audit findings = ruler-digit
+    interleave FP (vim redraw between typed chars on this lab; the 479B :wq marker byte-verifies).
 - maze L2/L3: narration txt exists but NO mp3/sync — build once the Muse/Helios TTS path is fixed (build_narration.py /opt/hatch/bin/tts path is stale; current TTS at ~/shadow-six-packs/tools/audio/narration/tts.py — pin the voice = Helios).
 - vortex L13: no mp3/sync (level blocked but narration should still exist for the blocked-analysis page).
 - drifter L0 + formulaone L0-L3: NO narration at all (mp3/sync/segments) — author + build.
