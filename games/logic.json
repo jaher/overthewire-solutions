@@ -3,7 +3,7 @@
  "host": "logic.smashthestack.org",
  "network": "smashthestack.org",
  "port": 2227,
- "status": "online (L1+L2 solved 2026-11-26; L2 = Caesar decode of level2_alt -> level3 login verified)",
+ "status": "online (L1+L2 solved 2026-11-26; L3 DOCUMENTED-BLOCKED - level3 exec deleted by a player, confession in ~/.bash_history; L4 therefore UNREACHABLE - its gate is the L3->L4 password the deleted binary would have yielded; full evidence in L3.cast + 19-round recon 2026-11-26, see OTW-PROGRESS.md)",
  "note": "Added to scope 2026-11-24. Level 1 is a WEB level at http://logic.smashthestack.org:8181/index.html. After that: ssh -l levelN logic.smashthestack.org -p2227 (replace levelN with the current level, e.g. level3). Tags/hall-of-fame links on the game page (logic.smashthestack.org:88) show level2..level11, i.e. at least 11 levels beyond the web level1. Mix of buffer overflows, format strings, assembly, vulnerable web apps, heap attacks. Verify live level count when starting.",
  "levels": [
   {
