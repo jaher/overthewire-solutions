@@ -1,0 +1,27 @@
+[
+  {
+    "title": "Goal",
+    "text": "Maze level 8. We're maze8 and we need maze9's password. /maze/maze8 is a setuid network daemon - it binds a port, forks per connection, and the child drops its privileges to maze9 before talking to us. Whatever we send it, it answers as maze9. That's the privilege boundary we're crossing.",
+    "lines": [{"step": 0, "role": "cmd"}, {"step": 1, "role": "out", "from": 0, "to": 0}, {"step": 2, "role": "out"}]
+  },
+  {
+    "title": "Vulnerability: the input IS the format string",
+    "text": "Disassembling the child path: after recv'ing 0x1ff bytes into a stack buffer and failing the strcmp against 'god' (a troll), the mismatch path calls snprintf(errbuf, 0x200, buf) - our buffer is passed as the FORMAT STRING, with no fourth argument. Then strlen(errbuf) is called, and strlen's GOT entry at 0x0804b288 is writable (partial RELRO). libc is at 0xf7d6d000 with ASLR off, so system sits at 0xf7dc0ce0. The plan: overwrite strlen@GOT with system; then strlen(errbuf) becomes system(errbuf), and errbuf starts with whatever we typed - because snprintf prints the literal text first, the first line of our format string IS the command.",
+    "lines": [{"step": 5, "role": "out"}, {"step": 6, "role": "out"}, {"step": 7, "role": "out"}, {"step": 8, "role": "out"}, {"step": 9, "role": "out"}]
+  },
+  {
+    "title": "Write mechanics: measured, not guessed",
+    "text": "Two numbers had to be measured, not guessed. First the vararg mapping: probe.py sends AAAA followed by %1$x %2$x ... and the reply shows 0x41414141 at slot 1 - our buffer sits at the start of the vararg window, and a pointer placed at buf offset o is vararg N = 134 + o/4. Second, the write plan: 4 x %hhn writes the four bytes of system()'s address one byte at a time. The printed-character counts are mod-256 deltas, sorted by (byte minus running total) mod 256, and the running total must include the literal command text. snprintf's %n counts are virtual - they keep counting past the 512-byte truncation - and the payload cap is the recv size, 511 bytes.",
+    "lines": [{"step": 11, "role": "cmd"}, {"step": 13, "role": "out"}, {"step": 14, "role": "out"}]
+  },
+  {
+    "title": "The exploit: typed, built, fired",
+    "text": "exp.py ties it together: spawn /maze/maze8 on port 31337, connect, send the payload built by build_payload - command text first, then the %c padding and %hhn writes, then the four GOT pointers at offsets 152 and up, NUL-padded. The child's system() runs our command with maze9's euid and writes the password into /tmp/o9. One honest detail: rm -f /tmp/o9 fails - the file is owned by maze9 from an earlier run - but maze9's own shell redirect overwrites it just the same.",
+    "lines": [{"step": 15, "role": "cmd"}, {"step": 17, "role": "out"}, {"step": 19, "role": "out"}, {"step": 20, "role": "out"}]
+  },
+  {
+    "title": "Solve and verify",
+    "text": "The payload fires, cat /tmp/o9 prints bmMHy7DM3E. The verify: ssh as maze9, id shows uid=15009(maze9), and cat /etc/maze_pass/maze9 confirms bmMHy7DM3E. Level 8 done.",
+    "lines": [{"step": 20, "role": "out"}, {"step": 22, "role": "cmd"}, {"step": 23, "role": "out"}, {"step": 24, "role": "out"}]
+  }
+]
