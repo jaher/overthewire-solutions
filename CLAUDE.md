@@ -5,6 +5,13 @@ terminal sessions. The user's non-negotiable standard: **a replay of the
 recording must reproduce the real session character-for-character — same
 typed commands, same editor sessions, same output, same final state.**
 
+**Vortex (L0–L13) is the standing quality benchmark.** Every game, every
+level, every re-record must meet that bar: the full step-by-step process of
+developing the exploit, real in-session vi/vim editing on the machine,
+verbatim outputs, and an educational narration that teaches the solve. A
+level that shows only the final exploit running — without the development
+process that produced it — does not meet the standard.
+
 ## Rule 1 — Every code file is typed in vi, in the session
 - ANY file whose contents matter to the solve — `.py`, `.c`, `.cc`, `.asm`,
   `.s`, shell scripts, exploit text — is created **in vi within the same
@@ -31,6 +38,11 @@ typed commands, same editor sessions, same output, same final state.**
 - The cast's own run must SOLVE the level inside the cast (real `id`,
   real `cat /pass/…` with the real password visible). A cast that doesn't
   end in a verified solve is discarded and re-recorded.
+- **Every single character of input and output must actually solve the real
+  level on the machine.** No decorative commands, no pre-built artifacts
+  carried in, no steps that exist only for the transcript: the whole
+  character stream, replayed verbatim on the server, is what solves the
+  level.
 
 ## Rule 3 — The replay (games/*.json) mirrors the cast 1:1
 - `steps[]` is a replayable script: typing every step, verbatim, in order,
@@ -52,12 +64,18 @@ typed commands, same editor sessions, same output, same final state.**
   pre-ssh `export PS1` lines, which belong to the recording harness, not
   the replay.
 
-## Rule 4 — Verification before commit
+## Rule 4 — Verification before commit (POST-SOLVE, verbatim, against the real server)
 - After recording a level: (a) the cast ends in a live solve; (b) the
-  `games/<game>.json` steps for that level replay against the live server
-  (or are byte-checked with the site's own parseVimScreen/buildVimScript
-  when a full live replay is impractical: 0 clears, 0 edits, final buffer
-  == the cast's `:wq` byte count); (c) narration sync/segments step indices
+  `games/<game>.json` steps for that level are replayed AGAINST THE REAL
+  SERVER in a fresh live pty session, and **every character of input and
+  output must match the real session verbatim — including the vi/vim
+  editing done on the machine**: the replay's editor session is driven
+  character-by-character exactly as the cast typed it, must land on the same
+  buffer (byte-identical to the cast's buffer, confirmed by the same `:wq`
+  `N L, M C` marker), and the run must reach the same solved state. There is
+  no byte-check-only escape hatch: a level whose steps cannot be verified
+  verbatim against a live session on the server is re-recorded, not patched
+  around; (c) narration sync/segments step indices
   re-keyed if steps were inserted/removed; (d) `python3 tools/audit_verbatim.py <game>`
   is run and every finding is resolved: rebuild the `out` verbatim from the
   cast (or re-record the level) — or, if it is a tool false positive
@@ -141,5 +159,26 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
 - Do not touch the model endpoint or the CCR bridge; no `git push`;
   commit after each level.
 
+## Rule 9 — Step-by-step process, vortex quality (user rule 2026-11-26)
+- A level must SHOW THE WHOLE PROCESS OF DEVELOPING THE EXPLOIT, step by
+  step — not jump from login to the final exploit firing. The standard
+  shape (the vortex L0–L13 reference): login → recon (the real discovery
+  steps, in the order taken) → vulnerability analysis (disassembly,
+  offsets, what the bytes mean) → exploit design (including the probes and
+  iterations that were actually run, with their real outputs) → code
+  written in vi on the machine → build → run → verification (real `id`,
+  real password, real next-level login).
+- Every phase must be present in the cast, in the JSON replay, and in the
+  narration (Rule 7), in the same order, at the same quality as vortex.
+  Short levels compress phases; they do not delete them (a level whose
+  "recon" is one `ls` still shows that `ls` and its full output, and the
+  narration explains why it is the whole recon).
+- Educational is the point: after the level, a reader who saw ONLY the
+  cast + narration can reproduce the exploit development from scratch —
+  they know what each step found, why the next step was chosen, and what
+  the bytes on screen mean.
+
+
 See RECORDING-STANDARD.md for the full v2 standard; this file adds the
-character-exact fidelity and vi-everywhere rules (user, 2026-11-25).
+character-exact fidelity and vi-everywhere rules (user, 2026-11-25) and the
+vortex-quality step-by-step + post-solve verbatim rules (user, 2026-11-26).
