@@ -3,8 +3,8 @@
  "host": "amateria.smashthestack.org",
  "network": "smashthestack.org",
  "port": 2229,
- "status": "online (probed 2026-11-24 18:30Z: web port 89 open; SSH 2229 not yet probed - verify)",
- "note": "Added to scope 2026-11-24. Intermediate game. SSH: ssh -p2229 levelX@amateria.smashthestack.org. Levels in /wargame/, passwords in /home/<user>/password, workspace /tmp/<random>. Level 0 is REMOTE (not ssh): source at http://amateria.smashthestack.org:89/level1.py; NO outbound connections allowed (no connectback/bindshell). Tags on the game page show level1..level7 => at least 8 levels (verify live).",
+ "status": "online (probed 2026-11-25/26: SSH 2229 up; level0 = remote cPickle challenge on port 54321; PARKED - see note)",
+ "note": "Added to scope 2026-11-24. Intermediate game. SSH: ssh -p2229 levelX@amateria.smashthestack.org. Levels in /wargame/, passwords in /home/<user>/password, workspace /tmp/<random>. L0 (remote, no shell access): cPickle.loads() RCE service on port 54321 (source :89/level1.py). 2026-11-25/26: unrestricted-pickle RCE CONFIRMED LIVE (posix.system executed via protocol-0 pickles) but the admins hardened the service mid-attack (~00:50 restart: global-reduce pickles now hang the parser while plain-data pickles still answer). The exit-code oracle ([system(cmd)] -> sum = 256*exit_code) and the no-fork file-read chain ([map(ord, read(lseek(open(path),off,0),1))]) are designed and ready - see OTW-PROGRESS.md for the full resume plan. No cast recorded: no verified solve (the password was never read before the patch).",
  "levels": [],
  "goals": {}
 }
