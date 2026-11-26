@@ -1,0 +1,10 @@
+tinel_cast.py - reconstruction of the tinel.py typed in the L4 cast
+(recordings/maze/L4.cast, :wq marker 58L, 2758B).
+
+The cast's vi rendering interleaves vim9 ruler redraws with the typed
+chars; the exact source line/byte layout could not be decoded with
+certainty. This reconstruction is FUNCTIONALLY verified against the
+cast: running it produces the byte-identical 123-byte ELF the cast's
+own xxd step shows (all six xxd rows match), and the build prints the
+same "wrote 123 bytes". The delta vs the cast marker is comment
+formatting only.

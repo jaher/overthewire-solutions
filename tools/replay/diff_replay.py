@@ -82,11 +82,14 @@ def main():
             marker = [l for l in expected if l.startswith('"')]
             seg_n = [norm(l) for l in seg]
             for mk in marker:
+                # the [New] token reflects file pre-existence, not content: a
+                # replay over an existing file drops it. Compare the core.
+                core = mk.replace('[New] ', '')
                 if mk not in seg:
                     # try normalized, or as a suffix of a line carrying
                     # escape-residue prefixes the cleaner kept
                     if norm(mk) not in seg_n and \
-                       not any(l.rstrip().endswith(mk) for l in seg):
+                       not any(l.rstrip().endswith(core) for l in seg):
                         print(f"step {si} ({cmd[:40]}): MARKER MISSING {mk}")
                         ok = False
                     else:
