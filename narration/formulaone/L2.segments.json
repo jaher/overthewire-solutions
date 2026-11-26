@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Goal",
+    "text": "Formula One, level 2. We log in as formulaone2 (uid=20002, L1's password) and face a setuid binary that invents temporary file names. Goal: /etc/formulaone_pass/formulaone2.",
+    "lines": [{"step": 0, "role": "cmd"}, {"step": 1, "role": "out", "from": 0, "to": 0}]
+  },
+  {
+    "title": "Reading the target: stat-then-fopen on invented names",
+    "text": "Two sources tell the story. formulaone2.c builds /tmp/tmp_XXXX names - four letters from a 26-letter alphabet, 456976 possibilities - and requires stat(name) != 0: the name must NOT exist. Only then does it fopen(name, 'r') and cat the contents. tmpnam.c shows the name generator. So the binary opens whatever file lands on one of those names - and the fopen runs as the setuid user formulaone2.",
+    "lines": [{"step": 2, "role": "out"}, {"step": 3, "role": "out"}]
+  },
+  {
+    "title": "The attack: fill the namespace, leave one hole",
+    "text": "f1l2_attack.c (typed in vi, compiled live) pre-creates 456,975 of the 456,976 names as symlinks to the password file - tmpfs has about a million free inodes, enough. One name, tmp_mzzz, is left as the hole. Because every other name exists, the binary's stat loop spins past them at memory speed and lands on the hole quickly. A toggle loop then flips the hole between absent (the stat loop observes it missing and fopen's it) and a password symlink (fopen reads the password). Sooner or later the stat lands while the hole is absent and the fopen lands on the symlink.",
+    "lines": [{"step": 5, "role": "cmd"}, {"step": 7, "role": "out"}, {"step": 8, "role": "cmd"}]
+  },
+  {
+    "title": "Solve and verify",
+    "text": "timeout 240 f1l2_attack piped through strings | head -3 prints Bf125B7St83elbZFOoXpp0FKprbD1hZP, and cat /etc/formulaone_pass/formulaone2 confirms it - the same password the cast used to log in as formulaone2. Level 2 done.",
+    "lines": [{"step": 9, "role": "out"}, {"step": 10, "role": "out"}]
+  }
+]

