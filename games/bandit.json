@@ -329,13 +329,217 @@
   },
   {
    "lvl": 3,
-   "steps": [],
-   "note": ""
+   "steps": [
+    {
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new bandit3@bandit.labs.overthewire.org -p 2220",
+     "out": [
+      "bandit3@bandit.labs.overthewire.org's password: ",
+      "",
+      "                         _                     _ _ _   ",
+      "                        | |__   __ _ _ __   __| (_) |_ ",
+      "                        | '_ \\ / _` | '_ \\ / _` | | __|",
+      "                        | |_) | (_| | | | | (_| | | |_ ",
+      "                        |_.__/ \\__,_|_| |_|\\__,_|_|\\__|",
+      "                      This is an OverTheWire game server. ",
+      "            More information on http://www.overthewire.org/wargames",
+      "backend: gibson-0",
+      "bandit3@bandit.labs.overthewire.org's password: ",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "Welcome to OverTheWire!",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "--[ Playing the games ]--",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "--[ Tips ]--",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "--[ Tools ]--",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "--[ More information ]--",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "  Enjoy your stay!"
+     ]
+    },
+    {
+     "cmd": "ls -la inhere/",
+     "out": [
+      "total 12",
+      "drwxr-xr-x 2 root    root    4096 Oct 25 13:37 .",
+      "drwxr-xr-x 3 root    root    4096 Oct 25 13:37 ..",
+      "-rw-r----- 1 bandit4 bandit3   33 Oct 25 13:37 ...Hiding-From-You"
+     ]
+    },
+    {
+     "cmd": "cat inhere/...Hiding-From-You",
+     "out": [
+      "xzTXq1rDJQVVAzdv5cHq1TQytTWufAMq"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to bandit.labs.overthewire.org closed."
+     ]
+    }
+   ],
+   "note": "bandit L3: hidden file in inhere/ - ls -la reveals ...Hiding-From-You; cat it: 'xzTXq1rDJQVVAzdv5cHq1TQytTWufAMq' (bandit4's login password). JSON = 4 steps mirroring the cast 1:1."
   },
   {
    "lvl": 4,
-   "steps": [],
-   "note": ""
+   "steps": [
+    {
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new bandit4@bandit.labs.overthewire.org -p 2220",
+     "out": [
+      "bandit4@bandit.labs.overthewire.org's password: ",
+      "",
+      "                         _                     _ _ _   ",
+      "                        | |__   __ _ _ __   __| (_) |_ ",
+      "                        | '_ \\ / _` | '_ \\ / _` | | __|",
+      "                        | |_) | (_| | | | | (_| | | |_ ",
+      "                        |_.__/ \\__,_|_| |_|\\__,_|_|\\__|",
+      "                      This is an OverTheWire game server. ",
+      "            More information on http://www.overthewire.org/wargames",
+      "backend: gibson-0",
+      "bandit4@bandit.labs.overthewire.org's password: ",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "Welcome to OverTheWire!",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "--[ Playing the games ]--",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "--[ Tips ]--",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "--[ Tools ]--",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "--[ More information ]--",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "  Enjoy your stay!"
+     ]
+    },
+    {
+     "cmd": "file inhere/* 2>/dev/null",
+     "out": [
+      "inhere/-file00: data",
+      "inhere/-file01: data",
+      "inhere/-file02: Non-ISO extended-ASCII text, with NEL line terminators, with escape sequences",
+      "inhere/-file03: data",
+      "inhere/-file04: data",
+      "inhere/-file05: data",
+      "inhere/-file06: data",
+      "inhere/-file07: ASCII text",
+      "inhere/-file08: data",
+      "inhere/-file09: Non-ISO extended-ASCII text, with no line terminators"
+     ]
+    },
+    {
+     "cmd": "cat inhere/-file07",
+     "out": [
+      "6C7h9GD8M6ai5nr7wo1RonrzFjj9yIrG"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to bandit.labs.overthewire.org closed."
+     ]
+    }
+   ],
+   "note": "bandit L4: ten -fileNN files, only one is ASCII text - file inhere/* identifies -file07 ('ASCII text'); cat it: '6C7h9GD8M6ai5nr7wo1RonrzFjj9yIrG' (bandit5's login password). JSON = 4 steps mirroring the cast 1:1."
   },
   {
    "lvl": 5,
