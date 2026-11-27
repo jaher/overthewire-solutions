@@ -59,7 +59,10 @@ def detect_prompt(stream):
     if live:
         alt = '|'.join(re.escape(t) for t in sorted(live, key=lambda t: -best[t]))
         return re.compile(r'\n[^\n]*(?:' + alt + r')[^\n]*\$')
-    return re.compile(r'\n[^\n]*\$')
+    # a bare '$' anywhere matches PHP/Perl output lines ($var); require '$ ' (dollar
+    # SPACE - the prompt shape 'user@host$ cmd') so '$var' output lines don't truncate
+    # segments (natas L26: 'private $logFile;' cut the segment to 13 chars)
+    return re.compile(r'\n[^\n]*\$ ')
 
 def unwrap(s):
     """Join 80-col soft wraps: a line not ending in space, followed by a line
