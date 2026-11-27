@@ -28,7 +28,7 @@
    ]
   },
   {
-   "text": "The solve is the same shellcode, with the signal disarmed: the exploit parent blocks SIGTERM before launching the binary, the mask is inherited, and the raise never delivers.",
+   "text": "The solve is the same shellcode with the signal disarmed: the exploit child blocks SIGTERM with pthread_sigmask before the exec, so the pending raise never delivers and the corrupted return still wins. One quirk: the spawned shell dies after its first command, so each run sends exactly one.",
    "lines": [
     {
      "step": 2,
@@ -37,16 +37,16 @@
    ]
   },
   {
-   "text": "Then the overflow runs to setresuid seventeen thousand two and execve /bin/sh.",
+   "text": "Then the overflow runs: setresuid seventeen thousand two re-asserts manpage two, execve of slash bin slash slash sh, NOP sled first and the return address swept around 0xffffd9e8 - the hit lands at 0xffffd5e0.",
    "lines": [
     {
-     "step": 1,
-     "role": "note"
+     "step": 6,
+     "role": "cmd"
     }
    ]
   },
   {
-   "text": "I log in as manpage one, read the source, block the signal in the parent, and run the exploit script.",
+   "text": "I log in as manpage one, read the source, probe the offset in gdb - the SIGTERM kill there shows the unblocked case - then type the nasm stub and the exploit in vi, assemble with nasm, and run the sweep.",
    "lines": [
     {
      "step": 2,
