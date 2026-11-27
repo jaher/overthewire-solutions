@@ -3184,7 +3184,10 @@
       "remote: Compressing objects:  16% (1/6)\rremote: Compressing objects:  33% (2/6)\rremote: Compressing objects:  50% (3/6)\rremote: Compressing objects:  66% (4/6)\rremote: Compressing objects:  83% (5/6)\rremote: Compressing objects: 100% (6/6)\rremote: Compressing objects: 100% (6/6), done.",
       "remote: Total 9 (delta 2), reused 0 (delta 0), pack-reused 0 (from 0)",
       "Receiving objects:  11% (1/9)\rReceiving objects:  22% (2/9)\rReceiving objects:  33% (3/9)\rReceiving objects:  44% (4/9)\rReceiving objects:  55% (5/9)\rReceiving objects:  66% (6/9)\rReceiving objects:  77% (7/9)\rReceiving objects:  88% (8/9)\rReceiving objects: 100% (9/9)\rReceiving objects: 100% (9/9), done.",
-      "Resolving deltas:   0% (0/2)\rResolving deltas:  50% (1/2)\rResolving deltas: 100% (2/2)\rResolving deltas: 100% (2/2), done."
+      "Resolving deltas:   0% (0/2)",
+      "Resolving deltas:  50% (1/2)",
+      "Resolving deltas: 100% (2/2)",
+      "Resolving deltas: 100% (2/2), done."
      ]
     },
     {
@@ -3227,8 +3230,153 @@
   },
   {
    "lvl": 29,
-   "steps": [],
-   "note": ""
+   "steps": [
+    {
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new bandit29@bandit.labs.overthewire.org -p 2220",
+     "out": [
+      "                         _                     _ _ _   ",
+      "                        | |__   __ _ _ __   __| (_) |_ ",
+      "                        | '_ \\ / _` | '_ \\ / _` | | __|",
+      "                        | |_) | (_| | | | | (_| | | |_ ",
+      "                        |_.__/ \\__,_|_| |_|\\__,_|_|\\__|",
+      "                                                       ",
+      "                      This is an OverTheWire game server. ",
+      "            More information on http://www.overthewire.org/wargames",
+      "backend: gibson-0",
+      "bandit29@bandit.labs.overthewire.org's password: ",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "Welcome to OverTheWire!",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "--[ Playing the games ]--",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "--[ Tips ]--",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "--[ Tools ]--",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "--[ More information ]--",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "  Enjoy your stay!"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to bandit.labs.overthewire.org closed."
+     ]
+    },
+    {
+     "cmd": "rm -rf /tmp/b29repo\nenv GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=accept-new\" git clone ssh://bandit29-git@bandit.labs.overthewire.org:2220/home/bandit29-git/repo /tmp/b29repo",
+     "out": [
+      "Cloning into '/tmp/b29repo'...",
+      "Cloning into '/tmp/b29repo'...",
+      "                         _                     _ _ _   ",
+      "                        | |__   __ _ _ __   __| (_) |_ ",
+      "                        | '_ \\ / _` | '_ \\ / _` | | __|",
+      "                        | |_) | (_| | | | | (_| | | |_ ",
+      "                        |_.__/ \\__,_|_| |_|\\__,_|_|\\__|",
+      "                                                       ",
+      "                      This is an OverTheWire game server. ",
+      "            More information on http://www.overthewire.org/wargames",
+      "backend: gibson-0",
+      "bandit29-git@bandit.labs.overthewire.org's password: ",
+      "remote: Enumerating objects: 16, done.",
+      "remote: Counting objects:   6% (1/16)\rremote: Counting objects:  12% (2/16)\rremote: Counting objects:  18% (3/16)\rremote: Counting objects:  25% (4/16)\rremote: Counting objects:  31% (5/16)\rremote: Counting objects:  37% (6/16)\rremote: Counting objects:  43% (7/16)\rremote: Counting objects:  50% (8/16)\rremote: Counting objects:  56% (9/16)\rremote: Counting objects:  62% (10/16)\rremote: Counting objects:  68% (11/16)\rremote: Counting objects:  75% (12/16)\rremote: Counting objects:  81% (13/16)\rremote: Counting objects:  87% (14/16)\rremote: Counting objects:  93% (15/16)\rremote: Counting objects: 100% (16/16)\rremote: Counting objects: 100% (16/16), done.",
+      "remote: Compressing objects:   9% (1/11)\rremote: Compressing objects:  18% (2/11)\rremote: Compressing objects:  27% (3/11)\rremote: Compressing objects:  36% (4/11)\rremote: Compressing objects:  45% (5/11)\rremote: Compressing objects:  54% (6/11)\rremote: Compressing objects:  63% (7/11)\rremote: Compressing objects:  72% (8/11)\rremote: Compressing objects:  81% (9/11)\rremote: Compressing objects:  90% (10/11)\rremote: Compressing objects: 100% (11/11)\rremote: Compressing objects: 100% (11/11), done.",
+      "Receiving objects:   6% (1/16)\rReceiving objects:  12% (2/16)\rReceiving objects:  18% (3/16)\rReceiving objects:  25% (4/16)\rReceiving objects:  31% (5/16)\rReceiving objects:  37% (6/16)\rReceiving objects:  43% (7/16)\rReceiving objects:  50% (8/16)\rReceiving objects:  56% (9/16)\rReceiving objects:  62% (10/16)\rReceiving objects:  68% (11/16)\rReceiving objects:  75% (12/16)\rReceiving objects:  81% (13/16)\rReceiving objects:  87% (14/16)\rReceiving objects:  93% (15/16)\rReceiving objects: 100% (16/16)\rremote: Total 16 (delta 2), reused 0 (delta 0), pack-reused 0 (from 0)",
+      "Receiving objects: 100% (16/16), 1.44 KiB | 147.00 KiB/s, done.",
+      "Resolving deltas:   0% (0/2)",
+      "Resolving deltas:  50% (1/2)",
+      "Resolving deltas: 100% (2/2)",
+      "Resolving deltas: 100% (2/2), done."
+     ]
+    },
+    {
+     "cmd": "cat /tmp/b29repo/README.md",
+     "out": [
+      "Some notes for bandit30 of bandit.",
+      "## credentials",
+      "- username: bandit30",
+      "- password: <no passwords in production!>"
+     ]
+    },
+    {
+     "cmd": "git -C /tmp/b29repo --no-pager branch -a",
+     "out": [
+      "  remotes/origin/HEAD -> origin/master",
+      "  remotes/origin/dev",
+      "  remotes/origin/master",
+      "  remotes/origin/sploits-dev"
+     ]
+    },
+    {
+     "cmd": "git -C /tmp/b29repo --no-pager show origin/dev:README.md",
+     "out": [
+      "Some notes for bandit30 of bandit.",
+      "## credentials",
+      "- username: bandit30",
+      "- password: jq9Dfg2rXsfYsWMgFuKlXhphjdH7USgX"
+     ]
+    },
+    {
+     "cmd": "rm -rf /tmp/b29repo\nexit\nexit",
+     "out": [
+      "client$ exit",
+      "exit",
+      "exit",
+      "exit"
+     ]
+    }
+   ],
+   "note": "bandit L29: the cloned repo's README.md says '<no passwords in production!>' but a non-default branch holds the real notes: git branch -a reveals remotes/origin/dev (and sploits-dev), and git show origin/dev:README.md prints the real credentials -> jq9Dfg2rXsfYsWMgFuKlXhphjdH7USgX. 7 steps mirroring the cast 1:1; git-clone \\r progress lines kept verbatim."
   },
   {
    "lvl": 30,
