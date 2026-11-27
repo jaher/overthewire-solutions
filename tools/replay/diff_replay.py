@@ -35,9 +35,31 @@ def main():
             anchors.append(-1)
             continue
         found = -1
+        # a step's cmd may carry several real commands (each echoed on its own
+        # line in the replay); anchor on the FIRST line. The final exit step's
+        # bare 'exit' would otherwise match the remote session's exit echo -
+        # prefer the client-side prompt line when it exists.
+        if cmd.rstrip() == 'exit\nexit':
+            # anchor at the remote shell's exit echo ('user@host$ exit'); the
+            # JSON out starts at 'logout', the line right after that echo
+            for i in range(len(lines) - 1, cur - 1, -1):
+                if lines[i].rstrip().endswith('exit') and 'client$' in lines[i]:
+                    for k in range(i, cur, -1):
+                        if 'manpage' in lines[k] and lines[k].rstrip().endswith('exit'):
+                            found = k
+                            break
+                    break
+            anchors.append(found if found >= 0 else -1)
+            if found < 0:
+                print(f"step {si} ({cmd[:50]}): ANCHOR NOT FOUND")
+                ok = False
+            else:
+                cur = found + 1
+            continue
+        first = cmd.split('\n')[0].rstrip()
         for i in range(cur, len(lines)):
             # the replay echoes commands with a prompt prefix
-            if lines[i].rstrip().endswith(cmd.rstrip()):
+            if lines[i].rstrip().endswith(first):
                 found = i
                 break
         if found < 0 and re.match(r'^(?:vi|vim)\s', cmd):
