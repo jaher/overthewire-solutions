@@ -43,8 +43,10 @@ def main():
                     # are SOURCE TEXT; stripping them corrupts the saved file
                     # (the L6 replay's sc.py/w6.py SyntaxError was exactly
                     # this). Match the full status shape including [New].
+                    # the cast stream strips the ESC before the save marker's
+                    # opening quote, so the marker can start with '="' too
                     body = [l for l in cand if l != '~'
-                            and not re.match(r'^"[^"]*"\s+(\[New\]\s+)?\d+L,\s*\d+[BC]', l)]
+                            and not re.match(r'^.{0,2}"[^"]*"\s+(\[New\]\s+)?\d+L,\s*\d+[BC]', l)]
                     if len(body) > len(buf):
                         buf = body
                 j += 1
@@ -66,7 +68,11 @@ def main():
             out.append('@line exit')
             i += 1
             continue
-        out.append(f'@line {cmd}')
+        # a step's cmd may carry several real commands (e.g. the manpage L0 gdb
+        # session: gdb -> set debuginfod enabled off -> disassemble -> run -> info ->
+        # quit -> y). Each line is a real typed command - emit one @line per line.
+        for cl in cmd.split('\n'):
+            out.append(f'@line {cl}')
         i += 1
     print('\n'.join(out))
 

@@ -49,34 +49,34 @@
    "text": "I read the source, cat /manpage/manpage0.c.",
    "lines": [
     {
-     "step": 3,
+     "step": 2,
      "role": "cmd"
     }
    ]
   },
   {
-   "text": "I find the buffer on the stack with gdb: the EIP offset is 260, ASLR is off, and the stack is executable.",
+   "text": "I measure the offset in gdb: the disassembly shows buf at e b p minus 0x100, so the saved EIP sits 260 bytes into the payload - two probes confirm it: 264 A's crash at 41414141, 260 A's plus BBBB crash at 42424242. gdb also shifts the stack, so the real address gets swept at run time.",
    "lines": [
     {
-     "step": 4,
+     "step": 0,
      "role": "cmd"
     }
    ]
   },
   {
-   "text": "I write the payload in python: a NOP sled, then a shellcode that calls setresuid seventeen thousand one three times and execve's /bin/sh, and the return address pointing back into the buffer.",
+   "text": "The shellcode goes in vi first: twenty-four lines of nasm, setresuid of seventeen thousand one across all three uids, then execve of slash bin slash slash sh - assembled with nasm, forty-one bytes, no zero bytes. The exploit script follows in vi: NOP sled first, shellcode last, then the little-endian return address, swept around 0xffffd9e8 because the stack shifts with the environment.",
    "lines": [
     {
-     "step": 5,
+     "step": 2,
      "role": "cmd"
     }
    ]
   },
   {
-   "text": "I run the exploit.",
+   "text": "Running the exploit sweeps candidate return addresses until the shellcode answers; the hit lands at 0xffffd5e0 and the spawned shell reads back the password file.",
    "lines": [
     {
-     "step": 5,
+     "step": 2,
      "role": "cmd",
      "from": 0,
      "to": 0

