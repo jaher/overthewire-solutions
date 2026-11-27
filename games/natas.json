@@ -681,7 +681,7 @@
       "    print(out, flush=True)",
       "print(\"FINAL\", out)",
       "~",
-      "\"/tmp/n17blind.py\" [New File] 27 lines, 1187 bytes written"
+      "\"/tmp/n17blind.py\" 27 lines, 1187 bytes written"
      ]
     },
     {
