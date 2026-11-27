@@ -231,6 +231,27 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   passed). Small buffers race less because vim exits faster; the sleep is
   cheap insurance for any vi session over ~50 lines.
 
+## Standing rule — never stop until all levels are solved (user 2026-11-27)
+- The mission is ALL levels, ALL games, solved and shipped. A parked line, a
+  blocked line, or a 6h timebox is a pause, never an ending: keep working.
+- When a level is stuck, work it in this order:
+  1. Re-derive the facts on the machine first - the binary, kernel, or lab
+     config may have changed; re-measure before re-using any old verdict
+     (e.g. re-check the lab kernel before re-asserting an L13-style block).
+  2. Research the internet: public write-ups, level hints, CVEs, kernel
+     behavior changes, forum threads. **Internet hint research is explicitly
+     authorized** - use it whenever a level is stuck or a technique is
+     unclear.
+  3. Try genuinely new angles (new primitives, new entry points, timing,
+     races, the environment, the wrapper programs around the level binary).
+  4. Only then park - and a park must name the EXACT external blocker (lab
+     offline, operator credentials needed, a lab-host-side change) plus when
+     to re-check it.
+- Park re-checks are part of the work, not optional: on every pass through
+  the queue, re-probe each parked level with a cheap live check; any change
+  in conditions (kernel, DNS, auth, rate limit, binary md5) immediately
+  reopens the level.
+
 See RECORDING-STANDARD.md for the full v2 standard; this file adds the
 character-exact fidelity and vi-everywhere rules (user, 2026-11-25) and the
 vortex-quality step-by-step + post-solve verbatim rules (user, 2026-11-26).
