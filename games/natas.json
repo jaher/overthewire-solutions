@@ -376,7 +376,7 @@
      ]
     }
    ],
-   "note": "natas L13 (client-side cast): same upload but with an in_array(filetype, image) check - shell13.php starts with the GIF89a magic so file() sees 'GIF image data' (the cast runs file to show it) and PHP still executes the trailing code (2L/70B). GET the uploaded path -> the password. 7 steps mirroring the cast 1:1."
+   "note": "natas L13 (client-side cast): same upload but with an in_array(filetype, image) check - shell13.php starts with the GIF89a magic so file() sees 'GIF image data' (the cast runs file to show it) and PHP still executes the trailing code (2L/70B). GET the uploaded path -> the server echoes the raw GIF89a bytes (the file's magic header sits before the PHP block and is printed verbatim) followed by natas14's password A0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8 - the final out line 'GIF89aA0xXu2x9FW8rb8OSQ4ei6n5VBbLUz8h8' is that concatenation, cast-verbatim. 7 steps mirroring the cast 1:1."
   },
   {
    "lvl": 14,
