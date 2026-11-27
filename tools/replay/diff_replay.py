@@ -146,9 +146,9 @@ def main():
             if not en:
                 continue
             # live timestamps (ls -l, dates) legitimately differ between runs
-            if re.match(r'^-\S+ \S+ \S+ \S+ \w+ \w+\s+\d+ [\d:]+ ', en) or \
+            if re.match(r'^[-bcdlps]\S{9} \S+ \S+ \S+ \S+ \w+ \w+ [\d:]+ ', en) or \
                re.search(r' (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) +\d+ [\d:]+ ', en):
-                hit_ts = [k for k in range(pos, len(seg_n)) if re.match(r'^\S+ \S+ \S+ \S+ \w+ \w+\s+\d+ [\d:]+ \S+$', seg_n[k])]
+                hit_ts = [k for k in range(pos, len(seg_n)) if re.match(r'^\S+ \S+ \S+ \S+ \S+ \w+ \w+ [\d:]+ ', seg_n[k])]
                 if hit_ts:
                     pos = hit_ts[0] + 1
                     continue

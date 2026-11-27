@@ -10,7 +10,7 @@
    ]
   },
   {
-   "text": "The goal is the manpage5 password, from /manpage/manpage4: a patched Wumpus game where the winner log prints the time, a first name, and a last name that are uninitialised on some paths.",
+   "text": "The goal is the manpage5 password. /manpage/manpage4 is a patched Hunt the Wumpus: when you win, log_winner prints your firstname and lastname through an sprintf into a 256-byte stack buffer.",
    "lines": [
     {
      "step": -1,
@@ -19,16 +19,7 @@
    ]
   },
   {
-   "text": "The solve is a fixed seed and a stack overflow.",
-   "lines": [
-    {
-     "step": 0,
-     "role": "cmd"
-    }
-   ]
-  },
-  {
-   "text": "I log in as manpage four.",
+   "text": "The patched source shows the bug: fgets reads the name, sscanf splits it with percent-100-s percent-100-s, and sprintf writes ctime plus firstname plus lastname into buf. With a no-space name the second token never matches, so lastname keeps whatever the stack held before - and sprintf writes past the buffer's end.",
    "lines": [
     {
      "step": 1,
@@ -37,25 +28,7 @@
    ]
   },
   {
-   "text": "I read the diff to see the patch.",
-   "lines": [
-    {
-     "step": 2,
-     "role": "note"
-    }
-   ]
-  },
-  {
-   "text": "I pick seed one two three four five, which replicates the host libc rand: the layout is player at room eighteen, wumpus at thirteen, pits at two and sixteen, bats at five and three.",
-   "lines": [
-    {
-     "step": 3,
-     "role": "note"
-    }
-   ]
-  },
-  {
-   "text": "I shoot the wumpus, and the ROOM number line persists in getnum's stack buffer, overlapping the name buffers.",
+   "text": "The disassembly confirms the layout: buf sits at ebp minus 0x100, firstname at ebp minus 0x200, lastname at ebp minus 0x300, and the frame has no stack canary - just leave and ret.",
    "lines": [
     {
      "step": 4,
@@ -64,7 +37,25 @@
    ]
   },
   {
-   "text": "That makes the print go into a buffer I control: a NOP sled, then a setresuid shellcode for seventeen thousand five, and the return address into the sled.",
+   "text": "The stale lastname is the key. lastname lives 1300 bytes above getnum's 2048-byte input buffer, which still holds my 1602-byte ROOM# line: the line's bytes from offset 1304 become the lastname string. That makes the sprintf output about 403 bytes - past the saved ebp and the return address at output 260.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The payload: the ROOM# line carries the NOP sled and the return value at line offset 1417, which lands exactly in the return-address slot. The name line carries 52 NOPs plus 48 bytes of shellcode, which sscanf copies into firstname at ebp minus 0x200 - below the overflowed frame, so the return value just has to point into that sled.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The shellcode needs no setresuid: the game is already setuid manpage5, so its euid can read the password file directly. It opens slash-tmp-slash-x - a symlink to the password file created first - reads 100 bytes onto the stack and writes them to file descriptor one. Exit code one marks that the shellcode ran.",
    "lines": [
     {
      "step": 5,
@@ -73,18 +64,25 @@
    ]
   },
   {
-   "text": "AHA, you got the wumpus.",
+   "text": "One practical discovery: with a pty on stdin the overflow never reaches the return address - the game exits cleanly. Driven through a pipe, the sprintf writes its full output and E I P is hijacked. The exploit feeds the whole game session through a pipe and sweeps the return value from 0xffffc800 to 0xffffdc00 until the process exits with code one - the shellcode's own exit.",
    "lines": [
     {
-     "step": 5,
-     "role": "cmd",
-     "from": 0,
-     "to": 0
+     "step": 9,
+     "role": "cmd"
     }
    ]
   },
   {
-   "text": "id confirms uid seventeen thousand five, manpage five.",
+   "text": "The sweep lands at 0xffffd0b8, and the shellcode dumps the password: v2ltdizZfm.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Level four solved - the login as manpage5 works.",
    "lines": [
     {
      "step": -1,
@@ -93,38 +91,11 @@
    ]
   },
   {
-   "text": "And the password file reads back v two l t d i z Z f m.",
-   "lines": [
-    {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "text": "The level is solved.",
-   "lines": [
-    {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
-   "text": "Manpage is complete.",
-   "lines": [
-    {
-     "step": -1,
-     "role": "goal"
-    }
-   ]
-  },
-  {
    "text": "I log out.",
    "lines": [
     {
-     "step": -1,
-     "role": "goal"
+     "step": 10,
+     "role": "cmd"
     }
    ]
   }

@@ -230,6 +230,19 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   gcc vanished after the 66-line f1l3.c save; attempt 3 with the sleep
   passed). Small buffers race less because vim exits faster; the sleep is
   cheap insurance for any vi session over ~50 lines.
+  (e) An exploit's address sweep is calibrated to the environment it was
+  measured in and does NOT transfer: the landing address shifts by hundreds
+  of bytes between an ssh-exec env and the ptyrun2 session env (manpage L4:
+  0xffffd940 via ssh exec, 0xffffd0b8 under ptyrun2 - the first recording's
+  sweep range missed entirely and the cast ran the sweep silently to no
+  result). Sweep wide (or re-measure the landing IN the recording
+  environment) before recording.
+  (f) The tty line discipline changes what an exploit can do: manpage L4's
+  sprintf overflow reaches the return slot only when stdin is a PIPE (a pty
+  run exits cleanly, the ret slot untouched). If a recorded run behaves
+  differently from a manual run, test the pipe-vs-tty delivery path too -
+  and note that a pipe run loses the interactive echo, so the JSON `out`
+  comes from the subprocess's captured stdout, not the pty.
 
 ## Standing rule — never stop until all levels are solved (user 2026-11-27)
 - The mission is ALL levels, ALL games, solved and shipped. A parked line, a
