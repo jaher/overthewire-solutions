@@ -221,6 +221,15 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   being typed into vi, and the follow-up commands landed inside the editor.
   Pick a token that exists only in the awaited output (e.g. the password the
   run prints), never one that occurs in code, comments, or prompts.
+  (d) After a LARGE-buffer `:wq` (65+ lines), settle before typing the next
+  command: put `@sleep 4` between `@viend` and the following `@line`. The
+  drain can return on prompt-lookalike output while vim is still tearing
+  down (restoring the terminal, releasing the tty), and vim then eats the
+  typed-ahead line - the driver logs the directive as sent, the cast shows
+  no echo, and the remote shell never sees it (formulaone L3 replays 1-2:
+  gcc vanished after the 66-line f1l3.c save; attempt 3 with the sleep
+  passed). Small buffers race less because vim exits faster; the sleep is
+  cheap insurance for any vi session over ~50 lines.
 
 See RECORDING-STANDARD.md for the full v2 standard; this file adds the
 character-exact fidelity and vi-everywhere rules (user, 2026-11-25) and the
