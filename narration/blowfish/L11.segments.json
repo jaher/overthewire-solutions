@@ -10,14 +10,6 @@
     {
      "step": 0,
      "role": "cmd"
-    },
-    {
-     "step": 1,
-     "role": "cmd"
-    },
-    {
-     "step": 2,
-     "role": "cmd"
     }
    ]
   },
@@ -25,14 +17,16 @@
    "text": "The disassembly is short. strncpy copies at most sixteen bytes of argv two into a buffer at E B P minus eight - an eight-byte buffer, so a sixteen-byte copy already reaches past the saved base pointer into the return address. Then strlen of the buffer must equal exactly seven, which means argv two must be exactly seven characters - that is the gate. When it passes, the program runs strcpy of the buffer and argv ONE with no length limit at all. That is the real overflow.",
    "lines": [
     {
-     "step": 3,
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
      "role": "cmd"
     },
     {
      "step": 3,
-     "role": "out",
-     "from": 0,
-     "to": 5
+     "role": "cmd"
     }
    ]
   },
@@ -44,20 +38,8 @@
      "role": "cmd"
     },
     {
-     "step": 4,
-     "role": "out",
-     "from": 0,
-     "to": 0
-    },
-    {
      "step": 5,
      "role": "cmd"
-    },
-    {
-     "step": 5,
-     "role": "out",
-     "from": 0,
-     "to": 0
     }
    ]
   },
@@ -66,19 +48,15 @@
    "lines": [
     {
      "step": 6,
-     "role": "cmd"
+     "role": "vim"
     },
     {
      "step": 7,
-     "role": "cmd"
+     "role": "vim"
     },
     {
      "step": 8,
-     "role": "cmd"
-    },
-    {
-     "step": 9,
-     "role": "cmd"
+     "role": "vim"
     }
    ]
   },
@@ -86,14 +64,8 @@
    "text": "Running it: the probe lands at zero b f f f f b one zero, the shell answers u i d equals one zero one two level twelve, and it reads the level twelve password: e m underscore k c u F.",
    "lines": [
     {
-     "step": 10,
+     "step": 11,
      "role": "cmd"
-    },
-    {
-     "step": 10,
-     "role": "out",
-     "from": 0,
-     "to": 2
     }
    ]
   },
@@ -101,10 +73,8 @@
    "text": "Verified live: logging in as level twelve with e m underscore k c u F succeeds. Level eleven solved.",
    "lines": [
     {
-     "step": 10,
-     "role": "out",
-     "from": 2,
-     "to": 2
+     "step": 11,
+     "role": "cmd"
     }
    ]
   }
