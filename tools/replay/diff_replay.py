@@ -222,10 +222,11 @@ def main():
                 if hit_sm:
                     pos = hit_sm[0] + 1
                     continue
-            # $RANDOM-derived workdir names (vortex L7: WORKDIR=/tmp/l7rec-NNNN)
-            if re.match(r'^WORKDIR=/tmp/\w+-\d+$', en):
+            # $RANDOM/mktemp-derived workdir names (vortex L7 /tmp/l7rec-NNNN,
+            # L11's mktemp -d /tmp/tmp.XXXXXXXXX) - run-to-run variables
+            if re.match(r'^WORKDIR=/tmp/\S+$', en) or re.match(r'^/tmp/tmp\.[A-Za-z0-9]+$', en):
                 hit_wd = [k for k in range(pos, len(seg_n))
-                          if re.match(r'^WORKDIR=/tmp/\w+-\d+$', seg_n[k])]
+                          if re.match(r'^(WORKDIR=/tmp/\S+|/tmp/tmp\.[A-Za-z0-9]+)$', seg_n[k])]
                 if hit_wd:
                     pos = hit_wd[0] + 1
                     continue
