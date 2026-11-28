@@ -384,8 +384,8 @@
 5. **Run it against the live service.**
    ```
    ./v0
-   received: 928768003 738568258 532716586 1402472015
-   sum:      3602524862 (0xd6ba2abe)
+   received: 1740728728 1686889646 685176201 1583143680
+   sum:      1400970959 (0x53811ecf)
    Username: vortex1 Password: <password>
    ```
    The four values and the sum change on every run — the service randomises

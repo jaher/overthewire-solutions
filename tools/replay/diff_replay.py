@@ -85,6 +85,14 @@ def main():
                     found = i - 1
                     break
             if found < 0:
+                # no logout (local/client-side session): anchor at the PROMPT
+                # exit echo ('client$ exit') so the segment carries the bare
+                # exit echoes the driver typed after it
+                for i in range(len(lines) - 1, cur - 1, -1):
+                    if lines[i].rstrip().endswith(first) and 'client$' in lines[i]:
+                        found = i
+                        break
+            if found < 0:
                 for i in range(len(lines) - 1, cur - 1, -1):
                     if lines[i].rstrip().endswith(first):
                         found = i
@@ -180,6 +188,21 @@ def main():
                 if hit_ts:
                     pos = hit_ts[0] + 1
                     continue
+            # per-connection random values (vortex L0: the service's four
+            # uint32s and their sum are fresh every connect) - match the
+            # shape, not the value
+            if re.match(r'^received: \d+ \d+ \d+ \d+$', en):
+                hit_rv = [k for k in range(pos, len(seg_n))
+                          if re.match(r'^received: \d+ \d+ \d+ \d+$', seg_n[k])]
+                if hit_rv:
+                    pos = hit_rv[0] + 1
+                    continue
+            if re.match(r'^sum:\s+\d+ \(0x[0-9a-f]+\)$', en):
+                hit_sm = [k for k in range(pos, len(seg_n))
+                          if re.match(r'^sum:\s+\d+ \(0x[0-9a-f]+\)$', seg_n[k])]
+                if hit_sm:
+                    pos = hit_sm[0] + 1
+                    continue
             hit = False
             for k in range(pos, len(seg_n)):
                 if seg_n[k] == en:
@@ -192,9 +215,18 @@ def main():
             # the final exit step's trailing 'exit' echo is typed at the client
             # shell; when the pty closes before bash echoes it the replay shows
             # only 'client$' (L3: cast has it, replay's client pty closed first).
-            # Accept that single line when everything else matched.
+            # Accept that single line when everything else matched. Same class
+            # for the bare driver-exit echoes of a local session (vortex L0:
+            # the pty dies between the two echoes; the cast keeps both, a
+            # replay can lose the last one to the same race).
             if cmd.rstrip() == 'exit\nexit' and missing == ['exit'] \
                and any('client$' in l for l in seg):
+                print(f"step {si} ({cmd[:40]}): trailing exit echo not echoed "
+                      f"(client pty closed) - accepted artifact")
+            elif cmd.rstrip() == 'exit' and missing == ['exit'] \
+                    and any(l.strip() == 'exit' for l in seg):
+                print(f"step {si} ({cmd[:40]}): trailing exit echo lost to the "
+                      f"pty-teardown race - accepted artifact")
                 print(f"step {si} ({cmd[:40]}): trailing exit echo not echoed "
                       f"(client pty closed) - accepted artifact")
             else:

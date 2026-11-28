@@ -1,1 +1,202 @@
-{"segments":[{"lines":[{"role":"goal","step":-1}],"text":"Vortex, level zero."},{"lines":[{"role":"goal","step":-1}],"text":"This one never gives you a shell at all: it is a network service listening on port 5842 of vortex.labs.overthewire.org."},{"lines":[{"role":"goal","step":-1}],"text":"The official description says the service sends four unsigned integers in host byte order, you add them up and send the sum back, and the reply contains the username and password for vortex one."},{"lines":[{"role":"goal","step":-1}],"text":"The machine is 32 bit x86, so host byte order means little endian."},{"lines":[{"role":"vimcmd","step":0},{"role":"vim","step":0}],"text":"I open vim and write a small C client, starting with the headers:"},{"lines":[{"role":"vim","step":1}],"text":"The headers: standard I/O, string, and unistd, then the socket headers, sys/socket, netinet/in, and arpa/inet, plus netdb for looking up host names."},{"lines":[{"role":"vim","step":2}],"text":"Then main: the declarations — a descriptor and counter, a sockaddr_in, a sixteen byte buffer, a two hundred fifty six byte reply buffer, four unsigned integers and a sum, a byte count — and then the TCP socket, created with socket, stream, zero, with an error check."},{"lines":[{"role":"vim","step":3}],"text":"Next I set up the address: zero the structure, set the family to AF_INET and the port to 5842, then resolve the host name with gethostbyname and copy the address in."},{"lines":[{"role":"vim","step":4}],"text":"Then I connect the socket to that address, with an error check."},{"lines":[{"role":"vim","step":5}],"text":"Then the read loop: keep reading until sixteen bytes have arrived, accumulating the count, and bail on any read error."},{"lines":[{"role":"vim","step":6}],"text":"Then the decode: copy each four byte group into an unsigned integer, add it to the sum, and print the four values and the sum."},{"lines":[{"role":"vim","step":7}],"text":"Then I write the four byte sum back to the service."},{"lines":[{"role":"vim","step":8}],"text":"Finally the reply loop: read into the two hundred fifty six byte buffer until the service closes, print the reply, close the socket, and return zero."},{"lines":[{"role":"vim","step":3}],"text":"The first bug I hit was using inet_pton on a host name, which only accepts a literal address, so I switched to gethostbyname;"},{"lines":[{"role":"vim","step":1}],"text":"the compiler also caught a missing netdb header."},{"lines":[{"role":"vim","step":5},{"role":"vim","step":8}],"text":"The reply arrives split across reads, and my input buffer was only sixteen bytes, so I read into a separate two hundred and fifty six byte buffer until the peer closes."},{"lines":[{"role":"cmd","step":9},{"role":"cmd","step":10},{"from":0,"role":"out","step":10,"to":2}],"text":"Then I compile with gcc, run it, and the service answers with the vortex one credentials."},{"lines":[{"from":2,"role":"out","step":10,"to":2},{"role":"pw","step":-1}],"text":"The service prints the vortex one username and password, and the level is solved."}]}
+{
+ "segments": [
+  {
+   "lines": [
+    {
+     "role": "goal",
+     "step": -1
+    }
+   ],
+   "text": "Vortex, level zero."
+  },
+  {
+   "lines": [
+    {
+     "role": "goal",
+     "step": -1
+    }
+   ],
+   "text": "This one never gives you a shell at all: it is a network service listening on port 5842 of vortex.labs.overthewire.org."
+  },
+  {
+   "lines": [
+    {
+     "role": "goal",
+     "step": -1
+    }
+   ],
+   "text": "The official description says the service sends four unsigned integers in host byte order, you add them up and send the sum back, and the reply contains the username and password for vortex one."
+  },
+  {
+   "lines": [
+    {
+     "role": "goal",
+     "step": -1
+    }
+   ],
+   "text": "The machine is 32 bit x86, so host byte order means little endian."
+  },
+  {
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "role": "vimcmd",
+     "step": 2
+    },
+    {
+     "role": "vim",
+     "step": 2
+    }
+   ],
+   "text": "I open vim and write a small C client, starting with the headers:"
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 2
+    }
+   ],
+   "text": "The headers: standard I/O, string, and unistd, then the socket headers, sys/socket, netinet/in, and arpa/inet, plus netdb for looking up host names."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 2
+    }
+   ],
+   "text": "Then main: the declarations — a descriptor and counter, a sockaddr_in, a sixteen byte buffer, a two hundred fifty six byte reply buffer, four unsigned integers and a sum, a byte count — and then the TCP socket, created with socket, stream, zero, with an error check."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 3
+    }
+   ],
+   "text": "Next I set up the address: zero the structure, set the family to AF_INET and the port to 5842, then resolve the host name with gethostbyname and copy the address in."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 3
+    }
+   ],
+   "text": "Then I connect the socket to that address, with an error check."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 3
+    }
+   ],
+   "text": "Then the read loop: keep reading until sixteen bytes have arrived, accumulating the count, and bail on any read error."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 3
+    }
+   ],
+   "text": "Then the decode: copy each four byte group into an unsigned integer, add it to the sum, and print the four values and the sum."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 5
+    }
+   ],
+   "text": "Then I write the four byte sum back to the service."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 6
+    }
+   ],
+   "text": "Finally the reply loop: read into the two hundred fifty six byte buffer until the service closes, print the reply, close the socket, and return zero."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 4
+    }
+   ],
+   "text": "The first bug I hit was using inet_pton on a host name, which only accepts a literal address, so I switched to gethostbyname;"
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 2
+    }
+   ],
+   "text": "the compiler also caught a missing netdb header."
+  },
+  {
+   "lines": [
+    {
+     "role": "vim",
+     "step": 3
+    },
+    {
+     "role": "vim",
+     "step": 6
+    }
+   ],
+   "text": "The reply arrives split across reads, and my input buffer was only sixteen bytes, so I read into a separate two hundred and fifty six byte buffer until the peer closes."
+  },
+  {
+   "lines": [
+    {
+     "role": "cmd",
+     "step": 7
+    },
+    {
+     "role": "cmd",
+     "step": 8
+    },
+    {
+     "from": 0,
+     "role": "out",
+     "step": 8,
+     "to": 3
+    }
+   ],
+   "text": "Then I compile with gcc, run it, and the service answers with the vortex one credentials."
+  },
+  {
+   "lines": [
+    {
+     "from": 3,
+     "role": "out",
+     "step": 8,
+     "to": 3
+    },
+    {
+     "role": "pw",
+     "step": -1
+    },
+    {
+     "step": 9,
+     "role": "cmd"
+    }
+   ],
+   "text": "The service prints the vortex one username and password, and the level is solved."
+  }
+ ]
+}
