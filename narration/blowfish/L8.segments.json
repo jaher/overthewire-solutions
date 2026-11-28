@@ -52,7 +52,11 @@
    "lines": [
     {
      "step": 7,
-     "role": "cmd"
+     "role": "vim"
+    },
+    {
+     "step": 8,
+     "role": "vim"
     }
    ]
   },
@@ -60,13 +64,13 @@
    "text": "The run's next printf call jumps into the shellcode instead, the shellcode aligns the ids and execs a shell, and the pass file reads w three l l underscore d zero n three exclamation mark's successor: capital U lowercase r underscore t three h underscore s h one t.",
    "lines": [
     {
-     "step": 8,
+     "step": 12,
      "role": "cmd"
     }
    ]
   },
   {
-   "text": "The level is solved: the shell prints Ur underscore t three h underscore s h one t, the level9 password.",
+   "text": "The level is solved: the hijacked printf drops the shell with euid one thousand nine, and the pass file reads Ur underscore t three h underscore s h one t, the level9 password.",
    "lines": [
     {
      "step": -1,
