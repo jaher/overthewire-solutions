@@ -243,6 +243,23 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   differently from a manual run, test the pipe-vs-tty delivery path too -
   and note that a pipe run loses the interactive echo, so the JSON `out`
   comes from the subprocess's captured stdout, not the pty.
+  (g) The site only renders a staged vim screen when the JSON step cmd
+  matches /^vim\s+(.+)$/ (index.html vimFileOf): type `vim <file>` in the
+  recording, never `vi <file>` - `vi` steps render as plain commands with
+  fragmented partial output instead of ONE continuous editor session
+  (vortex L4's vim sc.asm/ex6.py/gen.py is the reference appearance;
+  maze L4's four `vi tinel.py` steps had to be re-recorded as a single
+  `vim tinel.py` session, 2026-11-28 user correction).
+  (h) The lab throttles ssh auth by source after several failures: a failed
+  recording (wrong password, driver bug typing garbage at the login prompt)
+  locks out the NEXT attempts for minutes - and the lockout looks like a
+  password rotation (maze4/maze3/maze2 all "Permission denied" right after a
+  botched run, then the same passwords work again after a quiet period).
+  Before re-deriving passwords or assuming a lab reset, STOP connecting for
+  ~10 minutes and retry once; never fire rapid retry probes - each denied
+  attempt extends the lockout. Also: a failed session that dumps the whole
+  vi buffer into the CLIENT shell is the signature of ptyrun2 never entering
+  the editor (login failed), not a driver-file defect.
 
 ## Standing rule — never stop until all levels are solved (user 2026-11-27)
 - The mission is ALL levels, ALL games, solved and shipped. A parked line, a
@@ -264,6 +281,16 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   the queue, re-probe each parked level with a cheap live check; any change
   in conditions (kernel, DNS, auth, rate limit, binary md5) immediately
   reopens the level.
+
+## Standing rule — keep README.md in sync with solved levels (user 2026-11-28)
+- Every level (or game) that is completed, or whose blocker state changes
+  (solved, parked, re-opened, unblocked), updates the status row in
+  `README.md` in the SAME commit as the work. The per-game JSON is the
+  source of truth; the README table is the human-facing mirror and must
+  never lag it.
+- When resuming a session or finishing a queue pass, diff the README
+  against the actual per-game JSON state (solved level counts, missing
+  passwords, cast coverage) and fix any drift in the same commit.
 
 See RECORDING-STANDARD.md for the full v2 standard; this file adds the
 character-exact fidelity and vi-everywhere rules (user, 2026-11-25) and the
