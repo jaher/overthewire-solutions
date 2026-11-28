@@ -14,7 +14,7 @@ Solutions to **every OverTheWire wargame** plus the **SmashTheStack** missions, 
 | Natas | Web security | 0–33 | ✅ Complete (34/34) — [solutions](natas-solutions.md) |
 | Leviathan | Linux/binary basics | 0–7 | ✅ Complete (8/8) — [solutions](leviathan-solutions.md) |
 | Krypton | Classical cryptography | 0–7 | ✅ Complete (8/8) — [solutions](krypton-solutions.md) |
-| Manpage | Linux privilege basics | 0–4 done, L5 in flight | ✅ L0–L4 complete (5/5), L5 **re-opened** (mechanism proven via stack-fill injection: the win fires when 0xdeadbeef sits in the loader-startup residue at an i-slot; hunting a natural trigger on the current kernel — see `tools/manpage/L5_PARK.md`) — [solutions](manpage-solutions.md) |
+| Manpage | Linux privilege basics | 0–4 done, L5 parked | ✅ L0–L4 complete (5/5), L5 **parked 2026-11-28** (residue frame map: the i-slot band below frame 1 is deterministic ld.so/libc startup data — 102/150 slots nonzero, zero attacker bytes, the only per-run random words miss every i-slot; LD_PRELOAD stripped on the setuid exec; no sibling euid-6 route; blocker = modern kernel+glibc leave nothing winnable — see `tools/manpage/L5_PARK.md`) — [solutions](manpage-solutions.md) |
 | Narnia | Buffer overflows & shellcode | 0–9 | ✅ Complete (10/10); L9 cast pending re-record — [solutions](narnia-solutions.md) |
 | Behemoth | Exploitation vs. mitigations | 0–7 | ✅ Complete (8/8) — [solutions](behemoth-solutions.md) |
 | Utumno | Advanced exploitation / reversing | 0–7 | ✅ Complete (8/8) — [solutions](utumno-solutions.md) |

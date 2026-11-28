@@ -30,15 +30,48 @@ Win: canyou()'s uninitialized `int i` (ebp-0xc) must read 0xdeadbeef -> setreuid
   writes nothing readable); LD_DEBUG/LD_SHOW_AUXV/LD_TRACE: no content injection.
 - ptrace of the setuid binary: silently dropped at exec.
 
+## Second pass (2026-11-28, this session) - blocker CONFIRMED with a frame map
+- Residue frame map (gdb x/756xw band $ebp-3000..$ebp+64 on /tmp/mp5g): the band
+  below the first canyou frame is owned by ld.so (_dl_start/_dl_main/_dl_init
+  frames: ret ptrs f7fd7b39/f7fd012f/f7fd2af2/f7fd0d7e/f7fc99b4/f7fd02cb into
+  ld-linux r-x 0xf7fc7000..0xf7fec000) and libc __libc_start_main frames
+  (f7d8d7e7 into libc 0xf7d91000..). 102/150 i-slots at depths 2..92 hold
+  non-zero startup dwords (link_map ptrs f7ffda60/f7ffcfd4, auxv values
+  0x40/0x100/0x24c0000, stack ptrs) - deterministic, deadbeef-free, zero
+  attacker-influenced bytes (env/argv/exec-path markers never land; prior pass).
+- Per-run randomness: only TWO dwords vary between runs (0xffffd930, 0xffffdbe4
+  = AT_RANDOM-derived guard words); a two-run diff confirms NEITHER lands on an
+  i-slot (i-slots every 20B from ebp1-12 never coincide with them).
+- Invocation-shape sweep on the REAL setuid binary, all SIGSEGV: env -i, 2000
+  argv entries, 120KB single argv, ulimit -s 1MB/16MB/32MB, LC_ALL x3, via
+  /lib/ld-linux.so.2, setarch -R, MALLOC_PERTURB_, GLIBC_TUNABLES hwcaps.
+- LD_PRELOAD on the real setuid exec: silently stripped (constructor never
+  runs; same .so preloads fine on the chmod -s copy and prints
+  "PRELOAD uid=17005 euid=17005"; on the copy the fill then wins "I CAN!
+  17005" via system sh - mechanism re-proven live this session).
+- Sibling-account audit: NO setuid/setgid manpage6 binary except manpage5
+  itself; earlier sources (0-3.c) read via their own accounts contain no
+  euid-6 path; manpage4.diff = the already-solved wumpus; no manpage6 cron,
+  no manpage6 mail, /home/manpage6 stock dotfiles. glibc 2.3.6 source grep:
+  0xdeadbeef appears only in test code, never in startup/loader paths - the
+  2008-era residue would have been ordinary libc startup garbage, not a
+  planted constant; modern glibc 2.43's startup leaves nothing attacker-shaped.
+- Web research exhausted available channels: Wayback holds ONE snapshot of
+  intruded.net/manpage.html (level list only, no writeups; the "famous work of
+  Ilja" link = Ilja's blog, dead); no public writeup of manpage5 exists on
+  GitHub/bing/DDG/Google (all queries; search engines mostly bot-blocked).
+
 ## Exact blocker (external)
 The natural win needs 0xdeadbeef to exist in the ld.so/libc startup residue at
 an i-slot. Nothing attacker-controllable lands there on the CURRENT lab stack
-(modern kernel + glibc, binaries rebuilt Oct 2025). The intended 2008-era
-(intruded.net) mechanism - if it relied on an old libc startup leaving
-deadbeef, or on a different loader path - does not reproduce here.
+(modern kernel 7.0.0-1014-aws + glibc 2.43, binaries rebuilt Oct 2025): the
+residue is deterministic loader/libc startup data, the only per-run random
+words miss every i-slot, and every injection lever is closed by AT_SECURE
+(LD_PRELOAD stripped on the setuid exec).
 Re-check trigger: any change of the lab image (kernel/libc version, binary
-md5), or a found writeup of the original game (search terms used: "manpage5
-canyou 0xdeadbeef", intruded.net archives - none indexed).
+md5), or a found writeup of the original game (search terms used: "manpage5",
+"canyou deadbeef wargame", "manpage wargame intruded writeup", intruded.net +
+smashthestack forum archives - none indexed).
 
 ## Working probes left in place on the server
 /tmp/e208.b64+py (LD_PRELOAD filler = mechanism proof, works), /tmp/mp5_nosuid

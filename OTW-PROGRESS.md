@@ -428,3 +428,26 @@ Games registered in games/manifest.json + games/{tux,logic,blackbox,blowfish,ama
   classic unrestricted-pickle solve is DEAD; the exit-code oracle and the no-fork read
   chain both need a global reduce and are dead with it. AMATERIA L0 stays PARKED
   (documented once, moving on per the standing rule).
+
+## Manpage L5 second pass (2026-11-28): parked with residue frame-map evidence
+- Re-derived everything live as manpage5. The i-slot band below the first canyou
+  frame (gdb dump $ebp-3000..+64 on the chmod -s copy) is owned by ld.so
+  (_dl_start/_dl_main/_dl_init ret ptrs into 0xf7fc7000..0xf7fec000) and libc
+  __libc_start_main frames: 102/150 i-slots (every 20B from ebp1-12, depths
+  2..92) hold deterministic startup dwords (link_map ptrs, auxv values,
+  stack ptrs) - zero deadbeef, zero attacker-influenced bytes. Two-run diff:
+  the ONLY per-run varying dwords (0xffffd930, 0xffffdbe4, AT_RANDOM guards)
+  never land on an i-slot - the random-lottery angle is closed with data.
+- LD_PRELOAD on the REAL setuid exec is silently stripped (constructor never
+  runs); the same .so on the chmod -s copy fills the band and WINS ("I CAN!
+  17005", system sh) - mechanism re-proven, lever closed by AT_SECURE.
+- Invocation shapes on the real binary, all SIGSEGV: env -i, 2000 argv, 120KB
+  argv, ulimit -s 1MB/16MB/32MB, LC_ALL, via ld-linux.so.2, setarch -R,
+  MALLOC_PERTURB_, GLIBC_TUNABLES.
+- Sibling accounts: no setuid-manpage6 binary except manpage5 itself; earlier
+  sources read via their own accounts (0-3.c) have no euid-6 path; no manpage6
+  cron/mail/homes. glibc-2.3.6 source: 0xdeadbeef only in tests, not startup.
+- Web: Wayback holds one intruded.net/manpage.html snapshot (level list only);
+  no public manpage5 writeup exists on any reachable engine. Blocker = modern
+  kernel 7.0.0-1014-aws + glibc 2.43 startup leaves nothing winnable at the
+  i-slots. Re-check trigger: lab image change or a found writeup.
