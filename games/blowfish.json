@@ -204,7 +204,7 @@
      ]
     }
    ],
-   "note": "DOCUMENTED-BLOCKED (verified live 2026-11-25, cast L3.cast): the level2 README points at a hidden backdoor for level3. The level3 backdoor /var/opt/.level3_backdoor exists (owned level3, mode 755) but its setuid bit was stripped server-side - contrast the working level4 backdoor (-rwsr-xr-x). Running it grants no euid elevation (id still uid=1002(level2)), and /pass/level3 is -r--r----- level3:level3, so cat returns Permission denied. No server-side path to level3 exists; the chain jumps 2 -> 4 via the setuid level4 backdoor (see L2). Numbering stays contiguous with this evidence entry."
+   "note": "DOCUMENTED-BLOCKED (verified live 2026-11-25 and re-derived 2026-11-28, cast L3.cast): the level2 README points at a hidden backdoor for level3. The level3 backdoor /var/opt/.level3_backdoor exists (owned level3, mode 755) but its setuid bit was stripped server-side - contrast the working level4 backdoor (/var/local/.<6 spaces>level4_backdoor, -rwsr-xr-x). Running it grants no euid elevation (id still uid=1002(level2)), and /pass/level3 is -r--r----- level3:level3, so cat returns Permission denied. 2026-11-28 re-derivation adds: /home/level3 (the writeup's level3-binary location) is mode 700 - unreadable and unlistable from level2, the binary name inside unknown; find / -user level3 -perm -4000 returns nothing; no level3-group-writable paths exist; level3 group has no members. The level4 backdoor CONFIRMED still live (echo 'cat /pass/level4' | it -> n3xt_l3v3l! with euid=1004(level4)) - the chain jumps 2 -> 4 via it. No server-side path to level3 exists; numbering stays contiguous with this evidence entry."
   },
   {
    "lvl": 4,
