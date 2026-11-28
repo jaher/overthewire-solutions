@@ -10,14 +10,6 @@
     {
      "step": 0,
      "role": "cmd"
-    },
-    {
-     "step": 1,
-     "role": "cmd"
-    },
-    {
-     "step": 2,
-     "role": "cmd"
     }
    ]
   },
@@ -25,14 +17,16 @@
    "text": "The disassembly tells the story. The program calls geteuid, passes it to setuid, then calls system with a string from rodata. Then it prints a prompt, reads up to one hundred twenty-seven bytes, sleeps two seconds, takes strlen of the buffer, and compares it against a negative constant that strlen can never return. So the password game itself is unwinnable - the comparison always fails and the program prints Incorrect password and Goodbye. The only code that matters happens before any of that: the system call.",
    "lines": [
     {
-     "step": 3,
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
      "role": "cmd"
     },
     {
      "step": 3,
-     "role": "out",
-     "from": 0,
-     "to": 7
+     "role": "cmd"
     }
    ]
   },
@@ -42,12 +36,6 @@
     {
      "step": 4,
      "role": "cmd"
-    },
-    {
-     "step": 4,
-     "role": "out",
-     "from": 0,
-     "to": 8
     }
    ]
   },
@@ -60,14 +48,14 @@
     },
     {
      "step": 6,
-     "role": "cmd"
+     "role": "vim"
     },
     {
      "step": 7,
-     "role": "cmd"
+     "role": "vim"
     },
     {
-     "step": 8,
+     "step": 9,
      "role": "cmd"
     }
    ]
@@ -78,12 +66,6 @@
     {
      "step": 10,
      "role": "cmd"
-    },
-    {
-     "step": 10,
-     "role": "out",
-     "from": 0,
-     "to": 2
     }
    ]
   },
@@ -92,9 +74,7 @@
    "lines": [
     {
      "step": 10,
-     "role": "out",
-     "from": 0,
-     "to": 0
+     "role": "cmd"
     }
    ]
   }

