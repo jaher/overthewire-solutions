@@ -21,20 +21,8 @@
      "role": "cmd"
     },
     {
-     "step": 1,
-     "role": "out",
-     "from": 0,
-     "to": 0
-    },
-    {
      "step": 2,
      "role": "cmd"
-    },
-    {
-     "step": 2,
-     "role": "out",
-     "from": 0,
-     "to": 5
     }
    ]
   },
@@ -44,12 +32,6 @@
     {
      "step": 3,
      "role": "cmd"
-    },
-    {
-     "step": 3,
-     "role": "out",
-     "from": 0,
-     "to": 4
     }
    ]
   },
@@ -59,12 +41,6 @@
     {
      "step": 4,
      "role": "cmd"
-    },
-    {
-     "step": 4,
-     "role": "out",
-     "from": 0,
-     "to": 8
     }
    ]
   },
@@ -73,19 +49,15 @@
    "lines": [
     {
      "step": 5,
-     "role": "cmd"
+     "role": "vim"
     },
     {
      "step": 6,
-     "role": "cmd"
+     "role": "vim"
     },
     {
      "step": 7,
-     "role": "cmd"
-    },
-    {
-     "step": 8,
-     "role": "cmd"
+     "role": "vim"
     }
    ]
   },
@@ -93,14 +65,8 @@
    "text": "Running the script: the program prints Write Ok, then prints what it read through the symlink - the level ten password: error colon U underscore s u x zero r Z.",
    "lines": [
     {
-     "step": 9,
+     "step": 8,
      "role": "cmd"
-    },
-    {
-     "step": 9,
-     "role": "out",
-     "from": 0,
-     "to": 1
     }
    ]
   },
@@ -108,7 +74,7 @@
    "text": "Verified live: logging in as level ten with that password succeeds. Level nine solved; the password for level ten is error colon U underscore s u x zero r Z.",
    "lines": [
     {
-     "step": 10,
+     "step": 9,
      "role": "cmd"
     }
    ]
