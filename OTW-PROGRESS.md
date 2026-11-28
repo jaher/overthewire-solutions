@@ -223,6 +223,26 @@ Formula One | L1 | SOLVED (2026-11-23): classic access()/open() TOCTOU (Leviatha
 Formula One | L2 | SOLVED (2026-11-23): mytmpnam /tmp predictability + hole-toggle race - the setuid binary invents /tmp/tmp_XXXX (26^4 = 456976 names, srand(urandom) but irrelevant), requires stat(name)!=0, then fopen(name)+fgets+fwrite(256). Pre-created 456,975 names as symlinks to /etc/formulaone_pass/formulaone2 (tmpfs had 1M free inodes), leaving one hole; the binary spins in the stat loop until it picks the hole, and a symlink(hole);unlink(hole) toggle makes fopen land on the password symlink (fork-per-round absorbs the segfault rounds when fopen hits the absent state). Password Bf125B7St83elbZFOoXpp0FKprbD1hZP verified by ssh login as formulaone2 (uid=20002). Files: tools/formulaone/l2/ (attack.c). | recordings/formulaone/L2.cast
 Formula One | L3 | SOLVED (2026-11-23): double-read race on echo->sz + ret2shm - doecho loads echo->sz TWICE (check cmp 0xff at 0x80491e2, memcpy size at 0x8049205, puts() between them); we own the 0777 shm segment and a toggler flips sz 10<->0x400 so the check passes while memcpy smears 1KB of our data over the stack (0x400 stays inside the 8KB shm - 0x2000 would fault mid-copy and never return). Saved EIP (buf+0x110 <- shm+0x114) points at shellcode in the SHM_EXEC (RWX) mapping - ret2shm; shm VA deterministic with ASLR off, 4KB sweep around a mimic-probe address hit 0xf7fb9000. GOTCHA: strtoul('ADC00ADC',0,0) parses base-0 as DECIMAL and returns 0 - pass 0xADC00ADC. Password O50RB7ijle1PYuGyw595NuU9O8S49b4o verified by ssh login as formulaone3 (uid=20003). Files: tools/formulaone/l3/ (attack.c). | recordings/formulaone/L3.cast
 
+BLACKBOX UNBLOCKED (2026-11-28): level1/level1 authenticates again on
+blackbox.smashthestack.org:2225 (OpenSSH_4.3, legacy kex) - the 2026-11-26 host-wide
+S2S sshd lockout LIFTED. Recon (level1, uid=1002, group gamers): uname = 2.6.32-042stab145.3
+(OpenVZ 32-bit, kernel 2006-era userspace: glibc 2.3.6 /lib/tls, gcc 4.1, python 2.x only,
+no base64). Home /home/level1 holds login2 (level2-owned, NOT suid, rwxr-xr-x): fgets(8),
+strncmp(buf,"PassFor2",4) = only the first 4 bytes checked, then system("/bin/sh") - the
+shell runs as level1 (no escalation in the binary itself; the pass prefix is the 'access
+code' gimmick). Suid binaries: traceroute.lbl (LBNL 1.4a12, root), /bin/ping (stock),
+unix_chkpwd/pt_chown/ssh-keysign/suexec (stock). $ORIGIN/LD_AUDIT route DEAD: glibc 2.3.6
+predates LD_AUDIT entirely (the audit lib never loads even on non-suid with la_version
+defined; and hardlink of traceroute.lbl into /tmp succeeded but /tmp+simfs is 100% FULL
+(0 blocks free; only hardlinks/renames work; per-user quota blocks even mkdir; /dev/shm
+(tmpfs) is writable+53M free but cross-device = no hardlink; gcc needs TMPDIR=/dev/shm).
+Web 80/81/85 closed. Password file location: NOT /pass (doesn't exist); /home/levelN dirs
+are root:levelN drwxr-x--- (next level's material hidden in its home). OPEN LEADS for L1:
+(a) the gamers group: find / -group gamers; (b) traceroute.lbl -g gateway-list heap
+behavior on 1.4a12 (post-2000 fix presumed, unverified); (c) /var/backups/passwd.bak
+(readable! grep level); (d) the level2 home is root:level2 - inaccessible until level2;
+(e) any other suid/non-stock binary; (f) the LBNL traceroute 'freeing gateway' bug in
+1.4a12 - verify by source-diffing the 1.4a12 tarball. NEXT: continue blackbox L1 recon.
 ## Re-record queue (user rule 2026-11-23 — casts must be fully legit; spec in RECORDING-STANDARD.md)
 Every cast must: start with a visible typed ssh login (user@host -p port, password, MOTD, level prompt); show every compiled/run file being WRITTEN in-session (vim or labeled heredoc, code visible); only real commands (comments as `#` or `echo` narration); no raw binary dumps (xxd/strings/od -c); password in clean text + login-verified.
 Re-record (in order, serialized, one at a time; then continue unsolved levels):

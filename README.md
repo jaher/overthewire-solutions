@@ -30,7 +30,7 @@ Solutions to **every OverTheWire wargame** plus the **SmashTheStack** missions, 
 |---|---|---|---|
 | Blowfish | Beginner, binary | 0–13 | 🟡 L1–L13 recorded & solved (13/14); **L3 re-opened** (old verdict: level3 exec destroyed by a prior player — re-verifying on the live box); L0 entry-level cast pending — `recordings/blowfish/` |
 | Logic | Intermediate | 1–3 | ✅ L1–L3 solved (3/3); L4+ unreachable (19 recon rounds as level3, no path) |
-| Blackbox | Advanced | — | ⛔ **Blocked** — whole S2S host auth lockout (84.22.114.35 rejects every known-good credential incl. verified logic level3); operator/OTW-side, evidence in `OTW-BLACKBOX-PROBE.md` |
+| Blackbox | Advanced | 1–10 | 🟢 **UNBLOCKED 2026-11-28** — level1/level1 authenticates again (the 2026-11-26 host-wide lockout lifted); L1 recon in progress: `login2` (4-byte strncmp 'PassFor2' prefix → shell, not suid), suid `traceroute.lbl` 1.4a12 (glibc 2.3.6, no LD_AUDIT support), /tmp disk-full (hardlink-only writes) — [evidence](OTW-BLACKBOX-PROBE.md) |
 | Tux | Intermediate | 0+ | ⏳ L0 parked — rate-limited box, `pfwd=/bin/cat` tunnel-only; re-check when the rate limit lifts |
 | Amateria | Intermediate | 0+ | ⏳ L0 parked — admins patched the pickle service; all outbound routes closed |
 | APFEL | Beginner | — | ⛔ Offline — skipped until back online |
