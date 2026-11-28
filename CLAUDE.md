@@ -281,6 +281,21 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   the queue, re-probe each parked level with a cheap live check; any change
   in conditions (kernel, DNS, auth, rate limit, binary md5) immediately
   reopens the level.
+- **"Unreachable" is a hypothesis, never a verdict (user 2026-11-28).**
+  Levels the user considers solvable — "unreachable" ones included. When a
+  level was marked unreachable (no path from the current account, no
+  entry point, dead end), that claim must be re-derived from scratch, not
+  inherited: (a) re-read the level's own page/write-up for hints the
+  previous pass missed; (b) re-audit the *entire* attack surface, not just
+  the level binary — sibling accounts, cron, other games' binaries on the
+  host, web interfaces, file permissions, environment, the wrapper around
+  the level, and every account you can already read as a foothold; (c)
+  search the internet for that exact level (write-ups, forums, GitHub) —
+  techniques for the same level often exist that the prior pass never
+  considered; (d) try a different *entry account* if the game allows
+  multi-account access. A level stays "unreachable" only with current,
+  dated, per-route evidence that the specific route is closed *today* —
+  and even then it is re-probed on every queue pass.
 
 ## Standing rule — keep README.md in sync with solved levels (user 2026-11-28)
 - Every level (or game) that is completed, or whose blocker state changes
