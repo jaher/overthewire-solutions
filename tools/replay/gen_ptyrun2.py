@@ -85,7 +85,11 @@ def main():
             if i == 0:
                 pass  # ptyrun2 performs the typed login itself
             else:
-                out.append('@line exit')
+                # the preceding step is usually the logout 'exit' already
+                # emitted - a second one would close the CLIENT shell and
+                # strand the re-login in a dead pty (vortex L3 replay)
+                if not (out and out[-1] == '@line exit'):
+                    out.append('@line exit')
                 out.append('@sleep 2')
                 out.append('@login2')
             i += 1

@@ -227,6 +227,14 @@ def main():
                     and any(l.strip() == 'exit' for l in seg):
                 print(f"step {si} ({cmd[:40]}): trailing exit echo lost to the "
                       f"pty-teardown race - accepted artifact")
+            elif cmd.rstrip() == 'exit' and len(missing) == 1 \
+                    and missing[0].rstrip().endswith('exit') and '$' in missing[0] \
+                    and any(l.rstrip().endswith('exit') and '$' in l for l in seg):
+                # same echo, different client prompt label (cast container shows
+                # 'user@localhost$ ', replay shows 'client$ ') - prompt-label
+                # artifact, the echoed command is identical (vortex L3)
+                print(f"step {si} ({cmd[:40]}): client prompt label differs "
+                      f"({missing[0].strip()[:24]}... vs replay client$) - accepted artifact")
                 print(f"step {si} ({cmd[:40]}): trailing exit echo not echoed "
                       f"(client pty closed) - accepted artifact")
             else:
