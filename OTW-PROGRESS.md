@@ -471,7 +471,9 @@ Games registered in games/manifest.json + games/{tux,logic,blackbox,blowfish,ama
   the Oct 25 13:40 values. No readable path to the current ssh passwords from
   inside (shadow unreadable, /home/vortex4 empty + world-readable, no cron/
   mail exposure found).
-- OPERATOR ITEM: need current vortex4+ ssh passwords (or a lab-side check of
-  /etc/shadow). Until then vortex L4+ Rule-4b replays (and any re-records) are
-  parked on this credential gap; the L4 JSON/cast fixes are committed and
-  audit-clean.
+- RESOLVED (2026-11-28 later): NOT a password divergence - a throttle/lockout
+  of the gotcha-(h) class. After a long quiet period both vortex4 (TlI5kxGd1)
+  and vortex5 (uwaRhgNq1) log in live with the chain passwords (uid=5004,
+  uid=5005 verified). The original 60+ minutes of rejections were the lab's
+  source-based lockout persisting across what should have been enough quiet.
+  L4 Rule-4b replay re-opened and running; operator item withdrawn.
