@@ -266,6 +266,14 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   Quote literal dollar/backslash/asterisk payloads in @line strings exactly as
   you would at a real prompt, and verify the archive/file names in the cast
   before accepting the run.
+  (j) On chain levels the LOGIN password and the LEVEL-OUTPUT password are
+  different: account N's login password is level N-1's output (vortex3 logs
+  in with L2's xRMRVus8g, NOT L3's output TlI5kxGd1 = vortex4's password).
+  A replay that auth-fails with "Permission denied" on the FIRST password
+  prompt is a wrong LOGIN password until proven otherwise - probe the login
+  alone (`ptyrun2 ... 'id'`) before suspecting lab rotation or the driver;
+  the pre-auth MOTD banner prints regardless of auth outcome, so a banner in
+  the output is NOT a successful login.
 
 ## Standing rule — never stop until all levels are solved (user 2026-11-27)
 - The mission is ALL levels, ALL games, solved and shipped. A parked line, a
