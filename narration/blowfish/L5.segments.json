@@ -32,6 +32,18 @@
     {
      "step": 3,
      "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "cmd"
     }
    ]
   },
@@ -39,11 +51,19 @@
    "text": "I open vim and write the shellcode with the level-five ids, assemble it with nasm, and extract the raw bytes.",
    "lines": [
     {
-     "step": 4,
+     "step": 7,
      "role": "vim"
     },
     {
-     "step": 5,
+     "step": 8,
+     "role": "vim"
+    },
+    {
+     "step": 10,
+     "role": "cmd"
+    },
+    {
+     "step": 11,
      "role": "cmd"
     }
    ]
@@ -52,7 +72,11 @@
    "text": "I open vim and write the exploit, riding the environment for a stable landing address, and fire it at the level.",
    "lines": [
     {
-     "step": 6,
+     "step": 14,
+     "role": "vim"
+    },
+    {
+     "step": 15,
      "role": "vim"
     }
    ]
@@ -61,7 +85,7 @@
    "text": "The run lands in the shellcode and the shell reads the pass file: ur underscore so underscore l33t.",
    "lines": [
     {
-     "step": 7,
+     "step": 20,
      "role": "cmd"
     }
    ]
