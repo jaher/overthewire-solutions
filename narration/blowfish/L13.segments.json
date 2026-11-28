@@ -10,14 +10,6 @@
     {
      "step": 0,
      "role": "cmd"
-    },
-    {
-     "step": 1,
-     "role": "cmd"
-    },
-    {
-     "step": 2,
-     "role": "cmd"
     }
    ]
   },
@@ -25,14 +17,12 @@
    "text": "The source: two mallocs of two hundred fifty bytes, data one and data two, adjacent on the heap. Then a strange gate: main returns minus one if argc is nonzero - the program must be executed with an EMPTY argument vector, which means argv one and argv two are actually the first two ENVIRONMENT strings. We build that with a python launcher that calls execve with argv containing only a null pointer. The magic-byte gate wants zeroes and nines at argv one forty-eight to fifty-one and fifty-eight to sixty-one, dead beef at argv two thirty-eight to forty-one, and bad c zero d e d at argv two forty-eight to fifty-one. Passing it runs an unbounded strcpy of argv one into the two-hundred-fifty-byte heap buffer, prints a hex dump of the buffer, and frees it.",
    "lines": [
     {
-     "step": 2,
+     "step": 1,
      "role": "cmd"
     },
     {
      "step": 2,
-     "role": "out",
-     "from": 0,
-     "to": 9
+     "role": "cmd"
     }
    ]
   },
@@ -45,19 +35,11 @@
     },
     {
      "step": 4,
-     "role": "cmd"
+     "role": "vim"
     },
     {
      "step": 5,
-     "role": "cmd"
-    },
-    {
-     "step": 6,
-     "role": "cmd"
-    },
-    {
-     "step": 7,
-     "role": "cmd"
+     "role": "vim"
     }
    ]
   },
@@ -65,20 +47,12 @@
    "text": "Why those pointers: freeing data one makes glibc look at the next chunk - data two, whose header we overwrote. Its previous-in-use bit is clear, so free unlinks data two's fake chunk. Modern glibc checks that the forward pointer's own backward link and the backward pointer's own forward link both point back at the chunk - safe unlinking. We satisfy both by aiming the pointers at data two's own header fields, which our overflow fills with the chunk address itself. free then completes with no abort at all.",
    "lines": [
     {
-     "step": 4,
-     "role": "cmd"
-    },
-    {
-     "step": 5,
-     "role": "cmd"
-    },
-    {
      "step": 6,
-     "role": "cmd"
+     "role": "vim"
     },
     {
      "step": 7,
-     "role": "cmd"
+     "role": "vim"
     },
     {
      "step": 8,
@@ -86,15 +60,15 @@
     },
     {
      "step": 9,
-     "role": "cmd"
+     "role": "vim"
     },
     {
      "step": 10,
-     "role": "cmd"
+     "role": "vim"
     },
     {
      "step": 11,
-     "role": "cmd"
+     "role": "vim"
     }
    ]
   },
@@ -102,14 +76,8 @@
    "text": "Running it: the dump prints the overflowed buffer - the heap marker, the gate nines, the filler, and our fake-chunk bytes past the two-hundred-fifty-byte boundary - and the program exits without a single glibc complaint: the unlink passed every safe-unlinking check.",
    "lines": [
     {
-     "step": 13,
+     "step": 12,
      "role": "cmd"
-    },
-    {
-     "step": 13,
-     "role": "out",
-     "from": 0,
-     "to": 3
     }
    ]
   },
@@ -117,14 +85,8 @@
    "text": "One note: the binary is setuid level thirteen, which is already who we are, so this level grants no new privilege - the heap overflow is the point. The flag: reading slash pass slash level thirteen gives zero n three underscore m zero r three, which per the game's own banner is the password into Tux, the next wargame. Blowfish is complete.",
    "lines": [
     {
-     "step": 14,
+     "step": 13,
      "role": "cmd"
-    },
-    {
-     "step": 14,
-     "role": "out",
-     "from": 0,
-     "to": 0
     }
    ]
   }
