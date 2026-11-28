@@ -283,10 +283,16 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   BEFORE the next command.
   (l) A long-running step (crack, sweep) also eats the next @line: type-ahead
   lands in the running process's stdin and executes when it exits, killing
-  the session plan. Use "waitafter" with a token that appears ONLY in the
-  step's output (never in typed source - gotcha c), and re-check that stacked
-  relaunches are not writing to the same cast file (pgrep the FULL chain
-  before launching; one run at a time).
+  the session plan. ptyrun2's @line now WAITS FOR THE PROMPT after each
+  command (fixed at the driver level, vortex L6) - do not reintroduce blind
+  sleeps. A waitafter cascade that waits for the NEXT command's output
+  deadlocks (waitfor blocks BEFORE typing that command); waitafter tokens
+  must come from the CURRENT step's own output only.
+  (m) Replays leave artifacts in the LAB workdir (v6, ex.py, /tmp/l6rec/*) -
+  a killed run's leftovers break re-runs (cp 'Permission denied' on the
+  stale file in the sticky /tmp). Clean the lab workdir (a one-shot
+  ptyrun2 rm pass) before every replay launch, and make the first JSON
+  step idempotent (rm -f) where the cast shows it.
 
 ## Standing rule — never stop until all levels are solved (user 2026-11-27)
 - The mission is ALL levels, ALL games, solved and shipped. A parked line, a
