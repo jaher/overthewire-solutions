@@ -1,0 +1,114 @@
+{
+ "segments": [
+  {
+   "text": "Blowfish, level six.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the level7 password from /levels/level6: a badfunc with an overflow the source still shows, but this build needs a jmp esp trampoline instead of a fixed address.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "objdump on badfunc shows the overflow, the randomization check reads zero, and ldd confirms the libc this binary binds.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the shellcode: forty-one bytes that read the pass file and write it out, no zero bytes.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "nasm assembles it and objcopy extracts the binary.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write findjmp: it scans the loaded libc for a jmp esp byte pair and prints the first hit.",
+   "lines": [
+    {
+     "step": 9,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The scan reports the trampoline address.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the exploit: the payload pads to the return slot, drops in the trampoline, and follows it with the shellcode.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The run lands, the shellcode reads the file, and the password ur_so_l33t's successor comes back: g zero zero d underscore j zero b.",
+   "lines": [
+    {
+     "step": 12,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

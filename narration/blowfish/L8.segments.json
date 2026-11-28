@@ -1,0 +1,78 @@
+{
+ "segments": [
+  {
+   "text": "Blowfish, level eight.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the level9 password from /levels/level8: the source shows a printf of a buffer we control, which makes this a format-string level.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "objdump of main shows the printf call, and objdump dash R pins printf's GOT slot at 0x804c00c-ish - the write target. The randomization check reads zero.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the exploit: the format string uses percent-hn writes to patch printf's GOT entry with the address of our shellcode, which rides in the environment so its address is stable.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The run's next printf call jumps into the shellcode instead, the shellcode aligns the ids and execs a shell, and the pass file reads w three l l underscore d zero n three exclamation mark's successor: capital U lowercase r underscore t three h underscore s h one t.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved: the shell prints Ur underscore t three h underscore s h one t, the level9 password.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

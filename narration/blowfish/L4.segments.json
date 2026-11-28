@@ -1,0 +1,93 @@
+{
+ "segments": [
+  {
+   "text": "Blowfish, level four.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the level5 password from /levels/level4: a binary that calls setuid geteuid then strcpy's our argument over a small buffer.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The source shows the shape: setuid of the effective id drops privileges to our own, then an unbounded strcpy into a stack buffer - no canary, and the overflow runs at our own uid, so shellcode can do the work itself.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "objdump shows main passing argv one straight to the vulnerable function, and the readelf check confirms no stack randomization is on for the probe run.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the shellcode: fifty-five bytes, no zero bytes, geteuid, setreuid, setuid to align the ids, then execve of bin slash sh.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "nasm assembles it and objcopy extracts the raw binary.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the exploit: it measures the stack landing in this environment, rides the environment so the address is stable, and overflows the return address into the shellcode.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The run lands in the shellcode, id confirms uid one thousand five, level5, and the pass file reads yummy underscore bluntz.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

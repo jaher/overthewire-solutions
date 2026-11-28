@@ -1,0 +1,79 @@
+{
+ "segments": [
+  {
+   "text": "Blowfish, level five.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the level6 password from /levels/level5: another unbounded strcpy of our argument into a stack buffer, with the same no-randomization posture as level four.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The source and objdump show the same vulnerable shape as level four, so the same shellcode strategy applies: get the ids aligned with setreuid, then execve bin slash sh.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the shellcode with the level-five ids, assemble it with nasm, and extract the raw bytes.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "vim"
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the exploit, riding the environment for a stable landing address, and fire it at the level.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The run lands in the shellcode and the shell reads the pass file: ur underscore so underscore l33t.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

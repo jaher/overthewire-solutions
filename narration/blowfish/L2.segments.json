@@ -1,0 +1,101 @@
+{
+ "segments": [
+  {
+   "text": "Blowfish, level two.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "Level two's telnet service hands out another rot-thirteen challenge, and the level2 box hides the next hop. The goal is the level4 password from /pass/level4.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The service prints GungJnfRnfl; tr rot-thirteen decodes it to ThatWasEasy.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I log in as level2 with the previous password and confirm the identity.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The README points at a backdoor hidden somewhere on the system.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "A find for setuid-root-style binaries sweeps the box and turns up two unusual entries: the level3 backdoor in var opt, and a level4 backdoor in var local whose name is a dot, six spaces, and level4 underscore backdoor.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The listing confirms it: dash r w s r-xr-x, setuid level4, group level3.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Running it drops a shell whose id shows euid one thousand four, level4, and the pass file reads n three x t underscore l three v three l exclamation.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}

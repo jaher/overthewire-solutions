@@ -1,0 +1,83 @@
+{
+ "segments": [
+  {
+   "text": "Blowfish, level seven.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the level8 password from /levels/level7: the source shows the overflow, and this time the answer is return-to-libc rather than raw shellcode.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "objdump around the vulnerable call shows the buffer and the return, the randomization check reads zero, and the process maps confirm where libc loads.",
+   "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "nm on the libc dynamic symbols pins the exact addresses of system, setuid, and strcpy.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the exploit: the payload overflows the return address into system with a command string that cats the pass file, chained with setuid so the shell keeps the rights it needs.",
+   "lines": [
+    {
+     "step": 7,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The run returns into system, the command executes, and the pass file reads g zero zero d underscore j zero b's successor: w three l l underscore d zero n three exclamation.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  }
+ ]
+}
