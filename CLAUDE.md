@@ -274,6 +274,19 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   alone (`ptyrun2 ... 'id'`) before suspecting lab rotation or the driver;
   the pre-auth MOTD banner prints regardless of auth outcome, so a banner in
   the output is NOT a successful login.
+  (k) A program that reads a prompt interactively (getpass etc.) will EAT the
+  next @line's bytes as its input if nothing is fed at the prompt: the
+  symptom is a garbled first-read echo (vortex L5: getpass read the following
+  'exit' as the password; the binary's '<lastchar>:<hex>' debug print decoded
+  it). Every prompt-consuming step needs a "feed" (waitfor token + typed
+  answer + anchored follow-ups) in the JSON so gen_ptyrun2 emits the waitfor
+  BEFORE the next command.
+  (l) A long-running step (crack, sweep) also eats the next @line: type-ahead
+  lands in the running process's stdin and executes when it exits, killing
+  the session plan. Use "waitafter" with a token that appears ONLY in the
+  step's output (never in typed source - gotcha c), and re-check that stacked
+  relaunches are not writing to the same cast file (pgrep the FULL chain
+  before launching; one run at a time).
 
 ## Standing rule — never stop until all levels are solved (user 2026-11-27)
 - The mission is ALL levels, ALL games, solved and shipped. A parked line, a
