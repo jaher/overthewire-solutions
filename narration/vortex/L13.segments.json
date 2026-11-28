@@ -1,0 +1,219 @@
+{
+ "segments": [
+  {
+   "text": "Vortex, level thirteen.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The level is /vortex/vortex13, setuid vortex14, and its gate is argc equals zero: main's first instruction compares argc against zero and exits if any argument exists. On this lab's kernel, seven zero zero, the empty-argv hole is filled - exec with a null argv still reports argc one - so the gate is unreachable and the level is blocked. This session is the evidence re-derivation: four angles, each closed live.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as vortex13.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I make a working directory and sweep angle one, cron: the cleanup jobs are world-readable but bandit-scoped, the bandit cron scripts are mode seven fifty owned bandit22, nothing executes as vortex14.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Angle two, trusted library directories: ld dot so dot conf points at the standard multiarch paths, ld dot so dot preload does not exist, and every candidate directory is read-only - the touch probe fails with permission denied.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "cmd"
+    },
+    {
+     "step": 11,
+     "role": "cmd"
+    },
+    {
+     "step": 12,
+     "role": "cmd"
+    },
+    {
+     "step": 13,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Angle three, cross-process memory access: I open vim and write the park payload builder - the same ROP that parks the level twelve binary in safecode's loop, so a setuid vortex13 child of ours stays alive as a stable target.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "cmd"
+    },
+    {
+     "step": 15,
+     "role": "cmd"
+    },
+    {
+     "step": 16,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The payload is ten sixty-eight bytes, no zero bytes, and it saves park five dot bin.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I run the builder.",
+   "lines": [
+    {
+     "step": 19,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Then I open vim and write the process_vm probe: it forks a child that execs the level twelve binary with the park payload, sleeps past the drop, then tries process_vm_readv on the parked loop, process_vm_writev on the bss scratch, and a pwrite on proc slash pid slash mem.",
+   "lines": [
+    {
+     "step": 21,
+     "role": "vim"
+    },
+    {
+     "step": 22,
+     "role": "vim"
+    },
+    {
+     "step": 23,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I compile and run it: readv and writev fail with no such process - the child died before the probe landed - and the mem open fails with permission denied. Kernel yama and the setuid-loss point close the window.",
+   "lines": [
+    {
+     "step": 30,
+     "role": "cmd"
+    },
+    {
+     "step": 31,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Then I open vim and write the rw probe: it spawns the level thirteen binary itself with an empty argv twenty times and, per spawn, hammers process_vm_writev in a tight loop while the process lives, counting successes.",
+   "lines": [
+    {
+     "step": 32,
+     "role": "vim"
+    },
+    {
+     "step": 33,
+     "role": "vim"
+    },
+    {
+     "step": 34,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I compile it and run it under nohup: twenty spawns, zero writes, twenty eperm, zero exits. The post-exec window is not writable - the setuid loss happens before any userland access can land.",
+   "lines": [
+    {
+     "step": 39,
+     "role": "cmd"
+    },
+    {
+     "step": 40,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Angle four is closed by the same result: the userland-exec family needs a writable post-exec window, and the setuid-loss point precedes any of it.",
+   "lines": [
+    {
+     "step": 40,
+     "role": "cmd"
+    },
+    {
+     "step": 41,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level stays blocked pending a kernel change on the lab host; every route re-derived this session is closed with live evidence.",
+   "lines": [
+    {
+     "step": 41,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": 42,
+     "role": "cmd"
+    }
+   ]
+  }
+ ]
+}
