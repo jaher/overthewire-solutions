@@ -85,6 +85,15 @@
    "text": "The file is 29 lines, 924 bytes.",
    "lines": [
     {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "out",
+     "from": 0
+    },
+    {
      "step": 7,
      "role": "cmd"
     }
@@ -94,60 +103,80 @@
    "text": "I log out of the shell.",
    "lines": [
     {
-     "step": 9,
+     "step": 8,
      "role": "cmd"
     }
    ]
   },
   {
-   "text": "Back on my own shell, I make a local directory and write the cracker there. It is the same twenty-worker search, written out again to run locally. The heredoc writes the whole file in one go: imports, target, worker, and pool.",
+   "text": "Back on my own shell, I make a local directory and open vim on the cracker there. Vim warns about a swap file left by an earlier edit session; I open anyway. It is the same twenty-worker search, typed out again to run locally.",
    "lines": [
     {
-     "step": 10,
+     "step": 9,
      "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "vimcmd"
+    },
+    {
+     "step": 10,
+     "role": "vim"
     },
     {
      "step": 11,
-     "role": "cmd"
+     "role": "vim"
+    },
+    {
+     "step": 12,
+     "role": "vim"
+    },
+    {
+     "step": 13,
+     "role": "vim"
     }
    ]
   },
   {
-   "text": "The local copy is 29 lines, the run finds the five-character password, the hash checks out, and I log back in to run it.",
+   "text": "The local copy is 29 lines, the run finds the five-character password, and the hash checks out.",
    "lines": [
     {
-     "step": 12,
-     "role": "cmd"
-    },
-    {
-     "step": 13,
-     "role": "cmd"
-    },
-    {
-     "step": 13,
-     "role": "out",
-     "from": 0
-    },
-    {
      "step": 14,
      "role": "cmd"
-    },
-    {
-     "step": 14,
-     "role": "out",
-     "from": 0
     },
     {
      "step": 15,
      "role": "cmd"
+    },
+    {
+     "step": 15,
+     "role": "out",
+     "from": 0
+    },
+    {
+     "step": 16,
+     "role": "cmd"
+    },
+    {
+     "step": 16,
+     "role": "out",
+     "from": 0
     }
    ]
   },
   {
-   "text": "Then I run the level directly, /vortex/vortex5, and type the cracked password, five characters, at the getpass prompt.",
+   "text": "I log back in as vortex5 and run the level directly, /vortex/vortex5, typing the cracked password at the getpass prompt.",
    "lines": [
     {
-     "step": 16,
+     "step": 17,
+     "role": "cmd"
+    },
+    {
+     "step": 18,
+     "role": "cmd"
+    },
+    {
+     "step": 19,
      "role": "cmd"
     }
    ]
@@ -156,10 +185,10 @@
    "text": "The level says you got the right password, congrats, and spawns a shell.",
    "lines": [
     {
-     "step": 16,
-     "role": "cmd",
-     "from": 2,
-     "to": 2
+     "step": 19,
+     "role": "out",
+     "from": 3,
+     "to": 4
     }
    ]
   },
@@ -167,8 +196,9 @@
    "text": "id confirms uid five thousand six, vortex6.",
    "lines": [
     {
-     "step": 17,
-     "role": "cmd"
+     "step": 19,
+     "role": "out",
+     "from": 5
     }
    ]
   },
@@ -176,8 +206,13 @@
    "text": "And the password file reads back o five k capital B capital P z capital S capital F capital M.",
    "lines": [
     {
-     "step": 18,
-     "role": "cmd"
+     "step": 19,
+     "role": "out",
+     "from": 7
+    },
+    {
+     "step": -1,
+     "role": "pw"
     }
    ]
   },
@@ -185,7 +220,7 @@
    "text": "The level is solved.",
    "lines": [
     {
-     "step": 19,
+     "step": 20,
      "role": "cmd"
     }
    ]
@@ -194,7 +229,7 @@
    "text": "I log out.",
    "lines": [
     {
-     "step": 24,
+     "step": 21,
      "role": "cmd"
     }
    ]

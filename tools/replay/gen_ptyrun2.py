@@ -25,6 +25,7 @@ def main():
     steps = lv['steps']
     out = []
     i = 0
+    cur_shell = 'remote'
     while i < len(steps):
         st = steps[i]
         cmd = st['cmd']
@@ -56,9 +57,9 @@ def main():
                     if body and re.match(r'^\s*\d+(?: |$)', body[0]):
                         clean = []
                         for l in body:
-                            nm = re.match(r'^\s*(\d+) (.*)$', l)
+                            nm = re.match(r'^\s*(\d+)( (.*))?$', l)
                             if nm:
-                                clean.append(nm.group(2))
+                                clean.append(nm.group(3) or '')
                         body = clean
                     # union the staged screens: each carries a window of the
                     # buffer keyed by absolute line number; later screens
@@ -66,14 +67,25 @@ def main():
                     # end of the run = the final buffer
                     if body and re.match(r'^\s*\d+(?: |$)', steps[j]['out'][0] if steps[j]['out'] else ''):
                         for l in steps[j]['out']:
-                            nm = re.match(r'^\s*(\d+) (.*)$', l)
+                            nm = re.match(r'^\s*(\d+)( (.*))?$', l)
                             if nm:
-                                rows[int(nm.group(1))] = nm.group(2)
+                                rows[int(nm.group(1))] = nm.group(3) or ''
                 j += 1
             if rows:
                 buf = [rows[k] for k in sorted(rows)]
+            # the typing loop's trailing \r after the last line creates the
+            # final buffer line - drop a trailing blank row so the save line
+            # count matches the cast's :wq marker (vortex L5: 29L not 30L)
+            while buf and buf[-1] == '':
+                buf.pop()
+            # a buffer with interior blank lines needs @typeblanks (ptyrun2's
+            # blank-drop would shrink the save and diverge from the cast's
+            # :wq marker)
+            if any(l == '' for l in buf):
+                out.append('@typeblanks')
             out.append(f'@{editor} {fname}')
             out.extend(buf)
+            out.append('@typeblanks-off')
             out.append('@viend')
             i = j
             continue
@@ -84,18 +96,25 @@ def main():
         if cmd.startswith('ssh ') and ' -i ' not in cmd:
             if i == 0:
                 pass  # ptyrun2 performs the typed login itself
+                cur_shell = 'remote'
+            elif cur_shell == 'client':
+                # a client-side section ran between the logout and this ssh
+                # (vortex L5: local repro after the remote exit) - the typed
+                # ssh runs from the CURRENT client shell, no exit needed
+                out.append('@sleep 1')
+                out.append('@sshtyped')
+                cur_shell = 'remote'
             else:
-                # the preceding step is usually the logout 'exit' already
-                # emitted - a second one would close the CLIENT shell and
-                # strand the re-login in a dead pty (vortex L3 replay)
-                if not (out and out[-1] == '@line exit'):
-                    out.append('@line exit')
+                # still on the remote: log out first, then re-login
+                out.append('@line exit')
                 out.append('@sleep 2')
                 out.append('@login2')
             i += 1
             continue
-        if cmd == 'exit' and i + 1 >= len(steps):
+        if cmd == 'exit':
             out.append('@line exit')
+            if cur_shell == 'remote':
+                cur_shell = 'client'
             i += 1
             continue
         # a step's cmd may carry several real commands (e.g. the manpage L0 gdb
@@ -103,6 +122,30 @@ def main():
         # quit -> y). Each line is a real typed command - emit one @line per line.
         for cl in cmd.split('\n'):
             out.append(f'@line {cl}')
+        # "waitafter": "<token>" - the step's output takes a long time (a
+        # crack, a sweep); the next @line must not type ahead into the
+        # running process. The token must be a single word that appears ONLY
+        # in the awaited output, never in typed source (ptyrun2 gotcha c).
+        wa = st.get('waitafter')
+        if wa:
+            out.append(f'@waitfor {wa} -')
+        # "feed": {"waitfor": <token>, "type": <text>} - a prompt the step's
+        # program opens (getpass etc.): wait for the token, then type the
+        # text (vortex L5: the cracked password at getpass; without it the
+        # NEXT @line's bytes get eaten by the prompt - the 'exit' was read
+        # as the password, last-char 't' = 't:74' Incorrect)
+        fd = st.get('feed')
+        if fd:
+            out.append(f"@waitfor {fd['waitfor']} {fd['type']}")
+            # follow-up commands typed in the program's spawned shell (the
+            # step's out covers them - e.g. vortex L5's id + cat inside the
+            # won shell); a waitfor anchors each so typing waits for the
+            # previous command's output
+            for k, sub in enumerate(fd.get('then', [])):
+                anchor = fd.get('then_waitfors', [None] * len(fd.get('then', [])))[k]
+                if anchor:
+                    out.append(f'@waitfor {anchor} -')
+                out.append(f'@line {sub}')
         if cmd.startswith('ssh ') and ' -i ' in cmd:
             # a typed key-auth ssh opens a NEW remote session: pause so the
             # MOTD finishes before the next command is typed (typing during

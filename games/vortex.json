@@ -1769,17 +1769,26 @@
    "steps": [
     {
      "cmd": "ssh vortex5@vortex.labs.overthewire.org -p 2228",
-     "out": []
+     "out": [
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!"
+     ]
     },
     {
      "cmd": "mkdir -p /tmp/l5rec && cd /tmp/l5rec && rm -f crack5.py",
-     "out": []
+     "out": [
+      ""
+     ]
     },
     {
      "cmd": "vim crack5.py",
-     "text": "vim crack5.py -- the empty buffer",
      "out": [
-      "  1",
       "~",
       "~",
       "~",
@@ -1796,60 +1805,12 @@
       "~",
       "~",
       "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "crack5.py                                                                         0,0-1          All",
+      "crack5.py                                                                       0,0-1          All",
       "\"crack5.py\" [New]"
      ]
     },
     {
      "cmd": "vim crack5.py",
-     "text": "vim crack5.py -- insert chunk 1",
-     "out": [
-      "  1 import hashlib, itertools, string, multiprocessing as mp",
-      "  2",
-      "  3 TARGET = bytes.fromhex('155fb95d04287b757c996d77b5ea51f7')",
-      "  4 ALNUM = string.ascii_letters + string.digits",
-      "  5",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "crack5.py [+]                                                                     5,1            All",
-      "-- INSERT --"
-     ]
-    },
-    {
-     "cmd": "vim crack5.py",
-     "text": "vim crack5.py -- insert chunk 2",
      "out": [
       "  1 import hashlib, itertools, string, multiprocessing as mp",
       "  2",
@@ -1865,41 +1826,15 @@
       " 12                 return s",
       " 13     # the 5-char space: this first letter + 4 more",
       " 14     for t in itertools.product(ALNUM, repeat=4):",
-      " 15         s = first + ''.join(t)",
-      " 16         if hashlib.md5(s.encode()).digest() == TARGET:",
-      " 17             return s",
-      " 18     return None",
-      " 19",
       "~",
       "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "crack5.py [+]                                                                     19,1           All",
+      "crack5.py [+]                                                        14,48 ",
       "-- INSERT --"
      ]
     },
     {
      "cmd": "vim crack5.py",
-     "text": "vim crack5.py -- insert chunk 3",
      "out": [
-      "  2",
-      "  3 TARGET = bytes.fromhex('155fb95d04287b757c996d77b5ea51f7')",
-      "  4 ALNUM = string.ascii_letters + string.digits",
-      "  5",
-      "  6 def worker(first):",
-      "  7     # check short lengths for this first letter",
-      "  8     for L in range(1, 5):",
-      "  9         for t in itertools.product(ALNUM, repeat=L-1):",
-      " 10             s = first + ''.join(t)",
-      " 11             if hashlib.md5(s.encode()).digest() == TARGET:",
-      " 12                 return s",
-      " 13     # the 5-char space: this first letter + 4 more",
-      " 14     for t in itertools.product(ALNUM, repeat=4):",
       " 15         s = first + ''.join(t)",
       " 16         if hashlib.md5(s.encode()).digest() == TARGET:",
       " 17             return s",
@@ -1914,56 +1849,47 @@
       " 26                 break",
       " 27         else:",
       " 28             print('not found')",
-      " 29",
-      "crack5.py [+]                                                                     29,1           All",
+      "~",
+      "~",
+      "crack5.py [+]                                                        28,30 ",
       "-- INSERT --"
      ]
     },
     {
      "cmd": "vim crack5.py",
-     "text": "vim crack5.py -- finished, before :wq",
      "out": [
-      "  2",
-      "  3 TARGET = bytes.fromhex('155fb95d04287b757c996d77b5ea51f7')",
-      "  4 ALNUM = string.ascii_letters + string.digits",
-      "  5",
-      "  6 def worker(first):",
-      "  7     # check short lengths for this first letter",
-      "  8     for L in range(1, 5):",
-      "  9         for t in itertools.product(ALNUM, repeat=L-1):",
-      " 10             s = first + ''.join(t)",
-      " 11             if hashlib.md5(s.encode()).digest() == TARGET:",
-      " 12                 return s",
-      " 13     # the 5-char space: this first letter + 4 more",
-      " 14     for t in itertools.product(ALNUM, repeat=4):",
-      " 15         s = first + ''.join(t)",
-      " 16         if hashlib.md5(s.encode()).digest() == TARGET:",
-      " 17             return s",
-      " 18     return None",
-      " 19",
-      " 20 if __name__ == '__main__':",
-      " 21     with mp.Pool(20) as pool:",
-      " 22         for r in pool.imap_unordered(worker, list(ALNUM)):",
-      " 23             if r:",
-      " 24                 print('FOUND:', r)",
-      " 25                 pool.terminate()",
-      " 26                 break",
-      " 27         else:",
-      " 28             print('not found')",
       " 29",
-      "crack5.py [+]                                                                     29,1           All",
-      "                                                                                         ^["
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "crack5.py [+]                                                        29,1 ",
+      "\"crack5.py\" [New] 29L, 924B written"
      ]
     },
     {
      "cmd": "wc -l crack5.py",
      "out": [
+      "",
       "29 crack5.py"
      ]
     },
     {
      "cmd": "cat -n crack5.py",
      "out": [
+      "",
+      "",
       "     1\timport hashlib, itertools, string, multiprocessing as mp",
       "     2\t",
       "     3\tTARGET = bytes.fromhex('155fb95d04287b757c996d77b5ea51f7')",
@@ -1991,96 +1917,190 @@
       "    25\t                pool.terminate()",
       "    26\t                break",
       "    27\t        else:",
-      "    28\t            print('not found')",
-      "    29\t"
+      "    28\t            print('not found')"
      ]
     },
     {
      "cmd": "exit",
      "out": [
-      "logout"
+      "",
+      "logout",
+      "Connection to vortex.labs.overthewire.org closed."
      ]
     },
     {
      "cmd": "mkdir -p /tmp/l5local && cd /tmp/l5local && rm -f crack5.py",
-     "out": []
+     "out": [
+      ""
+     ]
     },
     {
-     "cmd": "cat > crack5.py <<'CRACKEOF'\nimport hashlib, itertools, string, multiprocessing as mp\n\nTARGET = bytes.fromhex('155fb95d04287b757c996d77b5ea51f7')\nALNUM = string.ascii_letters + string.digits\n\ndef worker(first):\n    # check short lengths for this first letter\n    for L in range(1, 5):\n        for t in itertools.product(ALNUM, repeat=L-1):\n            s = first + ''.join(t)\n            if hashlib.md5(s.encode()).digest() == TARGET:\n                return s\n    # the 5-char space: this first letter + 4 more\n    for t in itertools.product(ALNUM, repeat=4):\n        s = first + ''.join(t)\n        if hashlib.md5(s.encode()).digest() == TARGET:\n            return s\n    return None\n\nif __name__ == '__main__':\n    with mp.Pool(20) as pool:\n        for r in pool.imap_unordered(worker, list(ALNUM)):\n            if r:\n                print('FOUND:', r)\n                pool.terminate()\n                break\n        else:\n            print('not found')\nCRACKEOF",
-     "out": []
+     "cmd": "vim crack5.py",
+     "out": [
+      "E1187: Failed to source defaults.vim",
+      "~",
+      "~",
+      "~",
+      "Found a swap file by the name \".crack5.py.swp\"",
+      "owned by: node   dated: Sat Nov 28 10:24:34 2026",
+      "file name: /tmp/l5local/crack5.py",
+      "modified: YES",
+      "user name: node   host name: eb8f7e5ebf76",
+      "process ID: 2384578 (STILL RUNNING)",
+      "While opening file \"crack5.py\"",
+      "Swap file \".crack5.py.swp\" already exists!",
+      "[O]pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort:"
+     ]
+    },
+    {
+     "cmd": "vim crack5.py",
+     "out": [
+      "  1 import hashlib, itertools, string, multiprocessing as mp",
+      "  2",
+      "  3 TARGET = bytes.fromhex('155fb95d04287b757c996d77b5ea51f7')",
+      "  4 ALNUM = string.ascii_letters + string.digits",
+      "  5",
+      "  6 def worker(first):",
+      "  7     # check short lengths for this first letter",
+      "  8     for L in range(1, 5):",
+      "  9         for t in itertools.product(ALNUM, repeat=L-1):",
+      " 10             s = first + ''.join(t)",
+      " 11             if hashlib.md5(s.encode()).digest() == TARGET:",
+      " 12                 return s",
+      " 13     # the 5-char space: this first letter + 4 more",
+      " 14     for t in itertools.product(ALNUM, repeat=4):",
+      "~",
+      "~",
+      "crack5.py [+]                                                        14,48 ",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim crack5.py",
+     "out": [
+      " 15         s = first + ''.join(t)",
+      " 16         if hashlib.md5(s.encode()).digest() == TARGET:",
+      " 17             return s",
+      " 18     return None",
+      " 19",
+      " 20 if __name__ == '__main__':",
+      " 21     with mp.Pool(20) as pool:",
+      " 22         for r in pool.imap_unordered(worker, list(ALNUM)):",
+      " 23             if r:",
+      " 24                 print('FOUND:', r)",
+      " 25                 pool.terminate()",
+      " 26                 break",
+      " 27         else:",
+      " 28             print('not found')",
+      "~",
+      "~",
+      "crack5.py [+]                                                        28,30 ",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim crack5.py",
+     "out": [
+      " 29",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "crack5.py [+]                                                        29,1 ",
+      "\"crack5.py\" [New File] 29 lines, 924 bytes written"
+     ]
     },
     {
      "cmd": "wc -l crack5.py",
      "out": [
-      "28 crack5.py"
+      "",
+      "29 crack5.py"
      ]
     },
     {
      "cmd": "python3 crack5.py",
      "out": [
+      "",
       "FOUND: rlTf6"
-     ]
+     ],
+     "waitafter": "rlTf6"
     },
     {
      "cmd": "echo -n rlTf6 | md5sum",
      "out": [
+      "",
       "155fb95d04287b757c996d77b5ea51f7  -"
      ]
     },
     {
      "cmd": "ssh vortex5@vortex.labs.overthewire.org -p 2228",
-     "out": []
+     "out": [
+      "vortex5@vortex.labs.overthewire.org's password: ",
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!"
+     ]
+    },
+    {
+     "cmd": "cd /tmp/l5rec",
+     "out": [
+      ""
+     ]
     },
     {
      "cmd": "/vortex/vortex5",
      "out": [
+      "",
       "Password: ",
       "6:36",
-      "You got the right password, congrats!"
-     ]
-    },
-    {
-     "cmd": "id",
-     "out": [
-      "uid=5006(vortex6) gid=5005(vortex5) groups=5005(vortex5)"
-     ]
-    },
-    {
-     "cmd": "cat /etc/vortex_pass/vortex6",
-     "out": [
+      "You got the right password, congrats!",
+      "$ id",
+      "uid=5006(vortex6) gid=5005(vortex5) groups=5005(vortex5)",
+      "$ cat /etc/vortex_pass/vortex6",
       "o5kBPzSFM"
-     ]
+     ],
+     "feed": {
+      "waitfor": "Password:",
+      "type": "rlTf6",
+      "then": [
+       "id",
+       "cat /etc/vortex_pass/vortex6"
+      ],
+      "then_waitfors": [
+       "congrats",
+       "uid=5006"
+      ]
+     }
     },
     {
      "cmd": "exit",
-     "out": []
-    },
-    {
-     "cmd": "exit",
      "out": [
-      "logout"
-     ]
-    },
-    {
-     "cmd": "ssh vortex6@vortex.labs.overthewire.org -p 2228",
-     "out": []
-    },
-    {
-     "cmd": "id",
-     "out": [
-      "uid=5006(vortex6) gid=5006(vortex6) groups=5006(vortex6)"
-     ]
-    },
-    {
-     "cmd": "cat /etc/vortex_pass/vortex6",
-     "out": [
-      "o5kBPzSFM"
+      "vortex5@vortex:/tmp/l5rec$ exit"
      ]
     },
     {
      "cmd": "exit",
      "out": [
-      "logout"
+      "",
+      "logout",
+      "Connection to vortex.labs.overthewire.org closed.",
+      "client$ "
      ]
     }
    ]

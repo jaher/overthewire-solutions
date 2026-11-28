@@ -76,6 +76,14 @@ def main():
         last_exit = cmd.rstrip() == 'exit' and all(
             not steps[k].get('out') or steps[k]['cmd'].startswith('ssh ')
             for k in range(si + 1, len(steps)))
+        # consecutive vi steps with the same cmd = ONE editor session: they
+        # share the session's single command echo (vortex L5: remote vim 4
+        # steps + local vim 4 steps, each run echoes 'vim crack5.py' once)
+        if (re.match(r'^(?:vi|vim)\s', cmd) and si > 0
+                and steps[si-1].get('cmd') == cmd and anchors[si-1] >= 0):
+            anchors.append(anchors[si-1])
+            cur = anchors[si-1] + 1
+            continue
         found = -1
         if last_exit:
             # anchor at the remote shell's exit echo: the line right above the
@@ -155,9 +163,10 @@ def main():
                 core = mk.replace('[New] ', '')
                 if mk not in seg:
                     # try normalized, or as a suffix of a line carrying
-                    # escape-residue prefixes the cleaner kept
+                    # escape-residue prefixes the cleaner kept (the stream
+                    # line may keep the [New] token the core drops)
                     if norm(mk) not in seg_n and \
-                       not any(l.rstrip().endswith(core) for l in seg):
+                       not any(l.rstrip().endswith(core) or l.rstrip().endswith(mk) for l in seg):
                         print(f"step {si} ({cmd[:40]}): MARKER MISSING {mk}")
                         ok = False
                     else:
