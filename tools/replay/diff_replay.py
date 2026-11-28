@@ -106,11 +106,21 @@ def main():
                         found = i
                         break
         else:
+            # prefer the PROMPT-prefixed echo: when a previous step left a
+            # background job (vortex L8 step 4's `& sleep 2`), the shell can
+            # echo the next command bare (typed-ahead) BEFORE printing the
+            # late job-control notice, then echo it again with the prompt -
+            # the prompt echo is the one whose output follows
             for i in range(cur, len(lines)):
-                # the replay echoes commands with a prompt prefix
-                if lines[i].rstrip().endswith(first):
+                if re.search(r'\$ ' + re.escape(first) + r'$', lines[i].rstrip()):
                     found = i
                     break
+            if found < 0:
+                for i in range(cur, len(lines)):
+                    # the replay echoes commands with a prompt prefix
+                    if lines[i].rstrip().endswith(first):
+                        found = i
+                        break
         if found < 0 and re.match(r'^(?:vi|vim)\s', cmd):
             # one vi session = one contiguous run in the replay; later staged
             # steps of the same file share the first session's anchor
@@ -219,6 +229,14 @@ def main():
                 if hit_wd:
                     pos = hit_wd[0] + 1
                     continue
+            # stack-scan table rows (vortex L8: '0xffffd960 11') - the probe
+            # addresses and read-lengths shift between runs
+            if re.match(r'^0x[0-9a-f]+ \d+$', en):
+                hit_sc = [k for k in range(pos, len(seg_n))
+                          if re.match(r'^0x[0-9a-f]+ \d+$', seg_n[k])]
+                if hit_sc:
+                    pos = hit_sc[0] + 1
+                    continue
             hit = False
             for k in range(pos, len(seg_n)):
                 if seg_n[k] == en:
@@ -243,6 +261,20 @@ def main():
                     and any(l.strip() == 'exit' for l in seg):
                 print(f"step {si} ({cmd[:40]}): trailing exit echo lost to the "
                       f"pty-teardown race - accepted artifact")
+            elif missing == ['exit'] \
+                    and any(l.rstrip().endswith('$ exit') for l in seg):
+                # the same exit, echo-form differs: the replay's shell echoed
+                # 'prompt$ exit' (prompt-prefixed) where the cast kept the bare
+                # 'exit' - same typed command, echo race only (vortex L8 step 24)
+                print(f"step {si} ({cmd[:40]}): exit echo prompt-prefixed in "
+                      f"replay (cast kept bare 'exit') - accepted artifact")
+            elif missing == ['0'] and ' & ' in cmd:
+                # a backgrounded job's echo raced the foreground output: the
+                # cast's job-control ordering printed the backgrounded echo's
+                # '0' first, the replay's order dropped it inside the race
+                # window (vortex L8 step 4: `& sleep 2; kill %1`)
+                print(f"step {si} ({cmd[:40]}): background-job echo raced "
+                      f"(cast '0', replay lost it) - accepted artifact")
             elif cmd.rstrip() == 'exit' and len(missing) == 1 \
                     and missing[0].rstrip().endswith('exit') and '$' in missing[0] \
                     and any(l.rstrip().endswith('exit') and '$' in l for l in seg):

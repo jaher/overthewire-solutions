@@ -172,7 +172,7 @@
    ]
   },
   {
-   "text": "The exploit run is transported over a non-terminal session, because a terminal drags the thread to the dropped id and kills the race.",
+   "text": "The sweep now runs over the whole lower stack page, from ffff d zero zero zero to ffff e zero zero zero, because the probe showed the uid pattern sitting lower on the stack than the November recording's window.",
    "lines": [
     {
      "step": 24,
@@ -181,13 +181,13 @@
    ]
   },
   {
-   "text": "The sweep prints candidate addresses one by one, and the hit lands at ffff d nine eight eight: the uid signature reads nine thousand nine, the thread keeps its privilege.",
+   "text": "The sweep prints candidate addresses one by one, and the hit marks the buffer: the uid signature reads nine thousand nine, the thread keeps its privilege.",
    "lines": [
     {
      "step": 24,
      "role": "cmd",
      "from": 0,
-     "to": 3
+     "to": 6
     }
    ]
   },
@@ -197,8 +197,8 @@
     {
      "step": 24,
      "role": "cmd",
-     "from": 4,
-     "to": 4
+     "from": 7,
+     "to": 8
     }
    ]
   },
