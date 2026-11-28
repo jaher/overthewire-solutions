@@ -260,6 +260,12 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   attempt extends the lockout. Also: a failed session that dumps the whole
   vi buffer into the CLIENT shell is the signature of ptyrun2 never entering
   the editor (login failed), not a driver-file defect.
+  (i) ptyrun2 @line types through the REMOTE shell: anything the remote bash
+  would expand at a prompt gets expanded in the typed command - an unquoted
+  `$$.tar` became `<pid>.tar` on the wire (vortex L2 cast 1: "ownership.3.tar").
+  Quote literal dollar/backslash/asterisk payloads in @line strings exactly as
+  you would at a real prompt, and verify the archive/file names in the cast
+  before accepting the run.
 
 ## Standing rule — never stop until all levels are solved (user 2026-11-27)
 - The mission is ALL levels, ALL games, solved and shipped. A parked line, a
