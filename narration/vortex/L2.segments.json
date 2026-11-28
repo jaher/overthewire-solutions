@@ -10,7 +10,7 @@
    ]
   },
   {
-   "text": "The goal is the vortex3 password. The binary, /vortex/vortex2, is setuid vortex3, and all it does is run tar \u2014 and tar running as vortex3 can read the password file.",
+   "text": "The goal is the vortex3 password. The binary, /vortex/vortex2, is setuid vortex3, and all it does is exec tar with a fixed option bundle and up to three of our arguments — so tar runs as vortex3 and can read the password file.",
    "lines": [
     {
      "step": -1,
@@ -19,7 +19,7 @@
    ]
   },
   {
-   "text": "The plan: reuse the level-one trick to win a shell as vortex2, and have that shell run the wrapper on the password file, so tar writes it into an archive we can read.",
+   "text": "The plan: make tar archive the password file itself. Tar does not follow symlinks by default, but we control two of its arguments, and one of them can be an option — dash h, dereference — which turns the following into a plain option.",
    "lines": [
     {
      "step": -1,
@@ -28,26 +28,12 @@
    ]
   },
   {
-   "text": "I log in as vortex1 \u2014 the tools live in /vortex, and vortex1 can only write in /tmp.",
+   "text": "I log in as vortex2 and check the pieces: id shows five thousand two, the password file vortex3 is readable only by vortex3, and /vortex/vortex2 is setuid vortex3 with the vortex2 group — we may execute it.",
    "lines": [
     {
      "step": 0,
      "role": "cmd"
     },
-    {
-     "step": 0,
-     "role": "out",
-     "from": 0
-    },
-    {
-     "step": 0,
-     "role": "note"
-    }
-   ]
-  },
-  {
-   "text": "The listing confirms the setup: /vortex/vortex2 is setuid vortex3, the password file is mode four hundred and unreadable to us, and /tmp is world-writable with the sticky bit.",
-   "lines": [
     {
      "step": 1,
      "role": "cmd"
@@ -55,93 +41,88 @@
     {
      "step": 1,
      "role": "out",
-     "from": 0,
-     "to": 5
-    },
-    {
-     "step": 1,
-     "role": "note"
+     "from": 1
     }
    ]
   },
   {
-   "text": "I open vim and write drop.py: the level-one exploit as a reusable driver that feeds a script to the shell it wins.",
+   "text": "The file command confirms it: setuid ELF thirty two bit, not stripped. Running the binary bare, tar answers that it cowardly refuses to create an empty archive — so the wrapper really is tar, with our arguments appended after its own.",
    "lines": [
     {
      "step": 2,
-     "role": "vimcmd"
+     "role": "cmd"
     },
-    {
-     "step": 2,
-     "role": "vim"
-    }
-   ]
-  },
-  {
-   "text": "The imports, then the payload: two hundred sixty one backslashes and four 0xca bytes, the program spawned with a pipe, and after a short wait the payload goes in, then a plain sh, so the shell stays interactive.",
-   "lines": [
     {
      "step": 3,
-     "role": "vim"
+     "role": "cmd"
     }
    ]
   },
   {
-   "text": "Then it feeds the script file named on the command line, plus exit, and reads the shell's output for six seconds with select.",
+   "text": "I disassemble main: it builds an argv array whose first three slots are fixed addresses in rodata — the tar path, an option bundle, and the archive name — then copies argv one, two and three of the wrapper into the next three slots, and calls execv. No shell, no environment tricks: the injection surface is exactly those three argument slots.",
    "lines": [
     {
      "step": 4,
-     "role": "vim"
+     "role": "cmd"
     }
    ]
   },
   {
-   "text": "Finally it kills the process and prints whatever the shell said.",
+   "text": "The rodata dump names them: slash bin slash tar, the bundle c f — old-style create plus file — and the archive path slash tmp slash ownership dot dollar dollar dot tar, a literal name with dollar signs that no shell ever expands. Only two of our arguments survive, because the third slot has to stay null to terminate the array.",
    "lines": [
     {
      "step": 5,
-     "role": "vim"
+     "role": "cmd"
     }
    ]
   },
   {
-   "text": "I send the file over as base64 and write it back: seven hundred forty one bytes, executable.",
+   "text": "The archive from an earlier run is right where the constant says: owner vortex3, group vortex2 — group writable, and group vortex2 is us.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I set up a scratch directory with a dummy file, then probe whether injected options survive: I pass use-compress-program with an id redirect as the first argument. Tar accepts it and runs it — but the output shows uid five thousand two only: modern tar drops the setuid euid before spawning helper programs. Option injection works; privilege through it does not.",
    "lines": [
     {
      "step": 7,
      "role": "cmd"
     },
     {
-     "step": 7,
-     "role": "out",
-     "from": 0
+     "step": 8,
+     "role": "cmd"
     }
    ]
   },
   {
-   "text": "I open vim and write job.sh: the commands the won shell will run.",
-   "lines": [
-    {
-     "step": 8,
-     "role": "vimcmd"
-    },
-    {
-     "step": 8,
-     "role": "vim"
-    }
-   ]
-  },
-  {
-   "text": "It makes a scratch directory, runs /vortex/vortex2 on the password file so tar archives it, copies the archive into the scratch directory, and records the directory.",
+   "text": "So the privilege has to come from tar itself reading the file. I link the password file into the scratch directory.",
    "lines": [
     {
      "step": 9,
-     "role": "vim"
+     "role": "cmd"
     }
    ]
   },
   {
-   "text": "I send job.sh over the same way: a hundred fifty six bytes, executable.",
+   "text": "First try: run the wrapper on the link and list the archive. The listing shows the entry stored as a symlink — tar archived the link, not the target, and a symlink as vortex2 in an archive read back by vortex2 reads nothing.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "out",
+     "from": 1
+    }
+   ]
+  },
+  {
+   "text": "Second try: inject dash h — tar's dereference option — as the first argument, with the link second. Now the listing shows a regular file, minus r minus minus minus dash dash dash, owner vortex3, ten bytes: tar, running as vortex3, read the password file and stored its contents in the archive.",
    "lines": [
     {
      "step": 11,
@@ -150,12 +131,12 @@
     {
      "step": 11,
      "role": "out",
-     "from": 0
+     "from": 1
     }
    ]
   },
   {
-   "text": "I run the driver on job.sh \u2014 and the typed run shows the wrapper refusing to start from this channel: permission denied on line two, and the driver reports r c zero.",
+   "text": "Extracting to stdout with the extract flag and capital O prints the file content straight out of the archive: the vortex3 password. The archive is group vortex2, so reading it back is ordinary work. Level two solved.",
    "lines": [
     {
      "step": 12,
@@ -164,30 +145,20 @@
     {
      "step": 12,
      "role": "out",
-     "from": 0,
-     "to": 1
-    }
-   ]
-  },
-  {
-   "text": "The password itself was read from the archive in a separate interactive session \u2014 copy the tar, extract it, read the password file \u2014 and logging in as vortex3 with it returns the vortex3 id. The level is solved.",
-   "lines": [
-    {
-     "step": 13,
-     "role": "cmd"
-    },
-    {
-     "step": 13,
-     "role": "out",
-     "from": 0
-    },
-    {
-     "step": 13,
-     "role": "note"
+     "from": 1
     },
     {
      "step": -1,
      "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "I log out of the gibson, and level two is done.",
+   "lines": [
+    {
+     "step": 13,
+     "role": "cmd"
     }
    ]
   }

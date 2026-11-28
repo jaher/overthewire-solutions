@@ -172,6 +172,14 @@ def main():
                 if hit_ts:
                     pos = hit_ts[0] + 1
                     continue
+            # ISO-timestamp lines (tar tvf '2026-11-28 07:42', ls --full-time)
+            # carry a run-to-run mtime - same exemption class
+            if re.search(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}', en):
+                hit_ts = [k for k in range(pos, len(seg_n))
+                          if re.search(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}', seg_n[k])]
+                if hit_ts:
+                    pos = hit_ts[0] + 1
+                    continue
             hit = False
             for k in range(pos, len(seg_n)):
                 if seg_n[k] == en:
