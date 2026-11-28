@@ -330,6 +330,27 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   asciinema rec wraps a script that runs the pty phase (ptyrun2), then the
   -T phase (its real output appears as plain text in the recording), then
   the verify session (ptyrun2) - all three phases in ONE cast file.
+  (r) ptyrun2's pre-password wait had a 30s hard deadline (blowfish L13
+  replays, 2026-11-28): under lab load the banner + password prompt can take
+  longer than 30s to arrive; the deadline expiring types the password at
+  nothing and every later cmdfile line echoes at the password prompt (cast
+  signature: buffer lines like 'bash: p0: command not found' in the CLIENT
+  shell + 'Permission denied (publickey,password)'). Fixed in ptyrun2 (all
+  three login waits): the deadline extends while banner data still flows -
+  the wait only truly times out after 45s of silence. A session that dies
+  right after the MOTD with zero typed commands is the same stall one step
+  later (post-password drain + a frozen channel under the connection rate
+  limit) - the fix is a LONG quiet period (15-20 min), not driver retries.
+  (s) ptyrun2 @vi blocks always typed a trailing \r after the LAST buffer
+  line, so vim wrote an extra empty line and the :wq marker gained +1L/+1C
+  over a cast that edited a pre-existing file down to N lines (blowfish L13
+  l13launch.py: cast 9L/315C, replay 10L/316C). New directive "@nofinalnl"
+  on its own line before the final buffer line omits that \r. gen_ptyrun2
+  does not emit it - inject it into the replay cmdfile by hand when a cast
+  marker shows the no-trailing-blank shape (compare the marker's L count
+  against len(buffer)+1; equal = needs @nofinalnl). Beware the sed insertion
+  indentation: the directive must start at column 0 or it is typed as buffer
+  text (the 11L/327C run).
 
 ## Standing rule — never stop until all levels are solved (user 2026-11-27)
 - The mission is ALL levels, ALL games, solved and shipped. A parked line, a
