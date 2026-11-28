@@ -15,7 +15,7 @@ Solutions to **every OverTheWire wargame** plus the **SmashTheStack** missions, 
 | Leviathan | Linux/binary basics | 0–7 | ✅ Complete (8/8) — [solutions](leviathan-solutions.md) |
 | Krypton | Classical cryptography | 0–7 | ✅ Complete (8/8) — [solutions](krypton-solutions.md) |
 | Manpage | Linux privilege basics | 0–4 done, L5 parked | ✅ L0–L4 complete (5/5), L5 **parked 2026-11-28** (residue frame map: the i-slot band below frame 1 is deterministic ld.so/libc startup data — 102/150 slots nonzero, zero attacker bytes, the only per-run random words miss every i-slot; LD_PRELOAD stripped on the setuid exec; no sibling euid-6 route; blocker = modern kernel+glibc leave nothing winnable — see `tools/manpage/L5_PARK.md`) — [solutions](manpage-solutions.md) |
-| Narnia | Buffer overflows & shellcode | 0–9 | ✅ Complete (10/10); L9 cast pending re-record — [solutions](narnia-solutions.md) |
+| Narnia | Buffer overflows & shellcode | 0–9 | ✅ Complete (10/10) — [solutions](narnia-solutions.md) |
 | Behemoth | Exploitation vs. mitigations | 0–7 | ✅ Complete (8/8) — [solutions](behemoth-solutions.md) |
 | Utumno | Advanced exploitation / reversing | 0–7 | ✅ Complete (8/8) — [solutions](utumno-solutions.md) |
 | Maze | Exploitation & format strings | 0–8 | ✅ Complete (9/9) — [solutions](maze-solutions.md) |

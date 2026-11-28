@@ -1,7 +1,7 @@
 {
  "segments": [
   {
-   "text": "Narnia, level nine \u2014 the last one.",
+   "text": "Narnia, level nine — the last one.",
    "lines": [
     {
      "step": -1,
@@ -24,20 +24,40 @@
     {
      "step": 0,
      "role": "cmd"
+    },
+    {
+     "step": 0,
+     "role": "out",
+     "from": 0,
+     "to": 7
     }
    ]
   },
   {
-   "text": "The home directory holds a file called CONGRATULATIONS, and it reads: you are l three three t, next please \u2014 with a note asking us not to post writeups or spoilers. The game is complete.",
+   "text": "The home directory holds a file called CONGRATULATIONS, and it reads: you are l three three t, next please — with a note asking us not to post writeups or spoilers. The game is complete.",
    "lines": [
     {
      "step": 1,
      "role": "cmd"
     },
     {
-     "step": 1,
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
      "role": "out",
-     "from": 0,
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 3,
+     "role": "out",
+     "from": 1,
      "to": 2
     }
    ]
@@ -45,6 +65,10 @@
   {
    "text": "The password for narnia nine is shown, and the game is complete.",
    "lines": [
+    {
+     "step": 4,
+     "role": "cmd"
+    },
     {
      "step": -1,
      "role": "pw"
