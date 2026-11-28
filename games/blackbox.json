@@ -7,6 +7,13 @@
  "note": "Added to scope 2026-11-24. Advanced game. SSH: ssh -l level0 blackbox.smashthestack.org -p2225 (S2S FAQ pattern: username levelN, password levelN for the entry - verify first login live; the web page on :85 that used to document it is down). Legacy sshd (OpenSSH 4.3) - expect slow banner; drive via the claude-otw container ssh plumbing. Level count unknown until live recon.",
  "levels": [
   {
+   "lvl": 2,
+   "pw": "PassFor2",
+   "user": "level2",
+   "steps": [],
+   "note": "blackbox L2 (2026-11-28): the login2 binary in level1's home is the hint dispenser - strncmp(buf,'PassFor2',4) = only the first 4 bytes checked, and PassFor2 is level2's actual ssh password (login-verified, uid=1003). login2 itself is NOT suid (its system('/bin/sh') runs as level1 - no escalation in it). The L2->L3 gate = ~/getowner (setuid level3, source world-readable): filename from the env (survives setuid), strcpy(buf[128], '/tmp/'+filename) unbounded = a classic env-riding overflow; NX stack (GNU_STACK RW) => ret2libc into libc 2.3.6 (system @ +0x359b0, '/bin/sh' @ +0x120dce, no NUL bytes in the chain); ASLR randomizes the libc base over ~173 pages (observed 0xb75c8000-0xb7674000) => brute-force sweep with a comm-based hit detector (/proc/pid/comm == 'sh'). Cast pending a live re-solve."
+  },
+  {
    "lvl": 4,
    "pw": "BashingSh",
    "user": "level4",

@@ -223,6 +223,32 @@ Formula One | L1 | SOLVED (2026-11-23): classic access()/open() TOCTOU (Leviatha
 Formula One | L2 | SOLVED (2026-11-23): mytmpnam /tmp predictability + hole-toggle race - the setuid binary invents /tmp/tmp_XXXX (26^4 = 456976 names, srand(urandom) but irrelevant), requires stat(name)!=0, then fopen(name)+fgets+fwrite(256). Pre-created 456,975 names as symlinks to /etc/formulaone_pass/formulaone2 (tmpfs had 1M free inodes), leaving one hole; the binary spins in the stat loop until it picks the hole, and a symlink(hole);unlink(hole) toggle makes fopen land on the password symlink (fork-per-round absorbs the segfault rounds when fopen hits the absent state). Password Bf125B7St83elbZFOoXpp0FKprbD1hZP verified by ssh login as formulaone2 (uid=20002). Files: tools/formulaone/l2/ (attack.c). | recordings/formulaone/L2.cast
 Formula One | L3 | SOLVED (2026-11-23): double-read race on echo->sz + ret2shm - doecho loads echo->sz TWICE (check cmp 0xff at 0x80491e2, memcpy size at 0x8049205, puts() between them); we own the 0777 shm segment and a toggler flips sz 10<->0x400 so the check passes while memcpy smears 1KB of our data over the stack (0x400 stays inside the 8KB shm - 0x2000 would fault mid-copy and never return). Saved EIP (buf+0x110 <- shm+0x114) points at shellcode in the SHM_EXEC (RWX) mapping - ret2shm; shm VA deterministic with ASLR off, 4KB sweep around a mimic-probe address hit 0xf7fb9000. GOTCHA: strtoul('ADC00ADC',0,0) parses base-0 as DECIMAL and returns 0 - pass 0xADC00ADC. Password O50RB7ijle1PYuGyw595NuU9O8S49b4o verified by ssh login as formulaone3 (uid=20003). Files: tools/formulaone/l3/ (attack.c). | recordings/formulaone/L3.cast
 
+BLACKBOX L2 SOLVED + L3 ATTACK STATE (2026-11-28, same pass):
+- L2: login2 (level1's home, NOT suid) = the hint dispenser: strncmp(buf,
+  'PassFor2', 4) = the access code IS level2's ssh password; login-verified
+  as level2 (uid=1003).
+- The L2->L3 gate = /home/level2/getowner (4750 level3:gamers; source
+  world-readable): filename from the getenv (survives setuid - not LD_*),
+  strcpy(buf[128], '/tmp/'+filename) unbounded. NX stack (GNU_STACK RW) =>
+  ret2libc: libc 2.3.6 (/lib/tls) system @ +0x359b0, '/bin/sh' @ +0x120dce,
+  chain = 135 A's + [system][fake-ret][&'/bin/sh'] at buf+140 - no NUL bytes
+  in the chain bytes. ASLR (randomize_va_space=2) randomizes the libc base
+  over ~173 observed pages (0xb75c8000-0xb7674000) => brute-force: a C
+  wrapper re-execve's getowner ~3000x per guessed base with a /proc/pid/comm
+  == 'sh' hit detector, then feeds 'cat /home/level3/password' into the
+  spawned shell via a fifo; the win output goes to /dev/shm/win.txt.
+  Wrapper + sweep scripts staged on the box (/dev/shm/brute4, sweep2.sh).
+- SETBACK: the sweep verification ssh attempts (plus repeated checks) tripped
+  the host's connection-flood defense: kex_exchange_identification resets
+  from 84.22.114.35 for our IP (attempt 5+ over 40 min all reset). The sweep
+  MAY still be running on-box (nohup). RE-CHECK next pass: ssh back (from a
+  cooled-down IP state), read /dev/shm/win.txt (the L3 password if the sweep
+  hit) and /dev/shm/sweep2.log (progress/SWEEP2DONE). If the sweep died with
+  the box unreachable, re-run: the stagers are in /tmp/bb_stage4.sh +
+  /tmp/bb_stage5.sh (b64 python staging - the box has no base64 cmd, only
+  python2; gcc needs TMPDIR=/dev/shm because /tmp simfs is full).
+- GOTCHA (new): hammering an S2S host's sshd with frequent checks after an
+  exec storm = kex resets for the IP; space checks minutes apart.
 BLACKBOX L4 SOLVED + L5 RECON (2026-11-28, same pass):
 - L4: /home/level4/password = BashingSh (login-verified as level4, uid=1004).
   The password leaked by a prior player's artifact /dev/shm/l4_9z (level4:gamers
