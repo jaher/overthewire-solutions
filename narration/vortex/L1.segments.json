@@ -139,7 +139,7 @@
    ]
   },
   {
-   "text": "First I probe the hook through a pipe: three 0xbf bytes, then 0xc0 and 0xca, and the program just runs to All done \u2014 the bytes arrive, but with the cursor still at buf plus 0x100 nothing fires.",
+   "text": "First I probe the hook through a pipe: three 0xbf bytes, then 0xc0 and 0xca, and the program just runs to All done — the bytes arrive, but with the cursor still at buf plus 0x100 nothing fires.",
    "lines": [
     {
      "step": 3,
@@ -153,7 +153,7 @@
    ]
   },
   {
-   "text": "I check what the printf escapes actually emit, and od shows only three bytes and a newline \u2014 the escape route cannot build the payload.",
+   "text": "I check what the printf escapes actually emit, and od shows only three bytes and a newline — the escape route cannot build the payload.",
    "lines": [
     {
      "step": 4,
@@ -193,7 +193,7 @@
    "text": "The comment finishes the story: 0xca cannot be typed, so it is passed raw on a pipe, the getchar hook only filters keyboard input, and stdin stays open so the shell is interactive. The driver takes the backslash count from the command line, default two hundred sixty one, builds the payload, spawns the program with a pipe, and writes it.",
    "lines": [
     {
-     "step": 7,
+     "step": 6,
      "role": "vim"
     }
    ]
@@ -202,7 +202,7 @@
    "text": "It flushes, waits half a second, and feeds the shell id, cat of the vortex2 password file, and exit, then closes stdin and prints the return code.",
    "lines": [
     {
-     "step": 8,
+     "step": 6,
      "role": "vim"
     }
    ]
@@ -211,7 +211,7 @@
    "text": "Finally it reads the output and checks whether the vortex2 password is in it.",
    "lines": [
     {
-     "step": 9,
+     "step": 7,
      "role": "vim"
     }
    ]
@@ -220,16 +220,16 @@
    "text": "I send the file over as base64 and write it back, and it lands at eleven hundred sixty bytes.",
    "lines": [
     {
-     "step": 11,
+     "step": 8,
      "role": "cmd"
     },
     {
-     "step": 11,
+     "step": 8,
      "role": "out",
      "from": 0
     },
     {
-     "step": 11,
+     "step": 8,
      "role": "note"
     }
    ]
@@ -238,11 +238,11 @@
    "text": "First I try two hundred sixty backslashes: the program just prints the buffer back, and has shell is False.",
    "lines": [
     {
-     "step": 12,
+     "step": 9,
      "role": "cmd"
     },
     {
-     "step": 12,
+     "step": 9,
      "role": "out",
      "from": 0,
      "to": 2
@@ -253,11 +253,11 @@
    "text": "With two hundred sixty one it works: the output shows uid fifty oh two, vortex2, and the vortex2 password, and has shell is True.",
    "lines": [
     {
-     "step": 13,
+     "step": 9,
      "role": "cmd"
     },
     {
-     "step": 13,
+     "step": 9,
      "role": "out",
      "from": 0,
      "to": 2
@@ -265,12 +265,16 @@
    ]
   },
   {
-   "text": "The vortex2 password is printed, and the level is solved.",
+   "text": "The vortex2 password is printed, and the level is solved. I log out of the gibson, and level one is done.",
    "lines": [
     {
-     "step": 13,
+     "step": 9,
      "role": "out",
      "from": 1
+    },
+    {
+     "step": 10,
+     "role": "cmd"
     },
     {
      "step": -1,
