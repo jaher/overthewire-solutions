@@ -48,7 +48,11 @@
    "text": "I open vim and write the shellcode: fifty-five bytes, no zero bytes, geteuid, setreuid, setuid to align the ids, then execve of bin slash sh.",
    "lines": [
     {
-     "step": 5,
+     "step": 6,
+     "role": "vim"
+    },
+    {
+     "step": 7,
      "role": "vim"
     }
    ]
@@ -57,7 +61,11 @@
    "text": "nasm assembles it and objcopy extracts the raw binary.",
    "lines": [
     {
-     "step": 6,
+     "step": 9,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
      "role": "cmd"
     }
    ]
@@ -66,7 +74,7 @@
    "text": "I open vim and write the exploit: it measures the stack landing in this environment, rides the environment so the address is stable, and overflows the return address into the shellcode.",
    "lines": [
     {
-     "step": 7,
+     "step": 13,
      "role": "vim"
     }
    ]
@@ -75,7 +83,7 @@
    "text": "The run lands in the shellcode, id confirms uid one thousand five, level5, and the pass file reads yummy underscore bluntz.",
    "lines": [
     {
-     "step": 8,
+     "step": 19,
      "role": "cmd"
     }
    ]
