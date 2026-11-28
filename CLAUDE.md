@@ -302,6 +302,14 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   both handlers drain (idle=0.8, maxwait=10) before typing (vortex L9
   replay run 1). Symptom signature: the ssh line missing from the cast
   entirely + a ~30s silent gap + the password at the client prompt.
+  (o) A level that system()s a RELATIVE-path command (vortex L12: the parked
+  loop calls system("%d\n")) fails in a pty session with 'sh: 1: %d:
+  Permission denied' even though the file is executable in the CWD - dash's
+  PATH lookup does not include '.', and ./file works while `sh -c file`
+  fails (verified live: ./'%d' -> RAN-OK, sh -c '%d' -> rc=127). The fix is
+  `export PATH="$PWD:$PATH"` before the exploit run. The Nov-16 -T transport
+  worked only because that session's environment differed; never assume a
+  command-exec primitive transfers between session types.
 
 ## Standing rule — never stop until all levels are solved (user 2026-11-27)
 - The mission is ALL levels, ALL games, solved and shipped. A parked line, a
