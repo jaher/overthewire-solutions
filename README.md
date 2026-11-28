@@ -28,7 +28,7 @@ Solutions to **every OverTheWire wargame** plus the **SmashTheStack** missions, 
 
 | Game | Type | Levels | Status |
 |---|---|---|---|
-| Blowfish | Beginner, binary | 0–13 | 🟡 L1–L13 recorded & solved (13/14); **L3 re-opened** (old verdict: level3 exec destroyed by a prior player — re-verifying on the live box); L0 entry-level cast pending — `recordings/blowfish/` |
+| Blowfish | Beginner, binary | 0–13 | 🟡 L1–L13 recorded & solved (13/14); **L3 re-opened** (old verdict: level3 exec destroyed by a prior player — re-verifying on the live box); **L0 cast recorded + replay PASS** (entry level: /pass/level1 = 'level1', no challenge of its own) — `recordings/blowfish/` |
 | Logic | Intermediate | 1–3 | ✅ L1–L3 solved (3/3); L4+ unreachable (19 recon rounds as level3, no path) |
 | Blackbox | Advanced | 1–10 | 🟡 **UNBLOCKED 2026-11-28** (2026-11-26 lockout lifted): L2 solved (pw `PassFor2` = login2's strncmp-4 access code, login-verified) and L4 solved (pw `BashingSh`, from a player's `/dev/shm` artifact, login-verified); L3 attack running (getowner ret2libc brute over ~173 ASLR'd libc bases - an on-box sweep; our IP got kex-reset by the host mid-check, re-check next pass); **L5 parked** — shared.cc's path filter proven airtight (exact-port sweep of 3^16 inputs), no other euid-level5 reader; re-check queue-pass items logged — [evidence](OTW-BLACKBOX-PROBE.md) |
 | Tux | Intermediate | 0+ | ⏳ L0 parked — rate-limited box, `pfwd=/bin/cat` tunnel-only; re-check when the rate limit lifts |

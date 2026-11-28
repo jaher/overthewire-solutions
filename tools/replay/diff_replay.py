@@ -141,9 +141,9 @@ def main():
             # ssh login steps are performed by ptyrun2 itself (typed by the
             # driver, not echoed as a JSON-typed line) - match on the password
             # prompt instead
-            m = re.search(r"(\S+)@(\S+)\.labs", cmd)
+            m = re.search(r"(\S+)@(\S+)", cmd)
             if cmd.startswith('ssh ') and m:
-                pwline = f"{m.group(1)}@{m.group(2)}.labs.overthewire.org's password:"
+                pwline = f"{m.group(1)}@{m.group(2)}'s password:"
                 for i in range(cur, len(lines)):
                     if pwline in lines[i]:
                         found = i - 1  # the typed ssh line sits one above

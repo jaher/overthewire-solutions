@@ -12,15 +12,50 @@
    "pw": "level1",
    "steps": [
     {
-     "cmd": "ssh -p 2222 level1@blowfish.smashthestack.org",
+     "cmd": "ssh level1@blowfish.smashthestack.org -p 2222",
      "out": [
-      "level1@blowfish:~$ "
+      "     Use /code plz for umm, code ;D",
+      "     IF YOU LEAVE FILES IN /levels/tmp U SUCK ..plz remove them kthnx! ;D",
+      "     The password for the last level will get you into",
+      "     Tux, the more advanced wargame. Join #blowfish on ",
+      "     irc.smashthestack.org with any questions. ",
+      "     Admin - s0ttle@smashthestack.org",
+      "cat: README: No such file or directory",
+      "-bash: /bin/brew: No such file or directory"
+     ]
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "uid=1001(level1) gid=1001(level1) groups=1001(level1)"
      ]
     },
     {
      "cmd": "cat /pass/level1",
      "out": [
       "level1"
+     ]
+    },
+    {
+     "cmd": "cat ~/README 2>/dev/null | head -4",
+     "out": []
+    },
+    {
+     "cmd": "ls -la /levels/level1 2>/dev/null",
+     "out": []
+    },
+    {
+     "cmd": "/levels/level1 2>&1 | head -3",
+     "out": [
+      "-bash: /levels/level1: No such file or directory"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "user@localhost$ exit",
+      "exit"
      ]
     }
    ],

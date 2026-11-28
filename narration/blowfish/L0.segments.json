@@ -1,0 +1,84 @@
+{
+ "segments": [
+  {
+   "text": "Blowfish, level zero.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "This is the entry level: log in as level1 with the standard wargame password level1, confirm the identity, and read the pass file for the next level's credentials.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as level1. The motd lays out the house rules: no rooting, no network access, no personal files in tmp, and the final password opens the Tux wargame.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "id confirms uid one thousand one, level1.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The pass file reads level1 - the entry account's own password; the real chain starts at the telnet rot-thirteen service on port six thousand six hundred sixty-six, which is level one's cast.",
+   "lines": [
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "There is no README and no level1 binary in levels - the entry level has no challenge of its own.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The entry level is done; the next password comes from level one's telnet decode.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": 6,
+     "role": "cmd"
+    }
+   ]
+  }
+ ]
+}
