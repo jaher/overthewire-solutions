@@ -293,6 +293,15 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   stale file in the sticky /tmp). Clean the lab workdir (a one-shot
   ptyrun2 rm pass) before every replay launch, and make the first JSON
   step idempotent (rm -f) where the cast shows it.
+  (n) A mid-cast re-login (@sshtyped/@login2) right after `exit` races the
+  connection teardown: the @line idle-drain can end BEFORE 'logout'/
+  'Connection closed' arrive, so the typed ssh line lands in the DYING
+  ssh's raw-mode tty, which eats it silently (no echo in the cast), the
+  password-prompt deadline expires, and the password is typed at the client
+  prompt ('bash: <pw>: command not found'). Fixed at the driver level:
+  both handlers drain (idle=0.8, maxwait=10) before typing (vortex L9
+  replay run 1). Symptom signature: the ssh line missing from the cast
+  entirely + a ~30s silent gap + the password at the client prompt.
 
 ## Standing rule — never stop until all levels are solved (user 2026-11-27)
 - The mission is ALL levels, ALL games, solved and shipped. A parked line, a
