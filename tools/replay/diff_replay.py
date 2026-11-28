@@ -121,6 +121,15 @@ def main():
                     if lines[i].rstrip().endswith(first):
                         found = i
                         break
+            if found < 0:
+                # 80-col wrap artifact: a command ending in a quote can pick up
+                # a trailing space+quote when the terminal reassembles the wrap
+                # (vortex L12 step 6: "...,/^$/p' '" on screen) - accept the
+                # prompt-prefixed line that CONTAINS the command
+                for i in range(cur, len(lines)):
+                    if first in lines[i] and '$ ' in lines[i]:
+                        found = i
+                        break
         if found < 0 and re.match(r'^(?:vi|vim)\s', cmd):
             # one vi session = one contiguous run in the replay; later staged
             # steps of the same file share the first session's anchor

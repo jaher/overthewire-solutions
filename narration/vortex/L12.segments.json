@@ -1,0 +1,252 @@
+{
+ "segments": [
+  {
+   "text": "Vortex, level twelve.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The goal is the vortex13 password, from /vortex/vortex12: a setuid vortex13 binary that overflows a ten-thirty-two-byte stack buffer with our argument, then runs a ROP chain. The binary has no execve import, so the solve is a single four-byte GOT write: printf's GOT slot becomes system's libc address, and the parked loop that calls printf once a second calls system with its own percent-d format string as the command. An executable named percent-d on PATH delivers the leak.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "The transport matters: the privilege drop races the loop, and the race wins over a non-terminal exec channel and loses in a terminal, so the run fires over dash capital T.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "goal"
+    }
+   ]
+  },
+  {
+   "text": "I log in as vortex12.",
+   "lines": [
+    {
+     "step": 0,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I make a working directory and check the gate: the binary is setuid vortex13, the password file is mode four hundred, vortex13 only.",
+   "lines": [
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "md5 identifies the build, readelf shows the stack non-executable and partial RELRO, so no shellcode and no GOT hardening: a data write is the way.",
+   "lines": [
+    {
+     "step": 3,
+     "role": "cmd"
+    },
+    {
+     "step": 4,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "objdump shows main: pthread_create first, then getuid, getgid, and fix_perms, which drops the caller with two raw syscalls, then unsafecode with the overflow. Safecode is the parked loop: printf, fflush, sleep. Unsafecode holds the ten-thirty-two-byte buffer and the strcpy.",
+   "lines": [
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The GOT shows printf, fflush, sleep, and strcpy, all writable.",
+   "lines": [
+    {
+     "step": 8,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the payload builder: the chain is fixed addresses only, env-independent.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "Libc base f seven d six d zero zero zero was leaked live earlier by the parking-loop trick, so system sits at base plus five three c e zero, and the write-what-where gadget mov eax-pointer-ecx at base plus three c a e e.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The chain: ten thirty-two filler bytes into unsafecode's buffer, a readable saved ebp, popal-cld-ret to load the registers, six readable filler dwords for edi through edx, ecx holds system, eax holds printf's GOT slot, the gadget writes it, and the return parks main in safecode's loop head.",
+   "lines": [
+    {
+     "step": 10,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The file is thirty-one lines, fourteen sixty-six bytes.",
+   "lines": [
+    {
+     "step": 11,
+     "role": "vim"
+    },
+    {
+     "step": 12,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I run the builder: sy dot bin, ten eighty bytes.",
+   "lines": [
+    {
+     "step": 14,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the delivery driver: it reads the payload file raw and execs the level with it as the argument, because a shell argument would mangle the binary bytes.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "vim"
+    },
+    {
+     "step": 17,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I compile it thirty-two-bit.",
+   "lines": [
+    {
+     "step": 16,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I open vim and write the percent-d script: it copies the vortex13 password file into leak thirteen dot txt and chmods it readable. This file's name is the command the patched loop executes.",
+   "lines": [
+    {
+     "step": 17,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "I make it executable and list it: seventy-six bytes, executable.",
+   "lines": [
+    {
+     "step": 20,
+     "role": "vim"
+    },
+    {
+     "step": 21,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The run fires over dash capital T: the pty timing breaks the process-wide setresuid race, and the exec channel wins it. Attempt one: the level times out at sixty seconds, but the leak file landed, owned vortex13, ten bytes, and the cat prints the password, six i y capital A capital R lowercase s three lowercase c capital Y. The password dropped.",
+   "lines": [
+    {
+     "step": 22,
+     "role": "cmd"
+    },
+    {
+     "step": 23,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "Then I log in as vortex13 with that password.",
+   "lines": [
+    {
+     "step": 26,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "id confirms uid five thousand thirteen, vortex13.",
+   "lines": [
+    {
+     "step": 27,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "And the password file reads back the same password.",
+   "lines": [
+    {
+     "step": 28,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The listing shows the next binary, setuid vortex14.",
+   "lines": [
+    {
+     "step": 29,
+     "role": "cmd"
+    }
+   ]
+  },
+  {
+   "text": "The level is solved.",
+   "lines": [
+    {
+     "step": -1,
+     "role": "pw"
+    }
+   ]
+  },
+  {
+   "text": "I log out.",
+   "lines": [
+    {
+     "step": 30,
+     "role": "cmd"
+    }
+   ]
+  }
+ ]
+}
