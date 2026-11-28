@@ -455,3 +455,21 @@ Games registered in games/manifest.json + games/{tux,logic,blackbox,blowfish,ama
   no public manpage5 writeup exists on any reachable engine. Blocker = modern
   kernel 7.0.0-1014-aws + glibc 2.43 startup leaves nothing winnable at the
   i-slots. Re-check trigger: lab image change or a found writeup.
+
+## Vortex L4/L5 login-password divergence (2026-11-28, live-verified)
+- vortex1/2/3 ssh logins work with the chain password (L0->vortex1 Gq#qu3bF3,
+  L1->vortex2 qjUFVcpKl, L2->vortex3 xRMRVus8g - all verified live 2026-11-28).
+- vortex4 ssh REJECTS TlI5kxGd1 (= /etc/vortex_pass/vortex4 content, printed
+  live by the L3 exploit TODAY) on every attempt across 60+ minutes including
+  a 10-min quiet probe. vortex5 ssh REJECTS uwaRhgNq1 (= L4's cast output) on
+  its FIRST-ever attempt from this IP - a first-attempt denial is not a
+  throttle, so the ssh password is simply different from the pass file.
+- Conclusion: the lab's ssh passwords for levels >= 4 have diverged from the
+  /etc/vortex_pass files (or were rotated); the files themselves still carry
+  the Oct 25 13:40 values. No readable path to the current ssh passwords from
+  inside (shadow unreadable, /home/vortex4 empty + world-readable, no cron/
+  mail exposure found).
+- OPERATOR ITEM: need current vortex4+ ssh passwords (or a lab-side check of
+  /etc/shadow). Until then vortex L4+ Rule-4b replays (and any re-records) are
+  parked on this credential gap; the L4 JSON/cast fixes are committed and
+  audit-clean.
