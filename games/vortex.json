@@ -2513,11 +2513,21 @@
    "steps": [
     {
      "cmd": "ssh vortex7@vortex.labs.overthewire.org -p 2228",
-     "out": []
+     "out": [
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!"
+     ]
     },
     {
      "cmd": "d=/tmp/l7rec-$RANDOM; mkdir $d && cd $d && echo WORKDIR=$d",
      "out": [
+      "",
       "WORKDIR=/tmp/l7rec-10314"
      ]
     },
@@ -2851,7 +2861,9 @@
       " 55         print('crc7(full):', hex(crc7(full)), 'target: 0xe1ca95ee')",
       " 56",
       "crcpatch.py [+]                                                                   56,1           All",
-      "                                                                                         ^["
+      "                                                                                         ^[",
+      ":wq",
+      "\"crcpatch.py\" [New] 56L, 1446B written"
      ]
     },
     {
@@ -3094,7 +3106,9 @@
       " 33 open(out, \"wb\").write(full)",
       " 34",
       "ex7.py [+]                                                                        34,1           All",
-      "                                                                                         ^["
+      "                                                                                         ^[",
+      ":wq",
+      "\"ex7.py\" [New] 34L, 898B written"
      ]
     },
     {
@@ -3244,7 +3258,9 @@
       "~",
       "~",
       "drv.c [+]                                                                         6,1            All",
-      "                                                                                         ^["
+      "                                                                                         ^[",
+      ":wq",
+      "\"drv.c\" [New] 6L, 244B written"
      ]
     },
     {
@@ -3275,12 +3291,23 @@
     {
      "cmd": "exit",
      "out": [
-      "logout"
+      "",
+      "logout",
+      "Connection to vortex.labs.overthewire.org closed."
      ]
     },
     {
      "cmd": "ssh vortex8@vortex.labs.overthewire.org -p 2228",
-     "out": []
+     "out": [
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!"
+     ]
     },
     {
      "cmd": "id",
@@ -3297,7 +3324,9 @@
     {
      "cmd": "exit",
      "out": [
-      "logout"
+      "logout",
+      "user@localhost$ exit",
+      "exit"
      ]
     }
    ]

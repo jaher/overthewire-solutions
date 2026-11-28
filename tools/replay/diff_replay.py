@@ -212,6 +212,13 @@ def main():
                 if hit_sm:
                     pos = hit_sm[0] + 1
                     continue
+            # $RANDOM-derived workdir names (vortex L7: WORKDIR=/tmp/l7rec-NNNN)
+            if re.match(r'^WORKDIR=/tmp/\w+-\d+$', en):
+                hit_wd = [k for k in range(pos, len(seg_n))
+                          if re.match(r'^WORKDIR=/tmp/\w+-\d+$', seg_n[k])]
+                if hit_wd:
+                    pos = hit_wd[0] + 1
+                    continue
             hit = False
             for k in range(pos, len(seg_n)):
                 if seg_n[k] == en:
