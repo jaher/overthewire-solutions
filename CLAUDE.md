@@ -350,7 +350,14 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   marker shows the no-trailing-blank shape (compare the marker's L count
   against len(buffer)+1; equal = needs @nofinalnl). Beware the sed insertion
   indentation: the directive must start at column 0 or it is typed as buffer
-  text (the 11L/327C run).
+  text (the 11L/327C run). Related stall: a vim session that opens a STALE
+  lab file left by a killed replay (partial/corrupted buffer on the box) can
+  hang vim9 mid-typing for the rest of the session (blowfish L13 probes:
+  editing the leftover /dev/shm/p13.py froze vim at ~27s every time while
+  fresh files of the same size typed fine; the one-shot rm pass cleared it).
+  Clean the lab workdir before EVERY replay attempt, not just the first
+  (gotcha m's rule applies per-attempt, and the vim-freeze is its worst
+  symptom - a session that dies mid-typing leaves the poison behind).
 
 ## Standing rule — never stop until all levels are solved (user 2026-11-27)
 - The mission is ALL levels, ALL games, solved and shipped. A parked line, a
