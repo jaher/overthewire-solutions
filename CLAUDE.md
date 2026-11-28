@@ -320,6 +320,16 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   JSON-level waitfor: the exploit step's output token ('6iyARs3cY') in a
   @waitfor BEFORE any follow-up is typed, so nothing lands in the tty until
   the race has actually won.
+  (q) The transport can BE the exploit's win condition, not just a nuisance
+  (vortex L12: the process-wide setresuid race wins over ssh -T exec channels
+  and LOSES in a pty session - 7 pty runs x up to 40 attempts each all
+  failed, then the exact fireT.sh -T run dropped the password on attempt 1;
+  the leaked file's owner (vortex13:vortex12) fingerprints the between-
+  setresgid-and-setresuid window). When a recorded run needs a transport the
+  pty cannot provide, the honest cast shape is the original rec12.sh one:
+  asciinema rec wraps a script that runs the pty phase (ptyrun2), then the
+  -T phase (its real output appears as plain text in the recording), then
+  the verify session (ptyrun2) - all three phases in ONE cast file.
 
 ## Standing rule — never stop until all levels are solved (user 2026-11-27)
 - The mission is ALL levels, ALL games, solved and shipped. A parked line, a
