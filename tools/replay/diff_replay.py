@@ -70,11 +70,31 @@ def main():
                 cur = found + 1
             continue
         first = cmd.split('\n')[0].rstrip()
-        for i in range(cur, len(lines)):
-            # the replay echoes commands with a prompt prefix
-            if lines[i].rstrip().endswith(first):
-                found = i
-                break
+        # a trailing bare-'exit' step must anchor at the LAST echo (the remote
+        # shell's exit), not the first (the spawned shell's '$ exit' inside the
+        # previous step's output, maze L4)
+        last_exit = cmd.rstrip() == 'exit' and all(
+            not steps[k].get('out') or steps[k]['cmd'].startswith('ssh ')
+            for k in range(si + 1, len(steps)))
+        found = -1
+        if last_exit:
+            # anchor at the remote shell's exit echo: the line right above the
+            # 'logout' (or the last remote-prompt exit echo when no logout)
+            for i in range(len(lines) - 1, cur - 1, -1):
+                if lines[i].strip() == 'logout':
+                    found = i - 1
+                    break
+            if found < 0:
+                for i in range(len(lines) - 1, cur - 1, -1):
+                    if lines[i].rstrip().endswith(first):
+                        found = i
+                        break
+        else:
+            for i in range(cur, len(lines)):
+                # the replay echoes commands with a prompt prefix
+                if lines[i].rstrip().endswith(first):
+                    found = i
+                    break
         if found < 0 and re.match(r'^(?:vi|vim)\s', cmd):
             # one vi session = one contiguous run in the replay; later staged
             # steps of the same file share the first session's anchor

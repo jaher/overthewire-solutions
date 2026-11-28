@@ -9,6 +9,10 @@
     },
     {
      "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
      "role": "out",
      "from": 1,
      "to": 1
@@ -58,7 +62,7 @@
    ]
   },
   {
-   "text": "The builder goes in through vi. It packs an ELF header whose identification carries the bytes s-h, nul, dash-p, nul - the strings we need, hidden in the padding - sets e-phonoff to fifty-two so the gate's own seek lands on our program header, and packs one PT_LOAD with p-paddr zero. The twenty-six-byte stub is hand-assembled execve: push a null, push the address of dash-p, push the address of s-h, point e-c-x at that argv, point e-b-x at s-h, zero e-d-x for the null envp, eleven into a-l, and interrupt eight-zero. Python writes the hundred and twenty-three bytes, the assertion pins the size, and the build prints wrote one hundred and twenty-three bytes. xxd shows the file: the ELF magic, the s-h dash-p strings visible in row zero, and the code bytes starting at offset five-zero.",
+   "text": "The builder goes in through vim. It packs an ELF header whose identification carries the bytes s-h, nul, dash-p, nul - the strings we need, hidden in the padding - sets e-phonoff to fifty-two so the gate's own seek lands on our program header, and packs one PT_LOAD with p-paddr zero. The twenty-six-byte stub is hand-assembled execve: push a null, push the address of dash-p, push the address of s-h, point e-c-x at that argv, point e-b-x at s-h, zero e-d-x for the null envp, eleven into a-l, and interrupt eight-zero. Python writes the hundred and twenty-three bytes, the assertion pins the size, and the build prints wrote one hundred and twenty-three bytes. xxd shows the file: the ELF magic, the s-h dash-p strings visible in row zero, and the code bytes starting at offset five-zero.",
    "lines": [
     {
      "step": 7,
@@ -81,21 +85,25 @@
      "role": "cmd"
     },
     {
-     "step": 11,
+     "step": 12,
+     "role": "cmd"
+    },
+    {
+     "step": 12,
      "role": "out",
      "from": 1,
      "to": 1
     },
     {
-     "step": 12,
-     "role": "cmd"
-    },
-    {
      "step": 13,
      "role": "cmd"
     },
     {
-     "step": 13,
+     "step": 14,
+     "role": "cmd"
+    },
+    {
+     "step": 14,
      "role": "out",
      "from": 1,
      "to": 6
@@ -106,17 +114,17 @@
    "text": "The gate accepts it - valid file, executing - and hands us a dash running as maze5: i-d shows u-i-d fifteen thousand four but e-u-i-d fifteen thousand five - the setuid elevation, kept alive by dash minus-p. cat /etc/maze_pass/maze5 reads A-three-eight-four-six-Z-P-J-u-H. Maze four done.",
    "lines": [
     {
-     "step": 14,
+     "step": 15,
      "role": "cmd"
     },
     {
-     "step": 14,
+     "step": 15,
      "role": "out",
      "from": 1,
      "to": 6
     },
     {
-     "step": 15,
+     "step": 16,
      "role": "cmd"
     }
    ]

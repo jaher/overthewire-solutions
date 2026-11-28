@@ -31,9 +31,11 @@ def main():
         m = re.match(r'^(?:vi|vim)\s+(\S+)$', cmd)
         if m:
             fname = m.group(1)
+            editor = cmd.split()[0]
             # collect the whole vi run; the LAST staged step holds the full buffer
             j = i
             buf = []
+            rows = {}
             while j < len(steps) and steps[j]['cmd'] in (f'vi {fname}', f'vim {fname}'):
                 cand = steps[j]['out']
                 if isinstance(cand, list):
@@ -47,10 +49,30 @@ def main():
                     # opening quote, so the marker can start with '="' too
                     body = [l for l in cand if l != '~'
                             and not re.match(r'^.{0,2}"[^"]*"\s+(\[New\]\s+)?\d+L,\s*\d+[BC]', l)]
-                    if len(body) > len(buf):
-                        buf = body
+                    # staged screens (site convention, parseVimScreen): buffer
+                    # rows carry a right-aligned line number prefix; chrome rows
+                    # (status line, -- INSERT --, bare '  1' of an empty buffer)
+                    # don't map to buffer text. Strip the numbers, drop chrome.
+                    if body and re.match(r'^\s*\d+(?: |$)', body[0]):
+                        clean = []
+                        for l in body:
+                            nm = re.match(r'^\s*(\d+) (.*)$', l)
+                            if nm:
+                                clean.append(nm.group(2))
+                        body = clean
+                    # union the staged screens: each carries a window of the
+                    # buffer keyed by absolute line number; later screens
+                    # overwrite earlier rows (retyped lines) - the union at the
+                    # end of the run = the final buffer
+                    if body and re.match(r'^\s*\d+(?: |$)', steps[j]['out'][0] if steps[j]['out'] else ''):
+                        for l in steps[j]['out']:
+                            nm = re.match(r'^\s*(\d+) (.*)$', l)
+                            if nm:
+                                rows[int(nm.group(1))] = nm.group(2)
                 j += 1
-            out.append(f'@vi {fname}')
+            if rows:
+                buf = [rows[k] for k in sorted(rows)]
+            out.append(f'@{editor} {fname}')
             out.extend(buf)
             out.append('@viend')
             i = j

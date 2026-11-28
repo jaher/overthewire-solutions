@@ -14,12 +14,12 @@ Solutions to **every OverTheWire wargame** plus the **SmashTheStack** missions, 
 | Natas | Web security | 0–33 | ✅ Complete (34/34) — [solutions](natas-solutions.md) |
 | Leviathan | Linux/binary basics | 0–7 | ✅ Complete (8/8) — [solutions](leviathan-solutions.md) |
 | Krypton | Classical cryptography | 0–7 | ✅ Complete (8/8) — [solutions](krypton-solutions.md) |
-| Manpage | Linux privilege basics | 0–4 done, L5 in flight | ✅ L0–L4 complete (5/5), L5 parked (mechanism proven, natural trigger not yet found) — [solutions](manpage-solutions.md) |
-| Narnia | Buffer overflows & shellcode | 0–9 | ✅ Complete (10/10) — [solutions](narnia-solutions.md) |
+| Manpage | Linux privilege basics | 0–4 done, L5 in flight | ✅ L0–L4 complete (5/5), L5 **re-opened** (mechanism proven via stack-fill injection: the win fires when 0xdeadbeef sits in the loader-startup residue at an i-slot; hunting a natural trigger on the current kernel — see `tools/manpage/L5_PARK.md`) — [solutions](manpage-solutions.md) |
+| Narnia | Buffer overflows & shellcode | 0–9 | ✅ Complete (10/10); L9 cast pending re-record — [solutions](narnia-solutions.md) |
 | Behemoth | Exploitation vs. mitigations | 0–7 | ✅ Complete (8/8) — [solutions](behemoth-solutions.md) |
 | Utumno | Advanced exploitation / reversing | 0–7 | ✅ Complete (8/8) — [solutions](utumno-solutions.md) |
 | Maze | Exploitation & format strings | 0–8 | ✅ Complete (9/9) — [solutions](maze-solutions.md) |
-| Vortex | Classic exploitation | 0–13 | 🟡 L0–L12 complete (13/14); **L13 kernel-blocked** (lab kernel ≥5.18 fills the empty-argv hole → `argc==0` unreachable; 7 attempts, documented) — [solutions](vortex-solutions.md) |
+| Vortex | Classic exploitation | 0–13 | 🟡 L0–L12 complete (13/14); **L13 re-opened** (old verdict: lab kernel ≥5.18 fills the empty-argv hole → `argc==0` unreachable — re-deriving per the unreachable-is-a-hypothesis rule); L1/L2 casts pending re-record — [solutions](vortex-solutions.md) |
 | Drifter | New game, single level | 0 | ✅ L0 complete — cast in `recordings/drifter/` |
 | FormulaOne | Race-condition / file exploits | 0–3 | ✅ Complete (4/4) — cast in `recordings/formulaone/` |
 | Semtex | — | — | ⛔ Offline since 2022-08-16 (OTW-announced; live-verified) — skipped |
@@ -28,7 +28,7 @@ Solutions to **every OverTheWire wargame** plus the **SmashTheStack** missions, 
 
 | Game | Type | Levels | Status |
 |---|---|---|---|
-| Blowfish | Beginner, binary | 1–13 | 🟡 L1–L13 recorded & solved (13/14); **L3 documented-blocked** (level3 exec destroyed by a prior player, `~/.bash_history` confession) — `recordings/blowfish/` |
+| Blowfish | Beginner, binary | 0–13 | 🟡 L1–L13 recorded & solved (13/14); **L3 re-opened** (old verdict: level3 exec destroyed by a prior player — re-verifying on the live box); L0 entry-level cast pending — `recordings/blowfish/` |
 | Logic | Intermediate | 1–3 | ✅ L1–L3 solved (3/3); L4+ unreachable (19 recon rounds as level3, no path) |
 | Blackbox | Advanced | — | ⛔ **Blocked** — whole S2S host auth lockout (84.22.114.35 rejects every known-good credential incl. verified logic level3); operator/OTW-side, evidence in `OTW-BLACKBOX-PROBE.md` |
 | Tux | Intermediate | 0+ | ⏳ L0 parked — rate-limited box, `pfwd=/bin/cat` tunnel-only; re-check when the rate limit lifts |
