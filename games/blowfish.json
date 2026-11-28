@@ -91,25 +91,61 @@
   {
    "lvl": 2,
    "user": "level2",
-   "pw": "ThatWasEasy",
+   "pw": "n3xt_l3v3l!",
    "steps": [
-    {
-     "cmd": "telnet blowfish.smashthestack.org 6666",
-     "out": [
-      "Encrypted Password is: GungJnfRnfl"
-     ]
-    },
-    {
-     "cmd": "echo GungJnfRnfl | tr 'A-Za-z' 'N-ZA-Mn-za-m'",
-     "out": [
-      "ThatWasEasy"
-     ]
-    },
     {
      "cmd": "ssh -p 2222 level2@blowfish.smashthestack.org",
      "out": [
-      "(MOTD: READ READ READ)",
-      "level2@blowfish:~$ "
+      "level2@blowfish.smashthestack.org's password: ",
+      "",
+      "   _        __                          ___              __ ",
+      "",
+      " /\\ \\     /\\_ \\                       /'___\\ __         /\\ \\        ",
+      "",
+      " \\ \\ \\____\\//\\ \\     ___   __  __  __/\\ \\__//\\_\\    ____\\ \\ \\___    ",
+      "",
+      "  \\ \\ '__`\\ \\ \\ \\   / __`\\/\\ \\/\\ \\/\\ \\ \\  __\\/\\ \\  /' __\\\\ \\  _ `\\  ",
+      "",
+      "   \\ \\ \\_\\ \\ \\_\\ \\_/\\ \\_\\_\\ \\ \\_/ \\_/ \\ \\ \\_/\\ \\ \\/\\__  `\\\\ \\ \\ \\ \\ ",
+      "",
+      "    \\ \\____/ /\\____\\ \\____/\\ \\___x___/'\\ \\_\\  \\ \\_\\/\\____/ \\ \\_\\ \\_\\",
+      "",
+      "     \\/___/  \\/____/\\/___/  \\/__//__/   \\/_/   \\/_/\\/___/   \\/_/\\/_/",
+      "",
+      "     wargame ++ smashthestack.org ++ now in version 2.0",
+      "",
+      "   ",
+      "",
+      "     1. Thou shalt NOT root or otherwise harm the box.",
+      "",
+      "     2. Thou shalt NOT do any network access from this box.",
+      "",
+      "     3. Thou shalt NOT use /tmp, /levels/tmp or /var/tmp for personal code. ",
+      "",
+      "     4. Thou shalt give the root pass to l3thal if you manage to change it.",
+      "",
+      "     ",
+      "",
+      "     Passwords are in /pass.",
+      "",
+      "     There is a README in each users home directory.",
+      "",
+      "     /tmp && /var/tmp will be flushed daily by cron.",
+      "",
+      "     Use /code plz for umm, code ;D",
+      "",
+      "     IF YOU LEAVE FILES IN /levels/tmp U SUCK ..plz remove them kthnx! ;D",
+      "",
+      "     The password for the last level will get you into",
+      "",
+      "     Tux, the more advanced wargame. Join #blowfish on ",
+      "",
+      "     irc.smashthestack.org with any questions. ",
+      "",
+      "",
+      "",
+      "     Admin - s0ttle@smashthestack.org",
+      ""
      ]
     },
     {
@@ -128,9 +164,16 @@
      "cmd": "find / -perm -4000 -type f 2>/dev/null",
      "out": [
       "/bin/su",
+      "/levels/level9",
+      "/levels/level10",
       "/levels/level4",
+      "/levels/level12",
       "/levels/level5",
-      "...",
+      "/levels/level13",
+      "/levels/level11",
+      "/levels/level6",
+      "/levels/level7",
+      "/levels/level8",
       "/var/local/.      level4_backdoor"
      ]
     },
@@ -142,9 +185,7 @@
     },
     {
      "cmd": "'/var/local/.      level4_backdoor'",
-     "out": [
-      "sh-3.2$ "
-     ]
+     "out": []
     },
     {
      "cmd": "id",
@@ -159,7 +200,7 @@
      ]
     }
    ],
-   "note": "Entry: telnet 6666 -> ROT13. The level2 README's 'backdoor' is /var/local/.<spaces>level4_backdoor (setuid level4 /bin/sh wrapper). Running it gives euid level4 -> cat /pass/level4 -> level4 login. Level3 is skipped by design (the level3 backdoor copy in /var/opt lost its setuid bit server-side; /pass/level3 is level3-only readable). Verified live 2026-11-24."
+   "note": "Entry: telnet 6666 -> ROT13. The level2 README's 'backdoor' is /var/local/.<spaces>level4_backdoor (setuid level4 /bin/sh wrapper). Running it gives euid level4 -> cat /pass/level4 -> level4 login. Level3 is skipped by design (the level3 backdoor copy in /var/opt lost its setuid bit server-side; /pass/level3 is level3-only readable). Verified live 2026-11-24. | 2026-11-28 re-record: JSON outs rebuilt cast-verbatim (full MOTD in the ssh step); the two client-side telnet/ROT13 steps moved out - they are L1s cast (Rule 6: the replay mirrors the cast, no more)."
   },
   {
    "lvl": 3,
