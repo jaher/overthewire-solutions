@@ -239,6 +239,10 @@ BLACKBOX L2 SOLVED + L3 ATTACK STATE (2026-11-28, same pass):
   spawned shell via a fifo; the win output goes to /dev/shm/win.txt.
   Wrapper + sweep scripts staged on the box (/dev/shm/brute4, sweep2.sh).
 - SETBACK: the sweep verification ssh attempts (plus repeated checks) tripped
+  [BAN UPDATE 2026-11-28 ~07:00Z: the kex reset persisted 40+ min across 13
+  spaced retries (3-min gaps) - the ban is hours-long like the 2026-11-26
+  event; the on-box nohup sweep may still have completed and written
+  /dev/shm/win.txt - FIRST check that file on the next pass]. The original text:
   the host's connection-flood defense: kex_exchange_identification resets
   from 84.22.114.35 for our IP (attempt 5+ over 40 min all reset). The sweep
   MAY still be running on-box (nohup). RE-CHECK next pass: ssh back (from a
