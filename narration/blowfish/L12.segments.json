@@ -10,14 +10,6 @@
     {
      "step": 0,
      "role": "cmd"
-    },
-    {
-     "step": 1,
-     "role": "cmd"
-    },
-    {
-     "step": 2,
-     "role": "cmd"
     }
    ]
   },
@@ -25,14 +17,16 @@
    "text": "Two hard gates before anything else: the argument count must not exceed two, and the first environment pointer must be N U L L - the environment must be completely empty. Then strchr searches argv one for the byte zero b f, and rejects the whole run if it finds one. Every stack address on this box starts with zero b f, so the payload can never contain a stack address.",
    "lines": [
     {
-     "step": 3,
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
      "role": "cmd"
     },
     {
      "step": 3,
-     "role": "out",
-     "from": 0,
-     "to": 5
+     "role": "cmd"
     }
    ]
   },
@@ -40,18 +34,12 @@
    "text": "The overflow is in func: strncpy copies sixty-four bytes of argv one into a fifty-six-byte buffer, so the saved return address at offset sixty is fully ours. But where can we return? The stack is banned by the zero b f filter. Address randomization is off, so the libc base is fixed at zero b seven e nine d zero zero zero, and libc addresses like system at zero b seven e d four e b zero contain neither zero b f nor a NUL byte. system is the target - but its argument would be whatever garbage sits at the stack slot above ours.",
    "lines": [
     {
-     "step": 5,
-     "role": "cmd"
-    },
-    {
-     "step": 6,
+     "step": 4,
      "role": "cmd"
     },
     {
      "step": 5,
-     "role": "out",
-     "from": 0,
-     "to": 0
+     "role": "cmd"
     }
    ]
   },
@@ -59,20 +47,16 @@
    "text": "The elegant part: at the moment func returns, the stack pointer points at the slot holding the address of argv one itself - and that slot is exactly where system picks up its return address. So system runs the shell with a garbage command (the bytes at underscore start, which just error out), and when system returns, it returns INTO our argv one string, executing it as code. The payload is the fifty-five byte setuid shellcode first, padded to sixty bytes, then the system address.",
    "lines": [
     {
+     "step": 6,
+     "role": "vim"
+    },
+    {
      "step": 7,
-     "role": "cmd"
+     "role": "vim"
     },
     {
      "step": 8,
-     "role": "cmd"
-    },
-    {
-     "step": 9,
-     "role": "cmd"
-    },
-    {
-     "step": 10,
-     "role": "cmd"
+     "role": "vim"
     }
    ]
   },
@@ -80,14 +64,8 @@
    "text": "Running it: a shell appears - u i d equals one zero one three, level thirteen - and it reads the level thirteen password: zero n three underscore m zero r three.",
    "lines": [
     {
-     "step": 11,
+     "step": 10,
      "role": "cmd"
-    },
-    {
-     "step": 11,
-     "role": "out",
-     "from": 0,
-     "to": 1
     }
    ]
   },
@@ -95,10 +73,8 @@
    "text": "Verified live: logging in as level thirteen with zero n three underscore m zero r three succeeds. Level twelve solved.",
    "lines": [
     {
-     "step": 11,
-     "role": "out",
-     "from": 0,
-     "to": 0
+     "step": 10,
+     "role": "cmd"
     }
    ]
   }
