@@ -2112,11 +2112,22 @@
    "steps": [
     {
      "cmd": "ssh vortex6@vortex.labs.overthewire.org -p 2228",
-     "out": []
+     "out": [
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!"
+     ]
     },
     {
      "cmd": "mkdir -p /tmp/l6rec && cd /tmp/l6rec",
-     "out": []
+     "out": [
+      ""
+     ]
     },
     {
      "cmd": "nohup timeout 3 /vortex/vortex6 </dev/null >/tmp/l6rec/v6out 2>&1 & echo DETACHED",
@@ -2417,7 +2428,9 @@
       "~",
       "~",
       "ex.py [+]                                                                         12,1           All",
-      "                                                                                         ^["
+      "                                                                                         ^[",
+      ":wq",
+      "\"ex.py\" [New] 12L, 440B written"
      ]
     },
     {
@@ -2453,12 +2466,23 @@
     {
      "cmd": "exit",
      "out": [
-      "logout"
+      "",
+      "logout",
+      "Connection to vortex.labs.overthewire.org closed."
      ]
     },
     {
      "cmd": "ssh vortex7@vortex.labs.overthewire.org -p 2228",
-     "out": []
+     "out": [
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!"
+     ]
     },
     {
      "cmd": "id",
@@ -2475,7 +2499,9 @@
     {
      "cmd": "exit",
      "out": [
-      "logout"
+      "logout",
+      "user@localhost$ exit",
+      "exit"
      ]
     }
    ]
