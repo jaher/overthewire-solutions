@@ -10,7 +10,7 @@ Solutions to **every OverTheWire wargame** plus the **SmashTheStack** missions, 
 
 | Game | Type | Levels | Status |
 |---|---|---|---|
-| Bandit | Linux basics over SSH | 0–33 | ✅ Complete (34/34) — [solutions](bandit-solutions.md) |
+| Bandit | Linux basics over SSH | 0–33 | ✅ Complete (34/34) — L13 re-recorded 2026-11-28 (client-side key + key-auth ssh; the parked ptyrun2 @waitfor defect cleared) — [solutions](bandit-solutions.md) |
 | Natas | Web security | 0–33 | ✅ Complete (34/34) — [solutions](natas-solutions.md) |
 | Leviathan | Linux/binary basics | 0–7 | ✅ Complete (8/8) — [solutions](leviathan-solutions.md) |
 | Krypton | Classical cryptography | 0–7 | ✅ Complete (8/8) — [solutions](krypton-solutions.md) |

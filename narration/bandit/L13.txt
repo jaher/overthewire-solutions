@@ -1,1 +1,13 @@
-Bandit, level thirteen. The home directory holds no password file this time: it holds a private SSH key, the credential for bandit fourteen. I log in as bandit13 with ssh bandit13@bandit.labs.overthewire.org -p 2220. I list the directory: a HINT file, and sshkey dot private. I cat the key, and the whole private key prints, from BEGIN OPENSSH PRIVATE KEY to END. The note explains the catch: the lab blocks the localhost ssh hop, so use this key from the client to log in as bandit fourteen. That key is the credential for bandit fourteen, and the level is solved.
+Bandit, level thirteen.
+
+The home directory holds no password file this time: it holds a private SSH key, the credential for bandit fourteen.
+
+I log in as bandit13 with ssh bandit13@bandit.labs.overthewire.org -p 2220.
+
+I list the directory: a HINT file, and sshkey dot private.
+
+I cat the key, and the whole private key prints, from BEGIN OPENSSH PRIVATE KEY to END.
+
+The note explains the catch: the lab blocks the localhost ssh hop, so use this key from the client to log in as bandit fourteen.
+
+That key is the credential for bandit fourteen. The vim session writes it client-side, chmod 600 locks it down, and ssh -i authenticates as bandit fourteen straight from the client shell - the localhost hop is blocked, the full ssh hop is not. The bandit fourteen prompt lands, and cat /etc/bandit_pass/bandit14 reads aaWecNkG4FhxJQxz07uiwzVP6bJiYS65. Level thirteen solved.

@@ -6,6 +6,10 @@
     {
      "step": -1,
      "role": "goal"
+    },
+    {
+     "step": 0,
+     "role": "cmd"
     }
    ]
   },
@@ -13,8 +17,18 @@
    "text": "The home directory holds no password file this time: it holds a private SSH key, the credential for bandit fourteen.",
    "lines": [
     {
-     "step": -1,
-     "role": "goal"
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "cmd"
+    },
+    {
+     "step": 2,
+     "role": "out",
+     "from": 1,
+     "to": 1
     }
    ]
   },
@@ -24,6 +38,16 @@
     {
      "step": 0,
      "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "cmd"
+    },
+    {
+     "step": 1,
+     "role": "out",
+     "from": 1,
+     "to": 1
     }
    ]
   },
@@ -31,14 +55,14 @@
    "text": "I list the directory: a HINT file, and sshkey dot private.",
    "lines": [
     {
-     "step": 1,
+     "step": 2,
      "role": "cmd"
     },
     {
-     "step": 1,
+     "step": 2,
      "role": "out",
-     "from": 0,
-     "to": 2
+     "from": 1,
+     "to": 1
     }
    ]
   },
@@ -46,14 +70,14 @@
    "text": "I cat the key, and the whole private key prints, from BEGIN OPENSSH PRIVATE KEY to END.",
    "lines": [
     {
-     "step": 2,
+     "step": 3,
      "role": "cmd"
     },
     {
-     "step": 2,
+     "step": 3,
      "role": "out",
-     "from": 0,
-     "to": 37
+     "from": 1,
+     "to": 38
     }
    ]
   },
@@ -61,17 +85,57 @@
    "text": "The note explains the catch: the lab blocks the localhost ssh hop, so use this key from the client to log in as bandit fourteen.",
    "lines": [
     {
-     "step": 3,
-     "role": "note"
+     "step": 4,
+     "role": "cmd"
+    },
+    {
+     "step": 5,
+     "role": "cmd"
+    },
+    {
+     "step": 6,
+     "role": "cmd"
+    },
+    {
+     "step": 7,
+     "role": "cmd"
+    },
+    {
+     "step": 8,
+     "role": "cmd"
+    },
+    {
+     "step": 9,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "cmd"
+    },
+    {
+     "step": 10,
+     "role": "out",
+     "from": 1,
+     "to": 8
     }
    ]
   },
   {
-   "text": "That key is the credential for bandit fourteen, and the level is solved.",
+   "text": "That key is the credential for bandit fourteen. The vim session writes it client-side, chmod 600 locks it down, and ssh -i authenticates as bandit fourteen straight from the client shell - the localhost hop is blocked, the full ssh hop is not. The bandit fourteen prompt lands, and cat /etc/bandit_pass/bandit14 reads aaWecNkG4FhxJQxz07uiwzVP6bJiYS65. Level thirteen solved.",
    "lines": [
     {
-     "step": 3,
-     "role": "note"
+     "step": 11,
+     "role": "cmd"
+    },
+    {
+     "step": 11,
+     "role": "out",
+     "from": 1,
+     "to": 1
+    },
+    {
+     "step": 12,
+     "role": "cmd"
     },
     {
      "step": -1,

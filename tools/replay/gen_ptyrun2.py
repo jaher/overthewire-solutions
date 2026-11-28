@@ -77,7 +77,11 @@ def main():
             out.append('@viend')
             i = j
             continue
-        if cmd.startswith('ssh '):
+        # an 'ssh -i key ...' line is a typed command from the current
+        # shell (key auth), NOT a ptyrun2 login - only password-logins with a
+        # user@host but no -i are ptyrun2's own (bandit L13's client-side
+        # key-auth ssh must be typed, not re-login'd)
+        if cmd.startswith('ssh ') and ' -i ' not in cmd:
             if i == 0:
                 pass  # ptyrun2 performs the typed login itself
             else:
@@ -95,6 +99,12 @@ def main():
         # quit -> y). Each line is a real typed command - emit one @line per line.
         for cl in cmd.split('\n'):
             out.append(f'@line {cl}')
+        if cmd.startswith('ssh ') and ' -i ' in cmd:
+            # a typed key-auth ssh opens a NEW remote session: pause so the
+            # MOTD finishes before the next command is typed (typing during
+            # the banner echoes ahead into the client and the remote never
+            # sees it - bandit L13's replay)
+            out.append('@sleep 8')
         i += 1
     print('\n'.join(out))
 

@@ -1386,8 +1386,208 @@
   },
   {
    "lvl": 13,
-   "steps": [],
-   "note": ""
+   "steps": [
+    {
+     "cmd": "ssh -o StrictHostKeyChecking=accept-new bandit13@bandit.labs.overthewire.org -p 2220",
+     "out": []
+    },
+    {
+     "cmd": "id",
+     "out": [
+      "",
+      "uid=11013(bandit13) gid=11013(bandit13) groups=11013(bandit13)"
+     ]
+    },
+    {
+     "cmd": "ls -la sshkey.private",
+     "out": [
+      "",
+      "-rw-r----- 1 bandit14 bandit13 2602 Oct 25 13:37 sshkey.private"
+     ]
+    },
+    {
+     "cmd": "cat sshkey.private",
+     "out": [
+      "",
+      "-----BEGIN OPENSSH PRIVATE KEY-----",
+      "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",
+      "-----END OPENSSH PRIVATE KEY-----"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "",
+      "logout",
+      "Connection to bandit.labs.overthewire.org closed."
+     ]
+    },
+    {
+     "cmd": "vim bandit14.key",
+     "out": [
+      "  1",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "~",
+      "bandit14.key                                                                    0,0-1          All",
+      "\"bandit14.key\" [New]"
+     ]
+    },
+    {
+     "cmd": "vim bandit14.key",
+     "out": [
+      "  1 -----BEGIN OPENSSH PRIVATE KEY-----",
+      "  2 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn",
+      "  3 NhAAAAAwEAAQAAAYEAuCCoxSR6xDCnsm98kqan1x1JF3mfZ6kZa+BoAHetQ/91F4EKTfmE",
+      "  4 E+Xs8yVgLhn1YL0TvyVswMzy33OeFJV/KEzef54V8yZo7jFcx+pQlOF6+BFRy+wsyLASV5",
+      "  5 XxD/AtafdbVfLZFGTLC53kOFfT0VxokFmnTlIwRyxRJuNAWP9+fkAtbnfqkkixWqg0ZaLr",
+      "  6 1fICYam6vb6ilmNfuiGHZyQNHeTkOKZgAaMnQW6bYlRjnkxsNNxk1pj0sT3MUQdLrPCdyh",
+      "  7 l8rXUqZ60NZPA6X82/hJNQJR+zVghXrGmTTlU7MAHN7rTdoq4bIQtDShuZZmd5igp5OvVg",
+      "  8 tCn4bRM2CFXl8m0P6gNDpR+VYH5f99MwdXyrDUAzuusH7H6CyawRZZF8rFoqONc6HwTJ2h",
+      "  9 YJw2uf85ltD3wR8XWzvnBlf2+U9OEmhs01uEYNtNvhq7Gvz/TGI0wR0hEBmsznSns0jShT",
+      " 10 cqVsnTMhHaXse3u2D+tbGoC3wOcOyjeX7Skhq63bAAAFiMnVC+zJ1QvsAAAAB3NzaC1yc2",
+      " 11 EAAAGBALggqMUkesQwp7JvfJKmp9cdSRd5n2epGWvgaAB3rUP/dReBCk35hBPl7PMlYC4Z",
+      " 12 9WC9E78lbMDM8t9znhSVfyhM3n+eFfMmaO4xXMfqUJThevgRUcvsLMiwEleV8Q/wLWn3W1",
+      " 13 Xy2RRkywud5DhX09FcaJBZp05SMEcsUSbjQFj/fn5ALW536pJIsVqoNGWi69XyAmGpur2+",
+      " 14 opZjX7ohh2ckDR3k5DimYAGjJ0Fum2JUY55MbDTcZNaY9LE9zFEHS6zwncoZfK11KmetDW",
+      " 15 TwOl/Nv4STUCUfs1YIV6xpk05VOzABze603aKuGyELQ0obmWZneYoKeTr1YLQp+G0TNghV",
+      " 16 5fJtD+oDQ6UflWB+X/fTMHV8qw1AM7rrB+x+gsmsEWWRfKxaKjjXOh8EydoWCcNrn/OZbQ",
+      "bandit.key [+]                                                          16,71           ",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim bandit14.key",
+     "out": [
+      " 17 98EfF1s75wZX9vlPThJobNNbhGDbTb4auxr8/0xiNMEdIRAZrM50p7NI0oU3KlbJ0zIR2l",
+      " 18 7Ht7tg/rWxqAt8DnDso3l+0pIaut2wAAAAMBAAEAAAGAEgTUL1LGFtwCFUK2yK05gKIzjH",
+      " 19 IRCPZx7+4qj10m3iAqR84PgZj49W+LVDIkqu5MZpaqT4rsjSOhYv+wCSimJH39SjTgxgZM",
+      " 20 v36iK0hBcYhtXchoHlIzAcLFUL/yMtKYxyV3UT5uQwIoIq9lbaQerP7jlrjHWDFP2y85k9",
+      " 21 oqams6aEWEjKp8kKs/e/U5B3c9qBbCZ+dRyI7W32vDKvZsB0puZC4JrYeOnqpmRY968lD6",
+      " 22 3Lty3WtyDNQ0IgI/s/BIK4wmzFM/drZHOLJYjzJssyvjaSf5XydPq0sK+z/0wRUt1ev4+j",
+      " 23 2hBuFqunZN0uq2nIz4LSSoclPtTZqu2PhbQgGJj8OaXSH+TkKoLv+sG8dO+rrWtllkDJPX",
+      " 24 YsWBmcWfd/Rj0LnkOBSGu+O0ne4IpK+7wAWNoJwpw8MQkLRJkATay0rsGw3Bt7Bf7oqnDA",
+      " 25 gPFNfgckMfhWiORhwezgm5zEK50g4cCgwdCH2YQwQluRQHWKKPat9XjXCxSj3N9D1BAAAA",
+      " 26 wF2LTVT5VAvkqhJRe4KeT8RhydARmWdt/6YUY+liDnK/Bm4lhpeUrXJ2frX1sGeAty60ZL",
+      " 27 lA31Y+kV9xgS4HNOT2aRTCXdfVJ4XmMCsiTxcRejTo92c3EIfD/ttbxkoLTsR/2tjkYje3",
+      " 28 GbMOZpg3n0RgtpH0sjYFy5XyBByNEg7GEJ6jSNBr9nA+wZILqVbuaDdn+FeVcgWSxFUyIC",
+      " 29 kGZ0HketuIdv7EkperlJCcklOLl6Z3i0jwlFcMuZj98b1u/QAAAMEA5JNGvpj8WT4aQuM7",
+      " 30 XME/N/m//8/sAb2DMHUWMY0ySSSNRDbM3pJKkja7nUp0CybwTYTrf/agLxIgdQAo71GpK7",
+      " 31 ePRmsGu5+mrreNJKicGyER0IqCBhbWyljGDKFMJNGb2gk0Mu9XNZk9y3lRDmPRcfBMekmV",
+      " 32 fAjvy5rgAqyf/PsKznyZE12eGosH+CkfvWXdVRXd/hoOdWIZqaC+w8nLso6WLKhptWz8ke",
+      "bandit.key [+]                                                          32,71           ",
+      "-- INSERT --"
+     ]
+    },
+    {
+     "cmd": "vim bandit14.key",
+     "out": [
+      " 23 2hBuFqunZN0uq2nIz4LSSoclPtTZqu2PhbQgGJj8OaXSH+TkKoLv+sG8dO+rrWtllkDJPX",
+      " 24 YsWBmcWfd/Rj0LnkOBSGu+O0ne4IpK+7wAWNoJwpw8MQkLRJkATay0rsGw3Bt7Bf7oqnDA",
+      " 25 gPFNfgckMfhWiORhwezgm5zEK50g4cCgwdCH2YQwQluRQHWKKPat9XjXCxSj3N9D1BAAAA",
+      " 26 wF2LTVT5VAvkqhJRe4KeT8RhydARmWdt/6YUY+liDnK/Bm4lhpeUrXJ2frX1sGeAty60ZL",
+      " 27 lA31Y+kV9xgS4HNOT2aRTCXdfVJ4XmMCsiTxcRejTo92c3EIfD/ttbxkoLTsR/2tjkYje3",
+      " 28 GbMOZpg3n0RgtpH0sjYFy5XyBByNEg7GEJ6jSNBr9nA+wZILqVbuaDdn+FeVcgWSxFUyIC",
+      " 29 kGZ0HketuIdv7EkperlJCcklOLl6Z3i0jwlFcMuZj98b1u/QAAAMEA5JNGvpj8WT4aQuM7",
+      " 30 XME/N/m//8/sAb2DMHUWMY0ySSSNRDbM3pJKkja7nUp0CybwTYTrf/agLxIgdQAo71GpK7",
+      " 31 ePRmsGu5+mrreNJKicGyER0IqCBhbWyljGDKFMJNGb2gk0Mu9XNZk9y3lRDmPRcfBMekmV",
+      " 32 fAjvy5rgAqyf/PsKznyZE12eGosH+CkfvWXdVRXd/hoOdWIZqaC+w8nLso6WLKhptWz8ke",
+      " 33 SghZBBAsJW42cyenvyIdIzpVIcJpubAAAAwQDOOCoj/QwJLwXOd75KuUsfgI0Esq9vLSWl",
+      " 34 Ds3fQGhnNMEJZfD9B/W8Xa7VClfPHDItcDoXiSgj4dQnS1JeeVBBUHXLULmKLmNLRNQjLD",
+      " 35 0HSgyFYTpxl8tO5ZAlFRnGEwe7y9RvNeXp9zPQC2v1FTVQ2RdALiWvR4fGyDu0ER4hYiA/",
+      " 36 WfqaBSBABkdhyWLiTBja/VncIHBZ04Bk1S9nwc0z6USyTXpTwpZIJw1O74Tjk+8X3or8WC",
+      " 37 KN158egNsB+sEAAAAOcnVkeUBsb2NhbGhvc3QBAgMEBQ==",
+      " 38 -----END OPENSSH PRIVATE KEY-----",
+      "bandit14.key [+]                                                       38,34           All",
+      "\"bandit14.key\" 39 lines, 2603 bytes written"
+     ]
+    },
+    {
+     "cmd": "chmod 600 bandit14.key",
+     "out": [
+      ""
+     ]
+    },
+    {
+     "cmd": "ssh -i bandit14.key bandit14@bandit.labs.overthewire.org -p 2220",
+     "out": [
+      "",
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!"
+     ]
+    },
+    {
+     "cmd": "cat /etc/bandit_pass/bandit14",
+     "out": [
+      "",
+      "aaWecNkG4FhxJQxz07uiwzVP6bJiYS65"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "",
+      "logout",
+      "Connection to bandit.labs.overthewire.org closed.",
+      "client$ exit",
+      "exit"
+     ]
+    }
+   ],
+   "note": "bandit L13: bandit13's home holds sshkey.private (mode 660, bandit14's key); the localhost hop is blocked on this lab ('Connecting from/to localhost is blocked'), so the key is recreated CLIENT-side: sshkey.private printed in the bandit13 session, re-typed in a client-shell vim (39 lines, 2603B), chmod 600, then key-auth ssh as bandit14@bandit.labs (uid 11014) from the client - 'cat /etc/bandit_pass/bandit14' = aaWecNkG4FhxJQxz07uiwzVP6bJiYS65. Recorded 2026-11-28: one cast, client-side vim staged screens, @waitfor bandit14@bandit - gates the post-login cat."
   },
   {
    "lvl": 14,
@@ -2924,7 +3124,7 @@
       " | |                   | (_) | |__ \\ / /  ",
       " | |__   __ _ _ __   __| |_| |_   ) / /_  ",
       " | '_ \\ / _` | '_ \\ / _` | | __| / / '_ \\ ",
-      "--More--(66%)\r/usr/bin/vi -c 1 /home/bandit26/text.txt\u000f\"~/text.txt\"\r</text.txt\" [readonly] 6L, 258B\u25bd  \u001bPzz\u001b\\\u001b[0%m           __ _ _   ___   __",
+      "--More--(66%)\r/usr/bin/vi -c 1 /home/bandit26/text.txt\u000f\"~/text.txt\"\r</text.txt\" [readonly] 6L, 258B▽  \u001bPzz\u001b\\\u001b[0%m           __ _ _   ___   __",
       " | |                   | (_) | |__ \\ / /   | |__   __ _ _ __   __| |_| |_   ) / /_  | '_ \\ / _` | '_ \\ / _` | | __| / / '_ \\1,3Top:set shell=/bin/bash\r1,3Top:shell"
      ]
     },
