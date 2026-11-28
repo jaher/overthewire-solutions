@@ -310,6 +310,16 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   `export PATH="$PWD:$PATH"` before the exploit run. The Nov-16 -T transport
   worked only because that session's environment differed; never assume a
   command-exec primitive transfers between session types.
+  (p) A long-running exploit that LOOPs (vortex L12's parked system() loop)
+  defeats the @line idle-drain even at maxwait=300: the drain ends (maxwait)
+  or fires on a sub-second output gap, the follow-up commands type INTO the
+  running exploit's tty, and worse - if the loop's failing children fill the
+  pty output buffer while ptyrun2 has moved past its read loops, an orphaned
+  sh blocked on the full pty keeps the ssh session alive forever (deadlock:
+  the cast freezes mid-run and never reaches the re-login). The fix is a
+  JSON-level waitfor: the exploit step's output token ('6iyARs3cY') in a
+  @waitfor BEFORE any follow-up is typed, so nothing lands in the tty until
+  the race has actually won.
 
 ## Standing rule — never stop until all levels are solved (user 2026-11-27)
 - The mission is ALL levels, ALL games, solved and shipped. A parked line, a
