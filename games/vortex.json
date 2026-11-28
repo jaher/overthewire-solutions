@@ -4115,7 +4115,16 @@
    "steps": [
     {
      "cmd": "ssh vortex10@vortex.labs.overthewire.org -p 2228",
-     "out": []
+     "out": [
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!"
+     ]
     },
     {
      "cmd": "d=/tmp/l10rec-$RANDOM; mkdir $d && cd $d && echo WORKDIR=$d",
@@ -4469,7 +4478,9 @@
       " 27 }",
       " 28",
       "cracke.c [+]                                                                      28,1           All",
-      "                                                                                         ^["
+      "                                                                                         ^[",
+      ":wq",
+      "\"cracke.c\" [New] 28L, 892B written"
      ]
     },
     {
@@ -4691,7 +4702,9 @@
       " 28 print(\"response:\", out.decode('latin-1')[:200], flush=True)",
       " 29",
       "solve10.py [+]                                                                    29,1           All",
-      "                                                                                         ^["
+      "                                                                                         ^[",
+      ":wq",
+      "\"solve10.py\" [New] 29L, 1033B written"
      ]
     },
     {
@@ -4717,7 +4730,16 @@
     },
     {
      "cmd": "ssh vortex11@vortex.labs.overthewire.org -p 2228",
-     "out": []
+     "out": [
+      "--[ More information ]--",
+      "",
+      "  For more information regarding individual wargames, visit",
+      "  http://www.overthewire.org/wargames/",
+      "",
+      "  For support, questions or comments, contact us on discord or IRC.",
+      "",
+      "  Enjoy your stay!"
+     ]
     },
     {
      "cmd": "id",
@@ -4734,7 +4756,9 @@
     {
      "cmd": "exit",
      "out": [
-      "logout"
+      "logout",
+      "user@localhost$ exit",
+      "exit"
      ]
     }
    ]

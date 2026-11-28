@@ -237,6 +237,22 @@ def main():
                 if hit_sc:
                     pos = hit_sc[0] + 1
                     continue
+            # fresh rand() windows and their derived seed (vortex L10: the
+            # level prints 20 fresh rand values each run and the cracker's
+            # FOUND seed/skip are derived from them) - match the shape
+            if re.match(r'^\[ [0-9a-f]{8}(, [0-9a-f]{8})+,]$', en) or \
+               re.match(r'^array: [0-9a-f]{8}( [0-9a-f]{8})+ \.\.\.$', en):
+                rx = r'^(\[ [0-9a-f]{8}(, [0-9a-f]{8})+,]|array: [0-9a-f]{8}( [0-9a-f]{8})+ \.\.\.)$'
+                hit_r = [k for k in range(pos, len(seg_n)) if re.match(rx, seg_n[k])]
+                if hit_r:
+                    pos = hit_r[0] + 1
+                    continue
+            if re.match(r'^cracker: FOUND seed=-?\d+ skip=\d+$', en):
+                hit_f = [k for k in range(pos, len(seg_n))
+                         if re.match(r'^cracker: FOUND seed=-?\d+ skip=\d+$', seg_n[k])]
+                if hit_f:
+                    pos = hit_f[0] + 1
+                    continue
             hit = False
             for k in range(pos, len(seg_n)):
                 if seg_n[k] == en:
