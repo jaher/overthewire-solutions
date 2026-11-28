@@ -297,6 +297,30 @@ terminal screen, it does not belong in `out` — no matter how useful it is.
   dated, per-route evidence that the specific route is closed *today* —
   and even then it is re-probed on every queue pass.
 
+## Standing rule — parallel subagents for independent levels (user 2026-11-28)
+- If it is possible to solve two levels in parallel, do it: when the
+  current level is waiting on a long background task (sweep, replay,
+  rate-limit cooldown) and another level is INDEPENDENT — different game
+  and/or different lab host, no shared files — delegate it to a subagent
+  (Task tool) while the main turn keeps working its own level.
+- Discipline for parallel work:
+  - One level per agent, end-to-end: record -> JSON -> Rule-4b verbatim
+    replay -> audit -> commit. A subagent does not hand back a half-cast.
+  - **Never `git add -A` while another agent may be mid-work.** Stage only
+    this level's paths (`recordings/<game>/L<n>.*`, `games/<game>.json`,
+    `narration/<game>/L<n>.*`, plus the README/OTW-PROGRESS rows for this
+    level). Before committing, `git status`; if the index lock is busy,
+    wait and retry.
+  - Re-read `README.md` / `OTW-PROGRESS.md` from disk immediately before
+    editing them (never from cached context), so a parallel agent's row
+    update in the same file is not clobbered.
+  - Never run two live lab sessions on the SAME lab host in parallel
+    (rate-limit / auth lockout — already seen once with maze2). One live
+    pty per host, always.
+  - The parent verifies each subagent's commit against the normal gates
+    (Rule 4 post-solve verbatim replay, audit, README sync) on its next
+    turn before treating that level as done.
+
 ## Standing rule — keep README.md in sync with solved levels (user 2026-11-28)
 - Every level (or game) that is completed, or whose blocker state changes
   (solved, parked, re-opened, unblocked), updates the status row in
