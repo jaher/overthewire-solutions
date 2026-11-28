@@ -40,12 +40,7 @@
     {
      "step": 5,
      "role": "cmd"
-    }
-   ]
-  },
-  {
-   "text": "nm on the libc dynamic symbols pins the exact addresses of system, setuid, and strcpy.",
-   "lines": [
+    },
     {
      "step": 6,
      "role": "cmd"
@@ -53,7 +48,7 @@
    ]
   },
   {
-   "text": "I open vim and write the exploit: the payload overflows the return address into system with a command string that cats the pass file, chained with setuid so the shell keeps the rights it needs.",
+   "text": "nm on the libc dynamic symbols pins the exact addresses of system, setuid, and strcpy.",
    "lines": [
     {
      "step": 7,
@@ -62,10 +57,23 @@
    ]
   },
   {
-   "text": "The run returns into system, the command executes, and the pass file reads g zero zero d underscore j zero b's successor: w three l l underscore d zero n three exclamation.",
+   "text": "I open vim and write the exploit: the payload overflows the return address into system with a command string that cats the pass file, chained with setuid so the shell keeps the rights it needs.",
    "lines": [
     {
      "step": 8,
+     "role": "vim"
+    },
+    {
+     "step": 9,
+     "role": "vim"
+    }
+   ]
+  },
+  {
+   "text": "The run returns into system, the command executes, and the pass file reads g zero zero d underscore j zero b's successor: w three l l underscore d zero n three exclamation.",
+   "lines": [
+    {
+     "step": 12,
      "role": "cmd"
     }
    ]
