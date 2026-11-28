@@ -19,7 +19,7 @@ Solutions to **every OverTheWire wargame** plus the **SmashTheStack** missions, 
 | Behemoth | Exploitation vs. mitigations | 0–7 | ✅ Complete (8/8) — [solutions](behemoth-solutions.md) |
 | Utumno | Advanced exploitation / reversing | 0–7 | ✅ Complete (8/8) — [solutions](utumno-solutions.md) |
 | Maze | Exploitation & format strings | 0–8 | ✅ Complete (9/9) — [solutions](maze-solutions.md) |
-| Vortex | Classic exploitation | 0–13 | 🟡 L0–L12 complete (13/14); **L13 re-opened** (old verdict: lab kernel ≥5.18 fills the empty-argv hole → `argc==0` unreachable — re-deriving per the unreachable-is-a-hypothesis rule); L0/L1/L2 casts re-recorded (standard-v2, replay PASS); L3 verified + replay PASS; L4 JSON fixed (audit-clean, replay blocked on vortex4 ssh lockout — one-attempt re-probe next pass) — [solutions](vortex-solutions.md) |
+| Vortex | Classic exploitation | 0–13 | 🟡 L0–L12 complete (13/14); **L13 re-opened** (old verdict: lab kernel ≥5.18 fills the empty-argv hole → `argc==0` unreachable — re-deriving per the unreachable-is-a-hypothesis rule); L0/L1/L2 casts re-recorded (standard-v2, replay PASS); L3 verified + replay PASS; L4 JSON fixed (audit-clean) — **L4+ replays parked: lab ssh passwords for vortex4+ diverged from the pass files (live-verified, operator item)** — [solutions](vortex-solutions.md) |
 | Drifter | New game, single level | 0 | ✅ L0 complete — cast in `recordings/drifter/` |
 | FormulaOne | Race-condition / file exploits | 0–3 | ✅ Complete (4/4) — cast in `recordings/formulaone/` |
 | Semtex | — | — | ⛔ Offline since 2022-08-16 (OTW-announced; live-verified) — skipped |
